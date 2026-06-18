@@ -1,26 +1,5 @@
 {
   "version": 1,
-  "include": [
-    "/api/*",
-    "/_server-islands/*"
-  ],
-  "exclude": [
-    "/",
-    "/_astro/*",
-    "/favicon.svg",
-    "/manifest.json",
-    "/robots.txt",
-    "/sw.js",
-    "/data/*",
-    "/wasm/*",
-    "/404",
-    "/docs",
-    "/dossier",
-    "/etf",
-    "/guestbook",
-    "/offline",
-    "/projects",
-    "/uses",
-    "/world"
-  ]
+  "include": ["/api/*", "/_server-islands/*"],
+  "exclude": ["/", "/_astro/*", "/favicon.svg", "/manifest.json", "/robots.txt", "/sw.js", "/data/*", "/wasm/*", "/404", "/docs", "/dossier", "/etf", "/guestbook", "/offline", "/projects", "/uses", "/world"]
 }

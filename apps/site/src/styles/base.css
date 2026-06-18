@@ -303,14 +303,14 @@ ol {
 }
 
 /* Letterboxing on ultra-wide screens */
-@media (min-width: 1800px) {
+@media (min-width: 2200px) {
   body::before,
   body::after {
     content: "";
     position: fixed;
     top: 0;
     bottom: 0;
-    width: calc((100vw - 1400px) / 2);
+    width: calc((100vw - 1600px) / 2);
     background: #000;
     z-index: 9997;
   }
