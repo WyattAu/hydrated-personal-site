@@ -60,12 +60,12 @@ import '../styles/base.css';
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Market Treemap</p>
           <p class="text-sm mb-4" style="color: var(--text-secondary);">Sector allocation treemap with size representing market cap.</p>
-          <WasmEmbed widget="market_treemap" width={400} height={300} />
+          <WasmEmbed widget="treemap" width={400} height={300} />
         </div>
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">BTC Health</p>
           <p class="text-sm mb-4" style="color: var(--text-secondary);">Mempool fees, hashrate, and network health indicators.</p>
-          <WasmEmbed widget="btc_health_dashboard" width={400} height={300} />
+          <WasmEmbed widget="btc_health" width={400} height={300} />
         </div>
       </div>
     </section>

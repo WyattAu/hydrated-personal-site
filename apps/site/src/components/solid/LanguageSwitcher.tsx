@@ -1,4 +1,4 @@
-import { createSignal, onMount, For } from 'solid-js';
+import { Show, createSignal, onMount, For } from 'solid-js';
 import type { Lang } from '../../lib/i18n';
 
 const languages: { code: Lang; label: string; native: string }[] = [
@@ -26,7 +26,8 @@ export default function LanguageSwitcher() {
 
     const pathname = window.location.pathname;
     const stripped = pathname.replace(/^\/(en|zh|ja)(\/|$)/, '/');
-    const newPath = `/${lang}${stripped === '/' ? '/' : stripped}`;
+    const segments = stripped.split('/').filter(Boolean).map(encodeURIComponent);
+    const newPath = `/${lang}${segments.length > 0 ? '/' + segments.join('/') : '/'}`;
     window.location.href = newPath;
   }
 

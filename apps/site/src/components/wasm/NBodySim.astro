@@ -77,6 +77,7 @@ const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
         var bodies = defaultBodies();
 
         function draw() {
+          var h = height;
           ctx.fillStyle = '#0a0a0a';
           ctx.fillRect(0, 0, width, height);
 
@@ -101,7 +102,6 @@ const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
             }
           }
 
-          var h = height;
           function stepSim() {
             for (var i = 0; i < bodies.length; i++) {
               for (var j = 0; j < bodies.length; j++) {
@@ -128,7 +128,6 @@ const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
             }
           }
 
-          var h2 = height;
           if (isRunning) {
             stepSim();
           }

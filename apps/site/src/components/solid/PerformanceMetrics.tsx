@@ -147,6 +147,21 @@ export default function PerformanceMetrics(props: PerformanceMetricsProps) {
           />
         </div>
       </Show>
+
+      <div
+        class="mt-4 p-3 border"
+        style={{ 'border-color': 'var(--border)', background: 'var(--bg-secondary)' }}
+      >
+        <p
+          class="font-mono text-[10px] font-bold tracking-wider"
+          style={{ color: 'var(--accent-warm)' }}
+        >
+          SIMULATED DATA — Not financial advice
+        </p>
+        <p class="font-mono text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+          Performance metrics are randomly generated for demonstration purposes only.
+        </p>
+      </div>
     </div>
   );
 }

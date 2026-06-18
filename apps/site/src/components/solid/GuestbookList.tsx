@@ -17,7 +17,7 @@ export default function GuestbookList() {
       const res = await fetch('/api/guestbook');
       if (!res.ok) throw new Error('Failed to load');
       const data = await res.json();
-      setEntries(data);
+      setEntries(data.entries);
       setError(null);
     } catch {
       setError('Could not load guestbook entries.');

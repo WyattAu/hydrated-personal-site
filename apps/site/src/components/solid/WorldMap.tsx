@@ -37,6 +37,15 @@ const CAPITALS: { name: string; lat: number; lon: number; country: string }[] = 
   { name: 'Jakarta', lat: -6.2088, lon: 106.8456, country: 'ID' },
 ];
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const EQ_CACHE_KEY = 'earthquake_cache';
 const EQ_CACHE_TTL_MS = 10 * 60 * 1000;
 
@@ -104,9 +113,9 @@ export default function WorldMap() {
         .bindPopup(
           `<div class="font-mono text-xs">
             <div><strong>M${mag ?? '?'}</strong></div>
-            <div style="color:#888">${eq.properties.place ?? 'Unknown'}</div>
+            <div style="color:#888">${escapeHtml(eq.properties.place ?? 'Unknown')}</div>
             <div style="color:#888">${new Date(eq.properties.time).toLocaleString()}</div>
-            <a href="${eq.properties.url}" target="_blank" style="color:#00e5ff">USGS Details</a>
+            <a href="${escapeHtml(eq.properties.url ?? '')}" target="_blank" style="color:#00e5ff">USGS Details</a>
           </div>`,
         )
         .addTo(leafletMap);

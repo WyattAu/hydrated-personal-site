@@ -28,7 +28,14 @@ const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 // --- Structured Logger ---
 function log(level: string, message: string, meta: Record<string, unknown> = {}): void {
-  console.log(JSON.stringify({ ts: new Date().toISOString(), level, msg: message, ...meta }));
+  const entry = JSON.stringify({ ts: new Date().toISOString(), level, msg: message, ...meta });
+  if (level === 'error') {
+    console.error(entry);
+  } else if (level === 'warn') {
+    console.warn(entry);
+  } else {
+    console.log(entry);
+  }
 }
 
 // --- Security Headers ---
@@ -42,7 +49,7 @@ const securityHeaders: Record<string, string> = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   'Content-Security-Policy':
     "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.coingecko.com https://api.binance.com https://api.github.com https://api.alternative.me https://fcc-weather-api.glitch.me https://api.mempool.space https://blockchain.info https://news.ycombinator.com https://api.exchangerate-api.com https://www.jpl.nasa.gov https://data.giss.nasa.gov https://www.reddit.com https://query1.finance.yahoo.com; report-uri /api/csp-report;",
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://wyattau.com',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
@@ -908,7 +915,7 @@ export default {
       return new Response(null, {
         status: 204,
         headers: {
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': 'https://wyattau.com',
           'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization',
           'Access-Control-Max-Age': '86400',

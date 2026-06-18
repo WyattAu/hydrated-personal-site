@@ -1,4 +1,4 @@
-import { For, createEffect, onCleanup, onMount } from 'solid-js';
+import { For, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import type { EtfEntry } from '../../lib/types';
 
 interface EtfDetailProps {
@@ -129,11 +129,13 @@ export default function EtfDetail(props: EtfDetailProps) {
   let sectorCanvas: HTMLCanvasElement | undefined;
   let regionCanvas: HTMLCanvasElement | undefined;
 
-  const price = () => (Math.random() * 400 + 50).toFixed(2);
-  const change = () => ((Math.random() - 0.45) * 6).toFixed(2);
+  const [price, setPrice] = createSignal((Math.random() * 400 + 50).toFixed(2));
+  const [change, setChange] = createSignal(((Math.random() - 0.45) * 6).toFixed(2));
 
   createEffect(() => {
     props.etf;
+    setPrice((Math.random() * 400 + 50).toFixed(2));
+    setChange(((Math.random() - 0.45) * 6).toFixed(2));
     queueMicrotask(() => {
       if (sectorCanvas) drawBarChart(sectorCanvas, props.etf.sector_allocation);
       if (regionCanvas) drawDonutChart(regionCanvas, props.etf.region_allocation);

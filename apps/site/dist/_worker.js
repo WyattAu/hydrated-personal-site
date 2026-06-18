@@ -1,5 +1,5 @@
 var cache=new Map(),rl=new Map(),inf=new Map(),met={req:0,err:0};
-var sh={'Strict-Transport-Security':'max-age=31536000; includeSubDomains; preload','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'strict-origin-when-cross-origin','Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET, POST, DELETE, OPTIONS','Access-Control-Allow-Headers':'Content-Type, Authorization'};
+var sh={'Strict-Transport-Security':'max-age=31536000; includeSubDomains; preload','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'strict-origin-when-cross-origin','Access-Control-Allow-Origin':'https://wyattau.com','Access-Control-Allow-Methods':'GET, POST, DELETE, OPTIONS','Access-Control-Allow-Headers':'Content-Type, Authorization'};
 function J(d,s,e){return new Response(JSON.stringify(d),{status:s||200,headers:Object.assign({'Content-Type':'application/json'},sh,e||{})});}
 function E(m,s){return J({error:m},s||400);}
 function gc(k){var e=cache.get(k);return e?e.data:null;}
@@ -13,7 +13,7 @@ async function gbp(req,env,ip){if(!rlchk(ip,5,600000))return E('Rate limit excee
 function cached(key,fetcher,ttl){var c=gc(key);if(c)return Promise.resolve(c);return fetcher().then(function(d){if(d){sc(key,d,ttl);}return d||gc(key);});}
 export default{fetch:async function(request,env,ctx){
 var url=new URL(request.url),path=url.pathname;
-if(request.method==='OPTIONS'&&path.startsWith('/api/'))return new Response(null,{status:204,headers:{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET, POST, DELETE, OPTIONS','Access-Control-Allow-Headers':'Content-Type, Authorization','Access-Control-Max-Age':'86400'}});
+if(request.method==='OPTIONS'&&path.startsWith('/api/'))return new Response(null,{status:204,headers:{'Access-Control-Allow-Origin':'https://wyattau.com','Access-Control-Allow-Methods':'GET, POST, DELETE, OPTIONS','Access-Control-Allow-Headers':'Content-Type, Authorization','Access-Control-Max-Age':'86400'}});
 if(!path.startsWith('/api/'))return env.ASSETS.fetch(request);
 var ap=path.slice(5),st=Date.now(),r;
 try{

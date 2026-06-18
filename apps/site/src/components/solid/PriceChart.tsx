@@ -1,4 +1,4 @@
-import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 
 interface Kline {
   openTime: number;
