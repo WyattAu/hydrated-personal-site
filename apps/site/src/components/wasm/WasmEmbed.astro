@@ -49,7 +49,12 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
                     canvas.height = h;
                     el.innerHTML = '';
                     el.appendChild(canvas);
-                    createFn(canvas.id, w, h);
+                    // Wait for DOM to paint the canvas before WASM accesses it
+                    requestAnimationFrame(function() {
+                      requestAnimationFrame(function() {
+                        createFn(canvas.id, w, h);
+                      });
+                    });
                   } else {
                     throw new Error('Widget function create_' + widget + ' not found');
                   }

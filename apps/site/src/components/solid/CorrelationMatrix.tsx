@@ -1,4 +1,4 @@
-import { For, Show, createSignal, onCleanup, onMount } from 'solid-js';
+import { For, Show, createSignal, createEffect, onCleanup, onMount } from 'solid-js';
 import type { EtfEntry } from '../../lib/types';
 
 interface CorrelationMatrixProps {

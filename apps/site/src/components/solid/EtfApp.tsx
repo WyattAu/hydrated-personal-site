@@ -1,4 +1,4 @@
-import { For, Show, createSignal, onMount } from 'solid-js';
+import { For, Show, createSignal, createEffect, onMount } from 'solid-js';
 import { exportToCsv } from '../../lib/csv-export';
 import type { EtfEntry } from '../../lib/types';
 import CorrelationMatrix from './CorrelationMatrix';

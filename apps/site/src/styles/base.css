@@ -212,23 +212,25 @@ ol {
   }
 }
 
-/* Letterboxing on ultra-wide screens */
-@media (min-width: 2200px) {
+/* Letterboxing on ultra-wide screens - subtle edge darkening only */
+@media (min-width: 2600px) {
   body::before,
   body::after {
     content: "";
     position: fixed;
     top: 0;
     bottom: 0;
-    width: calc((100vw - 1600px) / 2);
-    background: #000;
+    width: calc((100vw - 1800px) / 2);
+    background: linear-gradient(to right, rgba(0,0,0,0.3), transparent);
     z-index: 9997;
+    pointer-events: none;
   }
   body::before {
     left: 0;
   }
   body::after {
     right: 0;
+    background: linear-gradient(to left, rgba(0,0,0,0.3), transparent);
   }
 }
 
