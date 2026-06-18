@@ -27,12 +27,20 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
 
 <script is:inline>
   (function () {
+    // Prevent duplicate initialization -- only run once per page
+    if (window.__wasmInit) return;
+    window.__wasmInit = true;
+
     function initWasmEmbeds() {
       var observer = new IntersectionObserver(
         function (entries) {
           entries.forEach(function (entry) {
             if (entry.isIntersecting) {
               var el = entry.target;
+              // Skip if already initialized
+              if (el.dataset.wasmReady) return;
+              el.dataset.wasmReady = '1';
+
               var widget = el.dataset.widget;
               var w = parseInt(el.dataset.width || '800', 10);
               var h = parseInt(el.dataset.height || '400', 10);
