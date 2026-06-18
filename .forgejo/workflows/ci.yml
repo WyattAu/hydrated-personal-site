@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
           version: latest
       - name: Install dependencies
@@ -31,8 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
           version: latest
       - name: Install dependencies
@@ -49,8 +49,8 @@ jobs:
     needs: [format, typecheck]
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
           version: latest
       - name: Install dependencies
@@ -61,7 +61,7 @@ jobs:
         run: bunx vitest run --reporter=junit --outputFile=reports/junit.xml
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
         with:
           name: test-results
           path: reports/
@@ -74,14 +74,14 @@ jobs:
     needs: [unit]
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: dtolnay/rust-toolchain@00901f5853516d291e59569dd1a3af3c60828eba
         with:
           targets: wasm32-unknown-unknown
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@9d401a67e2a3e761b73f17dd3f36ee6b0404091e
         with:
           workspaces: packages/widgets
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
           version: latest
       - name: Install wasm-pack
@@ -93,7 +93,7 @@ jobs:
       - name: Verify WASM output
         run: ls -la packages/widgets/pkg/*.wasm
       - name: Cache WASM artifacts
-        uses: actions/cache@v4
+        uses: actions/cache@6849a6489940f00c2f30c5fb15cdc015f340f7ac
         with:
           path: packages/widgets/pkg
           key: wasm-${{ hashFiles('packages/widgets/src/**') }}
@@ -104,8 +104,8 @@ jobs:
     needs: [unit]
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
           version: latest
       - name: Install dependencies
@@ -115,7 +115,7 @@ jobs:
       - name: Verify build output
         run: ls -la apps/site/dist/
       - name: Cache site build
-        uses: actions/cache@v4
+        uses: actions/cache@6849a6489940f00c2f30c5fb15cdc015f340f7ac
         with:
           path: apps/site/dist
           key: site-${{ hashFiles('apps/site/src/**') }}
@@ -127,8 +127,8 @@ jobs:
     needs: [wasm, site]
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
           version: latest
       - name: Install dependencies
@@ -139,7 +139,7 @@ jobs:
         run: bunx playwright test
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
         with:
           name: playwright-report
           path: playwright-report/
@@ -152,8 +152,8 @@ jobs:
     needs: [e2e]
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
           version: latest
       - name: Install dependencies
@@ -164,8 +164,35 @@ jobs:
         run: bunx lhci autorun --config=lighthouserc.json
       - name: Upload Lighthouse report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
         with:
           name: lighthouse-report
           path: lighthouse-reports/
           retention-days: 7
+
+  # Stage 6: Security Audits
+  npm-audit:
+    name: NPM/Bun Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
+        with:
+          version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Run npm audit
+        run: bunx npm audit --audit-level=high
+
+  cargo-audit:
+    name: Cargo Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: dtolnay/rust-toolchain@00901f5853516d291e59569dd1a3af3c60828eba
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+      - name: Run cargo audit
+        run: cargo audit

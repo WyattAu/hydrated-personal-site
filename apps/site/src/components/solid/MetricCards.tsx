@@ -1,4 +1,5 @@
 import { For, Show, createSignal, onCleanup, onMount } from 'solid-js';
+import { storeMetric, getMetricTrend } from '../../lib/metrics-history';
 
 // biome-ignore lint/correctness/noUnusedVariables: interface used for type documentation
 interface Metric {
@@ -23,6 +24,7 @@ function useCryptoPrice(symbol: string) {
       if (match) {
         setPrev(price());
         setPrice(Number.parseFloat(match.lastPrice));
+        storeMetric(symbol, Number.parseFloat(match.lastPrice));
       }
     } catch {}
   }
@@ -44,6 +46,7 @@ function useCryptoPrice(symbol: string) {
       if (p === null || pr === null || pr === 0) return null;
       return ((p - pr) / pr) * 100;
     },
+    trend: () => getMetricTrend(symbol),
   };
 }
 
@@ -61,6 +64,7 @@ function useSp500() {
         if (closes.length >= 2) {
           setPrice(closes[closes.length - 1]);
           setChange(((closes[closes.length - 1] - closes[0]) / closes[0]) * 100);
+          storeMetric('SP500', closes[closes.length - 1]);
         }
       }
     } catch {}
@@ -78,6 +82,7 @@ function useSp500() {
       return p !== null ? p.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '---';
     },
     change,
+    trend: () => getMetricTrend('SP500'),
   };
 }
 
@@ -90,8 +95,10 @@ function useFearGreed() {
       const res = await fetch('/api/fear-greed');
       const data = await res.json();
       if (data?.data?.[0]) {
-        setValue(Number.parseInt(data.data[0].value));
+        const v = Number.parseInt(data.data[0].value);
+        setValue(v);
         setLabel(data.data[0].value_classification);
+        storeMetric('fear-greed', v);
       }
     } catch {}
   }
@@ -109,6 +116,7 @@ function useFearGreed() {
     },
     displayLabel: label,
     change: () => null,
+    trend: () => getMetricTrend('fear-greed'),
   };
 }
 
@@ -121,7 +129,9 @@ function useKpIndex() {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         const latest = data[data.length - 1];
-        setKp(Number.parseFloat(latest.kp_index));
+        const v = Number.parseFloat(latest.kp_index);
+        setKp(v);
+        storeMetric('kp-index', v);
       }
     } catch {}
   }
@@ -138,6 +148,7 @@ function useKpIndex() {
       return k !== null ? k.toFixed(1) : '---';
     },
     change: () => null,
+    trend: () => getMetricTrend('kp-index'),
   };
 }
 
@@ -153,6 +164,7 @@ function useMempoolFees() {
           fastest: data.fees.fastestFee,
           mid: data.fees.halfHourFee,
         });
+        storeMetric('mempool', data.fees.fastestFee);
       }
     } catch {}
   }
@@ -169,6 +181,7 @@ function useMempoolFees() {
       return f !== null ? `${f.fastest} sat` : '---';
     },
     change: () => null,
+    trend: () => getMetricTrend('mempool'),
   };
 }
 
@@ -188,11 +201,33 @@ function SkeletonCard() {
   );
 }
 
+function TrendArrow(props: { trend: 'increasing' | 'decreasing' | 'stable' }) {
+  return (
+    <span
+      class="trend-arrow"
+      style={{
+        color:
+          props.trend === 'increasing'
+            ? '#69f0ae'
+            : props.trend === 'decreasing'
+              ? '#f44336'
+              : 'var(--text-secondary)',
+        'font-size': '11px',
+        'margin-left': '4px',
+        'vertical-align': 'middle',
+      }}
+    >
+      {props.trend === 'increasing' ? '\u25B2' : props.trend === 'decreasing' ? '\u25BC' : '\u25C0'}
+    </span>
+  );
+}
+
 function MetricCard(props: {
   label: string;
   value: string;
   change?: number | null;
   sublabel?: string;
+  trend?: 'increasing' | 'decreasing' | 'stable';
 }) {
   return (
     <div
@@ -206,6 +241,9 @@ function MetricCard(props: {
         style="color: var(--text-secondary); font-size: 9px; letter-spacing: 0.3em;"
       >
         {props.label.toUpperCase()}
+        <Show when={props.trend && props.trend !== 'stable'}>
+          <TrendArrow trend={props.trend!} />
+        </Show>
       </p>
       <p class="font-mono text-xl font-bold" style="color: var(--text-primary);">
         {props.value}
@@ -260,12 +298,22 @@ export default function MetricCards() {
           when={loaded()}
           fallback=<For each={[1, 2, 3, 4, 5, 6]}>{() => <SkeletonCard />}</For>
         >
-          <MetricCard label="BTC" value={btc.value()} change={btc.change()} />
-          <MetricCard label="ETH" value={eth.value()} change={eth.change()} />
-          <MetricCard label="S&P 500" value={sp.value()} change={sp.change()} />
-          <MetricCard label="Fear & Greed" value={fg.value()} sublabel={fg.displayLabel()} />
-          <MetricCard label="Kp Index" value={kp.value()} />
-          <MetricCard label="Mempool" value={mp.value()} sublabel="fastest fee" />
+          <MetricCard label="BTC" value={btc.value()} change={btc.change()} trend={btc.trend()} />
+          <MetricCard label="ETH" value={eth.value()} change={eth.change()} trend={eth.trend()} />
+          <MetricCard label="S&P 500" value={sp.value()} change={sp.change()} trend={sp.trend()} />
+          <MetricCard
+            label="Fear & Greed"
+            value={fg.value()}
+            sublabel={fg.displayLabel()}
+            trend={fg.trend()}
+          />
+          <MetricCard label="Kp Index" value={kp.value()} trend={kp.trend()} />
+          <MetricCard
+            label="Mempool"
+            value={mp.value()}
+            sublabel="fastest fee"
+            trend={mp.trend()}
+          />
         </Show>
       </div>
 

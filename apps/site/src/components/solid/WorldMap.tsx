@@ -37,6 +37,27 @@ const CAPITALS: { name: string; lat: number; lon: number; country: string }[] = 
   { name: 'Jakarta', lat: -6.2088, lon: 106.8456, country: 'ID' },
 ];
 
+const EQ_CACHE_KEY = 'earthquake_cache';
+const EQ_CACHE_TTL_MS = 10 * 60 * 1000;
+
+function loadCachedEarthquakes(): EarthquakeFeature[] {
+  try {
+    const raw = localStorage.getItem(EQ_CACHE_KEY);
+    if (!raw) return [];
+    const { features, timestamp } = JSON.parse(raw);
+    if (Date.now() - timestamp > EQ_CACHE_TTL_MS) return [];
+    return features;
+  } catch {
+    return [];
+  }
+}
+
+function storeCachedEarthquakes(features: EarthquakeFeature[]): void {
+  try {
+    localStorage.setItem(EQ_CACHE_KEY, JSON.stringify({ features, timestamp: Date.now() }));
+  } catch {}
+}
+
 export default function WorldMap() {
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
@@ -61,6 +82,36 @@ export default function WorldMap() {
   function getMagnitudeRadius(mag: number | null): number {
     if (mag === null) return 3;
     return Math.max(3, mag * 3);
+  }
+
+  function addEarthquakeMarkers(
+    leafletMap: any,
+    features: EarthquakeFeature[],
+    L: typeof import('leaflet'),
+  ) {
+    features.forEach((eq: EarthquakeFeature) => {
+      const [lon, lat] = eq.geometry.coordinates;
+      const mag = eq.properties.mag;
+      const color = getMagnitudeColor(mag);
+
+      const m = L.circleMarker([lat, lon], {
+        radius: getMagnitudeRadius(mag),
+        color,
+        fillColor: color,
+        fillOpacity: 0.5,
+        weight: 1,
+      })
+        .bindPopup(
+          `<div class="font-mono text-xs">
+            <div><strong>M${mag ?? '?'}</strong></div>
+            <div style="color:#888">${eq.properties.place ?? 'Unknown'}</div>
+            <div style="color:#888">${new Date(eq.properties.time).toLocaleString()}</div>
+            <a href="${eq.properties.url}" target="_blank" style="color:#00e5ff">USGS Details</a>
+          </div>`,
+        )
+        .addTo(leafletMap);
+      markers.push(m);
+    });
   }
 
   onMount(async () => {
@@ -119,34 +170,28 @@ export default function WorldMap() {
         markers.push(m);
       });
 
-      const res = await fetch('/api/earthquakes');
-      if (!res.ok) throw new Error('Failed to fetch earthquakes');
-      const data = await res.json();
+      // Load cached earthquakes immediately
+      const cached = loadCachedEarthquakes();
+      if (cached.length > 0) {
+        addEarthquakeMarkers(leafletMap, cached, L);
+        setLoading(false);
+      }
 
-      if (data.features) {
-        data.features.forEach((eq: EarthquakeFeature) => {
-          const [lon, lat] = eq.geometry.coordinates;
-          const mag = eq.properties.mag;
-          const color = getMagnitudeColor(mag);
+      // Fetch fresh data
+      try {
+        const res = await fetch('/api/earthquakes');
+        if (!res.ok) throw new Error('Failed to fetch earthquakes');
+        const data = await res.json();
 
-          const m = L.circleMarker([lat, lon], {
-            radius: getMagnitudeRadius(mag),
-            color,
-            fillColor: color,
-            fillOpacity: 0.5,
-            weight: 1,
-          })
-            .bindPopup(
-              `<div class="font-mono text-xs">
-                <div><strong>M${mag ?? '?'}</strong></div>
-                <div style="color:#888">${eq.properties.place ?? 'Unknown'}</div>
-                <div style="color:#888">${new Date(eq.properties.time).toLocaleString()}</div>
-                <a href="${eq.properties.url}" target="_blank" style="color:#00e5ff">USGS Details</a>
-              </div>`,
-            )
-            .addTo(leafletMap);
-          markers.push(m);
-        });
+        if (data.features) {
+          storeCachedEarthquakes(data.features);
+          // Clear old markers (capitals stay), add fresh earthquake markers
+          if (cached.length === 0) {
+            addEarthquakeMarkers(leafletMap, data.features, L);
+          }
+        }
+      } catch {
+        // Cache fallback already displayed
       }
 
       leafletMap.on('click', (e: { latlng: { lat: number; lng: number } }) => {

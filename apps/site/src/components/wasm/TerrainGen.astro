@@ -1,0 +1,289 @@
+---
+interface Props {
+  width?: number;
+  height?: number;
+  class?: string;
+  seed?: number;
+  octaves?: number;
+  persistence?: number;
+  scale?: number;
+}
+
+const {
+  width = 800,
+  height = 400,
+  class: className = '',
+  seed = 42,
+  octaves = 6,
+  persistence = 0.5,
+  scale = 100,
+} = Astro.props;
+
+const widgetId = `terrain-gen-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div
+  id={widgetId}
+  class={`wasm-embed terrain-gen ${className}`}
+  data-widget="terrain_generator"
+  data-width={width}
+  data-height={height}
+  data-seed={seed}
+  data-octaves={octaves}
+  data-persistence={persistence}
+  data-scale={scale}
+  style={`width: ${width}px; height: ${height}px;`}
+>
+  <div class="wasm-skeleton">
+    <div class="skeleton-pulse"></div>
+    <span class="skeleton-text">Loading Terrain Generator...</span>
+  </div>
+</div>
+
+<script is:inline define:vars={{ widgetId, width, height, seed, octaves, persistence, scale }}>
+(function () {
+  var el = document.getElementById(widgetId);
+  if (!el) return;
+
+  function initTerrain() {
+    var wasmPath = '/wasm/hydrated_widgets.js';
+    import(wasmPath)
+      .then(async function (mod) {
+        await mod.default();
+
+        var canvas = document.createElement('canvas');
+        canvas.id = el.id + '-canvas';
+        canvas.width = width;
+        canvas.height = height;
+        el.innerHTML = '';
+        el.appendChild(canvas);
+
+        var controls = document.createElement('div');
+        controls.className = 'terrain-controls';
+        controls.innerHTML =
+          '<button id="' + el.id + '-regen" class="terrain-btn">Regenerate</button>' +
+          '<label class="terrain-label">Seed: <input type="number" id="' + el.id + '-seed" value="' + seed + '" min="0" max="99999"></label>' +
+          '<label class="terrain-label">Octaves: <input type="range" id="' + el.id + '-oct" min="1" max="10" value="' + octaves + '"><span id="' + el.id + '-oct-val">' + octaves + '</span></label>' +
+          '<label class="terrain-label">Persistence: <input type="range" id="' + el.id + '-pers" min="0.1" max="0.9" step="0.05" value="' + persistence + '"><span id="' + el.id + '-pers-val">' + persistence + '</span></label>' +
+          '<label class="terrain-label">Scale: <input type="range" id="' + el.id + '-sc" min="20" max="300" value="' + scale + '"><span id="' + el.id + '-sc-val">' + scale + '</span></label>';
+        el.appendChild(controls);
+
+        var ctx = canvas.getContext('2d');
+        var currentSeed = seed;
+        var currentOctaves = octaves;
+        var currentPersistence = persistence;
+        var currentScale = scale;
+
+        function simplex2d(x, y, s) {
+          var n = Math.sin(x * 12.9898 + y * 78.233 + s * 43.12) * 43758.5453;
+          return n - Math.floor(n);
+        }
+
+        function noise2d(x, y, s) {
+          var value = 0;
+          var amp = 1;
+          var freq = 1;
+          var maxAmp = 0;
+          for (var o = 0; o < currentOctaves; o++) {
+            var sx = x * freq / currentScale;
+            var sy = y * freq / currentScale;
+            var n1 = simplex2d(Math.floor(sx), Math.floor(sy), s + o);
+            var n2 = simplex2d(Math.floor(sx) + 1, Math.floor(sy), s + o);
+            var n3 = simplex2d(Math.floor(sx), Math.floor(sy) + 1, s + o);
+            var n4 = simplex2d(Math.floor(sx) + 1, Math.floor(sy) + 1, s + o);
+            var fx = sx - Math.floor(sx);
+            var fy = sy - Math.floor(sy);
+            fx = fx * fx * (3 - 2 * fx);
+            fy = fy * fy * (3 - 2 * fy);
+            var top = n1 + (n2 - n1) * fx;
+            var bottom = n3 + (n4 - n3) * fx;
+            value += (top + (bottom - top) * fy) * amp;
+            maxAmp += amp;
+            amp *= currentPersistence;
+            freq *= 2;
+          }
+          return value / maxAmp;
+        }
+
+        function heightColor(h) {
+          if (h < 0.25) return [20, 60 + Math.floor(h * 300), 180];
+          if (h < 0.4) return [30 + Math.floor((h - 0.25) * 400), 140 + Math.floor((h - 0.25) * 200), 50];
+          if (h < 0.6) return [80 + Math.floor((h - 0.4) * 300), 160, 30];
+          if (h < 0.8) return [140, 120 - Math.floor((h - 0.6) * 200), 60];
+          return [180 + Math.floor((h - 0.8) * 200), 180 + Math.floor((h - 0.8) * 200), 190 + Math.floor((h - 0.8) * 200)];
+        }
+
+        function drawTerrain() {
+          var imgData = ctx.createImageData(width, height);
+          var data = imgData.data;
+          var cols = 80;
+          var rows = 40;
+          var cellW = width / cols;
+          var cellH = height / rows;
+          var heights = [];
+
+          for (var y = 0; y < rows; y++) {
+            heights[y] = [];
+            for (var x = 0; x < cols; x++) {
+              heights[y][x] = noise2d(x, y, currentSeed);
+            }
+          }
+
+          for (var py = 0; py < height; py++) {
+            for (var px = 0; px < width; px++) {
+              var gx = px / cellW;
+              var gy = py / cellH;
+              var ix = Math.floor(gx);
+              var iy = Math.floor(gy);
+              ix = Math.min(ix, cols - 1);
+              iy = Math.min(iy, rows - 1);
+              var h = heights[iy][ix];
+
+              var c = heightColor(h);
+              var idx = (py * width + px) * 4;
+              data[idx] = c[0];
+              data[idx + 1] = c[1];
+              data[idx + 2] = c[2];
+              data[idx + 3] = 255;
+            }
+          }
+          ctx.putImageData(imgData, 0, 0);
+
+          for (var row = 0; row < rows; row++) {
+            for (var col = 0; col < cols; col++) {
+              var h2 = heights[row][col];
+              var sx2 = col * cellW;
+              var sy2 = row * cellH;
+              if (h2 < 0.25) {
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+              } else if (h2 > 0.8) {
+                ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+              } else {
+                ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+              }
+              ctx.lineWidth = 0.5;
+              ctx.strokeRect(sx2, sy2, cellW, cellH);
+            }
+          }
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '12px monospace';
+          ctx.fillText('Procedural Terrain Generator', 10, 20);
+          ctx.fillText('Seed: ' + currentSeed + ' | Octaves: ' + currentOctaves + ' | Persistence: ' + currentPersistence, 10, 36);
+          ctx.fillText('Scale: ' + currentScale, 10, 52);
+
+          var legendY = height - 60;
+          ctx.fillStyle = '#333';
+          ctx.fillRect(width - 120, legendY, 110, 50);
+          ctx.fillStyle = '#fff';
+          ctx.font = '10px monospace';
+          ctx.fillText('Legend:', width - 110, legendY + 12);
+          var labels = ['Water', 'Sand', 'Grass', 'Rock', 'Snow'];
+          var lcolors = ['#3ca8b4', '#a0a032', '#50a050', '#8c783c', '#c8c8d0'];
+          for (var li = 0; li < labels.length; li++) {
+            ctx.fillStyle = lcolors[li];
+            ctx.fillRect(width - 110, legendY + 18 + li * 7, 8, 6);
+            ctx.fillStyle = '#aaa';
+            ctx.fillText(labels[li], width - 98, legendY + 24 + li * 7);
+          }
+        }
+
+        drawTerrain();
+
+        document.getElementById(el.id + '-regen').addEventListener('click', function () {
+          currentSeed = parseInt(document.getElementById(el.id + '-seed').value, 10) || 0;
+          drawTerrain();
+        });
+
+        document.getElementById(el.id + '-oct').addEventListener('input', function () {
+          currentOctaves = parseInt(this.value, 10);
+          document.getElementById(el.id + '-oct-val').textContent = this.value;
+          drawTerrain();
+        });
+
+        document.getElementById(el.id + '-pers').addEventListener('input', function () {
+          currentPersistence = parseFloat(this.value);
+          document.getElementById(el.id + '-pers-val').textContent = this.value;
+          drawTerrain();
+        });
+
+        document.getElementById(el.id + '-sc').addEventListener('input', function () {
+          currentScale = parseInt(this.value, 10);
+          document.getElementById(el.id + '-sc-val').textContent = this.value;
+          drawTerrain();
+        });
+      })
+      .catch(function (err) {
+        el.innerHTML =
+          '<div class="wasm-error">' +
+          '<p>Failed to load terrain generator.</p>' +
+          '<p class="wasm-error-detail">' + err.message + '</p>' +
+          '</div>';
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTerrain);
+  } else {
+    initTerrain();
+  }
+})();
+</script>
+
+<style>
+  .terrain-gen :global(.terrain-controls) {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: #111;
+    border-top: 1px solid #1a1a2e;
+    flex-wrap: wrap;
+  }
+
+  .terrain-gen :global(.terrain-btn) {
+    background: #1a1a2e;
+    color: #69f0ae;
+    border: 1px solid #69f0ae;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+
+  .terrain-gen :global(.terrain-btn:hover) {
+    background: #69f0ae;
+    color: #0a0a0a;
+  }
+
+  .terrain-gen :global(.terrain-label) {
+    color: #666;
+    font-size: 11px;
+    font-family: monospace;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .terrain-gen :global(.terrain-label input[type="range"]) {
+    width: 80px;
+    accent-color: #69f0ae;
+  }
+
+  .terrain-gen :global(.terrain-label input[type="number"]) {
+    width: 60px;
+    background: #1a1a2e;
+    color: #69f0ae;
+    border: 1px solid #333;
+    padding: 2px 4px;
+    font-family: monospace;
+    font-size: 11px;
+  }
+
+  .terrain-gen :global(.terrain-label span) {
+    color: #69f0ae;
+    min-width: 24px;
+  }
+</style>

@@ -1,15 +1,18 @@
 import { For, Show, createSignal, onMount } from 'solid-js';
+import { exportToCsv } from '../../lib/csv-export';
 import type { EtfEntry } from '../../lib/types';
 import CorrelationMatrix from './CorrelationMatrix';
 import EtfDetail from './EtfDetail';
 import PerformanceMetrics from './PerformanceMetrics';
 import PortfolioComparison from './PortfolioComparison';
+import PortfolioOptimizer from './PortfolioOptimizer';
 import SearchBar from './SearchBar';
 
 export default function EtfApp() {
   const [database, setDatabase] = createSignal<EtfEntry[]>([]);
   const [selectedEtf, setSelectedEtf] = createSignal<EtfEntry | null>(null);
   const [loading, setLoading] = createSignal(true);
+  const [selectedForOpt, setSelectedForOpt] = createSignal<EtfEntry[]>([]);
 
   onMount(async () => {
     try {
@@ -26,6 +29,34 @@ export default function EtfApp() {
     const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
     return v || '#00e5ff';
   };
+
+  function handleExportCsv() {
+    const data = database().map((etf) => ({
+      ticker: etf.ticker,
+      name: etf.name,
+      category: etf.category,
+      topSectors: Object.entries(etf.sector_allocation)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([k, v]) => `${k}: ${v}%`)
+        .join('; '),
+      topHoldings: etf.top_holdings
+        .slice(0, 3)
+        .map((h) => `${h.ticker} (${h.weight}%)`)
+        .join('; '),
+    }));
+    exportToCsv(data, 'etf-database');
+  }
+
+  function toggleOptSelected(etf: EtfEntry) {
+    const current = selectedForOpt();
+    const exists = current.find((e) => e.ticker === etf.ticker);
+    if (exists) {
+      setSelectedForOpt(current.filter((e) => e.ticker !== etf.ticker));
+    } else if (current.length < 6) {
+      setSelectedForOpt([...current, etf]);
+    }
+  }
 
   return (
     <div>
@@ -49,6 +80,48 @@ export default function EtfApp() {
         </Show>
       </div>
 
+      {/* Export + Optimize controls */}
+      <Show when={!loading()}>
+        <div class="flex flex-wrap gap-3 mb-6">
+          <button
+            type="button"
+            class="border px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors"
+            style={{
+              'border-color': 'var(--border)',
+              background: 'var(--bg-card)',
+              color: 'var(--accent)',
+            }}
+            onClick={handleExportCsv}
+          >
+            Export CSV
+          </button>
+          <Show when={selectedForOpt().length > 0}>
+            <span
+              class="border px-4 py-2 font-mono text-xs"
+              style={{
+                'border-color': 'var(--border)',
+                background: 'var(--bg-card)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              {selectedForOpt().length}/6 ETFs selected for optimization
+            </span>
+            <button
+              type="button"
+              class="border px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors"
+              style={{
+                'border-color': accentColor(),
+                background: 'var(--bg-card)',
+                color: accentColor(),
+              }}
+              onClick={() => setSelectedForOpt([])}
+            >
+              Clear
+            </button>
+          </Show>
+        </div>
+      </Show>
+
       {/* Selected ETF Detail */}
       <Show when={selectedEtf()}>
         <div class="mb-8">
@@ -58,6 +131,24 @@ export default function EtfApp() {
         {/* Performance Metrics */}
         <div class="mb-8">
           <PerformanceMetrics etf={selectedEtf()!} />
+        </div>
+
+        {/* Add to optimization button */}
+        <div class="mb-8">
+          <button
+            type="button"
+            class="border px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors"
+            style={{
+              'border-color': accentColor(),
+              background: 'var(--bg-card)',
+              color: accentColor(),
+            }}
+            onClick={() => toggleOptSelected(selectedEtf()!)}
+          >
+            {selectedForOpt().find((e) => e.ticker === selectedEtf()?.ticker)
+              ? 'Remove from Optimization'
+              : 'Add to Optimization'}
+          </button>
         </div>
       </Show>
 
@@ -100,6 +191,11 @@ export default function EtfApp() {
           </div>
         </div>
       </Show>
+
+      {/* Portfolio Optimizer */}
+      <div class="mb-8">
+        <PortfolioOptimizer selectedEtfs={selectedForOpt()} />
+      </div>
 
       {/* Portfolio Comparison */}
       <div class="mb-8">

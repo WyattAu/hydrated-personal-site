@@ -33,4 +33,13 @@ const timeline = defineCollection({
   }),
 });
 
-export const collections = { projects, expertise, timeline };
+const docs = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    order: z.number().default(0),
+  }),
+});
+
+export const collections = { projects, expertise, timeline, docs };

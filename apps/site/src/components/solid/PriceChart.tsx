@@ -244,43 +244,49 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
     onCleanup(() => observer.disconnect());
   });
 
+  let rafId: number | undefined;
+
   function handleMouseMove(e: MouseEvent) {
-    const canvas = canvasRef;
-    const data = klines();
-    if (!canvas || data.length === 0) return;
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = undefined;
+      const canvas = canvasRef;
+      const data = klines();
+      if (!canvas || data.length === 0) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const w = rect.width;
-    const padLeft = 70;
-    const padRight = 16;
-    const chartW = w - padLeft - padRight;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const w = rect.width;
+      const padLeft = 70;
+      const padRight = 16;
+      const chartW = w - padLeft - padRight;
 
-    const idx = Math.round(((x - padLeft) / chartW) * (data.length - 1));
-    if (idx < 0 || idx >= data.length) {
-      setCrosshair(null);
-      return;
-    }
+      const idx = Math.round(((x - padLeft) / chartW) * (data.length - 1));
+      if (idx < 0 || idx >= data.length) {
+        setCrosshair(null);
+        return;
+      }
 
-    const d = data[idx];
-    const padTop = 16;
-    const padBottom = 32;
-    const chartH = 320 - padTop - padBottom;
-    const prices = data.flatMap((dd) => [dd.high, dd.low]);
-    const minP = Math.min(...prices);
-    const maxP = Math.max(...prices);
-    const range = maxP - minP || 1;
-    const pPadding = range * 0.05;
-    const yMin = minP - pPadding;
-    const yMax = maxP + pPadding;
-    const yRange = yMax - yMin;
-    const price = yMin + (1 - (e.clientY - rect.top - padTop) / chartH) * yRange;
+      const d = data[idx];
+      const padTop = 16;
+      const padBottom = 32;
+      const chartH = 320 - padTop - padBottom;
+      const prices = data.flatMap((dd) => [dd.high, dd.low]);
+      const minP = Math.min(...prices);
+      const maxP = Math.max(...prices);
+      const range = maxP - minP || 1;
+      const pPadding = range * 0.05;
+      const yMin = minP - pPadding;
+      const yMax = maxP + pPadding;
+      const yRange = yMax - yMin;
+      const price = yMin + (1 - (e.clientY - rect.top - padTop) / chartH) * yRange;
 
-    setCrosshair({
-      price,
-      date: formatDate(d.openTime),
-      x: padLeft + (idx / (data.length - 1)) * chartW,
-      y: e.clientY - rect.top,
+      setCrosshair({
+        price,
+        date: formatDate(d.openTime),
+        x: padLeft + (idx / (data.length - 1)) * chartW,
+        y: e.clientY - rect.top,
+      });
     });
   }
 

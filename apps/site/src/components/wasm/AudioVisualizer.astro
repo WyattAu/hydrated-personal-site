@@ -1,0 +1,207 @@
+---
+interface Props {
+  width?: number;
+  height?: number;
+  class?: string;
+  fftSize?: number;
+}
+
+const { width = 800, height = 400, class: className = '', fftSize = 2048 } = Astro.props;
+
+const widgetId = `audio-viz-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div
+  id={widgetId}
+  class={`wasm-embed audio-visualizer ${className}`}
+  data-widget="audio_visualizer"
+  data-width={width}
+  data-height={height}
+  data-fft-size={fftSize}
+  style={`width: ${width}px; height: ${height}px;`}
+>
+  <div class="wasm-skeleton">
+    <div class="skeleton-pulse"></div>
+    <span class="skeleton-text">Loading Audio Visualizer...</span>
+  </div>
+</div>
+
+<script is:inline define:vars={{ widgetId, width, height, fftSize }}>
+(function () {
+  var el = document.getElementById(widgetId);
+  if (!el) return;
+
+  function initAudioVisualizer() {
+    var hasWebAudio = !!(window.AudioContext || window.webkitAudioContext);
+
+    if (!hasWebAudio) {
+      el.innerHTML =
+        '<div class="wasm-error">' +
+        '<p>Web Audio API not supported in this browser.</p>' +
+        '<p class="wasm-error-detail">Audio visualization requires Web Audio API support.</p>' +
+        '</div>';
+      return;
+    }
+
+    var wasmPath = '/wasm/hydrated_widgets.js';
+    import(wasmPath)
+      .then(async function (mod) {
+        await mod.default();
+
+        var canvas = document.createElement('canvas');
+        canvas.id = el.id + '-canvas';
+        canvas.width = width;
+        canvas.height = height;
+        el.innerHTML = '';
+        el.appendChild(canvas);
+
+        var controls = document.createElement('div');
+        controls.className = 'audio-controls';
+        controls.innerHTML =
+          '<button id="' + el.id + '-btn" class="audio-btn">Start Capture</button>' +
+          '<label class="audio-label">FFT Size: <select id="' + el.id + '-fft">' +
+          '<option value="256">256</option><option value="512">512</option>' +
+          '<option value="1024">1024</option><option value="2048" selected>2048</option>' +
+          '</select></label>';
+        el.appendChild(controls);
+
+        var audioCtx = null;
+        var analyser = null;
+        var source = null;
+        var animationId = null;
+        var isCapturing = false;
+        var viz = null;
+
+        var btn = document.getElementById(el.id + '-btn');
+        var fftSelect = document.getElementById(el.id + '-fft');
+
+        if (mod['create_audio_visualizer']) {
+          viz = mod['create_audio_visualizer'](canvas.id, width, height);
+        }
+
+        btn.addEventListener('click', async function () {
+          if (isCapturing) {
+            if (animationId) cancelAnimationFrame(animationId);
+            if (source) source.disconnect();
+            btn.textContent = 'Start Capture';
+            isCapturing = false;
+            return;
+          }
+
+          try {
+            var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = parseInt(fftSelect.value, 10);
+            source = audioCtx.createMediaStreamSource(stream);
+            source.connect(analyser);
+
+            var freqData = new Float32Array(analyser.frequencyBinCount);
+            var timeData = new Float32Array(analyser.fftSize);
+
+            btn.textContent = 'Stop Capture';
+            isCapturing = true;
+
+            function draw() {
+              if (!isCapturing) return;
+              analyser.getFloatFrequencyData(freqData);
+              analyser.getFloatTimeDomainData(timeData);
+
+              var ctx = canvas.getContext('2d');
+              ctx.fillStyle = '#0a0a0a';
+              ctx.fillRect(0, 0, width, height);
+
+              var barWidth = width / freqData.length;
+              var gradient = ctx.createLinearGradient(0, height, 0, 0);
+              gradient.addColorStop(0, '#00e5ff');
+              gradient.addColorStop(0.5, '#7c4dff');
+              gradient.addColorStop(1, '#ff4081');
+              ctx.fillStyle = gradient;
+
+              for (var i = 0; i < freqData.length; i++) {
+                var value = (freqData[i] + 140) / 140;
+                var barHeight = Math.max(0, value * height);
+                ctx.fillRect(i * barWidth, height - barHeight, barWidth - 1, barHeight);
+              }
+
+              ctx.fillStyle = '#ffffff';
+              ctx.font = '12px monospace';
+              ctx.fillText('Audio Visualizer - FFT: ' + analyser.fftSize, 10, 20);
+
+              animationId = requestAnimationFrame(draw);
+            }
+            draw();
+          } catch (err) {
+            el.innerHTML =
+              '<div class="wasm-error">' +
+              '<p>Microphone access denied.</p>' +
+              '<p class="wasm-error-detail">' + err.message + '</p>' +
+              '</div>';
+          }
+        });
+
+        fftSelect.addEventListener('change', function () {
+          if (analyser) {
+            analyser.fftSize = parseInt(fftSelect.value, 10);
+          }
+        });
+      })
+      .catch(function (err) {
+        el.innerHTML =
+          '<div class="wasm-error">' +
+          '<p>Failed to load audio visualizer widget.</p>' +
+          '<p class="wasm-error-detail">' + err.message + '</p>' +
+          '</div>';
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAudioVisualizer);
+  } else {
+    initAudioVisualizer();
+  }
+})();
+</script>
+
+<style>
+  .audio-visualizer :global(.audio-controls) {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 12px;
+    background: #111;
+    border-top: 1px solid #1a1a2e;
+  }
+
+  .audio-visualizer :global(.audio-btn) {
+    background: #1a1a2e;
+    color: #00e5ff;
+    border: 1px solid #00e5ff;
+    padding: 6px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+
+  .audio-visualizer :global(.audio-btn:hover) {
+    background: #00e5ff;
+    color: #0a0a0a;
+  }
+
+  .audio-visualizer :global(.audio-label) {
+    color: #666;
+    font-size: 11px;
+    font-family: monospace;
+  }
+
+  .audio-visualizer :global(.audio-label select) {
+    background: #1a1a2e;
+    color: #00e5ff;
+    border: 1px solid #333;
+    padding: 2px 4px;
+    font-family: monospace;
+    font-size: 11px;
+  }
+</style>

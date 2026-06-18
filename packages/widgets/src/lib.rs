@@ -14,6 +14,9 @@ pub use science::fourier::create_fourier_viz;
 pub use science::cellular::create_cellular_automata;
 pub use science::climate::{create_climate, update_climate};
 pub use science::physics::create_physics;
+pub use science::audio_viz::create_audio_visualizer;
+pub use science::nbody::create_nbody_simulation;
+pub use science::terrain::create_terrain_generator;
 
 pub use devtools::regex::create_regex_playground;
 pub use devtools::network::{create_network, update_network};

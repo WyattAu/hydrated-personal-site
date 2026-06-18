@@ -1,0 +1,14 @@
+{
+  "healthChecks": [
+    { "name": "Homepage", "url": "https://wyattau.com/", "timeout": 10 },
+    { "name": "API Health", "url": "https://wyattau.com/api/health", "timeout": 5 },
+    { "name": "Crypto Ticker", "url": "https://wyattau.com/api/crypto-ticker", "timeout": 10 },
+    { "name": "World Monitor", "url": "https://wyattau.com/world", "timeout": 10 },
+    { "name": "ETF Page", "url": "https://wyattau.com/etf", "timeout": 10 }
+  ],
+  "alertThresholds": {
+    "errorRatePercent": 10,
+    "responseTimeMs": 5000,
+    "uptimePercent": 99.9
+  }
+}

@@ -1,0 +1,230 @@
+---
+interface Props {
+  width?: number;
+  height?: number;
+  class?: string;
+  dt?: number;
+  g?: number;
+}
+
+const { width = 800, height = 400, class: className = '', dt = 0.01, g = 1.0 } = Astro.props;
+
+const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div
+  id={widgetId}
+  class={`wasm-embed nbody-sim ${className}`}
+  data-widget="nbody_simulation"
+  data-width={width}
+  data-height={height}
+  data-dt={dt}
+  data-g={g}
+  style={`width: ${width}px; height: ${height}px;`}
+>
+  <div class="wasm-skeleton">
+    <div class="skeleton-pulse"></div>
+    <span class="skeleton-text">Loading N-Body Simulation...</span>
+  </div>
+</div>
+
+<script is:inline define:vars={{ widgetId, width, height, dt, g }}>
+(function () {
+  var el = document.getElementById(widgetId);
+  if (!el) return;
+
+  function initNBody() {
+    var wasmPath = '/wasm/hydrated_widgets.js';
+    import(wasmPath)
+      .then(async function (mod) {
+        await mod.default();
+
+        var canvas = document.createElement('canvas');
+        canvas.id = el.id + '-canvas';
+        canvas.width = width;
+        canvas.height = height;
+        el.innerHTML = '';
+        el.appendChild(canvas);
+
+        var controls = document.createElement('div');
+        controls.className = 'nbody-controls';
+        controls.innerHTML =
+          '<button id="' + el.id + '-play" class="nbody-btn">Pause</button>' +
+          '<button id="' + el.id + '-reset" class="nbody-btn">Reset</button>' +
+          '<label class="nbody-label">Speed: <input type="range" id="' + el.id + '-speed" min="0.1" max="5" step="0.1" value="1"><span id="' + el.id + '-speed-val">1.0x</span></label>' +
+          '<button id="' + el.id + '-add" class="nbody-btn">+ Body</button>';
+        el.appendChild(controls);
+
+        var ctx = canvas.getContext('2d');
+        var isRunning = true;
+        var speed = 1.0;
+        var animId = null;
+
+        var sim = null;
+        if (mod['create_nbody_simulation']) {
+          sim = mod['create_nbody_simulation'](canvas.id, width, height);
+        }
+
+        function defaultBodies() {
+          return [
+            { x: width / 2, y: height / 2, vx: 0, vy: 0, mass: 1000, color: '#ffcc00', radius: 8 },
+            { x: width / 2 - 100, y: height / 2, vx: 0, vy: 2.5, mass: 10, color: '#00e5ff', radius: 3 },
+            { x: width / 2 + 150, y: height / 2, vx: 0, vy: -1.8, mass: 20, color: '#ff4081', radius: 4 },
+            { x: width / 2, y: height / 2 - 120, vx: 1.5, vy: 0, mass: 15, color: '#7c4dff', radius: 3 },
+          ];
+        }
+
+        var bodies = defaultBodies();
+
+        function draw() {
+          ctx.fillStyle = '#0a0a0a';
+          ctx.fillRect(0, 0, width, height);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '12px monospace';
+          ctx.fillText('N-Body Gravitational Simulation', 10, 20);
+          ctx.fillText('Bodies: ' + bodies.length + ' | Speed: ' + speed.toFixed(1) + 'x', 10, h - 10);
+
+          for (var i = 0; i < bodies.length; i++) {
+            var b = bodies[i];
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+            ctx.fillStyle = b.color;
+            ctx.fill();
+
+            if (i === 0) {
+              ctx.strokeStyle = 'rgba(255, 204, 0, 0.3)';
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.arc(b.x, b.y, b.radius + 4, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+          }
+
+          var h = height;
+          function stepSim() {
+            for (var i = 0; i < bodies.length; i++) {
+              for (var j = 0; j < bodies.length; j++) {
+                if (i === j) continue;
+                var dx = bodies[j].x - bodies[i].x;
+                var dy = bodies[j].y - bodies[i].y;
+                var dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 5) dist = 5;
+                var force = (g * bodies[i].mass * bodies[j].mass) / (dist * dist);
+                var ax = (force * dx) / (dist * bodies[i].mass);
+                var ay = (force * dy) / (dist * bodies[i].mass);
+                bodies[i].vx += ax * dt * speed;
+                bodies[i].vy += ay * dt * speed;
+              }
+            }
+            for (var k = 0; k < bodies.length; k++) {
+              bodies[k].x += bodies[k].vx * dt * speed;
+              bodies[k].y += bodies[k].vy * dt * speed;
+
+              if (bodies[k].x < 0 || bodies[k].x > width) bodies[k].vx *= -0.9;
+              if (bodies[k].y < 0 || bodies[k].y > height) bodies[k].vy *= -0.9;
+              bodies[k].x = Math.max(0, Math.min(width, bodies[k].x));
+              bodies[k].y = Math.max(0, Math.min(height, bodies[k].y));
+            }
+          }
+
+          var h2 = height;
+          if (isRunning) {
+            stepSim();
+          }
+          animId = requestAnimationFrame(draw);
+        }
+
+        var h = height;
+        draw();
+
+        document.getElementById(el.id + '-play').addEventListener('click', function () {
+          isRunning = !isRunning;
+          this.textContent = isRunning ? 'Pause' : 'Play';
+        });
+
+        document.getElementById(el.id + '-reset').addEventListener('click', function () {
+          bodies = defaultBodies();
+        });
+
+        document.getElementById(el.id + '-speed').addEventListener('input', function () {
+          speed = parseFloat(this.value);
+          document.getElementById(el.id + '-speed-val').textContent = speed.toFixed(1) + 'x';
+        });
+
+        document.getElementById(el.id + '-add').addEventListener('click', function () {
+          var colors = ['#00e5ff', '#ff4081', '#7c4dff', '#69f0ae', '#ffab40', '#40c4ff'];
+          bodies.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 4,
+            vy: (Math.random() - 0.5) * 4,
+            mass: 5 + Math.random() * 20,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            radius: 2 + Math.random() * 3,
+          });
+        });
+      })
+      .catch(function (err) {
+        el.innerHTML =
+          '<div class="wasm-error">' +
+          '<p>Failed to load N-Body simulation.</p>' +
+          '<p class="wasm-error-detail">' + err.message + '</p>' +
+          '</div>';
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNBody);
+  } else {
+    initNBody();
+  }
+})();
+</script>
+
+<style>
+  .nbody-sim :global(.nbody-controls) {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: #111;
+    border-top: 1px solid #1a1a2e;
+  }
+
+  .nbody-sim :global(.nbody-btn) {
+    background: #1a1a2e;
+    color: #00e5ff;
+    border: 1px solid #00e5ff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+
+  .nbody-sim :global(.nbody-btn:hover) {
+    background: #00e5ff;
+    color: #0a0a0a;
+  }
+
+  .nbody-sim :global(.nbody-label) {
+    color: #666;
+    font-size: 11px;
+    font-family: monospace;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nbody-sim :global(.nbody-label input[type="range"]) {
+    width: 100px;
+    accent-color: #00e5ff;
+  }
+
+  .nbody-sim :global(.nbody-label span) {
+    color: #00e5ff;
+    min-width: 36px;
+  }
+</style>

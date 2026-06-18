@@ -41,7 +41,7 @@ const securityHeaders: Record<string, string> = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   'Content-Security-Policy':
-    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.coingecko.com https://api.binance.com https://api.github.com https://api.alternative.me https://fcc-weather-api.glitch.me https://api.mempool.space https://blockchain.info https://news.ycombinator.com https://api.exchangerate-api.com https://www.jpl.nasa.gov https://data.giss.nasa.gov; report-uri /api/csp-report;",
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.coingecko.com https://api.binance.com https://api.github.com https://api.alternative.me https://fcc-weather-api.glitch.me https://api.mempool.space https://blockchain.info https://news.ycombinator.com https://api.exchangerate-api.com https://www.jpl.nasa.gov https://data.giss.nasa.gov https://www.reddit.com https://query1.finance.yahoo.com; report-uri /api/csp-report;",
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -52,6 +52,11 @@ const metrics = {
   requests: 0,
   errors: 0,
   upstreamLatency: new Map<string, number[]>(),
+  responseTimes: new Map<string, number[]>(),
+  alerts: {
+    errorRateHigh: false,
+    slowResponse: false,
+  },
 };
 
 function recordUpstreamLatency(endpoint: string, ms: number): void {
@@ -59,6 +64,43 @@ function recordUpstreamLatency(endpoint: string, ms: number): void {
   arr.push(ms);
   if (arr.length > 100) arr.shift();
   metrics.upstreamLatency.set(endpoint, arr);
+}
+
+function recordResponseTime(endpoint: string, ms: number): void {
+  const arr = metrics.responseTimes.get(endpoint) || [];
+  arr.push(ms);
+  if (arr.length > 100) arr.shift();
+  metrics.responseTimes.set(endpoint, arr);
+}
+
+function checkAlerts(): void {
+  // Check error rate
+  if (metrics.requests > 10) {
+    const errorRate = (metrics.errors / metrics.requests) * 100;
+    if (errorRate > 10 && !metrics.alerts.errorRateHigh) {
+      metrics.alerts.errorRateHigh = true;
+      log('warn', 'ALERT: Error rate exceeds 10%', {
+        errorRate: errorRate.toFixed(2),
+        requests: metrics.requests,
+        errors: metrics.errors,
+      });
+    } else if (errorRate <= 10 && metrics.alerts.errorRateHigh) {
+      metrics.alerts.errorRateHigh = false;
+      log('info', 'ALERT RESOLVED: Error rate back to normal', { errorRate: errorRate.toFixed(2) });
+    }
+  }
+
+  // Check response times per endpoint
+  for (const [endpoint, times] of metrics.responseTimes) {
+    if (times.length < 5) continue;
+    const avg = times.reduce((a, b) => a + b, 0) / times.length;
+    if (avg > 5000 && !metrics.alerts.slowResponse) {
+      metrics.alerts.slowResponse = true;
+      log('warn', 'ALERT: Slow response times detected', { endpoint, avgMs: Math.round(avg) });
+    } else if (avg <= 5000 && metrics.alerts.slowResponse) {
+      metrics.alerts.slowResponse = false;
+    }
+  }
 }
 
 // --- Body Size Limit ---
@@ -493,6 +535,167 @@ async function handleFred(): Promise<Response> {
   }
 }
 
+async function handleSocialSentiment(): Promise<Response> {
+  const cached = getCached('social-sentiment');
+  if (cached) return json(cached);
+
+  const positive = new Set([
+    'bullish',
+    'moon',
+    'hodl',
+    'buy',
+    'long',
+    'gain',
+    'profit',
+    'pump',
+    'surge',
+    'rally',
+    'breakout',
+    'ath',
+    'undervalued',
+    'opportunity',
+    'growth',
+    'adoption',
+    'milestone',
+    'record',
+    'soar',
+    'boom',
+    'strong',
+    'upgrade',
+    'accumulation',
+    'bottom',
+    'recovery',
+  ]);
+  const negative = new Set([
+    'bearish',
+    'dump',
+    'crash',
+    'sell',
+    'short',
+    'loss',
+    'scam',
+    'rug',
+    'fear',
+    'panic',
+    'bubble',
+    'overvalued',
+    'collapse',
+    'plunge',
+    'correction',
+    'downturn',
+    'fraud',
+    'hack',
+    'exploit',
+    'ponzi',
+    'decline',
+    'risk',
+    'warning',
+    'lawsuit',
+    'ban',
+  ]);
+
+  try {
+    const data = (await fetchJson(
+      'https://www.reddit.com/r/cryptocurrency/hot.json?limit=50',
+      'social-sentiment',
+      { headers: { 'User-Agent': 'hydrated-worker/1.0' } },
+    )) as {
+      data?: {
+        children: Array<{
+          data: { title: string; selftext?: string; score?: number };
+        }>;
+      };
+    };
+
+    let posCount = 0;
+    let negCount = 0;
+    const posts: Array<{ title: string; score: number; sentiment: string }> = [];
+
+    const children = data?.data?.children ?? [];
+    for (const child of children) {
+      const text = `${child.data.title} ${child.data.selftext || ''}`.toLowerCase();
+      const words = text.split(/\s+/);
+      let postPos = 0;
+      let postNeg = 0;
+      for (const word of words) {
+        if (positive.has(word)) postPos++;
+        if (negative.has(word)) postNeg++;
+      }
+      posCount += postPos;
+      negCount += postNeg;
+      const sentiment = postPos > postNeg ? 'positive' : postNeg > postPos ? 'negative' : 'neutral';
+      posts.push({
+        title: child.data.title.slice(0, 120),
+        score: child.data.score ?? 0,
+        sentiment,
+      });
+    }
+
+    const total = posCount + negCount || 1;
+    const result = {
+      score: Math.round((posCount / total) * 100),
+      positive: posCount,
+      negative: negCount,
+      totalPosts: children.length,
+      posts: posts.slice(0, 10),
+    };
+
+    setCache('social-sentiment', result, 15 * 60 * 1000);
+    return json(result);
+  } catch (e) {
+    log('error', 'social sentiment fetch failed', { error: String(e) });
+    return error('Upstream Reddit API unavailable', 502);
+  }
+}
+
+async function handleEtfPrice(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+  const ticker = url.searchParams.get('ticker');
+  if (!ticker) return error('ticker is required');
+
+  const sanitized = ticker.replace(/[^A-Z0-9.^-]/gi, '').toUpperCase();
+  const cacheKey = `etf-price:${sanitized}`;
+  const cached = getCached(cacheKey);
+  if (cached) return json(cached);
+
+  try {
+    const data = await fetchJson(
+      `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sanitized)}?range=1d&interval=1d`,
+      `etf-price:${sanitized}`,
+    );
+    const result = data as {
+      chart?: {
+        result?: Array<{
+          meta?: {
+            regularMarketPrice?: number;
+            previousClose?: number;
+            currency?: string;
+            symbol?: string;
+          };
+        }>;
+      };
+    };
+    const meta = result?.chart?.result?.[0]?.meta;
+    const price = meta?.regularMarketPrice ?? null;
+    const prevClose = meta?.previousClose ?? null;
+    const change = price && prevClose ? ((price - prevClose) / prevClose) * 100 : null;
+
+    const response = {
+      ticker: sanitized,
+      price,
+      previousClose: prevClose,
+      change: change ? Number(change.toFixed(2)) : null,
+      currency: meta?.currency ?? 'USD',
+    };
+
+    setCache(cacheKey, response, 5 * 60 * 1000);
+    return json(response);
+  } catch (e) {
+    log('error', 'etf price fetch failed', { ticker: sanitized, error: String(e) });
+    return error('Upstream Yahoo Finance API unavailable', 502);
+  }
+}
+
 // --- Guestbook ---
 
 async function handleGuestbookGet(request: Request): Promise<Response> {
@@ -601,6 +804,14 @@ function handleMetrics(): Response {
     latencySummary[key] = { avg: Math.round(avg), p95: Math.round(p95), count: sorted.length };
   }
 
+  const responseTimeSummary: Record<string, { avg: number; count: number }> = {};
+  for (const [key, values] of metrics.responseTimes) {
+    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+    responseTimeSummary[key] = { avg: Math.round(avg), count: values.length };
+  }
+
+  checkAlerts();
+
   return json({
     requests: metrics.requests,
     errors: metrics.errors,
@@ -610,6 +821,11 @@ function handleMetrics(): Response {
       Array.from(circuits.entries()).map(([k, v]) => [k, { open: v.open, failures: v.failures }]),
     ),
     latency: latencySummary,
+    responseTimes: responseTimeSummary,
+    alerts: {
+      errorRateHigh: metrics.alerts.errorRateHigh,
+      slowResponse: metrics.alerts.slowResponse,
+    },
   });
 }
 
@@ -622,6 +838,63 @@ async function handleCspReport(request: Request): Promise<Response> {
     // Ignore parse errors
   }
   return new Response(null, { status: 204 });
+}
+
+// --- API Versioning ---
+const SUPPORTED_VERSIONS = ['v1'];
+const LATEST_VERSION = 'v1';
+
+interface ApiVersionResult {
+  version: string;
+  route: string;
+}
+
+function resolveVersionedRoute(path: string): {
+  version: string | null;
+  route: string;
+  isVersioned: boolean;
+} {
+  const versionMatch = path.match(/^\/api\/(v\d+)(\/.*)?$/);
+  if (versionMatch) {
+    return {
+      version: versionMatch[1],
+      route: versionMatch[2] || '/',
+      isVersioned: true,
+    };
+  }
+  return { version: null, route: path, isVersioned: false };
+}
+
+function addVersionHeaders(response: Response, version: string): Response {
+  const newResponse = new Response(response.body, response);
+  newResponse.headers.set('X-API-Version', version);
+  newResponse.headers.set('X-API-Latest-Version', LATEST_VERSION);
+  newResponse.headers.set('X-API-Supported-Versions', SUPPORTED_VERSIONS.join(', '));
+  return newResponse;
+}
+
+function addDeprecationHeaders(response: Response): Response {
+  const newResponse = new Response(response.body, response);
+  newResponse.headers.set('Deprecation', 'true');
+  newResponse.headers.set('Sunset', 'Sat, 01 Jan 2028 00:00:00 GMT');
+  newResponse.headers.set('Link', '</api/v1>; rel="successor-version"');
+  newResponse.headers.set(
+    'X-Deprecation-Notice',
+    'Use /api/v1/ instead. Unversioned /api/ will be removed in a future release.',
+  );
+  return newResponse;
+}
+
+function handleVersions(): Response {
+  return json({
+    versions: SUPPORTED_VERSIONS,
+    latest: LATEST_VERSION,
+    deprecation: {
+      unversioned: true,
+      sunset: '2028-01-01',
+      message: 'Unversioned /api/ endpoints are deprecated. Use /api/v1/ instead.',
+    },
+  });
 }
 
 // --- Main Router ---
@@ -648,42 +921,56 @@ export default {
 
     try {
       let response: Response;
+      let isVersioned = false;
+      let apiVersion = LATEST_VERSION;
 
-      if (path === '/api/health') {
+      const { version, route, isVersioned: versioned } = resolveVersionedRoute(path);
+      isVersioned = versioned;
+      if (version) apiVersion = version;
+
+      const routePath = isVersioned ? `/api${route}` : path;
+
+      if (routePath === '/api/versions') {
+        response = handleVersions();
+      } else if (routePath === '/api/health') {
         response = json({ status: 'ok', environment: env.ENVIRONMENT, timestamp: Date.now() });
-      } else if (path === '/api/weather') {
+      } else if (routePath === '/api/weather') {
         response = await handleWeather(request);
-      } else if (path === '/api/stock-chart') {
+      } else if (routePath === '/api/stock-chart') {
         response = await handleStockChart(request);
-      } else if (path === '/api/crypto-ticker') {
+      } else if (routePath === '/api/crypto-ticker') {
         response = await handleCryptoTicker();
-      } else if (path === '/api/coingecko-global') {
+      } else if (routePath === '/api/coingecko-global') {
         response = await handleCoinGeckoGlobal();
-      } else if (path === '/api/earthquakes') {
+      } else if (routePath === '/api/earthquakes') {
         response = await handleEarthquakes();
-      } else if (path === '/api/fear-greed') {
+      } else if (routePath === '/api/fear-greed') {
         response = await handleFearGreed();
-      } else if (path === '/api/kp-index') {
+      } else if (routePath === '/api/kp-index') {
         response = await handleKpIndex();
-      } else if (path === '/api/mempool') {
+      } else if (routePath === '/api/mempool') {
         response = await handleMempool();
-      } else if (path === '/api/binance-klines') {
+      } else if (routePath === '/api/binance-klines') {
         response = await handleBinanceKlines(request);
-      } else if (path === '/api/hacker-news') {
+      } else if (routePath === '/api/hacker-news') {
         response = await handleHackerNews();
-      } else if (path === '/api/github-trending') {
+      } else if (routePath === '/api/github-trending') {
         response = await handleGithubTrending();
-      } else if (path === '/api/llm-benchmarks') {
+      } else if (routePath === '/api/llm-benchmarks') {
         response = await handleLlmBenchmarks();
-      } else if (path === '/api/exchange-rates') {
+      } else if (routePath === '/api/exchange-rates') {
         response = await handleExchangeRates();
-      } else if (path === '/api/fred') {
+      } else if (routePath === '/api/fred') {
         response = await handleFred();
-      } else if (path === '/api/metrics') {
+      } else if (routePath === '/api/social-sentiment') {
+        response = await handleSocialSentiment();
+      } else if (routePath === '/api/etf-price') {
+        response = await handleEtfPrice(request);
+      } else if (routePath === '/api/metrics') {
         response = handleMetrics();
-      } else if (path === '/api/csp-report') {
+      } else if (routePath === '/api/csp-report') {
         response = await handleCspReport(request);
-      } else if (path === '/api/guestbook') {
+      } else if (routePath === '/api/guestbook') {
         const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
         if (request.method === 'GET') {
           response = await handleGuestbookGet(request);
@@ -698,11 +985,20 @@ export default {
         response = error('Not found', 404);
       }
 
+      response = addVersionHeaders(response, apiVersion);
+
+      if (!isVersioned && path.startsWith('/api/') && path !== '/api/versions') {
+        response = addDeprecationHeaders(response);
+      }
+
       const duration = Date.now() - start;
+      recordResponseTime(path, duration);
+      response.headers.set('X-Response-Time', `${duration}ms`);
       log('info', 'request', { path, status: response.status, duration, method: request.method });
       return response;
     } catch (e) {
       metrics.errors++;
+      checkAlerts();
       log('error', 'unhandled error', { path, error: String(e) });
       return error('Internal server error', 500);
     }
