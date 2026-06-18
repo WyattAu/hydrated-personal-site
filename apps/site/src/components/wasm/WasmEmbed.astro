@@ -66,7 +66,7 @@ const ariaLabel = `${widget.replace(/_/g, ' ')} widget`;
               var endpoint = el.dataset.endpoint || '';
               var interval = parseInt(el.dataset.interval || '0', 10);
 
-              var wasmPath = '/wasm/hydrated_widgets_v2.js';
+              var wasmPath = '/wasm/hydrated_widgets.js';
               import(wasmPath)
                 .then(async function (mod) {
                   await mod.default();
