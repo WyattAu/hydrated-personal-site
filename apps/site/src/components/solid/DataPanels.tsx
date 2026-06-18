@@ -5,36 +5,44 @@ import { useLlmData } from '../../lib/llm-data';
 function useGithubTrending() {
   const [repos, setRepos] = createSignal<GitHubRepo[]>([]);
   const [loading, setLoading] = createSignal(true);
+  const [error, setError] = createSignal<string | null>(null);
 
   onMount(async () => {
     try {
       const res = await fetch('/api/github-trending');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const raw = await res.json();
       const items = raw?.items ?? (Array.isArray(raw) ? raw : []);
       setRepos(items.slice(0, 15));
-    } catch {}
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load');
+    }
     setLoading(false);
   });
 
-  return { repos, loading };
+  return { repos, loading, error };
 }
 
 function useHackerNews() {
   const [stories, setStories] = createSignal<HNStory[]>([]);
   const [loading, setLoading] = createSignal(true);
+  const [error, setError] = createSignal<string | null>(null);
 
   onMount(async () => {
     try {
       const res = await fetch('/api/hacker-news');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setStories(data.slice(0, 15));
       }
-    } catch {}
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load');
+    }
     setLoading(false);
   });
 
-  return { stories, loading };
+  return { stories, loading, error };
 }
 
 function timeAgo(ts: number): string {
@@ -134,12 +142,21 @@ function LlmPanel() {
 }
 
 function GithubPanel() {
-  const { repos, loading } = useGithubTrending();
+  const { repos, loading, error } = useGithubTrending();
 
   return (
     <div class="p-4 border h-full" style="border-color: var(--border); background: var(--bg-card);">
       {loading() ? (
         <PanelSkeleton />
+      ) : error() ? (
+        <div class="py-8 text-center">
+          <p class="code-text" style="color: var(--accent-warm);">
+            DATA ERROR
+          </p>
+          <p class="text-xs mt-1" style="color: var(--text-secondary);">
+            {error()}
+          </p>
+        </div>
       ) : (
         <>
           <PanelHeader title="GITHUB TRENDING" count={repos().length} />
@@ -184,12 +201,21 @@ function GithubPanel() {
 }
 
 function HnPanel() {
-  const { stories, loading } = useHackerNews();
+  const { stories, loading, error } = useHackerNews();
 
   return (
     <div class="p-4 border h-full" style="border-color: var(--border); background: var(--bg-card);">
       {loading() ? (
         <PanelSkeleton />
+      ) : error() ? (
+        <div class="py-8 text-center">
+          <p class="code-text" style="color: var(--accent-warm);">
+            DATA ERROR
+          </p>
+          <p class="text-xs mt-1" style="color: var(--text-secondary);">
+            {error()}
+          </p>
+        </div>
       ) : (
         <>
           <PanelHeader title="HACKER NEWS" count={stories().length} />

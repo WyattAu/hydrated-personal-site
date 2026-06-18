@@ -18,7 +18,14 @@ const DATA_SOURCES: { key: string; label: string; ttlMs: number }[] = [
   { key: 'llm-benchmarks', label: 'LLM Data', ttlMs: 6 * 60 * 60_000 },
 ];
 
-function freshnessClass(timestamp: number, ttlMs: number): { color: string; label: string } {
+const UNREACHABLE_SOURCES = new Set(['llm-benchmarks', 'github-trending']);
+
+function freshnessClass(
+  timestamp: number,
+  ttlMs: number,
+  key: string,
+): { color: string; label: string } {
+  if (UNREACHABLE_SOURCES.has(key)) return { color: '#9e9e9e', label: 'UNAVAILABLE' };
   const age = Date.now() - timestamp;
   if (age < ttlMs * 0.5) return { color: '#69f0ae', label: 'FRESH' };
   if (age < ttlMs) return { color: '#ffff00', label: 'AGING' };
@@ -101,7 +108,7 @@ export default function StaleIndicator() {
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-3">
             <For each={sources()}>
               {(src) => {
-                const status = freshnessClass(src.timestamp, src.ttlMs);
+                const status = freshnessClass(src.timestamp, src.ttlMs, src.key);
                 return (
                   <div class="flex flex-col gap-1">
                     <span class="code-text" style="color: var(--text-secondary); font-size: 9px;">

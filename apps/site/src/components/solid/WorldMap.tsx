@@ -37,6 +37,77 @@ const CAPITALS: { name: string; lat: number; lon: number; country: string }[] = 
   { name: 'Jakarta', lat: -6.2088, lon: 106.8456, country: 'ID' },
 ];
 
+const COUNTRIES = [
+  { name: 'United States', lat: 39.8, lon: -98.5, radius: 25 },
+  { name: 'Canada', lat: 56.1, lon: -106.3, radius: 25 },
+  { name: 'Mexico', lat: 23.6, lon: -102.5, radius: 12 },
+  { name: 'Brazil', lat: -14.2, lon: -51.9, radius: 22 },
+  { name: 'Argentina', lat: -38.4, lon: -63.6, radius: 15 },
+  { name: 'United Kingdom', lat: 55.4, lon: -3.4, radius: 8 },
+  { name: 'France', lat: 46.2, lon: 2.2, radius: 8 },
+  { name: 'Germany', lat: 51.2, lon: 10.4, radius: 7 },
+  { name: 'Italy', lat: 41.9, lon: 12.6, radius: 7 },
+  { name: 'Spain', lat: 40.5, lon: -3.7, radius: 8 },
+  { name: 'Poland', lat: 51.9, lon: 19.1, radius: 6 },
+  { name: 'Ukraine', lat: 48.4, lon: 31.2, radius: 9 },
+  { name: 'Russia', lat: 61.5, lon: 105.3, radius: 50 },
+  { name: 'China', lat: 35.9, lon: 104.2, radius: 20 },
+  { name: 'Japan', lat: 36.2, lon: 138.3, radius: 8 },
+  { name: 'South Korea', lat: 35.9, lon: 127.8, radius: 5 },
+  { name: 'India', lat: 20.6, lon: 78.9, radius: 18 },
+  { name: 'Australia', lat: -25.3, lon: 133.8, radius: 28 },
+  { name: 'South Africa', lat: -30.6, lon: 22.9, radius: 12 },
+  { name: 'Nigeria', lat: 9.1, lon: 8.7, radius: 10 },
+  { name: 'Egypt', lat: 26.8, lon: 30.8, radius: 10 },
+  { name: 'Turkey', lat: 38.9, lon: 35.2, radius: 10 },
+  { name: 'Saudi Arabia', lat: 23.9, lon: 45.1, radius: 14 },
+  { name: 'Indonesia', lat: -0.8, lon: 113.9, radius: 18 },
+  { name: 'Thailand', lat: 15.9, lon: 100.9, radius: 8 },
+  { name: 'Vietnam', lat: 14.1, lon: 108.3, radius: 8 },
+  { name: 'Pakistan', lat: 30.4, lon: 69.3, radius: 10 },
+  { name: 'Bangladesh', lat: 23.7, lon: 90.4, radius: 5 },
+  { name: 'Colombia', lat: 4.6, lon: -74.3, radius: 10 },
+  { name: 'Chile', lat: -35.7, lon: -71.5, radius: 12 },
+  { name: 'Peru', lat: -9.2, lon: -75.0, radius: 10 },
+  { name: 'Kenya', lat: -0.02, lon: 37.9, radius: 6 },
+  { name: 'Ethiopia', lat: 9.1, lon: 40.5, radius: 8 },
+  { name: 'Morocco', lat: 31.8, lon: -7.1, radius: 7 },
+  { name: 'Congo', lat: -4.0, lon: 21.8, radius: 10 },
+  { name: 'Tanzania', lat: -6.4, lon: 34.9, radius: 8 },
+  { name: 'Sweden', lat: 60.1, lon: 18.6, radius: 8 },
+  { name: 'Norway', lat: 60.5, lon: 8.5, radius: 8 },
+  { name: 'Finland', lat: 61.9, lon: 25.7, radius: 7 },
+  { name: 'Iceland', lat: 64.9, lon: -19.0, radius: 5 },
+  { name: 'New Zealand', lat: -40.9, lon: 174.9, radius: 7 },
+  { name: 'Mongolia', lat: 46.9, lon: 103.8, radius: 12 },
+  { name: 'Kazakhstan', lat: 48.0, lon: 66.9, radius: 15 },
+  { name: 'Iran', lat: 32.4, lon: 53.7, radius: 12 },
+  { name: 'Iraq', lat: 33.2, lon: 43.7, radius: 7 },
+  { name: 'Syria', lat: 34.8, lon: 39.0, radius: 5 },
+  { name: 'Israel', lat: 31.0, lon: 34.8, radius: 3 },
+  { name: 'Greece', lat: 39.1, lon: 21.8, radius: 5 },
+  { name: 'Portugal', lat: 39.4, lon: -8.2, radius: 4 },
+  { name: 'Netherlands', lat: 52.1, lon: 5.3, radius: 4 },
+  { name: 'Belgium', lat: 50.5, lon: 4.5, radius: 3 },
+  { name: 'Switzerland', lat: 46.8, lon: 8.2, radius: 3 },
+  { name: 'Austria', lat: 47.5, lon: 14.6, radius: 4 },
+  { name: 'Czech Republic', lat: 49.8, lon: 15.5, radius: 4 },
+];
+
+function findCountry(lat: number, lon: number): string {
+  let closest = 'Unknown Location';
+  let minDist = Infinity;
+  for (const c of COUNTRIES) {
+    const dist = Math.sqrt((lat - c.lat) ** 2 + (lon - c.lon) ** 2);
+    if (dist < minDist) {
+      minDist = dist;
+      closest = c.name;
+    }
+  }
+  if (minDist > 30) return `Near ${closest}`;
+  return closest;
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, '&amp;')
@@ -204,7 +275,8 @@ export default function WorldMap() {
       }
 
       leafletMap.on('click', (e: { latlng: { lat: number; lng: number } }) => {
-        setSelectedCountry(`Lat: ${e.latlng.lat.toFixed(2)}, Lon: ${e.latlng.lng.toFixed(2)}`);
+        const country = findCountry(e.latlng.lat, e.latlng.lng);
+        setSelectedCountry(country);
       });
 
       map = leafletMap;

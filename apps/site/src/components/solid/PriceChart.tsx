@@ -216,18 +216,45 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
     setError(null);
     try {
       const tfConfig = TIMEFRAMES.find((t) => t.key === tf())!;
-      const res = await fetch(
-        `/api/binance-klines?symbol=${symbol}&interval=${tfConfig.interval}&limit=${tfConfig.limit}`,
-      );
+      const isStock = symbol.startsWith('^');
+      const url = isStock
+        ? `/api/stock-chart?symbol=${symbol}&range=${tfConfig.key}&interval=${tfConfig.interval}`
+        : `/api/binance-klines?symbol=${symbol}&interval=${tfConfig.interval}&limit=${tfConfig.limit}`;
+      const res = await fetch(url);
       if (!res.ok) {
         throw new Error(`API returned ${res.status}`);
       }
       const raw = await res.json();
-      if (!Array.isArray(raw) || raw.length === 0) {
-        setKlines([]);
-        setError('No price data available');
+      if (isStock) {
+        const quotes = raw?.chart?.result?.[0]?.indicators?.quote?.[0];
+        if (quotes?.close && quotes?.timestamp) {
+          const klines: Kline[] = quotes.timestamp
+            .map((ts: number, i: number) => ({
+              openTime: ts * 1000,
+              open: quotes.open[i] ?? quotes.close[i] ?? 0,
+              high: quotes.high[i] ?? quotes.close[i] ?? 0,
+              low: quotes.low[i] ?? quotes.close[i] ?? 0,
+              close: quotes.close[i] ?? 0,
+              volume: quotes.volume[i] ?? 0,
+            }))
+            .filter((k: Kline) => k.close > 0);
+          if (klines.length === 0) {
+            setKlines([]);
+            setError('No price data available');
+          } else {
+            setKlines(klines);
+          }
+        } else {
+          setKlines([]);
+          setError('No price data available');
+        }
       } else {
-        setKlines(parseKlines(raw));
+        if (!Array.isArray(raw) || raw.length === 0) {
+          setKlines([]);
+          setError('No price data available');
+        } else {
+          setKlines(parseKlines(raw));
+        }
       }
     } catch (e) {
       setKlines([]);

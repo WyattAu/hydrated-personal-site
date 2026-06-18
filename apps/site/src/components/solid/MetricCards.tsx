@@ -38,7 +38,7 @@ function useCryptoPrice(symbol: string) {
   return {
     value: () => {
       const p = price();
-      return p !== null ? `$${p.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : '---';
+      return p !== null ? `$${p.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : 'N/A';
     },
     change: () => {
       const p = price();
@@ -79,7 +79,7 @@ function useSp500() {
   return {
     value: () => {
       const p = price();
-      return p !== null ? p.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '---';
+      return p !== null ? p.toLocaleString(undefined, { maximumFractionDigits: 2 }) : 'N/A';
     },
     change,
     trend: () => getMetricTrend('SP500'),
@@ -112,7 +112,7 @@ function useFearGreed() {
   return {
     value: () => {
       const v = value();
-      return v !== null ? `${v}` : '---';
+      return v !== null ? `${v}` : 'N/A';
     },
     displayLabel: label,
     change: () => null,
@@ -145,7 +145,7 @@ function useKpIndex() {
   return {
     value: () => {
       const k = kp();
-      return k !== null ? k.toFixed(1) : '---';
+      return k !== null ? k.toFixed(1) : 'N/A';
     },
     change: () => null,
     trend: () => getMetricTrend('kp-index'),
@@ -178,7 +178,7 @@ function useMempoolFees() {
   return {
     value: () => {
       const f = fees();
-      return f !== null ? `${f.fastest} sat` : '---';
+      return f !== null ? `${f.fastest} sat` : 'N/A';
     },
     change: () => null,
     trend: () => getMetricTrend('mempool'),
