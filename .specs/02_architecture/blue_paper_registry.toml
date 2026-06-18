@@ -1,0 +1,130 @@
+# Blue Paper Registry — Phase 2 Architecture
+# IEEE 1016 Software Design Description
+
+registry_version = "1.0.0"
+project = "Hydrated Personal Site"
+phase = 2
+created = "2026-06-17"
+author = "Construct (Systems Architect)"
+
+# ─── Blue Papers ────────────────────────────────────────────────
+
+[[blue_paper]]
+id = "BP-ASTRO-SITE-001"
+title = "Astro Site Core — SSG, Routing, Content Collections"
+status = "approved"
+priority = "critical"
+layer = "presentation"
+framework = "Astro 5.x"
+dependencies = []
+file = "BP-ASTRO-SITE-001.md"
+sections = [
+  "BP-1: Design Overview",
+  "BP-2: Design Decomposition",
+  "BP-3: Design Rationale",
+  "BP-4: Traceability",
+  "BP-5: Interface Design",
+  "BP-6: Data Design",
+  "BP-7: Component Design",
+  "BP-8: Deployment",
+  "BP-9: Compliance",
+  "BP-10: Quality Checklist"
+]
+
+[[blue_paper]]
+id = "BP-CF-WORKER-001"
+title = "CF Worker API Layer — Proxy, KV, Security"
+status = "approved"
+priority = "critical"
+layer = "infrastructure"
+framework = "Cloudflare Workers"
+dependencies = []
+file = "BP-CF-WORKER-001.md"
+sections = [
+  "BP-1: Design Overview",
+  "BP-2: Design Decomposition",
+  "BP-3: Design Rationale",
+  "BP-4: Traceability",
+  "BP-5: Interface Design",
+  "BP-6: Data Design",
+  "BP-7: Component Design",
+  "BP-8: Deployment",
+  "BP-9: Compliance",
+  "BP-10: Quality Checklist"
+]
+
+[[blue_paper]]
+id = "BP-WASM-WIDGETS-001"
+title = "Rust WASM Widget System — 13 Showcase Widgets"
+status = "approved"
+priority = "high"
+layer = "compute"
+framework = "Rust + wasm-pack + web-sys"
+dependencies = ["BP-CF-WORKER-001"]
+file = "BP-WASM-WIDGETS-001.md"
+sections = [
+  "BP-1: Design Overview",
+  "BP-2: Design Decomposition",
+  "BP-3: Design Rationale",
+  "BP-4: Traceability",
+  "BP-5: Interface Design",
+  "BP-6: Data Design",
+  "BP-7: Component Design",
+  "BP-8: Deployment",
+  "BP-9: Compliance",
+  "BP-10: Quality Checklist"
+]
+
+[[blue_paper]]
+id = "BP-SOLIDJS-COMPONENTS-001"
+title = "SolidJS Component Library — Reactive UI Islands"
+status = "approved"
+priority = "high"
+layer = "presentation"
+framework = "SolidJS 1.9"
+dependencies = ["BP-ASTRO-SITE-001", "BP-CF-WORKER-001"]
+file = "BP-SOLIDJS-COMPONENTS-001.md"
+sections = [
+  "BP-1: Design Overview",
+  "BP-2: Design Decomposition",
+  "BP-3: Design Rationale",
+  "BP-4: Traceability",
+  "BP-5: Interface Design",
+  "BP-6: Data Design",
+  "BP-7: Component Design",
+  "BP-8: Deployment",
+  "BP-9: Compliance",
+  "BP-10: Quality Checklist"
+]
+
+# ─── Cross-References ───────────────────────────────────────────
+
+[[cross_reference]]
+from = "BP-SOLIDJS-COMPONENTS-001"
+to = "BP-CF-WORKER-001"
+relationship = "calls-api"
+
+[[cross_reference]]
+from = "BP-WASM-WIDGETS-001"
+to = "BP-CF-WORKER-001"
+relationship = "calls-api"
+
+[[cross_reference]]
+from = "BP-SOLIDJS-COMPONENTS-001"
+to = "BP-ASTRO-SITE-001"
+relationship = "hydrates-within"
+
+[[cross_reference]]
+from = "BP-WASM-WIDGETS-001"
+to = "BP-ASTRO-SITE-001"
+relationship = "embedded-in"
+
+# ─── Coupling Metrics ───────────────────────────────────────────
+
+[coupling_metrics]
+ASTRO_to_SolidJS = "loose — client:load directive only"
+ASTRO_to_WASM = "loose — IntersectionObserver dynamic import"
+SolidJS_to_CFW = "loose — fetch() HTTP calls"
+WASM_to_CFW = "loose — fetch() HTTP calls"
+SolidJS_to_WASM = "loose — CustomEvent bridge"
+CFW_to_KV = "tight — native binding"

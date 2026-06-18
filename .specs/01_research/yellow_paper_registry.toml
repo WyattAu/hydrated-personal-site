@@ -1,0 +1,86 @@
+# Yellow Paper Registry — Hydrated Personal Site
+# Phase 1: Research & Theoretical Ground Truth
+
+[meta]
+project = "hydrated_personal_site"
+phase = 1
+created = "2026-06-17"
+author = "DeepThought (Researcher)"
+status = "active"
+
+[[papers]]
+id = "YP-WEB-ASTRO-SSG-001"
+title = "Astro SSG Architecture"
+domain = "web"
+layer = "presentation"
+status = "complete"
+file = "YP-WEB-ASTRO-SSG-001.md"
+abstract = """
+Static Site Generation theory, Astro islands architecture, Content Collections
+data model, file-based routing, build pipeline, and performance characteristics
+for the hydrated personal site migration from Leptos 0.8.
+"""
+
+[[papers]]
+id = "YP-WEB-SOLIDJS-REACTIVITY-001"
+title = "SolidJS Reactivity Model"
+domain = "web"
+layer = "presentation"
+status = "complete"
+file = "YP-WEB-SOLIDJS-REACTIVITY-001.md"
+abstract = """
+Fine-grained reactivity via signals, effects, and memos. No virtual DOM.
+Component ownership model, hydration strategies, and comparison with
+React/Svelte reactivity models.
+"""
+
+[[papers]]
+id = "YP-WASM-WIDGET-ARCH-001"
+title = "WASM Widget Architecture"
+domain = "wasm"
+layer = "compute"
+status = "complete"
+file = "YP-WASM-WIDGET-ARCH-001.md"
+abstract = """
+Standalone Rust + wasm-pack + web-sys widget model. Canvas2D rendering
+pipeline, IntersectionObserver lazy loading, CustomEvent bridge pattern,
+bundle size analysis, and memory safety in WASM context.
+"""
+
+[[papers]]
+id = "YP-VISUALIZATION-FINANCE-001"
+title = "Financial Data Visualization"
+domain = "visualization"
+layer = "presentation"
+status = "complete"
+file = "YP-VISUALIZATION-FINANCE-001.md"
+abstract = """
+uPlot architecture, candlestick chart construction, D3.js force-directed
+graph layout, Rough.js organic rendering, Canvas2D scatter plots, and
+60fps rendering performance with large datasets.
+"""
+
+[[papers]]
+id = "YP-INFRA-CF-WORKERS-001"
+title = "Edge Computing with Cloudflare Workers"
+domain = "infrastructure"
+layer = "edge"
+status = "complete"
+file = "YP-INFRA-CF-WORKERS-001.md"
+abstract = """
+V8 isolate model, KV storage semantics, API proxying patterns, rate limiting,
+security headers injection, and cache strategies for Cloudflare Workers.
+"""
+
+[[test_vectors]]
+file = "test_vectors/test_vectors_web_performance.toml"
+status = "complete"
+
+[[domain_constraints]]
+file = "domain_constraints/domain_constraints_web.toml"
+status = "complete"
+
+[[reports]]
+id = "phase_01_research_summary"
+file = "../.reports/phase_01_research_summary.md"
+status = "complete"

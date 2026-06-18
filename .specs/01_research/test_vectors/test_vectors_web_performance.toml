@@ -1,0 +1,321 @@
+# Test Vectors: Web Performance
+# Phase 1 Research — Hydrated Personal Site
+
+[meta]
+project = "hydrated_personal_site"
+phase = 1
+created = "2026-06-17"
+author = "DeepThought (Researcher)"
+
+# ============================================================
+# LCP Measurement Scenarios
+# ============================================================
+
+[[lcp_vectors]]
+id = "LCP-001"
+name = "Home page hero image"
+route = "/"
+element = "img.london_night"
+target_ms = 1500
+measurement = "Lighthouse CI"
+conditions = [
+  "4G network simulation (100ms RTT, 4Mbps down)",
+  "Mobile device emulation (Moto G Power)",
+  "Critical CSS inlined",
+  "Hero image preloaded",
+]
+expected = "LCP < 1500ms due to SSG + preload + critical CSS"
+pass_criteria = "LCP element painted within 1500ms of navigation start"
+
+[[lcp_vectors]]
+id = "LCP-002"
+name = "World monitor page"
+route = "/world"
+element = "h1.world-title"
+target_ms = 1500
+measurement = "Lighthouse CI"
+conditions = [
+  "4G network simulation",
+  "SolidJS islands hydrate after LCP",
+  "WASM widgets lazy-loaded (not blocking LCP)",
+]
+expected = "LCP < 1500ms, TTI < 2000ms"
+pass_criteria = "LCP element painted within 1500ms, WASM does not block"
+
+[[lcp_vectors]]
+id = "LCP-003"
+name = "ETF page with charts"
+route = "/etf"
+element = "h1.etf-title"
+target_ms = 1500
+measurement = "Lighthouse CI"
+conditions = [
+  "4G network simulation",
+  "uPlot loaded via IntersectionObserver (below fold)",
+  "SolidJS islands hydrate after LCP",
+]
+expected = "LCP < 1500ms, uPlot loads asynchronously"
+pass_criteria = "LCP element painted within 1500ms, uPlot loads on scroll"
+
+[[lcp_vectors]]
+id = "LCP-004"
+name = "Cold start vs warm cache"
+route = "/"
+element = "img.london_night"
+target_ms = 1500
+measurement = "Lighthouse CI"
+conditions = [
+  "Cold: No cached assets",
+  "Warm: All assets cached",
+]
+expected = "Cold < 1500ms, Warm < 500ms"
+pass_criteria = "Both scenarios meet targets"
+
+# ============================================================
+# Bundle Size Thresholds
+# ============================================================
+
+[[bundle_vectors]]
+id = "BUNDLE-001"
+name = "Initial HTML size"
+target_kb = 20
+measurement = "File size (gzipped)"
+file = "dist/client/**/*.html"
+pass_criteria = "All HTML files < 20KB gzipped"
+
+[[bundle_vectors]]
+id = "BUNDLE-002"
+name = "Total CSS bundle"
+target_kb = 80
+measurement = "File size (gzipped)"
+file = "dist/client/**/*.css"
+pass_criteria = "All CSS files combined < 80KB gzipped"
+
+[[bundle_vectors]]
+id = "BUNDLE-003"
+name = "SolidJS runtime + islands"
+target_kb = 35
+measurement = "File size (gzipped)"
+file = "dist/client/**/*.js"
+pass_criteria = "SolidJS-related JS < 35KB gzipped"
+
+[[bundle_vectors]]
+id = "BUNDLE-004"
+name = "Per-WASM widget binary"
+target_kb = 130
+measurement = "File size (gzipped)"
+file = "packages/widgets/pkg/*.wasm"
+pass_criteria = "No single WASM binary exceeds 130KB gzipped"
+
+[[bundle_vectors]]
+id = "BUNDLE-005"
+name = "Total first load"
+target_kb = 400
+measurement = "Sum of HTML + CSS + critical JS"
+pass_criteria = "First load < 400KB gzipped"
+
+[[bundle_vectors]]
+id = "BUNDLE-006"
+name = "Font files"
+target_kb = 80
+measurement = "File size (gzipped)"
+file = "public/fonts/*"
+pass_criteria = "Total fonts < 80KB gzipped"
+
+# ============================================================
+# API Response Time Targets
+# ============================================================
+
+[[api_vectors]]
+id = "API-001"
+name = "Crypto ticker (Binance)"
+endpoint = "/api/crypto-ticker"
+target_ms = 100
+cache_ttl_s = 10
+measurement = "CF Worker response time"
+conditions = ["Cached response", "Edge location"]
+pass_criteria = "< 100ms response time (cached)"
+
+[[api_vectors]]
+id = "API-002"
+name = "Weather (Open-Meteo)"
+endpoint = "/api/weather"
+target_ms = 200
+cache_ttl_s = 300
+measurement = "CF Worker response time"
+conditions = ["Cached response"]
+pass_criteria = "< 200ms response time (cached)"
+
+[[api_vectors]]
+id = "API-003"
+name = "Stock chart (Yahoo Finance)"
+endpoint = "/api/stock-chart"
+target_ms = 500
+cache_ttl_s = 120
+measurement = "CF Worker response time"
+conditions = ["Cached response", "External API latency included on miss"]
+pass_criteria = "< 500ms (cached), < 3s (miss)"
+
+[[api_vectors]]
+id = "API-004"
+name = "Guestbook CRUD"
+endpoint = "/api/guestbook"
+target_ms = 200
+cache_ttl_s = 0
+measurement = "CF Worker response time"
+conditions = ["KV read", "No caching"]
+pass_criteria = "< 200ms for GET, < 500ms for POST"
+
+[[api_vectors]]
+id = "API-005"
+name = "Rate limiting enforcement"
+endpoint = "/api/guestbook"
+target_ms = 100
+cache_ttl_s = 600
+measurement = "Rate limit check time"
+conditions = ["6th request within 10 minutes"]
+pass_criteria = "Returns 429 within 100ms"
+
+# ============================================================
+# WASM Load Time Targets
+# ============================================================
+
+[[wasm_vectors]]
+id = "WASM-001"
+name = "Fourier Transform widget"
+widget = "fourier"
+target_load_ms = 100
+target_render_ms = 50
+total_budget_ms = 150
+measurement = "Performance.now() in browser"
+conditions = [
+  "WASM binary gzipped ~65KB",
+  "IntersectionObserver trigger (200px margin)",
+  "No other WASM loading simultaneously",
+]
+pass_criteria = "Load + render < 150ms"
+
+[[wasm_vectors]]
+id = "WASM-002"
+name = "Order Book widget"
+widget = "order_book"
+target_load_ms = 100
+target_render_ms = 50
+total_budget_ms = 150
+measurement = "Performance.now() in browser"
+conditions = [
+  "WASM binary gzipped ~75KB",
+  "WebSocket connection to Binance",
+  "Canvas2D rendering",
+]
+pass_criteria = "Load + render < 150ms, WebSocket connects < 500ms"
+
+[[wasm_vectors]]
+id = "WASM-003"
+name = "Correlation Network widget"
+widget = "correlation"
+target_load_ms = 150
+target_render_ms = 100
+total_budget_ms = 250
+measurement = "Performance.now() in browser"
+conditions = [
+  "WASM binary gzipped ~118KB",
+  "D3.js force-directed layout",
+  "Canvas2D rendering",
+]
+pass_criteria = "Load + render + layout < 250ms"
+
+[[wasm_vectors]]
+id = "WASM-004"
+name = "Strategy Backtester widget"
+widget = "backtest"
+target_load_ms = 150
+target_render_ms = 100
+total_budget_ms = 250
+measurement = "Performance.now() in browser"
+conditions = [
+  "WASM binary gzipped ~130KB",
+  "Historical data fetch",
+  "Canvas2D rendering",
+]
+pass_criteria = "Load + compute + render < 250ms"
+
+[[wasm_vectors]]
+id = "WASM-005"
+name = "Multiple WASM widgets on same page"
+widget = "multiple"
+target_load_ms = 200
+target_render_ms = 150
+total_budget_ms = 350
+measurement = "Performance.now() in browser"
+conditions = [
+  "2 widgets visible simultaneously",
+  "Independent loading via IntersectionObserver",
+  "No blocking between widgets",
+]
+pass_criteria = "Both widgets loaded + rendered < 350ms total"
+
+# ============================================================
+# Cumulative Layout Shift Vectors
+# ============================================================
+
+[[cls_vectors]]
+id = "CLS-001"
+name = "Theme toggle layout stability"
+route = "/"
+trigger = "Theme toggle click"
+target_cls = 0.01
+measurement = "Lighthouse CLS score"
+pass_criteria = "CLS < 0.01 after theme toggle"
+
+[[cls_vectors]]
+id = "CLS-002"
+name = "WASM widget load layout stability"
+route = "/world"
+trigger = "WASM widget loads into container"
+target_cls = 0.01
+measurement = "Lighthouse CLS score"
+pass_criteria = "CLS < 0.01 after WASM widget loads"
+
+[[cls_vectors]]
+id = "CLS-003"
+name = "Font swap layout stability"
+route = "/"
+trigger = "Font loads (swap)"
+target_cls = 0.01
+measurement = "Lighthouse CLS score"
+pass_criteria = "CLS < 0.01 after font swap"
+
+# ============================================================
+# First Input Delay / INP Vectors
+# ============================================================
+
+[[fid_vectors]]
+id = "FID-001"
+name = "Theme toggle responsiveness"
+route = "/"
+trigger = "Click theme toggle"
+target_fid_ms = 50
+target_inp_ms = 200
+measurement = "Lighthouse FID + INP"
+pass_criteria = "FID < 50ms, INP < 200ms"
+
+[[fid_vectors]]
+id = "FID-002"
+name = "Command palette responsiveness"
+route = "/"
+trigger = "Press Ctrl+K"
+target_fid_ms = 50
+target_inp_ms = 200
+measurement = "Lighthouse FID + INP"
+pass_criteria = "FID < 50ms, INP < 200ms"
+
+[[fid_vectors]]
+id = "FID-003"
+name = "Search filter responsiveness"
+route = "/projects"
+trigger = "Type in search box"
+target_fid_ms = 50
+target_inp_ms = 200
+measurement = "Lighthouse FID + INP"
+pass_criteria = "FID < 50ms, INP < 200ms"

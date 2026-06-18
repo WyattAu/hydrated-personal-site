@@ -1,0 +1,107 @@
+name: Uptime Check
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  probe:
+    name: HTTP Probe
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        check:
+          - name: Homepage
+            url: https://wyattau.com/
+          - name: API Health
+            url: https://wyattau.com/api/health
+          - name: Crypto Ticker
+            url: https://wyattau.com/api/crypto-ticker
+          - name: World Monitor
+            url: https://wyattau.com/world
+          - name: ETF Page
+            url: https://wyattau.com/etf
+    steps:
+      - name: Check ${{ matrix.check.name }}
+        run: |
+          for i in 1 2 3; do
+            status=$(curl -sf -o /dev/null -w '%{http_code}' ${{ matrix.check.url }} || true)
+            if [ "$status" -eq 200 ]; then
+              echo "${{ matrix.check.name }}: OK (HTTP $status)"
+              exit 0
+            fi
+            echo "Attempt $i failed (HTTP $status), retrying in 30s..."
+            sleep 30
+          done
+          echo "${{ matrix.check.name }}: FAILED after 3 attempts"
+          exit 1
+
+  static:
+    name: Static Asset Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        asset:
+          - name: Favicon
+            url: https://wyattau.com/favicon.svg
+          - name: robots.txt
+            url: https://wyattau.com/robots.txt
+          - name: Sitemap
+            url: https://wyattau.com/sitemap.xml
+    steps:
+      - name: Check ${{ matrix.asset.name }}
+        run: |
+          for i in 1 2 3; do
+            status=$(curl -sf -o /dev/null -w '%{http_code}' ${{ matrix.asset.url }} || true)
+            if [ "$status" -eq 200 ]; then
+              echo "${{ matrix.asset.name }}: OK (HTTP $status)"
+              exit 0
+            fi
+            echo "Attempt $i failed (HTTP $status), retrying in 30s..."
+            sleep 30
+          done
+          echo "${{ matrix.asset.name }}: FAILED after 3 attempts"
+          exit 1
+
+  api-health:
+    name: API Endpoint Health
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        endpoint:
+          - name: Health
+            path: /api/health
+          - name: Crypto Ticker
+            path: /api/crypto-ticker
+          - name: Stock Chart (AAPL)
+            path: /api/stock-chart?symbol=AAPL&range=1d
+          - name: Earthquakes
+            path: /api/earthquakes
+          - name: Fear & Greed
+            path: /api/fear-greed
+          - name: Hacker News
+            path: /api/hacker-news
+          - name: Weather (Hong Kong)
+            path: /api/weather?lat=22.32&lng=114.17
+          - name: Exchange Rates
+            path: /api/exchange-rates
+    steps:
+      - name: Check ${{ matrix.endpoint.name }}
+        run: |
+          for i in 1 2 3; do
+            status=$(curl -sf -o /dev/null -w '%{http_code}' "https://wyattau.com${{ matrix.endpoint.path }}" || true)
+            if [ "$status" -eq 200 ] || [ "$status" -eq 400 ]; then
+              echo "${{ matrix.endpoint.name }}: OK (HTTP $status)"
+              exit 0
+            fi
+            echo "Attempt $i failed (HTTP $status), retrying in 30s..."
+            sleep 30
+          done
+          echo "${{ matrix.endpoint.name }}: FAILED after 3 attempts"
+          exit 1

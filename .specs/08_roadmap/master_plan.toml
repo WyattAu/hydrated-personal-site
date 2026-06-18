@@ -1,0 +1,675 @@
+# Master Plan: Hydrated Personal Site
+# Topological sort of all implementation tasks
+# Format: [task] with id, name, phase, prerequisites, outputs, verification, estimated_hours
+
+# =============================================================================
+# PHASE 0: FOUNDATION
+# =============================================================================
+
+[tasks.p0_01]
+id = "P0-01"
+name = "Initialize Astro 5 project"
+phase = 0
+prerequisites = []
+outputs = ["apps/site/package.json", "apps/site/astro.config.mjs", "apps/site/tsconfig.json"]
+verification = "bun run dev starts dev server at localhost:4321"
+estimated_hours = 2
+
+[tasks.p0_02]
+id = "P0-02"
+name = "Configure Tailwind CSS 4"
+phase = 0
+prerequisites = ["P0-01"]
+outputs = ["apps/site/tailwind.config.ts", "apps/site/src/styles/themes.css", "apps/site/src/styles/base.css"]
+verification = "CSS custom properties render, themes toggle works"
+estimated_hours = 2
+
+[tasks.p0_03]
+id = "P0-03"
+name = "Set up Turborepo monorepo"
+phase = 0
+prerequisites = ["P0-01"]
+outputs = ["turbo.json", "pnpm-workspace.yaml", "package.json"]
+verification = "turbo build runs without errors"
+estimated_hours = 2
+
+[tasks.p0_04]
+id = "P0-04"
+name = "Create CF Worker project"
+phase = 0
+prerequisites = ["P0-01"]
+outputs = ["worker/src/index.ts", "worker/wrangler.toml", "worker/package.json"]
+verification = "wrangler dev serves worker locally"
+estimated_hours = 2
+
+[tasks.p0_05]
+id = "P0-05"
+name = "Port CF Worker API endpoints"
+phase = 0
+prerequisites = ["P0-04"]
+outputs = ["worker/src/index.ts"]
+verification = "All 16+ API endpoints return valid JSON responses"
+estimated_hours = 8
+
+[tasks.p0_06]
+id = "P0-06"
+name = "Set up CI/CD (GitHub Actions)"
+phase = 0
+prerequisites = ["P0-01"]
+outputs = [".github/workflows/ci.yml"]
+verification = "Push to main triggers build + test pipeline"
+estimated_hours = 2
+
+[tasks.p0_07]
+id = "P0-07"
+name = "Set up testing (Vitest + Playwright)"
+phase = 0
+prerequisites = ["P0-01"]
+outputs = ["vitest.config.ts", "playwright.config.ts"]
+verification = "bun run test and bun run test:e2e both pass"
+estimated_hours = 2
+
+# =============================================================================
+# PHASE 1: CORE PAGES
+# =============================================================================
+
+[tasks.p1_01]
+id = "P1-01"
+name = "Create BaseLayout with SEO"
+phase = 1
+prerequisites = ["P0-01", "P0-02"]
+outputs = ["apps/site/src/layouts/BaseLayout.astro"]
+verification = "Layout renders with meta tags, fonts, critical CSS"
+estimated_hours = 3
+
+[tasks.p1_02]
+id = "P1-02"
+name = "Create Home page"
+phase = 1
+prerequisites = ["P1-01"]
+outputs = ["apps/site/src/pages/index.astro"]
+verification = "Hero, About, Featured Projects, Expertise, Employment, Contact sections render"
+estimated_hours = 4
+
+[tasks.p1_03]
+id = "P1-03"
+name = "Create Dossier page"
+phase = 1
+prerequisites = ["P1-01"]
+outputs = ["apps/site/src/pages/dossier.astro"]
+verification = "Expertise grid, employment timeline, education render"
+estimated_hours = 2
+
+[tasks.p1_04]
+id = "P1-04"
+name = "Create Uses page"
+phase = 1
+prerequisites = ["P1-01"]
+outputs = ["apps/site/src/pages/uses.astro"]
+verification = "Development tools list renders correctly"
+estimated_hours = 1
+
+[tasks.p1_05]
+id = "P1-05"
+name = "Create 404 page"
+phase = 1
+prerequisites = ["P1-01"]
+outputs = ["apps/site/src/pages/404.astro"]
+verification = "Terminal-style error page renders on invalid route"
+estimated_hours = 1
+
+[tasks.p1_06]
+id = "P1-06"
+name = "Create Nav component"
+phase = 1
+prerequisites = ["P1-01"]
+outputs = ["apps/site/src/components/astro/Nav.astro", "apps/site/src/components/solid/ThemeToggle.tsx"]
+verification = "Fixed nav with glassmorphism, active page highlighting, theme toggle works"
+estimated_hours = 2
+
+[tasks.p1_07]
+id = "P1-07"
+name = "Create Footer component"
+phase = 1
+prerequisites = ["P1-01"]
+outputs = ["apps/site/src/components/astro/Footer.astro"]
+verification = "Footer renders with links and social icons"
+estimated_hours = 1
+
+[tasks.p1_08]
+id = "P1-08"
+name = "Port scroll reveal animations"
+phase = 1
+prerequisites = ["P1-01"]
+outputs = ["apps/site/src/styles/animations.css"]
+verification = "Elements fade in on scroll via IntersectionObserver"
+estimated_hours = 2
+
+[tasks.p1_09]
+id = "P1-09"
+name = "Port theme system"
+phase = 1
+prerequisites = ["P1-01", "P0-02"]
+outputs = ["apps/site/src/styles/themes.css"]
+verification = "6 themes cycle, localStorage persists, system preference detected"
+estimated_hours = 2
+
+[tasks.p1_10]
+id = "P1-10"
+name = "Port command palette"
+phase = 1
+prerequisites = ["P1-01"]
+outputs = ["apps/site/src/components/solid/CommandPalette.tsx"]
+verification = "Opens on / or Ctrl+K, navigates pages, searches content"
+estimated_hours = 3
+
+[tasks.p1_11]
+id = "P1-11"
+name = "Visual regression testing"
+phase = 1
+prerequisites = ["P1-02", "P1-03", "P1-04", "P1-05", "P1-06", "P1-07"]
+outputs = ["tests/visual/", "tests/visual/*.spec.ts"]
+verification = "Screenshot comparison passes for all pages"
+estimated_hours = 4
+
+# =============================================================================
+# PHASE 2: WORLD MONITOR
+# =============================================================================
+
+[tasks.p2_01]
+id = "P2-01"
+name = "Create World page layout"
+phase = 2
+prerequisites = ["P1-01"]
+outputs = ["apps/site/src/pages/world.astro"]
+verification = "Page layout with map, metrics, charts, and panel slots renders"
+estimated_hours = 3
+
+[tasks.p2_02]
+id = "P2-02"
+name = "Solid MetricCards component"
+phase = 2
+prerequisites = ["P2-01", "P0-05"]
+outputs = ["apps/site/src/components/solid/MetricCards.tsx"]
+verification = "6 metric cards display live-updating crypto, macro, crash indicators"
+estimated_hours = 5
+
+[tasks.p2_03]
+id = "P2-03"
+name = "Integrate Leaflet.js map"
+phase = 2
+prerequisites = ["P2-01"]
+outputs = ["apps/site/src/components/solid/WorldMap.tsx"]
+verification = "World map renders with earthquake markers, country borders, capital markers"
+estimated_hours = 6
+
+[tasks.p2_04]
+id = "P2-04"
+name = "Integrate uPlot for price charts"
+phase = 2
+prerequisites = ["P2-01", "P0-05"]
+outputs = ["apps/site/src/components/solid/PriceChart.tsx"]
+verification = "Price chart renders with timeframe selection, crosshair, no watermark"
+estimated_hours = 4
+
+[tasks.p2_05]
+id = "P2-05"
+name = "Solid CountryPanel component"
+phase = 2
+prerequisites = ["P2-03", "P0-05"]
+outputs = ["apps/site/src/components/solid/CountryPanel.tsx"]
+verification = "Click country on map shows World Bank + REST Countries data panel"
+estimated_hours = 5
+
+[tasks.p2_06]
+id = "P2-06"
+name = "Solid DataPanels component"
+phase = 2
+prerequisites = ["P2-01", "P0-05"]
+outputs = ["apps/site/src/components/solid/DataPanels.tsx"]
+verification = "LLM benchmarks, GitHub Trending, ArXiv, HN panels display live data"
+estimated_hours = 6
+
+[tasks.p2_07]
+id = "P2-07"
+name = "Solid ScatterPlots component"
+phase = 2
+prerequisites = ["P2-01", "P0-05"]
+outputs = ["apps/site/src/components/solid/ScatterPlots.tsx"]
+verification = "LLM Intelligence vs Price and Intelligence vs Speed scatter plots render"
+estimated_hours = 4
+
+[tasks.p2_08]
+id = "P2-08"
+name = "Solid StaleIndicator component"
+phase = 2
+prerequisites = ["P2-01"]
+outputs = ["apps/site/src/components/solid/StaleIndicator.tsx"]
+verification = "Data freshness indicator shows age of each data source"
+estimated_hours = 2
+
+[tasks.p2_09]
+id = "P2-09"
+name = "Port vanilla JS chart code"
+phase = 2
+prerequisites = ["P2-03", "P2-04"]
+outputs = ["apps/site/src/lib/charts.ts"]
+verification = "Multi-graph, crosshair, timeframe switching all functional"
+estimated_hours = 4
+
+[tasks.p2_10]
+id = "P2-10"
+name = "Integration testing for World Monitor"
+phase = 2
+prerequisites = ["P2-01", "P2-02", "P2-03", "P2-04", "P2-05", "P2-06", "P2-07", "P2-08"]
+outputs = ["tests/e2e/world.spec.ts"]
+verification = "All World Monitor features work in E2E tests"
+estimated_hours = 3
+
+# =============================================================================
+# PHASE 3: ETF INTELLIGENCE
+# =============================================================================
+
+[tasks.p3_01]
+id = "P3-01"
+name = "Create ETF page layout"
+phase = 3
+prerequisites = ["P1-01"]
+outputs = ["apps/site/src/pages/etf.astro"]
+verification = "Page layout with search, detail, comparison, correlation slots renders"
+estimated_hours = 2
+
+[tasks.p3_02]
+id = "P3-02"
+name = "Solid SearchBar component"
+phase = 3
+prerequisites = ["P3-01"]
+outputs = ["apps/site/src/components/solid/SearchBar.tsx"]
+verification = "Autocomplete from 89 ETFs, keyboard navigation, select opens detail"
+estimated_hours = 3
+
+[tasks.p3_03]
+id = "P3-03"
+name = "Solid ETF detail view"
+phase = 3
+prerequisites = ["P3-01", "P0-05"]
+outputs = ["apps/site/src/components/solid/EtfDetail.tsx"]
+verification = "Price, change, sector allocation, region allocation, top holdings display"
+estimated_hours = 4
+
+[tasks.p3_04]
+id = "P3-04"
+name = "Solid PortfolioComparison component"
+phase = 3
+prerequisites = ["P3-01", "P3-03"]
+outputs = ["apps/site/src/components/solid/PortfolioComparison.tsx"]
+verification = "Side-by-side A vs B allocation comparison renders correctly"
+estimated_hours = 4
+
+[tasks.p3_05]
+id = "P3-05"
+name = "Solid CorrelationMatrix component"
+phase = 3
+prerequisites = ["P3-01", "P0-05"]
+outputs = ["apps/site/src/components/solid/CorrelationMatrix.tsx"]
+verification = "1Y daily returns heatmap renders for up to 10 ETFs"
+estimated_hours = 4
+
+[tasks.p3_06]
+id = "P3-06"
+name = "Solid PerformanceMetrics component"
+phase = 3
+prerequisites = ["P3-01", "P0-05"]
+outputs = ["apps/site/src/components/solid/PerformanceMetrics.tsx"]
+verification = "Total return, volatility, Sharpe ratio, max drawdown display"
+estimated_hours = 3
+
+[tasks.p3_07]
+id = "P3-07"
+name = "Integrate uPlot for ETF chart"
+phase = 3
+prerequisites = ["P3-03", "P2-04"]
+outputs = ["apps/site/src/components/solid/EtfChart.tsx"]
+verification = "ETF price chart renders with timeframe selection"
+estimated_hours = 2
+
+[tasks.p3_08]
+id = "P3-08"
+name = "Integration testing for ETF Intelligence"
+phase = 3
+prerequisites = ["P3-01", "P3-02", "P3-03", "P3-04", "P3-05", "P3-06", "P3-07"]
+outputs = ["tests/e2e/etf.spec.ts"]
+verification = "All ETF features work in E2E tests"
+estimated_hours = 4
+
+# =============================================================================
+# PHASE 4: WASM WIDGETS
+# =============================================================================
+
+[tasks.p4_01]
+id = "P4-01"
+name = "Set up wasm-pack build pipeline"
+phase = 4
+prerequisites = ["P0-01"]
+outputs = ["packages/widgets/Cargo.toml", "packages/widgets/scripts/build.sh"]
+verification = "wasm-pack build --target web --release produces .wasm + .js"
+estimated_hours = 4
+
+[tasks.p4_02]
+id = "P4-02"
+name = "Create embed wrapper pattern"
+phase = 4
+prerequisites = ["P4-01"]
+outputs = ["apps/site/src/components/wasm/WasmEmbed.astro"]
+verification = "IntersectionObserver loads WASM on scroll, shows skeleton during load"
+estimated_hours = 4
+
+[tasks.p4_03]
+id = "P4-03"
+name = "Fourier Transform widget"
+phase = 4
+prerequisites = ["P4-01"]
+outputs = ["packages/widgets/src/science/fourier.rs", "apps/site/public/wasm/fourier_bg.wasm"]
+verification = "FFT visualization renders on Home page, interactive controls work"
+estimated_hours = 6
+
+[tasks.p4_04]
+id = "P4-04"
+name = "Generative Art Studio widget"
+phase = 4
+prerequisites = ["P4-01"]
+outputs = ["packages/widgets/src/creative/generative.rs", "apps/site/public/wasm/generative_bg.wasm"]
+verification = "Procedural art generates on Home page, seed control works"
+estimated_hours = 8
+
+[tasks.p4_05]
+id = "P4-05"
+name = "Regex Playground widget"
+phase = 4
+prerequisites = ["P4-01"]
+outputs = ["packages/widgets/src/devtools/regex.rs", "apps/site/public/wasm/regex_bg.wasm"]
+verification = "Regex matching highlights on Home page, real-time feedback works"
+estimated_hours = 4
+
+[tasks.p4_06]
+id = "P4-06"
+name = "Order Book widget"
+phase = 4
+prerequisites = ["P4-01", "P0-05"]
+outputs = ["packages/widgets/src/finance/order_book.rs", "apps/site/public/wasm/order_book_bg.wasm"]
+verification = "Binance order book depth visualizes on World page"
+estimated_hours = 8
+
+[tasks.p4_07]
+id = "P4-07"
+name = "Market Treemap widget"
+phase = 4
+prerequisites = ["P4-01", "P0-05"]
+outputs = ["packages/widgets/src/finance/treemap.rs", "apps/site/public/wasm/treemap_bg.wasm"]
+verification = "Crypto market treemap renders on World page"
+estimated_hours = 6
+
+[tasks.p4_08]
+id = "P4-08"
+name = "BTC Health Dashboard widget"
+phase = 4
+prerequisites = ["P4-01", "P0-05"]
+outputs = ["packages/widgets/src/finance/btc_health.rs", "apps/site/public/wasm/btc_health_bg.wasm"]
+verification = "BTC network health gauges render on World page"
+estimated_hours = 8
+
+[tasks.p4_09]
+id = "P4-09"
+name = "Correlation Network widget"
+phase = 4
+prerequisites = ["P4-01", "P0-05"]
+outputs = ["packages/widgets/src/finance/correlation.rs", "apps/site/public/wasm/correlation_bg.wasm"]
+verification = "Asset correlation network graph renders on ETF page"
+estimated_hours = 8
+
+[tasks.p4_10]
+id = "P4-10"
+name = "Strategy Backtester widget"
+phase = 4
+prerequisites = ["P4-01", "P0-05"]
+outputs = ["packages/widgets/src/finance/backtest.rs", "apps/site/public/wasm/backtest_bg.wasm"]
+verification = "Strategy simulation runs on ETF page, equity curve displays"
+estimated_hours = 12
+
+[tasks.p4_11]
+id = "P4-11"
+name = "Climate Data Explorer widget"
+phase = 4
+prerequisites = ["P4-01"]
+outputs = ["packages/widgets/src/science/climate.rs", "apps/site/public/wasm/climate_bg.wasm"]
+verification = "NASA GISS temperature anomaly chart renders on Dossier page"
+estimated_hours = 10
+
+[tasks.p4_12]
+id = "P4-12"
+name = "Cellular Automata widget"
+phase = 4
+prerequisites = ["P4-01"]
+outputs = ["packages/widgets/src/science/cellular.rs", "apps/site/public/wasm/cellular_bg.wasm"]
+verification = "Game of Life runs on Dossier page, play/pause/reset controls work"
+estimated_hours = 4
+
+[tasks.p4_13]
+id = "P4-13"
+name = "Physics Sandbox widget"
+phase = 4
+prerequisites = ["P4-01"]
+outputs = ["packages/widgets/src/science/physics.rs", "apps/site/public/wasm/physics_bg.wasm"]
+verification = "2D particle simulation runs on Dossier page, interactive forces work"
+estimated_hours = 8
+
+[tasks.p4_14]
+id = "P4-14"
+name = "Color Blindness Simulator widget"
+phase = 4
+prerequisites = ["P4-01"]
+outputs = ["packages/widgets/src/creative/colorblind.rs", "apps/site/public/wasm/colorblind_bg.wasm"]
+verification = "Image upload + CVD simulation works on Dossier page"
+estimated_hours = 4
+
+[tasks.p4_15]
+id = "P4-15"
+name = "Network Topology Mapper widget"
+phase = 4
+prerequisites = ["P4-01"]
+outputs = ["packages/widgets/src/devtools/network.rs", "apps/site/public/wasm/network_bg.wasm"]
+verification = "Force-directed graph renders from user input on Projects page"
+estimated_hours = 6
+
+[tasks.p4_16]
+id = "P4-16"
+name = "Page integration for all widgets"
+phase = 4
+prerequisites = ["P4-02", "P4-03", "P4-04", "P4-05", "P4-06", "P4-07", "P4-08", "P4-09", "P4-10", "P4-11", "P4-12", "P4-13", "P4-14", "P4-15"]
+outputs = ["apps/site/src/pages/index.astro", "apps/site/src/pages/world.astro", "apps/site/src/pages/etf.astro", "apps/site/src/pages/dossier.astro", "apps/site/src/pages/projects.astro"]
+verification = "Each widget appears on its designated page"
+estimated_hours = 6
+
+[tasks.p4_17]
+id = "P4-17"
+name = "WASM loading optimization"
+phase = 4
+prerequisites = ["P4-16"]
+outputs = ["apps/site/src/components/wasm/WasmEmbed.astro"]
+verification = "WASM only loads when visible, skeleton shows during load, error boundary catches failures"
+estimated_hours = 2
+
+# =============================================================================
+# PHASE 5: POLISH
+# =============================================================================
+
+[tasks.p5_01]
+id = "P5-01"
+name = "Visual fidelity audit"
+phase = 5
+prerequisites = ["P4-16"]
+outputs = ["tests/visual/audit-report.md"]
+verification = "Pixel-perfect comparison with design spec across all pages"
+estimated_hours = 4
+
+[tasks.p5_02]
+id = "P5-02"
+name = "Responsive testing"
+phase = 5
+prerequisites = ["P5-01"]
+outputs = ["tests/e2e/responsive.spec.ts"]
+verification = "320px to 2560px viewport tested, no layout breaks"
+estimated_hours = 3
+
+[tasks.p5_03]
+id = "P5-03"
+name = "Lighthouse optimization"
+phase = 5
+prerequisites = ["P5-02"]
+outputs = ["tests/perf/lighthouse-report.json"]
+verification = "95+ across all Lighthouse categories"
+estimated_hours = 4
+
+[tasks.p5_04]
+id = "P5-04"
+name = "Accessibility audit"
+phase = 5
+prerequisites = ["P5-03"]
+outputs = ["tests/a11y/axe-report.json"]
+verification = "WCAG 2.1 AA compliant, axe-core zero violations"
+estimated_hours = 3
+
+[tasks.p5_05]
+id = "P5-05"
+name = "SEO validation"
+phase = 5
+prerequisites = ["P5-01"]
+outputs = ["tests/seo/validation-report.md"]
+verification = "Google Rich Results Test passes, sitemap valid, OG images render"
+estimated_hours = 2
+
+[tasks.p5_06]
+id = "P5-06"
+name = "Performance monitoring setup"
+phase = 5
+prerequisites = ["P5-03"]
+outputs = ["apps/site/src/pages/api/vitals.ts"]
+verification = "RUM vitals endpoint collects and aggregates Core Web Vitals"
+estimated_hours = 2
+
+# =============================================================================
+# PHASE 6: LAUNCH
+# =============================================================================
+
+[tasks.p6_01]
+id = "P6-01"
+name = "CF Pages deployment"
+phase = 6
+prerequisites = ["P5-04", "P5-05", "P5-06"]
+outputs = ["deployment:cf-pages"]
+verification = "Site live on CF Pages URL"
+estimated_hours = 2
+
+[tasks.p6_02]
+id = "P6-02"
+name = "Custom domain setup"
+phase = 6
+prerequisites = ["P6-01"]
+outputs = ["dns:wyattau.com"]
+verification = "wyattau.com resolves to CF Pages"
+estimated_hours = 1
+
+[tasks.p6_03]
+id = "P6-03"
+name = "SSL/TLS verification"
+phase = 6
+prerequisites = ["P6-02"]
+outputs = ["ssl:verified"]
+verification = "HTTPS everywhere, no mixed content"
+estimated_hours = 1
+
+[tasks.p6_04]
+id = "P6-04"
+name = "Smoke testing"
+phase = 6
+prerequisites = ["P6-01"]
+outputs = ["tests/smoke/results.md"]
+verification = "All pages load, all features work, no console errors"
+estimated_hours = 2
+
+[tasks.p6_05]
+id = "P6-05"
+name = "Documentation finalization"
+phase = 6
+prerequisites = ["P6-04"]
+outputs = [".docs/user_guide.md", ".docs/api_reference.md", ".docs/design_system.md", ".docs/deployment_runbook.md"]
+verification = "All documentation complete and accurate"
+estimated_hours = 2
+
+# =============================================================================
+# DEPENDENCY GRAPH (topological order)
+# =============================================================================
+#
+# Phase 0:
+#   P0-01 → P0-02, P0-03, P0-04, P0-06, P0-07
+#   P0-04 → P0-05
+#
+# Phase 1 (depends on Phase 0):
+#   P0-01 + P0-02 → P1-01
+#   P1-01 → P1-02, P1-03, P1-04, P1-05, P1-06, P1-07, P1-08, P1-09, P1-10
+#   P1-01 + P0-02 → P1-09
+#   P1-02 + P1-03 + P1-04 + P1-05 + P1-06 + P1-07 → P1-11
+#
+# Phase 2 (depends on Phase 1):
+#   P1-01 → P2-01
+#   P2-01 + P0-05 → P2-02, P2-04, P2-06, P2-07
+#   P2-01 → P2-03, P2-08
+#   P2-03 + P0-05 → P2-05
+#   P2-03 + P2-04 → P2-09
+#   P2-01 + P2-02 + P2-03 + P2-04 + P2-05 + P2-06 + P2-07 + P2-08 → P2-10
+#
+# Phase 3 (depends on Phase 1):
+#   P1-01 → P3-01
+#   P3-01 → P3-02, P3-03
+#   P3-01 + P0-05 → P3-03, P3-05, P3-06
+#   P3-01 + P3-03 → P3-04
+#   P3-03 + P2-04 → P3-07
+#   P3-01 + P3-02 + P3-03 + P3-04 + P3-05 + P3-06 + P3-07 → P3-08
+#
+# Phase 4 (depends on Phase 0 + Phase 1):
+#   P0-01 → P4-01
+#   P4-01 → P4-02, P4-03, P4-04, P4-05, P4-06, P4-07, P4-08, P4-09, P4-10, P4-11, P4-12, P4-13, P4-14, P4-15
+#   P4-01 + P0-05 → P4-06, P4-07, P4-08, P4-09, P4-10
+#   P4-02 + all widgets → P4-16
+#   P4-16 → P4-17
+#
+# Phase 5 (depends on Phase 4):
+#   P4-16 → P5-01
+#   P5-01 → P5-02, P5-05
+#   P5-02 → P5-03
+#   P5-03 → P5-04, P5-06
+#
+# Phase 6 (depends on Phase 5):
+#   P5-04 + P5-05 + P5-06 → P6-01
+#   P6-01 → P6-02, P6-04
+#   P6-02 → P6-03
+#   P6-04 → P6-05
+
+# =============================================================================
+# EFFORT SUMMARY
+# =============================================================================
+
+[summary]
+phase_0_hours = 20
+phase_1_hours = 25
+phase_2_hours = 42
+phase_3_hours = 26
+phase_4_hours = 96
+phase_5_hours = 18
+phase_6_hours = 8
+total_hours = 235
+
+# Parallelization notes:
+# Phase 2 and Phase 3 can run in parallel (both depend on Phase 1)
+# Phase 4 can start after Phase 0 + Phase 1 (widgets are independent of Phase 2/3)
+# Critical path: P0-01 → P0-05 → P1-01 → P1-06 → P2-01 → P2-03 → P4-01 → P4-16 → P5-01 → P5-03 → P6-01

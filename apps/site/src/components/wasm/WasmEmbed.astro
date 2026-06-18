@@ -1,0 +1,144 @@
+---
+interface Props {
+  widget: string;
+  width?: number;
+  height?: number;
+  class?: string;
+}
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const { widget, width = 800, height = 400, class: className = '' } = Astro.props;
+const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div
+  id={widgetId}
+  class={`wasm-embed ${className}`}
+  data-widget={widget}
+  data-width={width}
+  data-height={height}
+  style={`width: ${width}px; height: ${height}px;`}
+>
+  <div class="wasm-skeleton">
+    <div class="skeleton-pulse"></div>
+    <span class="skeleton-text">Loading {widget}...</span>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    function initWasmEmbeds() {
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              var el = entry.target;
+              var widget = el.dataset.widget;
+              var w = parseInt(el.dataset.width || '800', 10);
+              var h = parseInt(el.dataset.height || '400', 10);
+
+              var wasmPath = '/wasm/hydrated_widgets.js';
+              import(wasmPath)
+                .then(async function (mod) {
+                  await mod.default();
+                  var createFn = mod['create_' + widget];
+                  if (createFn) {
+                    var canvas = document.createElement('canvas');
+                    canvas.id = el.id + '-canvas';
+                    canvas.width = w;
+                    canvas.height = h;
+                    el.innerHTML = '';
+                    el.appendChild(canvas);
+                    createFn(canvas.id, w, h);
+                  } else {
+                    throw new Error('Widget function create_' + widget + ' not found');
+                  }
+                })
+                .catch(function (err) {
+                  el.innerHTML =
+                    '<div class="wasm-error">' +
+                    '<p>Failed to load widget.</p>' +
+                    '<p class="wasm-error-detail">' + err.message + '</p>' +
+                    '</div>';
+                  console.error('WASM widget "' + widget + '" failed:', err);
+                });
+
+              observer.unobserve(el);
+            }
+          });
+        },
+        { rootMargin: '200px' }
+      );
+
+      document.querySelectorAll('.wasm-embed').forEach(function (el) {
+        observer.observe(el);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initWasmEmbeds);
+    } else {
+      initWasmEmbeds();
+    }
+  })();
+</script>
+
+<style>
+  .wasm-embed {
+    position: relative;
+    border: 1px solid #1a1a2e;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #0a0a0a;
+  }
+
+  .wasm-skeleton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    gap: 12px;
+  }
+
+  .skeleton-pulse {
+    width: 60%;
+    height: 8px;
+    background: linear-gradient(90deg, #1a1a2e 25%, #2a2a4e 50%, #1a1a2e 75%);
+    background-size: 200% 100%;
+    animation: pulse 1.5s ease-in-out infinite;
+    border-radius: 4px;
+  }
+
+  .skeleton-text {
+    color: #666;
+    font-size: 12px;
+    font-family: monospace;
+  }
+
+  .wasm-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #ff6b6b;
+    font-family: monospace;
+    font-size: 13px;
+    text-align: center;
+    padding: 16px;
+  }
+
+  .wasm-error-detail {
+    color: #888;
+    font-size: 11px;
+    margin-top: 8px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+</style>

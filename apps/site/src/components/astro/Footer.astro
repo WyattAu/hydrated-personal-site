@@ -1,0 +1,41 @@
+---
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const currentYear = new Date().getFullYear();
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const links = [
+  { label: 'GitHub', href: 'https://github.com/WyattAu' },
+  { label: 'Forgejo', href: 'https://forgejo.wyattau.com/WyattAu' },
+  { label: 'Email', href: 'mailto:wyatt_au@protonmail.com' },
+];
+---
+
+<footer
+  class="border-t py-12 px-6 md:px-12 lg:px-24"
+  style="border-color: var(--border);"
+>
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div>
+      <p class="font-mono text-xs font-bold tracking-widest uppercase mb-2" style="color: var(--accent);">
+        WYATT_AU
+      </p>
+      <p class="code-text" style="color: var(--text-secondary);">
+        &copy; {currentYear} Wyatt Au. Built with Astro + SolidJS.
+      </p>
+    </div>
+
+    <div class="flex gap-6">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          target={link.href.startsWith('http') ? '_blank' : undefined}
+          rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+          class="nav-text transition-opacity hover:opacity-100 opacity-50"
+          style="color: var(--text-secondary);"
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</footer>

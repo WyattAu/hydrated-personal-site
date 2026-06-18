@@ -132,3 +132,54 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# ---> Astro
+.astro/
+dist/
+.output/
+
+# ---> Node
+node_modules/
+
+# ---> Bun
+.bun/
+
+# ---> Cloudflare Wrangler
+.wrangler/
+.dev.vars
+
+# ---> WASM
+packages/widgets/target/
+packages/widgets/pkg/
+
+# ---> Testing
+coverage/
+test-results/
+playwright-report/
+reports/
+
+# ---> Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ---> IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---> OS
+.DS_Store
+Thumbs.db
+
+# ---> Turbo
+.turbo/
+
+# ---> Misc
+*.log
+tmp/
+temp/
+

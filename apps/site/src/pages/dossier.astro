@@ -1,0 +1,280 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/astro/Nav.astro';
+import Footer from '../components/astro/Footer.astro';
+import WasmEmbed from '../components/wasm/WasmEmbed.astro';
+import '../styles/base.css';
+import '../styles/animations.css';
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const expertiseCategories = [
+  {
+    title: 'Programming Languages',
+    icon: 'code',
+    details: [
+      'Rust — Systems programming, WASM, async/await, serde',
+      'C++ — Systems programming, QT, boost, SIMD/AVX',
+      'C — Low-level systems programming',
+      'Python — Automation, data processing, testing',
+      'Go — Backend services, Echo framework',
+      'Java — Enterprise applications, Gradle builds',
+      'TypeScript/JavaScript — Full-stack web development',
+      'Dart — Cross-platform mobile (Flutter)',
+      'Bash — Infrastructure automation, CI/CD',
+      'Nix — Declarative system configuration',
+      'SQL — PostgreSQL, query optimization',
+    ],
+  },
+  {
+    title: 'Frameworks & Libraries',
+    icon: 'layers',
+    details: [
+      'Leptos — Rust SSR/WASM reactive framework',
+      'Flutter — Cross-platform UI toolkit',
+      'Axum — Rust async web framework',
+      'Actix — High-performance Rust web framework',
+      'React/Next.js — Server-side rendering',
+      'FastAPI — Python async web framework',
+      'QT — Cross-platform C++ GUI framework',
+      'imgui — Immediate-mode C++ GUI library',
+      'Echo — Go web framework',
+      'Docusaurus — React-based documentation site generator',
+      'Bloc — Flutter state management',
+    ],
+  },
+  {
+    title: 'DevOps & Infrastructure',
+    icon: 'server',
+    details: [
+      'Docker — Containerization, multi-stage builds',
+      'Kubernetes — Orchestration, Helm charts',
+      'Cloudflare — Pages, Workers, DNS, CDN',
+      'AWS — Cloud infrastructure and services',
+      'Terraform — Infrastructure as Code',
+      'Ansible — Configuration management',
+      'GitHub Actions / Forgejo Actions / Gitlab CI / Jenkins / Woodpecker CI — CI/CD pipelines',
+      'Nix Flakes — Reproducible builds',
+      'TrueNAS Scale / Proxmox — Self-hosted storage and virtualization',
+      'Keycloak — Identity and access management',
+      'Traefik — Cloud-native edge router and reverse proxy',
+      'Linux distros — Debian, Red Hat, Arch, Alpine, distroless images',
+    ],
+  },
+  {
+    title: 'Monitoring & Deployment',
+    icon: 'activity',
+    details: [
+      'Prometheus + Grafana — Metrics and dashboards',
+      'Loki — Log aggregation',
+      'Jaeger — Distributed tracing',
+      'Uptime Kuma — Availability monitoring',
+      'NGINX — Reverse proxy, load balancing, serving',
+      'Argo CD — GitOps continuous deployment for Kubernetes',
+      'Blue-Green / Canary deployments',
+      'Feature flags and progressive rollouts',
+    ],
+  },
+  {
+    title: 'Databases',
+    icon: 'database',
+    details: [
+      'PostgreSQL — Advanced queries, JSONB, partitioning',
+      'TimescaleDB — Time-series extension for PostgreSQL',
+      'Redis — Caching, message queues',
+      'SQLite — Embedded databases, WASM',
+      'MariaDB — MySQL-compatible relational database',
+      'Supabase — Backend-as-a-Service',
+      'Firebase — Real-time database, authentication',
+    ],
+  },
+  {
+    title: 'Tooling & Practices',
+    icon: 'wrench',
+    details: [
+      'Git — Advanced workflows, rebasing, bisect, LFS, submodules',
+      'CMake / CTest / Ninja — C/C++ build systems',
+      'Conan / vcpkg — C++ package managers',
+      'Lean 4 — Formal verification, theorem proving',
+      'Valgrind — Memory analysis',
+      'Catch2 — C++ unit testing framework',
+      'CLion / VS Code / Neovim — IDE and editor proficiency',
+      'Code review and pair programming',
+      'TDD and property-based testing',
+      'Makefile — Build automation',
+      'Doxygen — C++ documentation generator',
+      'MkDocs — Markdown documentation site generator',
+      'Portainer — Docker management UI',
+    ],
+  },
+];
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const employment = [
+  {
+    role: 'Founder & Backend Engineer',
+    company: 'QuestHive',
+    duration: 'Jun 2025 — Present',
+    description:
+      'Bootstrapping an early-stage SaaS platform focused on infrastructure automation. Responsible for system architecture, interfacing services, and deployment pipelines.',
+    achievements: [
+      'Designed and implemented the core knowledge graph engine for infrastructure documentation',
+      'Built automated deployment pipeline using Cloudflare Workers and CI/CD',
+      'Developed API-first architecture enabling integration with existing DevOps workflows',
+    ],
+  },
+  {
+    role: 'Freelance Developer',
+    company: 'Self-Employed',
+    duration: '2022 — 2025',
+    description:
+      'Delivered full-stack solutions for clients including web applications, mobile apps, and infrastructure automation.',
+    achievements: [
+      'Built and deployed multiple production web applications using Rust, Flutter, and TypeScript',
+      'Implemented infrastructure automation reducing deployment time by 60%',
+      'Developed cross-platform mobile applications with Flutter and Dart',
+    ],
+  },
+];
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const education = [
+  {
+    degree: 'International Baccalaureate (IB)',
+    institution: 'Dartford Grammar School — Kent, UK',
+    duration: '2023 — 2025',
+    description:
+      'Rigorous pre-university programme with emphasis on critical thinking, research methodology, and international-mindedness.',
+  },
+];
+---
+
+<BaseLayout title="Dossier — Wyatt Au" description="Personal dossier, timeline, and detailed biography of Wyatt Au.">
+  <Nav />
+
+  <main id="main-content" class="pt-24">
+    <!-- Header -->
+    <section class="py-16 px-6 md:px-12 lg:px-24">
+      <p class="label mb-6 cinematic-enter" style="color: var(--accent);">DOSSIER</p>
+      <h1 class="text-3xl md:text-5xl font-bold mb-4 cinematic-enter cinematic-enter-delay-1">Dossier</h1>
+      <p class="text-lg cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 640px;">
+        A detailed overview of technical expertise, professional timeline, and educational background.
+      </p>
+    </section>
+
+    <!-- Expertise Grid -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-8 reveal" style="color: var(--accent);">EXPERTISE</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 stagger-children reveal">
+        {expertiseCategories.map((cat) => (
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="font-mono text-[10px] px-2 py-1 font-bold uppercase tracking-wider" style="border: 1px solid var(--border); color: var(--accent);">
+                {cat.icon}
+              </span>
+              <span class="font-mono text-xs font-bold uppercase tracking-wider" style="color: var(--accent);">
+                {cat.title}
+              </span>
+            </div>
+            <ul class="space-y-2">
+              {cat.details.map((detail) => (
+                <li class="text-sm" style="color: var(--text-secondary);">
+                  {detail}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Employment Timeline -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-8 reveal" style="color: var(--accent);">EMPLOYMENT</p>
+      <div class="max-w-3xl stagger-children reveal">
+        {employment.map((job, i) => (
+          <div class={i < employment.length - 1 ? 'mb-12' : ''}>
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1 gap-1">
+              <h3 class="font-mono text-sm font-bold">{job.role}</h3>
+              <span class="code-text" style="color: var(--text-secondary);">{job.duration}</span>
+            </div>
+            <p class="text-sm mb-2" style="color: var(--accent);">{job.company}</p>
+            <p class="text-sm mb-3" style="color: var(--text-secondary);">{job.description}</p>
+            <ul class="space-y-1.5">
+              {job.achievements.map((achievement) => (
+                <li class="text-sm flex items-start gap-2" style="color: var(--text-secondary);">
+                  <span style="color: var(--accent);">→</span>
+                  {achievement}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-8 reveal" style="color: var(--accent);">EDUCATION</p>
+      <div class="max-w-3xl reveal">
+        {education.map((edu) => (
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1 gap-1">
+              <h3 class="font-mono text-sm font-bold">{edu.degree}</h3>
+              <span class="code-text" style="color: var(--text-secondary);">{edu.duration}</span>
+            </div>
+            <p class="text-sm mb-2" style="color: var(--accent);">{edu.institution}</p>
+            <p class="text-sm" style="color: var(--text-secondary);">{edu.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- WASM Widgets -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-6 reveal" style="color: var(--accent);">INTERACTIVE DEMOS</p>
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 reveal">WASM Widgets</h2>
+      <p class="mb-8 reveal" style="color: var(--text-secondary); max-width: 640px;">
+        Client-side interactive demonstrations powered by WebAssembly.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 stagger-children reveal">
+        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Climate Data Explorer</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Visualize historical climate datasets with interactive charts and filtering.</p>
+          <WasmEmbed widget="climate_data_explorer" width={600} height={350} />
+        </div>
+        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Cellular Automata</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Conway's Game of Life and custom rulesets running at 60fps in WASM.</p>
+          <WasmEmbed widget="cellular_automata" width={600} height={350} />
+        </div>
+        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Physics Sandbox</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Real-time rigid body simulation with collision detection and gravity.</p>
+          <WasmEmbed widget="physics_sandbox" width={600} height={350} />
+        </div>
+        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Color Blindness Simulator</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Preview designs under protanopia, deuteranopia, and tritanopia filters.</p>
+          <WasmEmbed widget="color_blindness_simulator" width={600} height={350} />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+
+  <script>
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    document.querySelectorAll('.reveal, .stagger-children').forEach((el) => observer.observe(el));
+  </script>
+</BaseLayout>

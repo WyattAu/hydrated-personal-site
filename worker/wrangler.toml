@@ -1,0 +1,12 @@
+name = "hydrated-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+
+# KV namespace for guestbook (configure after first deploy)
+# [[kv_namespaces]]
+# binding = "GUESTBOOK"
+# id = "xxx"

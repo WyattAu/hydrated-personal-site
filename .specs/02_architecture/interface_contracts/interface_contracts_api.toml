@@ -1,0 +1,449 @@
+# Interface Contracts — API Endpoints
+# Hydrated Personal Site
+
+version = "1.0.0"
+base_url = "/api"
+protocol = "HTTPS"
+format = "JSON"
+
+# ─── Health Check ──────────────────────────────────────────────
+
+[[endpoint]]
+id = "HEALTH-001"
+method = "GET"
+path = "/api/health"
+description = "Health check endpoint"
+params = {}
+cache_ttl = 0
+error_codes = []
+
+[endpoint.response]
+status = 200
+schema = """
+{ "status": "ok", "timestamp": number, "version": string }
+"""
+
+# ─── Weather ───────────────────────────────────────────────────
+
+[[endpoint]]
+id = "WEATHER-001"
+method = "GET"
+path = "/api/weather"
+description = "Open-Meteo weather proxy"
+cache_ttl = 300
+error_codes = [400, 502, 429]
+external_api = "https://api.open-meteo.com/v1/forecast"
+
+[endpoint.params]
+lat = { type = "number", required = true, description = "Latitude" }
+lon = { type = "number", required = true, description = "Longitude" }
+units = { type = "string", required = false, default = "celsius", enum = ["celsius", "fahrenheit"] }
+
+[endpoint.response]
+status = 200
+schema = """
+{ "temperature": number, "humidity": number, "windSpeed": number, "description": string, "icon": string }
+"""
+
+[endpoint.errors]
+400 = "Missing required parameters (lat, lon)"
+502 = "Upstream API error (Open-Meteo)"
+429 = "Rate limit exceeded"
+
+# ─── Stock Chart ───────────────────────────────────────────────
+
+[[endpoint]]
+id = "STOCK-CHART-001"
+method = "GET"
+path = "/api/stock-chart"
+description = "Yahoo Finance chart data proxy"
+cache_ttl = 120
+error_codes = [400, 404, 502]
+external_api = "https://query1.finance.yahoo.com/v8/finance/chart/"
+
+[endpoint.params]
+symbol = { type = "string", required = true, description = "Ticker symbol (e.g. AAPL, BTC-USD)" }
+range = { type = "string", required = false, default = "1d", enum = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "5y"] }
+interval = { type = "string", required = false, default = "auto", enum = ["1m", "5m", "15m", "1h", "1d", "1wk"] }
+
+[endpoint.response]
+status = 200
+schema = """
+{ "symbol": string, "timestamps": number[], "opens": number[], "highs": number[], "lows": number[], "closes": number[], "volumes": number[] }
+"""
+
+[endpoint.errors]
+400 = "Invalid symbol or parameters"
+404 = "Symbol not found"
+502 = "Upstream API error (Yahoo Finance)"
+
+# ─── Crypto Ticker ─────────────────────────────────────────────
+
+[[endpoint]]
+id = "CRYPTO-TICKER-001"
+method = "GET"
+path = "/api/crypto-ticker"
+description = "Binance crypto price proxy"
+cache_ttl = 10
+error_codes = [502]
+external_api = "https://api.binance.com/api/v3/ticker/24hr"
+
+[endpoint.params]
+symbols = { type = "string", required = false, default = "BTCUSDT,ETHUSDT", description = "Comma-separated symbol list" }
+
+[endpoint.response]
+status = 200
+schema = """
+[{ "symbol": string, "price": number, "change": number, "changePercent": number, "volume": number, "timestamp": number }]
+"""
+
+[endpoint.errors]
+502 = "Upstream API error (Binance)"
+
+# ─── CoinGecko Global ──────────────────────────────────────────
+
+[[endpoint]]
+id = "COINGECKO-GLOBAL-001"
+method = "GET"
+path = "/api/coingecko-global"
+description = "CoinGecko global market data"
+cache_ttl = 300
+error_codes = [502]
+external_api = "https://api.coingecko.com/api/v3/global"
+
+[endpoint.params] = {}
+
+[endpoint.response]
+status = 200
+schema = """
+{ "totalMarketCap": { "usd": number }, "totalVolume": { "usd": number }, "btcDominance": number, "activeCryptos": number }
+"""
+
+[endpoint.errors]
+502 = "Upstream API error (CoinGecko)"
+
+# ─── Earthquakes ───────────────────────────────────────────────
+
+[[endpoint]]
+id = "EARTHQUAKES-001"
+method = "GET"
+path = "/api/earthquakes"
+description = "USGS earthquake data"
+cache_ttl = 300
+error_codes = [502]
+external_api = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary"
+
+[endpoint.params]
+minMagnitude = { type = "number", required = false, default = 4.5, description = "Minimum magnitude" }
+days = { type = "number", required = false, default = 7, description = "Number of days back" }
+
+[endpoint.response]
+status = 200
+schema = """
+{ "earthquakes": [{ "id": string, "magnitude": number, "place": string, "time": number, "lat": number, "lng": number, "depth": number }] }
+"""
+
+[endpoint.errors]
+502 = "Upstream API error (USGS)"
+
+# ─── Fear & Greed ──────────────────────────────────────────────
+
+[[endpoint]]
+id = "FEAR-GREED-001"
+method = "GET"
+path = "/api/fear-greed"
+description = "Crypto Fear & Greed Index"
+cache_ttl = 300
+error_codes = [502]
+external_api = "https://api.alternative.me/fng/"
+
+[endpoint.params] = {}
+
+[endpoint.response]
+status = 200
+schema = """
+{ "value": number, "classification": string, "timestamp": number }
+"""
+
+[endpoint.errors]
+502 = "Upstream API error (alternative.me)"
+
+# ─── Kp Index ──────────────────────────────────────────────────
+
+[[endpoint]]
+id = "KP-INDEX-001"
+method = "GET"
+path = "/api/kp-index"
+description = "NOAA Kp geomagnetic index"
+cache_ttl = 600
+error_codes = [502]
+external_api = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
+
+[endpoint.params] = {}
+
+[endpoint.response]
+status = 200
+schema = """
+{ "kpIndex": number, "timestamp": number }
+"""
+
+[endpoint.errors]
+502 = "Upstream API error (NOAA)"
+
+# ─── Mempool ───────────────────────────────────────────────────
+
+[[endpoint]]
+id = "MEMPOOL-001"
+method = "GET"
+path = "/api/mempool"
+description = "BTC mempool fees from mempool.space"
+cache_ttl = 60
+error_codes = [502]
+external_api = "https://mempool.space/api/v1/fees/recommended"
+
+[endpoint.params] = {}
+
+[endpoint.response]
+status = 200
+schema = """
+{ "fees": { "fastestFee": number, "halfHourFee": number, "hourFee": number, "economyFee": number }, "timestamp": number }
+"""
+
+[endpoint.errors]
+502 = "Upstream API error (mempool.space)"
+
+# ─── Binance Klines ────────────────────────────────────────────
+
+[[endpoint]]
+id = "BINANCE-KLINES-001"
+method = "GET"
+path = "/api/binance-klines"
+description = "Binance price history (klines)"
+cache_ttl = 300
+error_codes = [400, 502]
+external_api = "https://api.binance.com/api/v3/klines"
+
+[endpoint.params]
+symbol = { type = "string", required = true, description = "Trading pair (e.g. BTCUSDT)" }
+interval = { type = "string", required = false, default = "1d", enum = ["1m", "5m", "15m", "1h", "1d", "1wk"] }
+limit = { type = "number", required = false, default = 100, description = "Max 1000" }
+
+[endpoint.response]
+status = 200
+schema = """
+[{ "openTime": number, "open": number, "high": number, "low": number, "close": number, "volume": number, "closeTime": number }]
+"""
+
+[endpoint.errors]
+400 = "Invalid symbol or parameters"
+502 = "Upstream API error (Binance)"
+
+# ─── Hacker News ───────────────────────────────────────────────
+
+[[endpoint]]
+id = "HACKER-NEWS-001"
+method = "GET"
+path = "/api/hacker-news"
+description = "Hacker News top stories"
+cache_ttl = 300
+error_codes = [502]
+external_api = "https://hacker-news.firebaseio.com/v0"
+
+[endpoint.params]
+limit = { type = "number", required = false, default = 20, description = "Max 50" }
+
+[endpoint.response]
+status = 200
+schema = """
+[{ "id": number, "title": string, "url": string, "score": number, "by": string, "time": number, "descendants": number }]
+"""
+
+[endpoint.errors]
+502 = "Upstream API error (HN Firebase)"
+
+# ─── GitHub Trending ───────────────────────────────────────────
+
+[[endpoint]]
+id = "GITHUB-TRENDING-001"
+method = "GET"
+path = "/api/github-trending"
+description = "GitHub trending repositories"
+cache_ttl = 1800
+error_codes = [502]
+external_api = "GitHub Trending (scraped)"
+
+[endpoint.params]
+language = { type = "string", required = false, description = "Programming language filter" }
+since = { type = "string", required = false, default = "daily", enum = ["daily", "weekly", "monthly"] }
+
+[endpoint.response]
+status = 200
+schema = """
+[{ "name": string, "url": string, "description": string, "language": string, "stars": number, "forks": number, "todayStars": number }]
+"""
+
+[endpoint.errors]
+502 = "Upstream API error (GitHub)"
+
+# ─── LLM Benchmarks ───────────────────────────────────────────
+
+[[endpoint]]
+id = "LLM-BENCHMARKS-001"
+method = "GET"
+path = "/api/llm-benchmarks"
+description = "LLM benchmark data from Artificial Analysis"
+cache_ttl = 21600
+error_codes = [502]
+external_api = "https://api.artificialanalysis.ai"
+
+[endpoint.params] = {}
+
+[endpoint.response]
+status = 200
+schema = """
+[{ "model": string, "provider": string, "scores": { [benchmark: string]: number }, "price": number, "speed": number }]
+"""
+
+[endpoint.errors]
+502 = "Upstream API error (Artificial Analysis)"
+
+# ─── Guestbook ─────────────────────────────────────────────────
+
+[[endpoint]]
+id = "GUESTBOOK-GET-001"
+method = "GET"
+path = "/api/guestbook"
+description = "List guestbook entries"
+cache_ttl = 0
+error_codes = [500]
+
+[endpoint.params]
+limit = { type = "number", required = false, default = 20, description = "Entries per page" }
+offset = { type = "number", required = false, default = 0, description = "Pagination offset" }
+
+[endpoint.response]
+status = 200
+schema = """
+{ "entries": [{ "id": string, "name": string, "message": string, "timestamp": number }], "total": number }
+"""
+
+[endpoint.errors]
+500 = "KV storage error"
+
+[[endpoint]]
+id = "GUESTBOOK-POST-001"
+method = "POST"
+path = "/api/guestbook"
+description = "Create guestbook entry"
+cache_ttl = 0
+error_codes = [400, 413, 429]
+
+[endpoint.params]
+name = { type = "string", required = true, max_length = 50, description = "Display name" }
+message = { type = "string", required = true, max_length = 500, description = "Message content" }
+honeypot = { type = "string", required = true, must_be = "", description = "Must be empty (anti-spam)" }
+
+[endpoint.response]
+status = 201
+schema = """
+{ "id": string, "name": string, "message": string, "timestamp": number }
+"""
+
+[endpoint.errors]
+400 = "Validation error (missing fields, invalid data)"
+413 = "Message too long (max 500 chars)"
+429 = "Rate limit exceeded (5 requests per 10 minutes per IP)"
+
+[[endpoint]]
+id = "GUESTBOOK-DELETE-001"
+method = "DELETE"
+path = "/api/guestbook/:id"
+description = "Delete guestbook entry (admin only)"
+cache_ttl = 0
+error_codes = [401, 404]
+
+[endpoint.params]
+id = { type = "string", required = true, location = "path", description = "Entry ID" }
+authorization = { type = "string", required = true, location = "header", description = "Bearer token" }
+
+[endpoint.response]
+status = 200
+schema = """
+{ "deleted": true }
+"""
+
+[endpoint.errors]
+401 = "Unauthorized (invalid or missing bearer token)"
+404 = "Entry not found"
+
+# ─── Exchange Rates ────────────────────────────────────────────
+
+[[endpoint]]
+id = "EXCHANGE-RATES-001"
+method = "GET"
+path = "/api/exchange-rates"
+description = "Currency exchange rates"
+cache_ttl = 3600
+error_codes = [502]
+external_api = "https://api.exchangerate-api.com"
+
+[endpoint.params]
+base = { type = "string", required = false, default = "USD", description = "Base currency" }
+
+[endpoint.response]
+status = 200
+schema = """
+{ "base": string, "rates": { [currency: string]: number }, "timestamp": number }
+"""
+
+[endpoint.errors]
+502 = "Upstream API error (exchangerate-api)"
+
+# ─── FRED ──────────────────────────────────────────────────────
+
+[[endpoint]]
+id = "FRED-001"
+method = "GET"
+path = "/api/fred"
+description = "Federal Reserve Economic Data"
+cache_ttl = 3600
+error_codes = [400, 502]
+external_api = "https://api.stlouisfed.org/fred/series/observations"
+
+[endpoint.params]
+series = { type = "string", required = true, description = "Series ID (e.g. GDP, UNRATE, CPIAUCSL)" }
+limit = { type = "number", required = false, default = 100, description = "Number of observations" }
+
+[endpoint.response]
+status = 200
+schema = """
+{ "series": string, "data": [{ "date": string, "value": number }] }
+"""
+
+[endpoint.errors]
+400 = "Invalid series ID"
+502 = "Upstream API error (FRED)"
+
+# ─── Vitals (RUM) ──────────────────────────────────────────────
+
+[[endpoint]]
+id = "VITALS-001"
+method = "POST"
+path = "/api/vitals"
+description = "Real User Monitoring vitals collection"
+cache_ttl = 0
+error_codes = [400]
+
+[endpoint.params]
+ttfb = { type = "number", required = true, description = "Time to First Byte (ms)" }
+lcp = { type = "number", required = true, description = "Largest Contentful Paint (ms)" }
+cls = { type = "number", required = true, description = "Cumulative Layout Shift" }
+inp = { type = "number", required = true, description = "Interaction to Next Paint (ms)" }
+url = { type = "string", required = true, description = "Page URL" }
+
+[endpoint.response]
+status = 204
+schema = ""
+
+[endpoint.errors]
+400 = "Invalid vitals data"

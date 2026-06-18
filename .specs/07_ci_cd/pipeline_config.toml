@@ -1,0 +1,365 @@
+# Phase 6: CI/CD Pipeline Configuration
+# Forgejo Actions workflow structure
+
+# ============================================================
+# ci.yml — Continuous Integration
+# ============================================================
+
+[job.ci]
+name = "CI"
+on = ["push", "pull_request"]
+concurrency_group = "ci-${{ github.ref }}"
+
+[job.ci.permissions]
+contents = "read"
+
+# --- Stage 1: Format + Lint (parallel) ---
+
+[job.ci.stage1]
+name = "Quality Gate: Format & Lint"
+
+[job.ci.stage1.format]
+name = "Biome Format Check"
+runs_on = "ubuntu-latest"
+steps = [
+  { uses = "actions/checkout@v4" },
+  { uses = "oven-sh/setup-bun@v2", with = { version = "latest" } },
+  { run = "bun install --frozen-lockfile", name = "Install dependencies" },
+  { run = "bunx biome format .", name = "Format check" },
+  { run = "bunx biome check .", name = "Lint check" },
+]
+quality_gate = "exit_code == 0"
+timeout_minutes = 5
+
+[job.ci.stage1.lint]
+name = "TypeScript Type Check"
+runs_on = "ubuntu-latest"
+steps = [
+  { uses = "actions/checkout@v4" },
+  { uses = "oven-sh/setup-bun@v2", with = { version = "latest" } },
+  { run = "bun install --frozen-lockfile", name = "Install dependencies" },
+  { run = "bunx tsc --noEmit -p apps/site/tsconfig.json", name = "Type check site" },
+  { run = "bunx tsc --noEmit -p worker/tsconfig.json", name = "Type check worker" },
+]
+quality_gate = "exit_code == 0"
+timeout_minutes = 5
+
+# --- Stage 2: Test (after Stage 1 passes) ---
+
+[job.ci.stage2]
+name = "Test Suite"
+needs = ["stage1"]
+runs_on = "ubuntu-latest"
+
+[job.ci.stage2.unit]
+name = "Unit Tests (Vitest)"
+steps = [
+  { uses = "actions/checkout@v4" },
+  { uses = "oven-sh/setup-bun@v2", with = { version = "latest" } },
+  { run = "bun install --frozen-lockfile", name = "Install dependencies" },
+  { run = "bunx vitest run --coverage", name = "Run unit tests" },
+  { run = "bunx vitest run --reporter=junit --outputFile=reports/junit.xml", name = "Generate JUnit report" },
+]
+quality_gate = "exit_code == 0 && coverage >= 80%"
+timeout_minutes = 10
+artifacts = ["reports/junit.xml", "coverage/"]
+
+[job.ci.stage2.property]
+name = "Property-Based Tests (fast-check)"
+steps = [
+  { uses = "actions/checkout@v4" },
+  { uses = "oven-sh/setup-bun@v2", with = { version = "latest" } },
+  { run = "bun install --frozen-lockfile", name = "Install dependencies" },
+  { run = "bunx vitest run --testPathPattern='property'", name = "Run property tests" },
+]
+quality_gate = "exit_code == 0"
+timeout_minutes = 10
+
+# --- Stage 3: Build (after Stage 2 passes) ---
+
+[job.ci.stage3]
+name = "Build Verification"
+needs = ["stage2"]
+
+[job.ci.stage3.wasm]
+name = "Build WASM Widgets"
+runs_on = "ubuntu-latest"
+steps = [
+  { uses = "actions/checkout@v4" },
+  { uses = "dtolnay/rust-toolchain@stable", with = { targets = "wasm32-unknown-unknown" } },
+  { uses = "Swatinem/rust-cache@v2", with = { workspaces = "packages/widgets" } },
+  { run = "curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh", name = "Install wasm-pack" },
+  { run = "wasm-pack build --target web --release packages/widgets", name = "Build WASM" },
+  { run = "ls -la packages/widgets/pkg/*.wasm", name = "Verify WASM output" },
+]
+quality_gate = "exit_code == 0 && wasm_files >= 1"
+timeout_minutes = 15
+cache = { key = "wasm-${{ hashFiles('packages/widgets/src/**') }}", path = "packages/widgets/pkg/" }
+
+[job.ci.stage3.site]
+name = "Build Astro Site"
+runs_on = "ubuntu-latest"
+steps = [
+  { uses = "actions/checkout@v4" },
+  { uses = "oven-sh/setup-bun@v2", with = { version = "latest" } },
+  { run = "bun install --frozen-lockfile", name = "Install dependencies" },
+  { run = "bunx turbo build --filter=site", name = "Build Astro site" },
+  { run = "ls -la apps/site/dist/", name = "Verify build output" },
+]
+quality_gate = "exit_code == 0 && dist_files >= 10"
+timeout_minutes = 10
+cache = { key = "site-${{ hashFiles('apps/site/src/**') }}", path = "apps/site/dist/" }
+
+# --- Stage 4: E2E Tests (after Stage 3 passes) ---
+
+[job.ci.stage4]
+name = "E2E Tests"
+needs = ["stage3"]
+runs_on = "ubuntu-latest"
+
+[job.ci.stage4.e2e]
+name = "Playwright E2E"
+steps = [
+  { uses = "actions/checkout@v4" },
+  { uses = "oven-sh/setup-bun@v2", with = { version = "latest" } },
+  { run = "bun install --frozen-lockfile", name = "Install dependencies" },
+  { run = "bunx playwright install --with-deps chromium", name = "Install Playwright" },
+  { run = "bunx vitest run --testPathPattern='e2e'", name = "Run E2E tests" },
+]
+quality_gate = "exit_code == 0"
+timeout_minutes = 20
+artifacts = ["test-results/", "playwright-report/"]
+
+[job.ci.stage4.a11y]
+name = "Accessibility Tests (axe-core)"
+steps = [
+  { uses = "actions/checkout@v4" },
+  { uses = "oven-sh/setup-bun@v2", with = { version = "latest" } },
+  { run = "bun install --frozen-lockfile", name = "Install dependencies" },
+  { run = "bunx vitest run --testPathPattern='a11y'", name = "Run accessibility tests" },
+]
+quality_gate = "exit_code == 0"
+timeout_minutes = 10
+
+# --- Stage 5: Performance (after Stage 4 passes) ---
+
+[job.ci.stage5]
+name = "Performance Gate"
+needs = ["stage4"]
+runs_on = "ubuntu-latest"
+
+[job.ci.stage5.lighthouse]
+name = "Lighthouse CI"
+steps = [
+  { uses = "actions/checkout@v4" },
+  { uses = "oven-sh/setup-bun@v2", with = { version = "latest" } },
+  { run = "bun install --frozen-lockfile", name = "Install dependencies" },
+  { run = "bunx serve apps/site/dist -l 3000 &", name = "Start preview server" },
+  { run = "bunx lhci autorun --config=lighthouserc.json", name = "Run Lighthouse CI" },
+]
+quality_gate = "performance >= 95 && accessibility >= 100 && seo >= 100"
+timeout_minutes = 15
+artifacts = ["lighthouse-reports/"]
+
+# ============================================================
+# deploy.yml — Deployment Pipeline
+# ============================================================
+
+[job.deploy]
+name = "Deploy"
+on = ["push"]
+branches = ["main"]
+concurrency_group = "deploy"
+
+[job.deploy.permissions]
+contents = "read"
+pages = "write"
+id-token = "write"
+
+[job.deploy.build]
+name = "Build & Deploy"
+runs_on = "ubuntu-latest"
+environment = { name = "production", url = "https://wyattau.com" }
+
+[job.deploy.build.steps]
+1 = { uses = "actions/checkout@v4" }
+2 = { uses = "dtolnay/rust-toolchain@stable", with = { targets = "wasm32-unknown-unknown" } }
+3 = { uses = "Swatinem/rust-cache@v2", with = { workspaces = "packages/widgets" } }
+4 = { uses = "oven-sh/setup-bun@v2", with = { version = "latest" } }
+5 = { run = "curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh", name = "Install wasm-pack" }
+6 = { run = "bun install --frozen-lockfile", name = "Install dependencies" }
+7 = { run = "bunx biome check .", name = "Final lint check" }
+8 = { run = "wasm-pack build --target web --release packages/widgets", name = "Build WASM widgets" }
+9 = { run = "cp packages/widgets/pkg/*.wasm apps/site/public/wasm/", name = "Copy WASM to public" }
+10 = { run = "bunx turbo build --filter=site", name = "Build Astro site" }
+11 = { run = "bunx turbo build --filter=worker", name = "Build CF Worker" }
+
+[job.deploy.deploy_pages]
+name = "Deploy to CF Pages"
+needs = ["build"]
+runs_on = "ubuntu-latest"
+steps = [
+  { uses = "actions/download-artifact@v4", with = { name = "site-dist", path = "dist" } },
+  { run = "npx wrangler pages deploy dist --project-name=hydrated-site", name = "Deploy CF Pages",
+    env = { CLOUDFLARE_ACCOUNT_ID = "${{ secrets.CF_ACCOUNT_ID }}", CLOUDFLARE_API_TOKEN = "${{ secrets.CF_API_TOKEN }}" } },
+]
+quality_gate = "exit_code == 0"
+
+[job.deploy.deploy_worker]
+name = "Deploy CF Worker"
+needs = ["build"]
+runs_on = "ubuntu-latest"
+steps = [
+  { uses = "actions/download-artifact@v4", with = { name = "worker-dist", path = "worker/dist" } },
+  { run = "npx wrangler deploy", name = "Deploy Worker",
+    env = { CLOUDFLARE_ACCOUNT_ID = "${{ secrets.CF_ACCOUNT_ID }}", CLOUDFLARE_API_TOKEN = "${{ secrets.CF_API_TOKEN }}",
+            AA_API_KEY = "${{ secrets.AA_API_KEY }}", FRED_API_KEY = "${{ secrets.FRED_API_KEY }}" } },
+]
+quality_gate = "exit_code == 0"
+
+# ============================================================
+# uptime.yml — Health Monitoring
+# ============================================================
+
+[job.uptime]
+name = "Uptime Check"
+on = { schedule = ["*/5 * * * *"] }  # Every 5 minutes
+on.workflow_dispatch = true
+
+[job.uptime.probe]
+name = "HTTP Probe"
+runs_on = "ubuntu-latest"
+strategy = { max_attempts = 3, retry_delay = 30 }
+
+[job.uptime.probe.steps]
+1 = { run = """
+  curl -sf https://wyattau.com/ -o /dev/null -w '%{http_code}' | grep -q '200'
+  """, name = "Check homepage" }
+2 = { run = """
+  curl -sf https://wyattau.com/api/health -o /dev/null -w '%{http_code}' | grep -q '200'
+  """, name = "Check API health" }
+3 = { run = """
+  curl -sf https://wyattau.com/api/crypto-ticker -o /dev/null -w '%{http_code}' | grep -q '200'
+  """, name = "Check crypto ticker" }
+4 = { run = """
+  curl -sf https://wyattau.com/world -o /dev/null -w '%{http_code}' | grep -q '200'
+  """, name = "Check world monitor page" }
+5 = { run = """
+  curl -sf https://wyattau.com/etf -o /dev/null -w '%{http_code}' | grep -q '200'
+  """, name = "Check ETF page" }
+
+[job.uptime.static]
+name = "Static Asset Check"
+runs_on = "ubuntu-latest"
+
+[job.uptime.static.steps]
+1 = { run = """
+  curl -sf https://wyattau.com/favicon.svg -o /dev/null -w '%{http_code}' | grep -q '200'
+  """, name = "Check favicon" }
+2 = { run = """
+  curl -sf https://wyattau.com/wasm/ -o /dev/null -w '%{http_code}' | grep -q '200'
+  """, name = "Check WASM directory" }
+3 = { run = """
+  curl -sf https://wyattau.com/robots.txt -o /dev/null -w '%{http_code}' | grep -q '200'
+  """, name = "Check robots.txt" }
+4 = { run = """
+  curl -sf https://wyattau.com/sitemap.xml -o /dev/null -w '%{http_code}' | grep -q '200'
+  """, name = "Check sitemap.xml" }
+
+[job.uptime.api_health]
+name = "API Endpoint Health"
+runs_on = "ubuntu-latest"
+strategy = { matrix = { endpoint = [
+  "/api/health",
+  "/api/crypto-ticker",
+  "/api/stock-chart?symbol=AAPL&range=1d",
+  "/api/earthquakes",
+  "/api/fear-greed",
+  "/api/hacker-news",
+  "/api/weather?lat=22.32&lng=114.17",
+  "/api/exchange-rates",
+] } }
+
+[job.uptime.api_health.steps]
+1 = { run = """
+  curl -sf https://wyattau.com${{ matrix.endpoint }} -o /dev/null -w '%{http_code}' | grep -qE '200|400'
+  """, name = "Check ${{ matrix.endpoint }}" }
+
+# ============================================================
+# Caching Strategy
+# ============================================================
+
+[cache]
+# Bun global cache
+bun = { path = "~/.bun/install/cache", key = "bun-${{ hashFiles('bun.lock') }}" }
+
+# Turborepo cache
+turborepo = { path = ".turbo/cache", key = "turbo-${{ github.sha }}", restore_keys = ["turbo-"] }
+
+# Rust cargo cache
+rust = { path = "~/.cargo/registry", key = "rust-${{ hashFiles('packages/widgets/Cargo.lock') }}", restore_paths = [
+  "~/.cargo/registry",
+  "~/.cargo/git",
+  "packages/widgets/target"
+] }
+
+# WASM build cache (separate from site build)
+wasm = { path = "packages/widgets/pkg", key = "wasm-${{ hashFiles('packages/widgets/src/**') }}" }
+
+# Site build cache
+site = { path = "apps/site/dist", key = "site-${{ hashFiles('apps/site/src/**') }}" }
+
+# ============================================================
+# Parallel Execution Plan
+# ============================================================
+
+[parallel]
+# Stage 1: Format and Lint run in parallel
+stage1 = ["ci.stage1.format", "ci.stage1.lint"]
+
+# Stage 2: Unit and Property tests run in parallel
+stage2 = ["ci.stage2.unit", "ci.stage2.property"]
+
+# Stage 3: WASM and Site build run in parallel
+stage3 = ["ci.stage3.wasm", "ci.stage3.site"]
+
+# Stage 4: E2E and A11y run in parallel
+stage4 = ["ci.stage4.e2e", "ci.stage4.a11y"]
+
+# Stage 5: Sequential (needs build output)
+stage5 = ["ci.stage5.lighthouse"]
+
+# Deploy: Pages and Worker deploy in parallel after build
+deploy_parallel = ["deploy.deploy_pages", "deploy.deploy_worker"]
+
+# Uptime: All probes run in parallel
+uptime_parallel = ["uptime.probe", "uptime.static", "uptime.api_health"]
+
+# ============================================================
+# Quality Gates Summary
+# ============================================================
+
+[quality_gates]
+# Stage 1: Format + Type check
+format = "exit_code == 0"
+typecheck = "exit_code == 0"
+
+# Stage 2: Tests pass + coverage threshold
+unit_tests = "exit_code == 0 && coverage >= 80%"
+property_tests = "exit_code == 0"
+
+# Stage 3: Build produces expected output
+wasm_build = "exit_code == 0 && wasm_files >= 1"
+site_build = "exit_code == 0 && dist_files >= 10"
+
+# Stage 4: E2E pass + A11y pass
+e2e = "exit_code == 0"
+a11y = "exit_code == 0"
+
+# Stage 5: Lighthouse thresholds
+lighthouse_performance = ">= 95"
+lighthouse_accessibility = ">= 100"
+lighthouse_seo = ">= 100"
+
+# Deploy: Build succeeds + deploy succeeds
+deploy = "exit_code == 0"

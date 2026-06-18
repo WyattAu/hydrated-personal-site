@@ -1,0 +1,350 @@
+# Domain Constraints: Web Performance & Infrastructure
+# Phase 1 Research — Hydrated Personal Site
+
+[meta]
+project = "hydrated_personal_site"
+phase = 1
+created = "2026-06-17"
+author = "DeepThought (Researcher)"
+
+# ============================================================
+# Browser Performance Constraints
+# ============================================================
+
+[browser_performance]
+description = "Core Web Vitals and browser-imposed limits"
+
+[lcp]
+metric = "Largest Contentful Paint"
+target = "1.5s"
+good_threshold = "2.5s"
+poor_threshold = "4.0s"
+constraint = "SSG + critical CSS + font preload + hero image preload"
+note = "Google uses LCP < 2.5s as 'good'. We target 1.5s for margin."
+
+[cls]
+metric = "Cumulative Layout Shift"
+target = "0.01"
+good_threshold = "0.1"
+poor_threshold = "0.25"
+constraint = "Fixed dimensions + font-display: swap + skeleton loading"
+note = "CLS < 0.01 eliminates all visible layout shift."
+
+[inp]
+metric = "Interaction to Next Paint"
+target = "200ms"
+good_threshold = "200ms"
+poor_threshold = "500ms"
+constraint = "SolidJS fine-grained reactivity, no heavy JS on main thread"
+note = "INP replaced FID in 2024. Measures full interaction latency."
+
+[fid]
+metric = "First Input Delay"
+target = "50ms"
+good_threshold = "100ms"
+poor_threshold = "300ms"
+constraint = "SolidJS hydration only on interactive islands"
+note = "Legacy metric, kept for compatibility. INP is primary."
+
+[ttfb]
+metric = "Time to First Byte"
+target = "100ms"
+good_threshold = "200ms"
+poor_threshold = "800ms"
+constraint = "CF Pages edge CDN (200+ locations)"
+note = "SSG + CDN = near-zero TTFB for cached content."
+
+[tti]
+metric = "Time to Interactive"
+target = "1.5s"
+good_threshold = "3.0s"
+poor_threshold = "7.0s"
+constraint = "Lazy WASM, no render-blocking JS"
+note = "TTI measures when main thread is idle after load."
+
+# ============================================================
+# Bundle Size Budgets
+# ============================================================
+
+[bundle_budgets]
+description = "Asset size limits for fast initial load"
+
+[initial_load]
+name = "Total first load (HTML + CSS + JS)"
+target_kb = 400
+constraint = "SSG + tree-shaking + code splitting"
+breakdown = { html = "20KB", css = "80KB", solidjs_runtime = "15KB", solidjs_islands = "20KB", alpine = "16KB", fonts = "80KB", misc = "10KB" }
+
+[css]
+name = "Total CSS bundle"
+target_kb = 80
+constraint = "Tailwind CSS 4 purging + minification"
+note = "Current: 103KB. Target: 80KB with Tailwind 4."
+
+[solidjs]
+name = "SolidJS runtime"
+target_kb = 15
+constraint = "SolidJS 1.9 core runtime"
+note = "Includes signals, effects, component runtime."
+
+[solidjs_islands]
+name = "SolidJS island code"
+target_kb = 20
+constraint = "All hydrated island components combined"
+note = "Tree-shaken per page, only included islands shipped."
+
+[wasm_per_widget]
+name = "Per-WASM widget binary"
+target_kb = 130
+constraint = "Rust + wasm-pack + web-sys (no framework)"
+note = "Range: 40-130KB depending on widget complexity."
+
+[wasm_total]
+name = "Total WASM (all 13 widgets)"
+target_kb = 1100
+constraint = "All widgets built separately, lazy-loaded"
+note = "Only 1-2 widgets loaded per page visit."
+
+[fonts]
+name = "Font files (Inter + JetBrains Mono)"
+target_kb = 80
+constraint = "Self-hosted, woff2, subset if needed"
+breakdown = { inter = "47KB", jetbrains_mono = "31KB" }
+
+[charts]
+name = "Chart libraries"
+target_kb = 230
+constraint = "Lazy-loaded via IntersectionObserver"
+note = "uPlot: 48KB, D3: 230KB (lazy), Rough.js: 40KB (lazy)"
+
+# ============================================================
+# API Cache TTLs
+# ============================================================
+
+[api_cache_ttls]
+description = "Cache duration per endpoint based on data freshness requirements"
+
+[crypto_ticker]
+endpoint = "/api/crypto-ticker"
+ttl_seconds = 10
+rationale = "Price data changes every second. 10s TTL balances freshness vs API load."
+source = "Binance REST API"
+
+[mempool]
+endpoint = "/api/mempool"
+ttl_seconds = 60
+rationale = "Mempool fees change every block (~10min). 1min TTL is reasonable."
+source = "mempool.space"
+
+[stock_chart]
+endpoint = "/api/stock-chart"
+ttl_seconds = 120
+rationale = "Stock prices update during market hours. 2min TTL for real-time feel."
+source = "Yahoo Finance"
+
+[weather]
+endpoint = "/api/weather"
+ttl_seconds = 300
+rationale = "Weather data updates hourly. 5min TTL is sufficient."
+source = "Open-Meteo"
+
+[earthquakes]
+endpoint = "/api/earthquakes"
+ttl_seconds = 300
+rationale = "USGS updates every 5 minutes. Match their update frequency."
+source = "USGS"
+
+[coingecko_global]
+endpoint = "/api/coingecko-global"
+ttl_seconds = 300
+rationale = "CoinGecko rate-limits at 10-30 req/min. 5min TTL is safe."
+source = "CoinGecko"
+
+[fear_greed]
+endpoint = "/api/fear-greed"
+ttl_seconds = 300
+rationale = "Fear & Greed index updates daily. 5min TTL is more than sufficient."
+source = "Alternative.me"
+
+[hacker_news]
+endpoint = "/api/hacker-news"
+ttl_seconds = 300
+rationale = "HN front page changes every few minutes. 5min TTL captures most updates."
+source = "HN Firebase API"
+
+[kp_index]
+endpoint = "/api/kp-index"
+ttl_seconds = 600
+rationale = "NOAA Kp index updates every 3 hours. 10min TTL is conservative."
+source = "NOAA"
+
+[binance_klines]
+endpoint = "/api/binance-klines"
+ttl_seconds = 300
+rationale = "Historical price data. 5min TTL for fresh candle data."
+source = "Yahoo Finance"
+
+[github_trending]
+endpoint = "/api/github-trending"
+ttl_seconds = 1800
+rationale = "GitHub trending updates every few hours. 30min TTL."
+source = "GitHub API"
+
+[exchange_rates]
+endpoint = "/api/exchange-rates"
+ttl_seconds = 3600
+rationale = "Exchange rates update daily. 1h TTL."
+source = "ExchangeRate-API"
+
+[fred]
+endpoint = "/api/fred"
+ttl_seconds = 3600
+rationale = "FRED data updates monthly/quarterly. 1h TTL."
+source = "Federal Reserve"
+
+[llm_benchmarks]
+endpoint = "/api/llm-benchmarks"
+ttl_seconds = 21600
+rationale = "LLM benchmarks update monthly. 6h TTL."
+source = "Artificial Analysis"
+
+[guestbook]
+endpoint = "/api/guestbook"
+ttl_seconds = 0
+rationale = "No caching for user-submitted content. Read-through to KV."
+source = "CF KV"
+
+# ============================================================
+# CF Worker Execution Limits
+# ============================================================
+
+[cf_worker_limits]
+description = "Cloudflare Workers platform constraints"
+
+[cpu_time_free]
+name = "CPU time (free plan)"
+value_ms = 10
+constraint = "All API handlers must complete within 10ms CPU time"
+note = "Wall-clock time can be longer (includes I/O wait)."
+
+[cpu_time_paid]
+name = "CPU time (paid plan)"
+value_ms = 30000
+constraint = "Complex computation allowed on paid plan"
+note = "Not needed for this project (API proxying is fast)."
+
+[memory]
+name = "Worker memory"
+value_mb = 128
+constraint = "API proxy responses must fit in memory"
+note = "All API responses are < 1MB JSON."
+
+[subrequests]
+name = "Subrequests per invocation"
+value = 50
+constraint = "Maximum 50 fetch() calls per Worker invocation"
+note = "Single API proxy = 1 subrequest. No fan-out needed."
+
+[kv_reads_per_second]
+name = "KV reads per second per key"
+value = 1000
+constraint = "Guestbook reads must stay under 1000/s per key"
+note = "Personal site will never hit this limit."
+
+[kv_writes_per_second]
+name = "KV writes per second per key"
+value = 1
+constraint = "Guestbook writes limited to 1/s per key"
+note = "Rate limiting also constrains to 5/10min per IP."
+
+[kv_value_size]
+name = "KV value size limit"
+value_kb = 25
+constraint = "Guestbook entries must be < 25KB"
+note = "Typical entry: ~1KB. Plenty of headroom."
+
+[kv_list_limit]
+name = "KV list results per call"
+value = 100
+constraint = "Guestbook pagination needed for > 100 entries"
+note = "Cursor-based pagination for guestbook list."
+
+[request_size]
+name = "Request body size"
+value_kb = 100
+constraint = "Guestbook POST body must be < 100KB"
+note = "Typical form submission: ~1KB."
+
+[response_size]
+name = "Response body size"
+value_mb = 100
+constraint = "API proxy responses must be < 100MB"
+note = "All API responses are < 1MB JSON."
+
+# ============================================================
+# WASM Memory Constraints
+# ============================================================
+
+[wasm_memory]
+description = "WASM heap and memory limits in browser context"
+
+[heap_initial]
+name = "Initial WASM heap"
+value_kb = 16
+constraint = "WASM modules start with 16KB heap"
+note = "Grows automatically as needed."
+
+[heap_maximum]
+name = "Maximum WASM heap"
+value_mb = 256
+constraint = "WASM heap cannot exceed 256MB"
+note = "Typical widget usage: 1-10MB. Well within limits."
+
+[linear_memory]
+name = "Linear memory pages"
+value_mb = 4
+constraint = "Default memory allocation: 4MB (64 pages)"
+note = "Grows in 64KB pages as needed."
+
+[canvas_memory]
+name = "Canvas2D buffer memory"
+value_mb = 8
+constraint = "Canvas pixel buffer at 4K: ~32MB (RGBA)"
+note = "Widgets typically use 800x400 canvas: ~1.3MB."
+
+[total_budget]
+name = "Total WASM memory budget per widget"
+value_mb = 50
+constraint = "Heap + canvas + data combined"
+note = "Conservative budget for complex widgets."
+
+# ============================================================
+# Network Constraints
+# ============================================================
+
+[network]
+description = "Network-related constraints"
+
+[connection_limit]
+name = "Concurrent connections"
+value = 6
+constraint = "Browser limits 6 concurrent connections per domain"
+note = "WASM loads are sequential per widget. Not a bottleneck."
+
+[http2]
+name = "HTTP/2 multiplexing"
+enabled = true
+constraint = "CF Pages serves via HTTP/2"
+note = "Multiplexed requests reduce connection overhead."
+
+[dns_prefetch]
+name = "DNS prefetch for external domains"
+domains = ["api.binance.com", "api.coingecko.com", "api.yahoo.com"]
+constraint = "Reduce DNS lookup time for API calls"
+note = "Added via <link rel=\"dns-prefetch\"> in BaseLayout."
+
+[preload]
+name = "Critical asset preloading"
+assets = ["hero-image", "inter-font", "jetbrains-font"]
+constraint = "Preload LCP elements and critical fonts"
+note = "Reduces LCP by eliminating discovery time."

@@ -1,0 +1,365 @@
+/* ============================================================
+   ANIMATIONS — Scroll Reveal, Parallax, Amoebic, Cinematic
+   ============================================================ */
+
+/* ============================================================
+   SCROLL REVEAL — IntersectionObserver-driven
+   ============================================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-cinematic), transform 0.8s var(--ease-cinematic);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 {
+  transition-delay: 0.1s;
+}
+.reveal-delay-2 {
+  transition-delay: 0.2s;
+}
+.reveal-delay-3 {
+  transition-delay: 0.3s;
+}
+.reveal-delay-4 {
+  transition-delay: 0.4s;
+}
+.reveal-delay-5 {
+  transition-delay: 0.5s;
+}
+.reveal-delay-6 {
+  transition-delay: 0.6s;
+}
+
+/* Slide from left */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.8s var(--ease-cinematic), transform 0.8s var(--ease-cinematic);
+}
+
+.reveal-left.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Slide from right */
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.8s var(--ease-cinematic), transform 0.8s var(--ease-cinematic);
+}
+
+.reveal-right.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Scale reveal */
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.8s var(--ease-cinematic), transform 0.8s var(--ease-cinematic);
+}
+
+.reveal-scale.revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================================
+   PARALLAX LAYERS
+   ============================================================ */
+
+.parallax-container {
+  perspective: 1000px;
+  overflow: hidden;
+  position: relative;
+}
+
+.parallax-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.parallax-bg {
+  transform: translateZ(-2px) scale(3);
+  z-index: var(--z-bg);
+}
+
+.parallax-mid {
+  transform: translateZ(-1px) scale(2);
+  z-index: var(--z-content);
+}
+
+.parallax-fg {
+  transform: translateZ(0);
+  z-index: var(--z-card);
+}
+
+/* ============================================================
+   AMOEBIC HOVER STATES
+   ============================================================ */
+
+.amoebic-morph {
+  transition: all 0.4s var(--ease-amoeba);
+  border-radius: 0;
+}
+
+.amoebic-morph:hover {
+  border-radius: 20% 40% 30% 50%;
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.amoebic-breathe:hover {
+  animation: amoeba-breathe 2s ease-in-out infinite;
+}
+
+@keyframes amoeba-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    border-radius: 0;
+  }
+  25% {
+    border-radius: 20% 0 30% 0;
+  }
+  50% {
+    transform: scale(1.01);
+    border-radius: 0 30% 0 20%;
+  }
+  75% {
+    border-radius: 30% 0 20% 0;
+  }
+}
+
+/* Amoebic underline for nav items */
+.amoebic-underline {
+  position: relative;
+}
+
+.amoebic-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.4s var(--ease-amoeba), border-radius 0.4s var(--ease-amoeba);
+  border-radius: 0;
+}
+
+.amoebic-underline:hover::after,
+.amoebic-underline.active::after {
+  width: 100%;
+  border-radius: 50% 30% 50% 30%;
+}
+
+/* ============================================================
+   CINEMATIC FADE-IN
+   ============================================================ */
+
+.cinematic-enter {
+  animation: cinematic-fade-in 0.8s var(--ease-cinematic) both;
+}
+
+.cinematic-enter-delay-1 {
+  animation-delay: 0.15s;
+}
+.cinematic-enter-delay-2 {
+  animation-delay: 0.3s;
+}
+.cinematic-enter-delay-3 {
+  animation-delay: 0.45s;
+}
+.cinematic-enter-delay-4 {
+  animation-delay: 0.6s;
+}
+
+@keyframes cinematic-fade-in {
+  0% {
+    opacity: 0;
+    filter: blur(4px) brightness(0.5);
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) brightness(1);
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   BREATHE ANIMATION
+   ============================================================ */
+
+.breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.01);
+    opacity: 0.95;
+  }
+}
+
+/* ============================================================
+   STAGGER CHILDREN
+   ============================================================ */
+
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.5s var(--ease-cinematic), transform 0.5s var(--ease-cinematic);
+}
+
+.stagger-children.revealed > *:nth-child(1) {
+  transition-delay: 0.05s;
+  opacity: 1;
+  transform: translateY(0);
+}
+.stagger-children.revealed > *:nth-child(2) {
+  transition-delay: 0.1s;
+  opacity: 1;
+  transform: translateY(0);
+}
+.stagger-children.revealed > *:nth-child(3) {
+  transition-delay: 0.15s;
+  opacity: 1;
+  transform: translateY(0);
+}
+.stagger-children.revealed > *:nth-child(4) {
+  transition-delay: 0.2s;
+  opacity: 1;
+  transform: translateY(0);
+}
+.stagger-children.revealed > *:nth-child(5) {
+  transition-delay: 0.25s;
+  opacity: 1;
+  transform: translateY(0);
+}
+.stagger-children.revealed > *:nth-child(6) {
+  transition-delay: 0.3s;
+  opacity: 1;
+  transform: translateY(0);
+}
+.stagger-children.revealed > *:nth-child(7) {
+  transition-delay: 0.35s;
+  opacity: 1;
+  transform: translateY(0);
+}
+.stagger-children.revealed > *:nth-child(8) {
+  transition-delay: 0.4s;
+  opacity: 1;
+  transform: translateY(0);
+}
+.stagger-children.revealed > *:nth-child(9) {
+  transition-delay: 0.45s;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   HOVER LIFT
+   ============================================================ */
+
+.hover-lift {
+  transition: transform 0.3s var(--ease-brutal), box-shadow 0.3s var(--ease-brutal);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================
+   GLOW PULSE
+   ============================================================ */
+
+.glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow-pulse {
+  0% {
+    box-shadow: 0 0 5px rgba(0, 229, 255, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+  }
+}
+
+/* ============================================================
+   SCROLL-DRIVEN PARALLAX (CSS-only where supported)
+   ============================================================ */
+
+@supports (animation-timeline: scroll()) {
+  .scroll-parallax {
+    animation: scroll-parallax linear both;
+    animation-timeline: scroll();
+    animation-range: 0% 100%;
+  }
+
+  @keyframes scroll-parallax {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-50px);
+    }
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .stagger-children > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .cinematic-enter {
+    animation: none;
+  }
+
+  .breathe {
+    animation: none;
+  }
+
+  .amoebic-morph:hover,
+  .amoebic-breathe:hover {
+    animation: none;
+    border-radius: 0;
+    transform: none;
+  }
+
+  .hover-lift:hover {
+    transform: none;
+  }
+}

@@ -1,0 +1,149 @@
+---
+export interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonical?: string;
+  type?: string;
+}
+
+const {
+  title = 'Wyatt Au — Backend Engineer & Systems Architect',
+  description = 'Building deterministic infrastructure and high-performance systems. Currently bootstrapping QuestHive.',
+  ogImage = '/og-image.png',
+  canonical = Astro.url.href,
+  type = 'website',
+} = Astro.props;
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template below
+const siteName = 'wyatt_au';
+const siteUrl = 'https://wyatt.au';
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template below
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Wyatt Au',
+  jobTitle: 'Backend Engineer & Systems Architect',
+  url: siteUrl,
+  email: 'wyatt_au@protonmail.com',
+  location: {
+    '@type': 'Place',
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'GB',
+    },
+  },
+  sameAs: [
+    'https://github.com/WyattAu',
+    'https://forgejo.wyattau.com/wyatt_admin',
+    'https://x.com/_WyattAu_',
+  ],
+  knowsAbout: [
+    'Systems Programming',
+    'Rust',
+    'WebAssembly',
+    'Infrastructure Engineering',
+    'DevOps',
+    'Cloud Architecture',
+  ],
+  worksFor: {
+    '@type': 'Organization',
+    name: 'QuestHive',
+    url: 'https://questhive.io',
+  },
+};
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template below
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Wyatt Au',
+  url: siteUrl,
+  description: description,
+  author: {
+    '@type': 'Person',
+    name: 'Wyatt Au',
+  },
+  publisher: {
+    '@type': 'Person',
+    name: 'Wyatt Au',
+  },
+};
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template below
+const webPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: title,
+  description: description,
+  url: canonical,
+  inLanguage: 'en-GB',
+};
+---
+
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight-navy">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${siteUrl}${ogImage}`} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:locale" content="en_GB" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${siteUrl}${ogImage}`} />
+    <meta name="twitter:creator" content="@_WyattAu_" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#050505" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Wyatt Au" />
+
+    <!-- Fonts: Inter + JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(webPageSchema)} />
+
+    <!-- Theme init (prevent flash) -->
+    <script is:inline>
+      (function () {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || 'midnight-navy';
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <slot />
+
+    <!-- Cinematic overlays -->
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="film-grain" aria-hidden="true"></div>
+  </body>
+</html>

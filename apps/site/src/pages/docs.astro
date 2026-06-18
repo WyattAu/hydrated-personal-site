@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/astro/Nav.astro';
+import Footer from '../components/astro/Footer.astro';
+import '../styles/base.css';
+import '../styles/animations.css';
+---
+
+<BaseLayout title="Docs — Wyatt Au" description="Technical notes, architecture decisions, and infrastructure documentation.">
+  <Nav />
+
+  <main id="main-content" class="pt-24">
+    <section class="py-16 px-6 md:px-12 lg:px-24">
+      <p class="label mb-6 cinematic-enter" style="color: var(--accent);">DOCS</p>
+      <h1 class="text-3xl md:text-5xl font-bold mb-4 cinematic-enter cinematic-enter-delay-1">Technical Notes</h1>
+      <p class="text-lg cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 640px;">
+        Architecture decisions, infrastructure patterns, and engineering notes.
+      </p>
+    </section>
+
+    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <div class="max-w-3xl reveal">
+        <div class="p-8 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-4" style="color: var(--accent);">
+            Coming Soon
+          </p>
+          <p class="text-lg mb-4" style="color: var(--text-primary);">
+            This section will host technical notes and documentation powered by WyattsNotes.
+          </p>
+          <p class="text-sm mb-6" style="color: var(--text-secondary);">
+            Expect deep dives into systems architecture, infrastructure patterns,
+            Rust and WASM experimentation, and deployment strategies.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-4 border" style="border-color: var(--border); background: var(--bg-secondary);">
+              <p class="font-mono text-xs font-bold mb-1" style="color: var(--text-primary);">Infrastructure</p>
+              <p class="text-sm" style="color: var(--text-secondary);">Docker, Kubernetes, Cloudflare, self-hosted services</p>
+            </div>
+            <div class="p-4 border" style="border-color: var(--border); background: var(--bg-secondary);">
+              <p class="font-mono text-xs font-bold mb-1" style="color: var(--text-primary);">Rust & WASM</p>
+              <p class="text-sm" style="color: var(--text-secondary);">Systems programming, WebAssembly, performance</p>
+            </div>
+            <div class="p-4 border" style="border-color: var(--border); background: var(--bg-secondary);">
+              <p class="font-mono text-xs font-bold mb-1" style="color: var(--text-primary);">Security</p>
+              <p class="text-sm" style="color: var(--text-secondary);">CSP headers, sandboxing, IAM, threat modeling</p>
+            </div>
+            <div class="p-4 border" style="border-color: var(--border); background: var(--bg-secondary);">
+              <p class="font-mono text-xs font-bold mb-1" style="color: var(--text-primary);">Architecture</p>
+              <p class="text-sm" style="color: var(--text-secondary);">System design, trade-offs, ADRs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- External Link -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <div class="max-w-3xl reveal">
+        <p class="font-mono text-xs font-bold uppercase tracking-wider mb-4" style="color: var(--accent);">
+          Existing Notes
+        </p>
+        <p class="text-sm mb-4" style="color: var(--text-secondary);">
+          A selection of technical notes are already available on WyattsNotes, a Docusaurus-powered site
+          covering infrastructure, DevOps, databases, networking, security, and algorithms.
+        </p>
+        <a
+          href="https://wyattsnotes.wyattau.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="amoeba-hover inline-block px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider border"
+          style="border-color: var(--border); color: var(--text-secondary);"
+        >
+          Visit WyattsNotes ↗
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+
+  <script>
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    document.querySelectorAll('.reveal, .stagger-children').forEach((el) => observer.observe(el));
+  </script>
+</BaseLayout>

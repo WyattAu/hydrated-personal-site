@@ -1,0 +1,335 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/astro/Nav.astro';
+import Footer from '../components/astro/Footer.astro';
+import ThemeToggle from '../components/solid/ThemeToggle';
+import CommandPalette from '../components/solid/CommandPalette';
+import TickerBar from '../components/solid/TickerBar';
+import ContactForm from '../components/solid/ContactForm';
+import WasmEmbed from '../components/wasm/WasmEmbed.astro';
+import '../styles/base.css';
+import '../styles/animations.css';
+
+import { getCollection } from 'astro:content';
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const allProjects = (await getCollection('projects'))
+  .filter((p) => p.data.featured)
+  .sort((a, b) => a.data.order - b.data.order);
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const expertiseCategories = [
+  { title: 'Systems Programming', items: 'Rust, C++, C, Lean 4, WASM', icon: '{ }' },
+  { title: 'Web Assembly', items: 'Leptos, wasm-pack, WASM sandboxing', icon: '<>' },
+  {
+    title: 'Infrastructure',
+    items: 'Docker, Kubernetes, Cloudflare, Terraform, Nix Flakes',
+    icon: '::',
+  },
+  {
+    title: 'Data Engineering',
+    items: 'PostgreSQL, TimescaleDB, Redis, Prometheus + Grafana',
+    icon: '##',
+  },
+  { title: 'Security', items: 'Bubblewrap isolation, CSP headers, Keycloak IAM', icon: '[]' },
+  { title: 'UI/UX', items: 'SolidJS, Flutter, Brutalist design, Theme systems', icon: '//' },
+];
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const employment = [
+  {
+    role: 'Founder & Backend Engineer',
+    company: 'QuestHive',
+    duration: 'Jun 2025 — Present',
+    description:
+      'Bootstrapping an early-stage SaaS platform focused on infrastructure automation. Responsible for system architecture, interfacing services, and deployment pipelines.',
+    highlights: ['System architecture', 'CI/CD pipelines', 'Cloudflare Workers deployment'],
+  },
+  {
+    role: 'Freelance Developer',
+    company: 'Self-Employed',
+    duration: '2022 — 2025',
+    description:
+      'Delivered full-stack solutions for clients including web applications, mobile apps, and infrastructure automation.',
+    highlights: ['Full-stack web apps', 'Mobile applications', 'Infrastructure automation'],
+  },
+];
+---
+
+<BaseLayout>
+  <Nav />
+
+  <main id="main-content">
+    <!-- Hero -->
+    <section class="min-h-screen flex flex-col justify-center px-6 md:px-12 lg:px-24 relative">
+      <div class="max-w-4xl">
+        <p class="label mb-4 cinematic-enter" style="color: var(--accent);">Backend Engineer &amp; Systems Architect</p>
+
+        <h1 class="hero-name mb-6 cinematic-enter cinematic-enter-delay-1">WYATT AU</h1>
+
+        <p class="text-lg md:text-xl mb-8 cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 640px;">
+          Building deterministic infrastructure and high-performance systems.
+          Currently bootstrapping QuestHive.
+        </p>
+
+        <p class="code-text mb-10 cinematic-enter cinematic-enter-delay-3" style="color: var(--text-secondary);">
+          United Kingdom // <a href="mailto:wyatt_au@protonmail.com" class="hover:underline" style="color: var(--accent);">wyatt_au@protonmail.com</a>
+        </p>
+
+        <div class="flex gap-4 cinematic-enter cinematic-enter-delay-4 flex-wrap">
+          <a
+            href="https://github.com/WyattAu"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="amoeba-hover px-4 py-2 border text-xs font-mono uppercase tracking-widest"
+            style="border-color: var(--border); color: var(--text-secondary);"
+          >
+            GitHub
+          </a>
+          <a
+            href="https://forgejo.wyattau.com/wyatt_admin"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="amoeba-hover px-4 py-2 border text-xs font-mono uppercase tracking-widest"
+            style="border-color: var(--border); color: var(--text-secondary);"
+          >
+            Forgejo
+          </a>
+          <a
+            href="https://x.com/_WyattAu_"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="amoeba-hover px-4 py-2 border text-xs font-mono uppercase tracking-widest"
+            style="border-color: var(--border); color: var(--text-secondary);"
+          >
+            X / Twitter
+          </a>
+          <a
+            href="https://ocis.wyattau.com/s/RvJsRemvgLYnuIh"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="amoeba-hover px-4 py-2 border text-xs font-mono uppercase tracking-widest"
+            style="border-color: var(--border); color: var(--text-secondary);"
+          >
+            CV
+          </a>
+        </div>
+      </div>
+
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2">
+        <span
+          class="label block text-center breathe"
+          style="color: var(--text-secondary);"
+        >
+          SCROLL ↓
+        </span>
+      </div>
+    </section>
+
+    <!-- Ticker Bar -->
+    <section class="px-6 md:px-12 lg:px-24" style="border-top: 1px solid var(--border);">
+      <TickerBar client:load />
+    </section>
+
+    <!-- About -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 border-t reveal" style="border-color: var(--border);">
+      <p class="label mb-6" style="color: var(--accent);">001 — ABOUT</p>
+      <div class="max-w-3xl">
+        <h2 class="text-2xl md:text-3xl font-bold mb-6">Systems thinker, infrastructure builder.</h2>
+        <p class="mb-4" style="color: var(--text-secondary);">
+          UK-based backend and DevOps engineer with 6 years of experience building reproducible infrastructure,
+          CI/CD pipelines, and high-performance systems. I architect solutions that stay standing after the next
+          "must-have feature" ships to production.
+        </p>
+        <p class="mb-4" style="color: var(--text-secondary);">
+          My work spans distributed systems, real-time data pipelines, developer experience tooling,
+          and security-focused sandboxing. I believe in deterministic builds, modular architecture,
+          and infrastructure that can be reasoned about.
+        </p>
+        <p style="color: var(--text-secondary);">
+          Currently focused on WebAssembly-powered developer tools and infrastructure automation through QuestHive.
+          When not shipping code, I'm probably debugging a CI pipeline or contributing to open-source projects
+          that solve real problems.
+        </p>
+      </div>
+    </section>
+
+    <!-- Featured Projects -->
+    <section id="projects" class="py-24 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-6 reveal" style="color: var(--accent);">002 — FEATURED PROJECTS</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children reveal">
+        {allProjects.map((project) => (
+          <a
+            href={project.data.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="amoebic-morph block p-6 border"
+            style="border-color: var(--border); background: var(--bg-card); text-decoration: none;"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-mono text-sm font-bold" style="color: var(--text-primary);">{project.data.title}</h3>
+              {project.data.featured && (
+                <span class="font-mono text-[9px] font-bold uppercase tracking-widest px-2 py-0.5" style="background: var(--accent); color: var(--bg-primary);">
+                  Featured
+                </span>
+              )}
+            </div>
+            <p class="text-sm mb-3" style="color: var(--text-secondary);">{project.data.description}</p>
+            <p class="code-text" style="color: var(--accent);">{project.data.technologies.join(' · ')}</p>
+          </a>
+        ))}
+      </div>
+      <div class="mt-8 reveal">
+        <a
+          href="/projects"
+          class="amoeba-hover inline-block px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider border"
+          style="border-color: var(--border); color: var(--text-secondary);"
+        >
+          View All Projects →
+        </a>
+      </div>
+    </section>
+
+    <!-- WASM Showcase -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-6 reveal" style="color: var(--accent);">003 — WASM SHOWCASE</p>
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 reveal">Interactive Demonstrations</h2>
+      <p class="mb-8 reveal" style="color: var(--text-secondary); max-width: 640px;">
+        Real-time, client-side computations powered by WebAssembly. No server round-trips.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children reveal">
+        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Fourier Transform</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Real-time DFT visualization. Decompose signals into frequency components interactively.</p>
+          <WasmEmbed widget="fourier_transform" width={400} height={300} />
+        </div>
+        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Generative Art</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Procedural art generation using WASM-accelerated noise functions and color palettes.</p>
+          <WasmEmbed widget="generative_art" width={400} height={300} />
+        </div>
+        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Regex Playground</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Test and debug regular expressions with real-time matching and group extraction.</p>
+          <WasmEmbed widget="regex_playground" width={400} height={300} />
+        </div>
+      </div>
+    </section>
+
+    <!-- Expertise Grid -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-6 reveal" style="color: var(--accent);">004 — EXPERTISE</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 stagger-children reveal">
+        {expertiseCategories.map((cat) => (
+          <div>
+            <div class="flex items-center gap-3 mb-3">
+              <span class="font-mono text-xs px-2 py-1" style="background: var(--bg-card); color: var(--accent); border: 1px solid var(--border);">
+                {cat.icon}
+              </span>
+              <h3 class="font-mono text-xs font-bold uppercase tracking-wider" style="color: var(--accent);">{cat.title}</h3>
+            </div>
+            <p class="text-sm" style="color: var(--text-secondary);">{cat.items}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Employment Timeline -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-6 reveal" style="color: var(--accent);">005 — EMPLOYMENT</p>
+      <div class="max-w-3xl stagger-children reveal">
+        {employment.map((job, i) => (
+          <div class={i < employment.length - 1 ? 'mb-12' : ''}>
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1 gap-1">
+              <h3 class="font-mono text-sm font-bold">{job.role}</h3>
+              <span class="code-text" style="color: var(--text-secondary);">{job.duration}</span>
+            </div>
+            <p class="text-sm mb-2" style="color: var(--accent);">{job.company}</p>
+            <p class="text-sm mb-3" style="color: var(--text-secondary);">{job.description}</p>
+            <div class="flex flex-wrap gap-2">
+              {job.highlights.map((h) => (
+                <span class="font-mono text-[10px] px-2 py-1" style="border: 1px solid var(--border); color: var(--text-secondary);">
+                  {h}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="py-24 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-6 reveal" style="color: var(--accent);">006 — CONTACT</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 reveal">
+        <div>
+          <h2 class="text-2xl md:text-3xl font-bold mb-4">Get in touch.</h2>
+          <p style="color: var(--text-secondary);" class="mb-6">
+            Open to collaborations on high-performance systems, infrastructure tooling,
+            and developer experience projects.
+          </p>
+          <div class="flex flex-col gap-3 mb-8">
+            <a
+              href="mailto:wyatt_au@protonmail.com"
+              class="amoeba-hover inline-block px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider text-center"
+              style="background: var(--accent); color: var(--bg-primary);"
+            >
+              Email
+            </a>
+            <a
+              href="https://github.com/WyattAu"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="amoeba-hover inline-block px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider border text-center"
+              style="border-color: var(--border); color: var(--text-secondary);"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://forgejo.wyattau.com/wyatt_admin"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="amoeba-hover inline-block px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider border text-center"
+              style="border-color: var(--border); color: var(--text-secondary);"
+            >
+              Forgejo
+            </a>
+            <a
+              href="https://x.com/_WyattAu_"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="amoeba-hover inline-block px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider border text-center"
+              style="border-color: var(--border); color: var(--text-secondary);"
+            >
+              X / Twitter
+            </a>
+          </div>
+        </div>
+        <div>
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-4" style="color: var(--accent);">Send a Message</p>
+          <ContactForm client:load />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+
+  <ThemeToggle client:load />
+  <CommandPalette client:load />
+
+  <script>
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    document.querySelectorAll('.reveal, .stagger-children').forEach((el) => observer.observe(el));
+  </script>
+</BaseLayout>

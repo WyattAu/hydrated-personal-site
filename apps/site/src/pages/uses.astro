@@ -1,0 +1,286 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/astro/Nav.astro';
+import Footer from '../components/astro/Footer.astro';
+import '../styles/base.css';
+import '../styles/animations.css';
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const developmentTools = [
+  {
+    category: 'Editors',
+    items: [
+      {
+        name: 'Neovim',
+        desc: 'Primary editor with LSP, Treesitter, and custom keymaps. Rust, Go, Python, C++ support.',
+        url: 'https://neovim.io',
+      },
+      {
+        name: 'VS Code',
+        desc: 'Secondary editor for web dev, TypeScript, and quick edits.',
+        url: 'https://code.visualstudio.com',
+      },
+      {
+        name: 'CLion',
+        desc: 'C++ and Rust development with CMake integration and debugger.',
+        url: 'https://www.jetbrains.com/clion/',
+      },
+    ],
+  },
+  {
+    category: 'Terminal',
+    items: [
+      {
+        name: 'WezTerm',
+        desc: 'GPU-accelerated terminal emulator with Lua config and multiplexing.',
+        url: 'https://wezfurlong.org/wezterm/',
+      },
+      {
+        name: 'Git',
+        desc: 'Advanced workflows: rebase, bisect, worktrees, submodules. Forgejo for private repos.',
+        url: 'https://git-scm.com',
+      },
+    ],
+  },
+  {
+    category: 'Languages',
+    items: [
+      {
+        name: 'Rust',
+        desc: 'Systems programming, WASM, async/await. Primary language for new projects.',
+        url: 'https://www.rust-lang.org',
+      },
+      { name: 'Go', desc: 'Backend services, CLI tools, Echo framework.', url: 'https://go.dev' },
+      {
+        name: 'Python',
+        desc: 'Automation, data processing, testing.',
+        url: 'https://www.python.org',
+      },
+      {
+        name: 'TypeScript',
+        desc: 'Full-stack web development.',
+        url: 'https://www.typescriptlang.org',
+      },
+      {
+        name: 'Lean 4',
+        desc: 'Formal verification and theorem proving for critical algorithms.',
+        url: 'https://lean-lang.org',
+      },
+    ],
+  },
+  {
+    category: 'Tools',
+    items: [
+      {
+        name: 'Docker',
+        desc: 'Multi-stage builds, distroless images, compose for local dev.',
+        url: 'https://www.docker.com',
+      },
+      {
+        name: 'Valgrind',
+        desc: 'Memory analysis, leak detection, and profiling for C/C++.',
+        url: 'https://valgrind.org',
+      },
+      { name: 'Makefile', desc: 'Build automation for C/C++ and multi-language projects.' },
+    ],
+  },
+];
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const infrastructureTools = [
+  {
+    category: 'Hosting & Edge',
+    items: [
+      {
+        name: 'Cloudflare Pages',
+        desc: 'Static site hosting with edge functions for this portfolio.',
+        url: 'https://pages.cloudflare.com',
+      },
+      {
+        name: 'Cloudflare Workers',
+        desc: 'Serverless edge compute for API proxies and data transformations.',
+        url: 'https://workers.cloudflare.com',
+      },
+    ],
+  },
+  {
+    category: 'Git & CI/CD',
+    items: [
+      {
+        name: 'Forgejo',
+        desc: 'Self-hosted Gitea fork for private repositories and CI/CD.',
+        url: 'https://forgejo.org',
+      },
+      {
+        name: 'GitHub Actions',
+        desc: 'Automated builds, tests, and deployments.',
+        url: 'https://github.com/features/actions',
+      },
+    ],
+  },
+  {
+    category: 'Self-Hosted',
+    items: [
+      {
+        name: 'TrueNAS Scale',
+        desc: 'Self-hosted NAS with ZFS, Docker, and VM hosting.',
+        url: 'https://www.truenas.com',
+      },
+      {
+        name: 'Proxmox VE',
+        desc: 'KVM/QEMU and LXC container management.',
+        url: 'https://www.proxmox.com',
+      },
+      {
+        name: 'Traefik',
+        desc: 'Edge router with automatic SSL and service discovery.',
+        url: 'https://traefik.io',
+      },
+      {
+        name: 'Keycloak',
+        desc: 'Identity and access management for self-hosted services.',
+        url: 'https://www.keycloak.org',
+      },
+    ],
+  },
+  {
+    category: 'Databases',
+    items: [
+      { name: 'PostgreSQL', desc: 'Primary relational database with JSONB and partitioning.' },
+      { name: 'TimescaleDB', desc: 'Time-series extension for PostgreSQL.' },
+      { name: 'Redis', desc: 'Caching and message queues.' },
+    ],
+  },
+];
+
+// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
+const hardware = [
+  {
+    name: 'Custom PC',
+    category: 'WORKSTATION',
+    desc: 'Ryzen 9 7950X, 64GB DDR5, RTX 4070. Ubuntu 24.04 host with Proxmox/TrueNAS VMs.',
+    specs: ['AMD Ryzen 9 7950X', '64GB DDR5', 'NVIDIA RTX 4070', 'Ubuntu 24.04'],
+  },
+  {
+    name: 'Framework Laptop 16',
+    category: 'LAPTOP',
+    desc: 'AMD Ryzen 7 7840HS, 32GB DDR5. Modular, repairable. NixOS daily driver.',
+    specs: ['AMD Ryzen 7 7840HS', '32GB DDR5', 'NixOS', 'Modular Design'],
+  },
+  {
+    name: 'HHKB Professional',
+    category: 'KEYBOARD',
+    desc: 'Topre electrostatic capacitive switches. Primary typing device.',
+    specs: ['Topre Switches', 'Electrostatic Capacitive', 'USB-C', 'Compact Layout'],
+  },
+];
+---
+
+<BaseLayout title="Uses — Wyatt Au" description="Tools, software, and hardware I use daily.">
+  <Nav />
+
+  <main id="main-content" class="pt-24">
+    <!-- Header -->
+    <section class="py-16 px-6 md:px-12 lg:px-24">
+      <p class="label mb-6 cinematic-enter" style="color: var(--accent);">USES</p>
+      <h1 class="text-3xl md:text-5xl font-bold mb-4 cinematic-enter cinematic-enter-delay-1">Uses</h1>
+      <p class="text-lg cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 640px;">
+        Tools, software, and hardware I use daily for development, infrastructure, and productivity.
+      </p>
+    </section>
+
+    <!-- Development Tools -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-8 reveal" style="color: var(--accent);">DEVELOPMENT</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        {developmentTools.map((group) => (
+          <div class="reveal">
+            <h3 class="font-mono text-xs font-bold uppercase tracking-wider mb-4 pb-2 border-b" style="color: var(--accent); border-color: var(--border);">{group.category}</h3>
+            <div class="space-y-3">
+              {group.items.map((tool) => (
+                <div class="flex flex-col gap-1 py-2 border-b" style="border-color: var(--border);">
+                  <span class="font-mono text-sm font-bold" style="color: var(--text-primary);">
+                    {tool.url ? (
+                      <a href={tool.url} target="_blank" rel="noopener noreferrer" class="hover:underline" style="color: var(--accent);">
+                        {tool.name} ↗
+                      </a>
+                    ) : (
+                      tool.name
+                    )}
+                  </span>
+                  <span class="text-sm" style="color: var(--text-secondary);">{tool.desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Infrastructure -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-8 reveal" style="color: var(--accent);">INFRASTRUCTURE</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        {infrastructureTools.map((group) => (
+          <div class="reveal">
+            <h3 class="font-mono text-xs font-bold uppercase tracking-wider mb-4 pb-2 border-b" style="color: var(--accent); border-color: var(--border);">{group.category}</h3>
+            <div class="space-y-3">
+              {group.items.map((tool) => (
+                <div class="flex flex-col gap-1 py-2 border-b" style="border-color: var(--border);">
+                  <span class="font-mono text-sm font-bold" style="color: var(--text-primary);">
+                    {tool.url ? (
+                      <a href={tool.url} target="_blank" rel="noopener noreferrer" class="hover:underline" style="color: var(--accent);">
+                        {tool.name} ↗
+                      </a>
+                    ) : (
+                      tool.name
+                    )}
+                  </span>
+                  <span class="text-sm" style="color: var(--text-secondary);">{tool.desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Hardware -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-8 reveal" style="color: var(--accent);">HARDWARE</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children reveal">
+        {hardware.map((hw) => (
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-[10px] font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">{hw.category}</p>
+            <h3 class="font-mono text-sm font-bold mb-2" style="color: var(--text-primary);">{hw.name}</h3>
+            <p class="text-sm mb-3" style="color: var(--text-secondary);">{hw.desc}</p>
+            <div class="flex flex-wrap gap-1.5">
+              {hw.specs.map((spec) => (
+                <span class="font-mono text-[9px] px-1.5 py-0.5" style="border: 1px solid var(--border); color: var(--text-secondary);">
+                  {spec}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+
+  <script>
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    document.querySelectorAll('.reveal, .stagger-children').forEach((el) => observer.observe(el));
+  </script>
+</BaseLayout>

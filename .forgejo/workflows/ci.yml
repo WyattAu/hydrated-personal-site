@@ -1,0 +1,171 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Stage 1: Format & Lint (parallel)
+  format:
+    name: Biome Format & Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Format & lint check
+        run: bunx biome check .
+
+  typecheck:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Type check site
+        run: bunx tsc --noEmit -p apps/site/tsconfig.json
+      - name: Type check worker
+        run: bunx tsc --noEmit -p worker/tsconfig.json
+
+  # Stage 2: Test Suite
+  unit:
+    name: Unit Tests (Vitest)
+    runs-on: ubuntu-latest
+    needs: [format, typecheck]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Run all tests (unit + property) with coverage
+        run: bunx vitest run --coverage
+      - name: Generate JUnit report
+        run: bunx vitest run --reporter=junit --outputFile=reports/junit.xml
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: reports/
+          retention-days: 7
+
+  # Stage 3: Build Verification (parallel)
+  wasm:
+    name: Build WASM Widgets
+    runs-on: ubuntu-latest
+    needs: [unit]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/widgets
+      - uses: oven-sh/setup-bun@v2
+        with:
+          version: latest
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build WASM
+        run: wasm-pack build --target web --release packages/widgets
+      - name: Verify WASM output
+        run: ls -la packages/widgets/pkg/*.wasm
+      - name: Cache WASM artifacts
+        uses: actions/cache@v4
+        with:
+          path: packages/widgets/pkg
+          key: wasm-${{ hashFiles('packages/widgets/src/**') }}
+
+  site:
+    name: Build Astro Site
+    runs-on: ubuntu-latest
+    needs: [unit]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build Astro site
+        run: bunx turbo build --filter=site
+      - name: Verify build output
+        run: ls -la apps/site/dist/
+      - name: Cache site build
+        uses: actions/cache@v4
+        with:
+          path: apps/site/dist
+          key: site-${{ hashFiles('apps/site/src/**') }}
+
+  # Stage 4: E2E Tests
+  e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    needs: [wasm, site]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Install Playwright
+        run: bunx playwright install --with-deps chromium
+      - name: Run E2E tests
+        run: bunx playwright test
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  # Stage 5: Performance Gate
+  lighthouse:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    needs: [e2e]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Install Lighthouse CI
+        run: bun add -d @lhci/cli
+      - name: Run Lighthouse CI
+        run: bunx lhci autorun --config=lighthouserc.json
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: lighthouse-reports/
+          retention-days: 7
