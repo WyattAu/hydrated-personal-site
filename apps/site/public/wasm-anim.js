@@ -21,6 +21,18 @@
       useUpdateFn: false,
       // Regex is static but re-renders keep it responsive
     },
+    order_book: {
+      useUpdateFn: false,
+      // Data-driven via endpoint, no animation loop needed
+    },
+    treemap: {
+      useUpdateFn: false,
+      // Data-driven via endpoint, no animation loop needed
+    },
+    btc_health: {
+      useUpdateFn: false,
+      // Data-driven via endpoint, no animation loop needed
+    },
   };
 
   /**

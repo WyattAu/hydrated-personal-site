@@ -50,6 +50,7 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
   const [tf, setTf] = createSignal<Timeframe>('1m');
   const [klines, setKlines] = createSignal<Kline[]>([]);
   const [loading, setLoading] = createSignal(true);
+  const [error, setError] = createSignal<string | null>(null);
   const [crosshair, setCrosshair] = createSignal<{
     price: number;
     date: string;
@@ -212,17 +213,28 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
 
   async function fetchData() {
     setLoading(true);
+    setError(null);
     try {
       const tfConfig = TIMEFRAMES.find((t) => t.key === tf())!;
       const res = await fetch(
         `/api/binance-klines?symbol=${symbol}&interval=${tfConfig.interval}&limit=${tfConfig.limit}`,
       );
+      if (!res.ok) {
+        throw new Error(`API returned ${res.status}`);
+      }
       const raw = await res.json();
-      setKlines(parseKlines(raw));
-    } catch {
+      if (!Array.isArray(raw) || raw.length === 0) {
+        setKlines([]);
+        setError('No price data available');
+      } else {
+        setKlines(parseKlines(raw));
+      }
+    } catch (e) {
       setKlines([]);
+      setError(e instanceof Error ? e.message : 'Failed to load price data');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   createEffect(() => {
@@ -352,9 +364,14 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
 
         {!loading() && klines().length === 0 && (
           <div class="flex items-center justify-center" style="height: 320px;">
-            <p class="code-text" style="color: var(--text-secondary);">
-              No data available
-            </p>
+            <div class="text-center">
+              <p class="code-text mb-1" style="color: var(--accent-warm);">
+                {error() ? 'DATA ERROR' : 'NO DATA'}
+              </p>
+              <p class="text-xs" style="color: var(--text-secondary);">
+                {error() || 'No price data available'}
+              </p>
+            </div>
           </div>
         )}
       </div>

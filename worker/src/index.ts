@@ -705,7 +705,7 @@ async function handleEtfPrice(request: Request): Promise<Response> {
 
 // --- Guestbook ---
 
-async function handleGuestbookGet(request: Request): Promise<Response> {
+async function handleGuestbookGet(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   const page = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10) || 1);
   const limit = Math.min(
@@ -714,12 +714,56 @@ async function handleGuestbookGet(request: Request): Promise<Response> {
   );
 
   const fallbackEntries = [
-    { id: '1', name: 'Visitor', message: 'Great site!', created: Date.now() - 86400000 },
-    { id: '2', name: 'Dev', message: 'Love the WASM widgets.', created: Date.now() - 3600000 },
+    {
+      id: '1',
+      name: 'Visitor',
+      message: 'Great site!',
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+    },
+    {
+      id: '2',
+      name: 'Dev',
+      message: 'Love the WASM widgets.',
+      created_at: new Date(Date.now() - 3600000).toISOString(),
+    },
   ];
 
-  // Use fallback data (in-memory) since KV list is not available in all environments
-  const allEntries = fallbackEntries;
+  let allEntries: Array<{ id: string; name: string; message: string; created_at: string }> =
+    fallbackEntries;
+
+  // Try to read from KV if available
+  if (env.GUESTBOOK) {
+    try {
+      const listResult = await env.GUESTBOOK.list({ prefix: 'entry:' });
+      if (listResult.keys.length > 0) {
+        const kvEntries: Array<{ id: string; name: string; message: string; created_at: string }> =
+          [];
+        for (const key of listResult.keys) {
+          const value = await env.GUESTBOOK.get(key.name);
+          if (value) {
+            try {
+              const parsed = JSON.parse(value);
+              // Normalize field name: worker stores as 'created', frontend expects 'created_at'
+              if (parsed.created && !parsed.created_at) {
+                parsed.created_at = new Date(parsed.created).toISOString();
+              }
+              kvEntries.push(parsed);
+            } catch {
+              // Skip malformed entries
+            }
+          }
+        }
+        if (kvEntries.length > 0) {
+          // Sort by created_at descending (newest first)
+          kvEntries.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+          allEntries = kvEntries;
+        }
+      }
+    } catch (e) {
+      log('warn', 'KV read failed, using fallback', { error: String(e) });
+    }
+  }
+
   const start = (page - 1) * limit;
   const entries = allEntries.slice(start, start + limit);
 
@@ -980,7 +1024,7 @@ export default {
       } else if (routePath === '/api/guestbook') {
         const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
         if (request.method === 'GET') {
-          response = await handleGuestbookGet(request);
+          response = await handleGuestbookGet(request, env);
         } else if (request.method === 'POST') {
           response = await handleGuestbookPost(request, env, ip);
         } else if (request.method === 'DELETE') {

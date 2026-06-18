@@ -223,19 +223,17 @@ export default function WorldMap() {
 
   return (
     <div class="relative w-full h-full">
-      {!loading() && (
-        <div
-          ref={mapRef}
-          class="w-full h-full"
-          style="background: var(--bg-secondary);"
-          role="region"
-          aria-label="Interactive world map with earthquake markers and capital indicators"
-        />
-      )}
+      <div
+        ref={mapRef}
+        class="w-full h-full"
+        style="background: var(--bg-secondary);"
+        role="region"
+        aria-label="Interactive world map with earthquake markers and capital indicators"
+      />
 
       {loading() && (
         <div
-          class="absolute inset-0 flex items-center justify-center"
+          class="absolute inset-0 flex items-center justify-center z-10"
           style="background: var(--bg-secondary);"
         >
           <div class="text-center">
@@ -252,7 +250,7 @@ export default function WorldMap() {
 
       {error() && (
         <div
-          class="absolute inset-0 flex items-center justify-center p-6"
+          class="absolute inset-0 flex items-center justify-center p-6 z-10"
           style="background: var(--bg-secondary);"
         >
           <div class="text-center">
@@ -268,7 +266,7 @@ export default function WorldMap() {
 
       {selectedCountry() && (
         <div
-          class="absolute bottom-4 left-4 px-3 py-2 border font-mono text-xs"
+          class="absolute bottom-4 left-4 px-3 py-2 border font-mono text-xs z-10"
           style="background: var(--bg-card); border-color: var(--border); color: var(--text-secondary); backdrop-filter: blur(8px);"
         >
           {selectedCountry()}

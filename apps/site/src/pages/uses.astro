@@ -1,4 +1,5 @@
 ---
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/astro/Nav.astro';
 import Footer from '../components/astro/Footer.astro';
@@ -152,31 +153,9 @@ const infrastructureTools = [
     ],
   },
 ];
-
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
-const hardware = [
-  {
-    name: 'Custom PC',
-    category: 'WORKSTATION',
-    desc: 'Ryzen 9 7950X, 64GB DDR5, RTX 4070. Ubuntu 24.04 host with Proxmox/TrueNAS VMs.',
-    specs: ['AMD Ryzen 9 7950X', '64GB DDR5', 'NVIDIA RTX 4070', 'Ubuntu 24.04'],
-  },
-  {
-    name: 'Framework Laptop 16',
-    category: 'LAPTOP',
-    desc: 'AMD Ryzen 7 7840HS, 32GB DDR5. Modular, repairable. NixOS daily driver.',
-    specs: ['AMD Ryzen 7 7840HS', '32GB DDR5', 'NixOS', 'Modular Design'],
-  },
-  {
-    name: 'HHKB Professional',
-    category: 'KEYBOARD',
-    desc: 'Topre electrostatic capacitive switches. Primary typing device.',
-    specs: ['Topre Switches', 'Electrostatic Capacitive', 'USB-C', 'Compact Layout'],
-  },
-];
 ---
 
-<BaseLayout title="Uses — Wyatt Au" description="Tools, software, and hardware I use daily.">
+<BaseLayout title="Uses — Wyatt Au" description="Tools and software I use daily for development, infrastructure, and productivity.">
   <Nav />
 
   <main id="main-content" class="pt-24">
@@ -185,7 +164,7 @@ const hardware = [
       <p class="label mb-6 cinematic-enter" style="color: var(--accent);">USES</p>
       <h1 class="text-3xl md:text-5xl font-bold mb-4 cinematic-enter cinematic-enter-delay-1">Uses</h1>
       <p class="text-lg cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 640px;">
-        Tools, software, and hardware I use daily for development, infrastructure, and productivity.
+        Tools and software I use daily for development, infrastructure, and productivity.
       </p>
     </section>
 
@@ -238,27 +217,6 @@ const hardware = [
                   </span>
                   <span class="text-sm" style="color: var(--text-secondary);">{tool.desc}</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <!-- Hardware -->
-    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
-      <p class="label mb-8 reveal" style="color: var(--accent);">HARDWARE</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children reveal">
-        {hardware.map((hw) => (
-          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
-            <p class="font-mono text-[10px] font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">{hw.category}</p>
-            <h3 class="font-mono text-sm font-bold mb-2" style="color: var(--text-primary);">{hw.name}</h3>
-            <p class="text-sm mb-3" style="color: var(--text-secondary);">{hw.desc}</p>
-            <div class="flex flex-wrap gap-1.5">
-              {hw.specs.map((spec) => (
-                <span class="font-mono text-[9px] px-1.5 py-0.5" style="border: 1px solid var(--border); color: var(--text-secondary);">
-                  {spec}
-                </span>
               ))}
             </div>
           </div>

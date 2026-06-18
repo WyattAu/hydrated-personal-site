@@ -29,9 +29,15 @@ export function useLlmData() {
     onMount(async () => {
       try {
         const res = await fetch('/api/llm-benchmarks');
+        if (!res.ok) throw new Error(`API returned ${res.status}`);
         const raw = await res.json();
-        data[1](parseModels(raw));
-      } catch {}
+        const parsed = parseModels(raw);
+        if (parsed.length > 0) {
+          data[1](parsed);
+        }
+      } catch (e) {
+        console.warn('LLM benchmarks fetch failed:', e);
+      }
       loading[1](false);
     });
   }

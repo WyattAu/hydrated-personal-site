@@ -4,12 +4,22 @@ interface Props {
   width?: number;
   height?: number;
   class?: string;
+  dataEndpoint?: string;
+  dataInterval?: number;
 }
 
 // biome-ignore lint/correctness/noUnusedVariables: used in Astro template
-const { widget, width = 800, height = 400, class: className = '' } = Astro.props;
+const {
+  widget,
+  width = 800,
+  height = 400,
+  class: className = '',
+  dataEndpoint = '',
+  dataInterval = 0,
+} = Astro.props;
 const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
 const canvasId = `${widgetId}-canvas`;
+const ariaLabel = `${widget.replace(/_/g, ' ')} widget`;
 ---
 
 <div
@@ -18,13 +28,18 @@ const canvasId = `${widgetId}-canvas`;
   data-widget={widget}
   data-width={width}
   data-height={height}
+  data-endpoint={dataEndpoint}
+  data-interval={dataInterval}
   style={`width: ${width}px; height: ${height}px;`}
 >
   <canvas
     id={canvasId}
     width={width}
     height={height}
-    style="display: block; width: 100%; height: 100%;"
+    tabindex="0"
+    role="application"
+    aria-label={ariaLabel}
+    style="display: block; width: 100%; height: 100%; outline: none;"
   ></canvas>
 </div>
 
@@ -48,6 +63,8 @@ const canvasId = `${widgetId}-canvas`;
               var w = parseInt(el.dataset.width || '800', 10);
               var h = parseInt(el.dataset.height || '400', 10);
               var canvasId = el.id + '-canvas';
+              var endpoint = el.dataset.endpoint || '';
+              var interval = parseInt(el.dataset.interval || '0', 10);
 
               var wasmPath = '/wasm/hydrated_widgets_v2.js';
               import(wasmPath)
@@ -60,6 +77,32 @@ const canvasId = `${widgetId}-canvas`;
                       throw new Error('Canvas element ' + canvasId + ' not found in DOM');
                     }
                     createFn(canvasId, w, h);
+
+                    // Fetch data and call update function if endpoint is specified
+                    var updateFn = mod['update_' + widget];
+                    if (endpoint && updateFn) {
+                      function fetchDataAndUpdate() {
+                        fetch(endpoint)
+                          .then(function (res) {
+                            if (!res.ok) throw new Error('Data fetch failed');
+                            return res.json();
+                          })
+                          .then(function (data) {
+                            try {
+                              updateFn(canvasId, w, h, JSON.stringify(data));
+                            } catch (e) {
+                              console.warn('WASM update failed for ' + widget + ':', e);
+                            }
+                          })
+                          .catch(function (e) {
+                            console.warn('WASM data fetch failed for ' + widget + ':', e);
+                          });
+                      }
+                      fetchDataAndUpdate();
+                      if (interval > 0) {
+                        el.__wasmDataInterval = setInterval(fetchDataAndUpdate, interval);
+                      }
+                    }
 
                     // Start animation loop after initial render
                     if (window.__wasmAnim) {

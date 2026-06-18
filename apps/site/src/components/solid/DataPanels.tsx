@@ -95,27 +95,38 @@ function LlmPanel() {
       ) : (
         <>
           <PanelHeader title="LLM BENCHMARKS" count={data().length} />
-          <div class="overflow-y-auto" style="max-height: 400px;">
-            <For each={data()}>
-              {(m) => (
-                <div class="py-2 border-b" style="border-color: var(--border);">
-                  <div class="flex justify-between items-baseline mb-1">
-                    <span class="font-mono text-xs font-bold" style="color: var(--text-primary);">
-                      {m.model}
-                    </span>
-                    <span class="code-text" style="color: var(--accent);">
-                      {m.average_score.toFixed(1)}
-                    </span>
+          {data().length === 0 ? (
+            <div class="py-8 text-center">
+              <p class="code-text" style="color: var(--text-secondary);">
+                No benchmark data available
+              </p>
+              <p class="text-xs mt-1" style="color: var(--text-secondary);">
+                Data source may be temporarily unavailable
+              </p>
+            </div>
+          ) : (
+            <div class="overflow-y-auto" style="max-height: 400px;">
+              <For each={data()}>
+                {(m) => (
+                  <div class="py-2 border-b" style="border-color: var(--border);">
+                    <div class="flex justify-between items-baseline mb-1">
+                      <span class="font-mono text-xs font-bold" style="color: var(--text-primary);">
+                        {m.model}
+                      </span>
+                      <span class="code-text" style="color: var(--accent);">
+                        {m.average_score.toFixed(1)}
+                      </span>
+                    </div>
+                    <div class="flex gap-3 text-xs" style="color: var(--text-secondary);">
+                      <span>MMLU: {m.mmlu.toFixed(1)}</span>
+                      <span>HE: {m.humaneval.toFixed(1)}</span>
+                      <span>GSM8K: {m.gsm8k.toFixed(1)}</span>
+                    </div>
                   </div>
-                  <div class="flex gap-3 text-xs" style="color: var(--text-secondary);">
-                    <span>MMLU: {m.mmlu.toFixed(1)}</span>
-                    <span>HE: {m.humaneval.toFixed(1)}</span>
-                    <span>GSM8K: {m.gsm8k.toFixed(1)}</span>
-                  </div>
-                </div>
-              )}
-            </For>
-          </div>
+                )}
+              </For>
+            </div>
+          )}
         </>
       )}
     </div>
