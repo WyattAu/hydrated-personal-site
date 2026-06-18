@@ -6,6 +6,16 @@ const TAU: f64 = 2.0 * PI;
 
 #[wasm_bindgen]
 pub fn create_fourier_viz(canvas_id: &str, width: u32, height: u32) -> Result<(), JsValue> {
+    update_fourier_viz(canvas_id, width, height, 0.0)
+}
+
+#[wasm_bindgen]
+pub fn update_fourier_viz(
+    canvas_id: &str,
+    width: u32,
+    height: u32,
+    time: f64,
+) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let canvas = document
@@ -21,9 +31,8 @@ pub fn create_fourier_viz(canvas_id: &str, width: u32, height: u32) -> Result<()
 
     let harmonics = 5;
     let sample_count = 512;
-    let time = 0.0;
 
-    draw_fourier_viz(&ctx, width, height, harmonics, sample_count, time);
+    draw_fourier_viz(&ctx, width, height, harmonics, sample_count, time)?;
 
     Ok(())
 }

@@ -1,4 +1,4 @@
-import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { useLlmData } from '../../lib/llm-data';
 
 interface Point {
@@ -208,7 +208,7 @@ function ScatterCanvas(props: {
           aria-label={props.title}
         />
       </div>
-      <Show when={tooltip()}>
+      {tooltip() && (
         <div
           class="absolute px-2 py-1 font-mono text-xs pointer-events-none"
           style={{
@@ -221,7 +221,7 @@ function ScatterCanvas(props: {
         >
           {tooltip()?.label}
         </div>
-      </Show>
+      )}
     </div>
   );
 }
@@ -254,7 +254,7 @@ export default function ScatterPlots() {
       <p class="label mb-3" style="color: var(--accent);">
         SCATTER PLOTS
       </p>
-      <Show when={!loading()}>
+      {!loading() && (
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <ScatterCanvas
             points={intelligenceVsPrice}
@@ -269,8 +269,8 @@ export default function ScatterPlots() {
             title="LLM Intelligence vs. Coding"
           />
         </div>
-      </Show>
-      <Show when={loading()}>
+      )}
+      {loading() && (
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <div
             class="border flex items-center justify-center"
@@ -289,7 +289,7 @@ export default function ScatterPlots() {
             </p>
           </div>
         </div>
-      </Show>
+      )}
     </div>
   );
 }

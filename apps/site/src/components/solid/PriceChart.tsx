@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { For, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 
 interface Kline {
   openTime: number;
@@ -325,7 +325,7 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
         class="border relative"
         style="border-color: var(--border); background: var(--bg-card);"
       >
-        <Show when={!loading()}>
+        {!loading() && (
           <canvas
             ref={canvasRef}
             class="w-full cursor-crosshair"
@@ -334,9 +334,9 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
             role="img"
             aria-label={`${title} price chart`}
           />
-        </Show>
+        )}
 
-        <Show when={loading()}>
+        {loading() && (
           <div class="flex items-center justify-center" style="height: 320px;">
             <div class="text-center">
               <div
@@ -348,15 +348,15 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
               </p>
             </div>
           </div>
-        </Show>
+        )}
 
-        <Show when={!loading() && klines().length === 0()}>
+        {!loading() && klines().length === 0 && (
           <div class="flex items-center justify-center" style="height: 320px;">
             <p class="code-text" style="color: var(--text-secondary);">
               No data available
             </p>
           </div>
-        </Show>
+        )}
       </div>
 
       <style>{`

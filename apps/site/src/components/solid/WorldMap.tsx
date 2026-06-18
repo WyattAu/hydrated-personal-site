@@ -1,4 +1,4 @@
-import { Show, createSignal, onCleanup, onMount } from 'solid-js';
+import { createSignal, onCleanup, onMount } from 'solid-js';
 import type { EarthquakeFeature } from '../../lib/types';
 
 interface MapInstance {
@@ -223,7 +223,7 @@ export default function WorldMap() {
 
   return (
     <div class="relative w-full h-full">
-      <Show when={!loading()}>
+      {!loading() && (
         <div
           ref={mapRef}
           class="w-full h-full"
@@ -231,9 +231,9 @@ export default function WorldMap() {
           role="region"
           aria-label="Interactive world map with earthquake markers and capital indicators"
         />
-      </Show>
+      )}
 
-      <Show when={loading()}>
+      {loading() && (
         <div
           class="absolute inset-0 flex items-center justify-center"
           style="background: var(--bg-secondary);"
@@ -248,9 +248,9 @@ export default function WorldMap() {
             </p>
           </div>
         </div>
-      </Show>
+      )}
 
-      <Show when={error()}>
+      {error() && (
         <div
           class="absolute inset-0 flex items-center justify-center p-6"
           style="background: var(--bg-secondary);"
@@ -264,16 +264,16 @@ export default function WorldMap() {
             </p>
           </div>
         </div>
-      </Show>
+      )}
 
-      <Show when={selectedCountry()}>
+      {selectedCountry() && (
         <div
           class="absolute bottom-4 left-4 px-3 py-2 border font-mono text-xs"
           style="background: var(--bg-card); border-color: var(--border); color: var(--text-secondary); backdrop-filter: blur(8px);"
         >
           {selectedCountry()}
         </div>
-      </Show>
+      )}
 
       <style>{`
         @keyframes spin {

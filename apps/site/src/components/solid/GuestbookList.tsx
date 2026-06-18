@@ -1,4 +1,4 @@
-import { For, Show, createSignal, onMount } from 'solid-js';
+import { For, createSignal, onMount } from 'solid-js';
 
 interface GuestbookEntry {
   id: number;
@@ -43,23 +43,23 @@ export default function GuestbookList() {
 
   return (
     <div>
-      <Show when={loading() && entries().length === 0}>
+      {loading() && entries().length === 0 && (
         <p class="font-mono text-xs" style="color: var(--text-secondary);">
           Loading entries...
         </p>
-      </Show>
+      )}
 
-      <Show when={error()}>
+      {error() && (
         <p class="font-mono text-xs" style="color: var(--accent-warm);">
           {error()}
         </p>
-      </Show>
+      )}
 
-      <Show when={!loading() && entries().length === 0 && !error()}>
+      {!loading() && entries().length === 0 && !error() && (
         <p class="font-mono text-xs" style="color: var(--text-secondary);">
           No entries yet. Be the first to sign.
         </p>
-      </Show>
+      )}
 
       <For each={entries()}>
         {(entry) => (

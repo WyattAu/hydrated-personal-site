@@ -28,6 +28,8 @@ const canvasId = `${widgetId}-canvas`;
   ></canvas>
 </div>
 
+<script is:inline src="/wasm-anim.js"></script>
+
 <script is:inline>
   (function () {
     if (window.__wasmInit) return;
@@ -53,13 +55,22 @@ const canvasId = `${widgetId}-canvas`;
                   await mod.default();
                   var createFn = mod['create_' + widget];
                   if (createFn) {
-                    // Canvas is already in the DOM from the template
-                    // Just verify it exists and call the WASM function
                     var canvasEl = document.getElementById(canvasId);
                     if (!canvasEl) {
                       throw new Error('Canvas element ' + canvasId + ' not found in DOM');
                     }
                     createFn(canvasId, w, h);
+
+                    // Start animation loop after initial render
+                    if (window.__wasmAnim) {
+                      el.__wasmAnimLoop = window.__wasmAnim.startAnimationLoop(
+                        mod,
+                        widget,
+                        canvasId,
+                        w,
+                        h
+                      );
+                    }
                   } else {
                     throw new Error('Widget function create_' + widget + ' not found');
                   }

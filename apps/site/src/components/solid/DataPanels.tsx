@@ -1,4 +1,4 @@
-import { For, Show, createSignal, onMount } from 'solid-js';
+import { For, createSignal, onMount } from 'solid-js';
 import type { GitHubRepo, HNStory } from '../../lib/types';
 import { useLlmData } from '../../lib/llm-data';
 
@@ -76,11 +76,11 @@ function PanelHeader(props: { title: string; count?: number }) {
       <p class="label" style="color: var(--accent);">
         {props.title}
       </p>
-      <Show when={props.count !== undefined}>
+      {props.count !== undefined && (
         <span class="code-text" style="color: var(--text-secondary);">
           {props.count} items
         </span>
-      </Show>
+      )}
     </div>
   );
 }
@@ -90,30 +90,34 @@ function LlmPanel() {
 
   return (
     <div class="p-4 border h-full" style="border-color: var(--border); background: var(--bg-card);">
-      <Show when={!loading()} fallback={<PanelSkeleton />}>
-        <PanelHeader title="LLM BENCHMARKS" count={data().length} />
-        <div class="overflow-y-auto" style="max-height: 400px;">
-          <For each={data()}>
-            {(m) => (
-              <div class="py-2 border-b" style="border-color: var(--border);">
-                <div class="flex justify-between items-baseline mb-1">
-                  <span class="font-mono text-xs font-bold" style="color: var(--text-primary);">
-                    {m.model}
-                  </span>
-                  <span class="code-text" style="color: var(--accent);">
-                    {m.average_score.toFixed(1)}
-                  </span>
+      {loading() ? (
+        <PanelSkeleton />
+      ) : (
+        <>
+          <PanelHeader title="LLM BENCHMARKS" count={data().length} />
+          <div class="overflow-y-auto" style="max-height: 400px;">
+            <For each={data()}>
+              {(m) => (
+                <div class="py-2 border-b" style="border-color: var(--border);">
+                  <div class="flex justify-between items-baseline mb-1">
+                    <span class="font-mono text-xs font-bold" style="color: var(--text-primary);">
+                      {m.model}
+                    </span>
+                    <span class="code-text" style="color: var(--accent);">
+                      {m.average_score.toFixed(1)}
+                    </span>
+                  </div>
+                  <div class="flex gap-3 text-xs" style="color: var(--text-secondary);">
+                    <span>MMLU: {m.mmlu.toFixed(1)}</span>
+                    <span>HE: {m.humaneval.toFixed(1)}</span>
+                    <span>GSM8K: {m.gsm8k.toFixed(1)}</span>
+                  </div>
                 </div>
-                <div class="flex gap-3 text-xs" style="color: var(--text-secondary);">
-                  <span>MMLU: {m.mmlu.toFixed(1)}</span>
-                  <span>HE: {m.humaneval.toFixed(1)}</span>
-                  <span>GSM8K: {m.gsm8k.toFixed(1)}</span>
-                </div>
-              </div>
-            )}
-          </For>
-        </div>
-      </Show>
+              )}
+            </For>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -123,43 +127,47 @@ function GithubPanel() {
 
   return (
     <div class="p-4 border h-full" style="border-color: var(--border); background: var(--bg-card);">
-      <Show when={!loading()} fallback={<PanelSkeleton />}>
-        <PanelHeader title="GITHUB TRENDING" count={repos().length} />
-        <div class="overflow-y-auto" style="max-height: 400px;">
-          <For each={repos()}>
-            {(r) => (
-              <a
-                href={r.html_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="block py-2 border-b transition-colors"
-                style="border-color: var(--border);"
-              >
-                <div class="flex justify-between items-baseline mb-1">
-                  <span class="font-mono text-xs font-bold" style="color: var(--text-primary);">
-                    {r.full_name}
-                  </span>
-                  <span class="code-text" style="color: var(--accent);">
-                    ★ {r.stargazers_count.toLocaleString()}
-                  </span>
-                </div>
-                <Show when={r.description}>
-                  <p class="text-xs mb-1" style="color: var(--text-secondary); line-height: 1.4;">
-                    {r.description?.length > 80
-                      ? `${r.description?.slice(0, 80)}...`
-                      : r.description}
-                  </p>
-                </Show>
-                <Show when={r.language}>
-                  <span class="code-text" style="color: var(--accent);">
-                    {r.language}
-                  </span>
-                </Show>
-              </a>
-            )}
-          </For>
-        </div>
-      </Show>
+      {loading() ? (
+        <PanelSkeleton />
+      ) : (
+        <>
+          <PanelHeader title="GITHUB TRENDING" count={repos().length} />
+          <div class="overflow-y-auto" style="max-height: 400px;">
+            <For each={repos()}>
+              {(r) => (
+                <a
+                  href={r.html_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="block py-2 border-b transition-colors"
+                  style="border-color: var(--border);"
+                >
+                  <div class="flex justify-between items-baseline mb-1">
+                    <span class="font-mono text-xs font-bold" style="color: var(--text-primary);">
+                      {r.full_name}
+                    </span>
+                    <span class="code-text" style="color: var(--accent);">
+                      ★ {r.stargazers_count.toLocaleString()}
+                    </span>
+                  </div>
+                  {r.description && (
+                    <p class="text-xs mb-1" style="color: var(--text-secondary); line-height: 1.4;">
+                      {r.description.length > 80
+                        ? `${r.description.slice(0, 80)}...`
+                        : r.description}
+                    </p>
+                  )}
+                  {r.language && (
+                    <span class="code-text" style="color: var(--accent);">
+                      {r.language}
+                    </span>
+                  )}
+                </a>
+              )}
+            </For>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -169,36 +177,40 @@ function HnPanel() {
 
   return (
     <div class="p-4 border h-full" style="border-color: var(--border); background: var(--bg-card);">
-      <Show when={!loading()} fallback={<PanelSkeleton />}>
-        <PanelHeader title="HACKER NEWS" count={stories().length} />
-        <div class="overflow-y-auto" style="max-height: 400px;">
-          <For each={stories()}>
-            {(s) => (
-              <a
-                href={s.url || `https://news.ycombinator.com/item?id=${s.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="block py-2 border-b transition-colors"
-                style="border-color: var(--border);"
-              >
-                <div class="flex justify-between items-baseline mb-1">
-                  <span class="font-mono text-xs font-bold" style="color: var(--text-primary);">
-                    {s.title}
-                  </span>
-                  <span class="code-text" style="color: var(--accent);">
-                    ▲ {s.score}
-                  </span>
-                </div>
-                <div class="flex gap-3 text-xs" style="color: var(--text-secondary);">
-                  <span>{s.author}</span>
-                  <span>{timeAgo(s.time)}</span>
-                  <span>{s.comments} comments</span>
-                </div>
-              </a>
-            )}
-          </For>
-        </div>
-      </Show>
+      {loading() ? (
+        <PanelSkeleton />
+      ) : (
+        <>
+          <PanelHeader title="HACKER NEWS" count={stories().length} />
+          <div class="overflow-y-auto" style="max-height: 400px;">
+            <For each={stories()}>
+              {(s) => (
+                <a
+                  href={s.url || `https://news.ycombinator.com/item?id=${s.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="block py-2 border-b transition-colors"
+                  style="border-color: var(--border);"
+                >
+                  <div class="flex justify-between items-baseline mb-1">
+                    <span class="font-mono text-xs font-bold" style="color: var(--text-primary);">
+                      {s.title}
+                    </span>
+                    <span class="code-text" style="color: var(--accent);">
+                      ▲ {s.score}
+                    </span>
+                  </div>
+                  <div class="flex gap-3 text-xs" style="color: var(--text-secondary);">
+                    <span>{s.author}</span>
+                    <span>{timeAgo(s.time)}</span>
+                    <span>{s.comments} comments</span>
+                  </div>
+                </a>
+              )}
+            </For>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { For, Show, createSignal, onCleanup, onMount } from 'solid-js';
+import { For, createSignal, onCleanup, onMount } from 'solid-js';
 
 interface DataSourceStatus {
   key: string;
@@ -96,7 +96,7 @@ export default function StaleIndicator() {
         </span>
       </button>
 
-      <Show when={expanded()}>
+      {expanded() && (
         <div class="px-4 pb-3 border-t" style="border-color: var(--border);">
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-3">
             <For each={sources()}>
@@ -122,7 +122,7 @@ export default function StaleIndicator() {
             </For>
           </div>
         </div>
-      </Show>
+      )}
     </div>
   );
 }

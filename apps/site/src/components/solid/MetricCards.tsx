@@ -1,4 +1,4 @@
-import { For, Show, createSignal, onCleanup, onMount } from 'solid-js';
+import { For, createSignal, onCleanup, onMount } from 'solid-js';
 import { storeMetric, getMetricTrend } from '../../lib/metrics-history';
 
 // biome-ignore lint/correctness/noUnusedVariables: interface used for type documentation
@@ -241,34 +241,28 @@ function MetricCard(props: {
         style="color: var(--text-secondary); font-size: 9px; letter-spacing: 0.3em;"
       >
         {props.label.toUpperCase()}
-        <Show when={props.trend && props.trend !== 'stable'}>
-          <TrendArrow trend={props.trend!} />
-        </Show>
+        {props.trend && props.trend !== 'stable' && <TrendArrow trend={props.trend} />}
       </p>
       <p class="font-mono text-xl font-bold" style="color: var(--text-primary);">
         {props.value}
       </p>
-      <Show when={props.change !== null && props.change !== undefined}>
+      {props.change !== null && props.change !== undefined && (
         <p
           class="code-text mt-1"
           style={{
             color:
-              props.change! > 0
-                ? '#69f0ae'
-                : props.change! < 0
-                  ? '#f44336'
-                  : 'var(--text-secondary)',
+              props.change > 0 ? '#69f0ae' : props.change < 0 ? '#f44336' : 'var(--text-secondary)',
           }}
         >
-          {props.change! > 0 ? '+' : ''}
+          {props.change > 0 ? '+' : ''}
           {props.change?.toFixed(2)}%
         </p>
-      </Show>
-      <Show when={props.sublabel}>
+      )}
+      {props.sublabel && (
         <p class="code-text mt-1" style="color: var(--text-secondary);">
           {props.sublabel}
         </p>
-      </Show>
+      )}
     </div>
   );
 }
@@ -294,27 +288,33 @@ export default function MetricCards() {
         METRICS
       </p>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        <Show
-          when={loaded()}
-          fallback=<For each={[1, 2, 3, 4, 5, 6]}>{() => <SkeletonCard />}</For>
-        >
-          <MetricCard label="BTC" value={btc.value()} change={btc.change()} trend={btc.trend()} />
-          <MetricCard label="ETH" value={eth.value()} change={eth.change()} trend={eth.trend()} />
-          <MetricCard label="S&P 500" value={sp.value()} change={sp.change()} trend={sp.trend()} />
-          <MetricCard
-            label="Fear & Greed"
-            value={fg.value()}
-            sublabel={fg.displayLabel()}
-            trend={fg.trend()}
-          />
-          <MetricCard label="Kp Index" value={kp.value()} trend={kp.trend()} />
-          <MetricCard
-            label="Mempool"
-            value={mp.value()}
-            sublabel="fastest fee"
-            trend={mp.trend()}
-          />
-        </Show>
+        {loaded() ? (
+          <>
+            <MetricCard label="BTC" value={btc.value()} change={btc.change()} trend={btc.trend()} />
+            <MetricCard label="ETH" value={eth.value()} change={eth.change()} trend={eth.trend()} />
+            <MetricCard
+              label="S&P 500"
+              value={sp.value()}
+              change={sp.change()}
+              trend={sp.trend()}
+            />
+            <MetricCard
+              label="Fear & Greed"
+              value={fg.value()}
+              sublabel={fg.displayLabel()}
+              trend={fg.trend()}
+            />
+            <MetricCard label="Kp Index" value={kp.value()} trend={kp.trend()} />
+            <MetricCard
+              label="Mempool"
+              value={mp.value()}
+              sublabel="fastest fee"
+              trend={mp.trend()}
+            />
+          </>
+        ) : (
+          <For each={[1, 2, 3, 4, 5, 6]}>{() => <SkeletonCard />}</For>
+        )}
       </div>
 
       <style>{`
