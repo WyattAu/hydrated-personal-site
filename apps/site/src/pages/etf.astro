@@ -4,6 +4,7 @@ import Nav from '../components/astro/Nav.astro';
 import Footer from '../components/astro/Footer.astro';
 import ThemeToggle from '../components/solid/ThemeToggle';
 import EtfApp from '../components/solid/EtfApp';
+import AppErrorBoundary from '../components/solid/ErrorBoundary';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
 import '../styles/base.css';
 ---
@@ -22,7 +23,9 @@ import '../styles/base.css';
     </section>
 
     <section class="px-6 md:px-12 lg:px-24 pb-12">
-      <EtfApp client:load />
+      <AppErrorBoundary client:load>
+        <EtfApp client:load />
+      </AppErrorBoundary>
     </section>
 
     <!-- WASM Correlation Network -->

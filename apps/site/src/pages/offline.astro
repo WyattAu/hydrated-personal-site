@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/base.css';
+---
+
+<BaseLayout title="Offline" description="You are currently offline.">
+  <main class="min-h-screen flex flex-col items-center justify-center px-6">
+    <div class="text-center">
+      <p class="stat-value mb-4" style="color: var(--accent);">Offline</p>
+      <div class="font-mono text-sm mb-8" style="color: var(--text-secondary);">
+        <span style="color: var(--accent);">$</span> ping wyatt.au<br />
+        <span style="color: var(--text-secondary);">ping: no response</span>
+      </div>
+      <p class="mb-8" style="color: var(--text-secondary);">You are currently offline. Please check your internet connection.</p>
+      <button
+        onclick="window.location.reload()"
+        class="amoeba-hover inline-block px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider cursor-pointer"
+        style="background: var(--accent); color: var(--bg-primary);"
+      >
+        Retry
+      </button>
+    </div>
+  </main>
+</BaseLayout>

@@ -9,6 +9,7 @@ import PriceChart from '../components/solid/PriceChart';
 import DataPanels from '../components/solid/DataPanels';
 import ScatterPlots from '../components/solid/ScatterPlots';
 import StaleIndicator from '../components/solid/StaleIndicator';
+import AppErrorBoundary from '../components/solid/ErrorBoundary';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
 import '../styles/base.css';
 ---
@@ -28,7 +29,9 @@ import '../styles/base.css';
 
     <!-- Map -->
     <section class="w-full border-y" style="border-color: var(--border); height: 50vh; min-height: 360px;">
-      <WorldMap client:load />
+      <AppErrorBoundary client:load>
+        <WorldMap client:load />
+      </AppErrorBoundary>
     </section>
 
     <!-- Metric Cards -->
@@ -38,7 +41,9 @@ import '../styles/base.css';
 
     <!-- Price Chart -->
     <section class="px-6 md:px-12 lg:px-24 py-4">
-      <PriceChart client:load symbol="BTCUSDT" title="BTC / USDT" />
+      <AppErrorBoundary client:load>
+        <PriceChart client:load symbol="BTCUSDT" title="BTC / USDT" />
+      </AppErrorBoundary>
     </section>
 
     <!-- WASM Finance Widgets -->

@@ -87,7 +87,6 @@ export interface KpIndexResponse {
   timestamp_tag: string;
   kp_index: string;
 }
-[];
 
 export interface MempoolData {
   fees: {

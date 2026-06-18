@@ -1,37 +1,6 @@
 import { For, Show, createSignal, onMount } from 'solid-js';
-import type { GitHubRepo, HNStory, LLMBenchmarkModel } from '../../lib/types';
-
-function useLlmBenchmarks() {
-  const [data, setData] = createSignal<LLMBenchmarkModel[]>([]);
-  const [loading, setLoading] = createSignal(true);
-
-  onMount(async () => {
-    try {
-      const res = await fetch('/api/llm-benchmarks');
-      const raw = await res.json();
-      const models: LLMBenchmarkModel[] = [];
-      if (Array.isArray(raw)) {
-        for (const m of raw.slice(0, 15)) {
-          models.push({
-            model: m.model || m.name || 'Unknown',
-            parameter_count: m.parameter_count || m.params || '?',
-            average_score: m.average_score ?? m.avg ?? 0,
-            mmlu: m.mmlu ?? 0,
-            hellaswag: m.hellaswag ?? 0,
-            arc: m.arc ?? 0,
-            truthfulqa: m.truthfulqa ?? 0,
-            gsm8k: m.gsm8k ?? 0,
-            humaneval: m.humaneval ?? 0,
-          });
-        }
-      }
-      setData(models);
-    } catch {}
-    setLoading(false);
-  });
-
-  return { data, loading };
-}
+import type { GitHubRepo, HNStory } from '../../lib/types';
+import { useLlmData } from '../../lib/llm-data';
 
 function useGithubTrending() {
   const [repos, setRepos] = createSignal<GitHubRepo[]>([]);
@@ -117,7 +86,7 @@ function PanelHeader(props: { title: string; count?: number }) {
 }
 
 function LlmPanel() {
-  const { data, loading } = useLlmBenchmarks();
+  const { data, loading } = useLlmData();
 
   return (
     <div class="p-4 border h-full" style="border-color: var(--border); background: var(--bg-card);">

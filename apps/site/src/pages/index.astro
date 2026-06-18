@@ -7,6 +7,7 @@ import CommandPalette from '../components/solid/CommandPalette';
 import TickerBar from '../components/solid/TickerBar';
 import ContactForm from '../components/solid/ContactForm';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
+import AppErrorBoundary from '../components/solid/ErrorBoundary';
 import '../styles/base.css';
 import '../styles/animations.css';
 
@@ -307,7 +308,9 @@ const employment = [
         </div>
         <div>
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-4" style="color: var(--accent);">Send a Message</p>
-          <ContactForm client:load />
+          <AppErrorBoundary client:load>
+            <ContactForm client:load />
+          </AppErrorBoundary>
         </div>
       </div>
     </section>

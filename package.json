@@ -16,6 +16,7 @@
     "@vitest/coverage-v8": "^4.1.9",
     "fast-check": "^4.8.0",
     "happy-dom": "^20.10.5",
+    "valibot": "^1.0.0",
     "turbo": "^2.0.0",
     "vitest": "^4.1.9"
   }

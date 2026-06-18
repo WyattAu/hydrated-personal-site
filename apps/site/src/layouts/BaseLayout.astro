@@ -136,6 +136,15 @@ const webPageSchema = {
         document.documentElement.setAttribute('data-theme', theme);
       })();
     </script>
+
+    <!-- Service Worker Registration (production only) -->
+    <script is:inline>
+      if ('serviceWorker' in navigator && location.protocol === 'https:') {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+      }
+    </script>
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
