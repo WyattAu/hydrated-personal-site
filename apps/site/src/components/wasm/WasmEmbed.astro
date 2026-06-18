@@ -9,6 +9,7 @@ interface Props {
 // biome-ignore lint/correctness/noUnusedVariables: used in Astro template
 const { widget, width = 800, height = 400, class: className = '' } = Astro.props;
 const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
+const canvasId = `${widgetId}-canvas`;
 ---
 
 <div
@@ -19,15 +20,16 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
   data-height={height}
   style={`width: ${width}px; height: ${height}px;`}
 >
-  <div class="wasm-skeleton">
-    <div class="skeleton-pulse"></div>
-    <span class="skeleton-text">Loading {widget}...</span>
-  </div>
+  <canvas
+    id={canvasId}
+    width={width}
+    height={height}
+    style="display: block; width: 100%; height: 100%;"
+  ></canvas>
 </div>
 
 <script is:inline>
   (function () {
-    // Prevent duplicate initialization -- only run once per page
     if (window.__wasmInit) return;
     window.__wasmInit = true;
 
@@ -37,13 +39,13 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
           entries.forEach(function (entry) {
             if (entry.isIntersecting) {
               var el = entry.target;
-              // Skip if already initialized
               if (el.dataset.wasmReady) return;
               el.dataset.wasmReady = '1';
 
               var widget = el.dataset.widget;
               var w = parseInt(el.dataset.width || '800', 10);
               var h = parseInt(el.dataset.height || '400', 10);
+              var canvasId = el.id + '-canvas';
 
               var wasmPath = '/wasm/hydrated_widgets.js';
               import(wasmPath)
@@ -51,23 +53,13 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
                   await mod.default();
                   var createFn = mod['create_' + widget];
                   if (createFn) {
-                    var canvas = document.createElement('canvas');
-                    canvas.id = el.id + '-canvas';
-                    canvas.width = w;
-                    canvas.height = h;
-                    el.innerHTML = '';
-                    el.appendChild(canvas);
-                    // Wait for DOM to paint the canvas before WASM accesses it
-                    function tryCreateFn() {
-                      var canvasEl = document.getElementById(canvas.id);
-                      if (canvasEl) {
-                        createFn(canvas.id, w, h);
-                      } else {
-                        // Canvas not yet in DOM, retry
-                        setTimeout(tryCreateFn, 50);
-                      }
+                    // Canvas is already in the DOM from the template
+                    // Just verify it exists and call the WASM function
+                    var canvasEl = document.getElementById(canvasId);
+                    if (!canvasEl) {
+                      throw new Error('Canvas element ' + canvasId + ' not found in DOM');
                     }
-                    setTimeout(tryCreateFn, 100);
+                    createFn(canvasId, w, h);
                   } else {
                     throw new Error('Widget function create_' + widget + ' not found');
                   }
