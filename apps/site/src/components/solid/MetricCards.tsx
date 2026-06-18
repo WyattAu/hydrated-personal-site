@@ -9,7 +9,7 @@ interface Metric {
   refreshMs: number;
 }
 
-function useBtcPrice() {
+function useCryptoPrice(symbol: string) {
   const [price, setPrice] = createSignal<number | null>(null);
   const [prev, setPrev] = createSignal<number | null>(null);
 
@@ -17,50 +17,12 @@ function useBtcPrice() {
     try {
       const res = await fetch('/api/crypto-ticker');
       const data = await res.json();
-      const btc = Array.isArray(data)
-        ? data.find((t: { symbol: string }) => t.symbol === 'BTCUSDT')
+      const match = Array.isArray(data)
+        ? data.find((t: { symbol: string }) => t.symbol === symbol)
         : null;
-      if (btc) {
+      if (match) {
         setPrev(price());
-        setPrice(Number.parseFloat(btc.lastPrice));
-      }
-    } catch {}
-  }
-
-  onMount(() => {
-    fetch_();
-    const id = setInterval(fetch_, 10_000);
-    onCleanup(() => clearInterval(id));
-  });
-
-  return {
-    value: () => {
-      const p = price();
-      return p !== null ? `$${p.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : '---';
-    },
-    change: () => {
-      const p = price();
-      const pr = prev();
-      if (p === null || pr === null || pr === 0) return null;
-      return ((p - pr) / pr) * 100;
-    },
-  };
-}
-
-function useEthPrice() {
-  const [price, setPrice] = createSignal<number | null>(null);
-  const [prev, setPrev] = createSignal<number | null>(null);
-
-  async function fetch_() {
-    try {
-      const res = await fetch('/api/crypto-ticker');
-      const data = await res.json();
-      const eth = Array.isArray(data)
-        ? data.find((t: { symbol: string }) => t.symbol === 'ETHUSDT')
-        : null;
-      if (eth) {
-        setPrev(price());
-        setPrice(Number.parseFloat(eth.lastPrice));
+        setPrice(Number.parseFloat(match.lastPrice));
       }
     } catch {}
   }
@@ -274,8 +236,8 @@ function MetricCard(props: {
 }
 
 export default function MetricCards() {
-  const btc = useBtcPrice();
-  const eth = useEthPrice();
+  const btc = useCryptoPrice('BTCUSDT');
+  const eth = useCryptoPrice('ETHUSDT');
   const sp = useSp500();
   const fg = useFearGreed();
   const kp = useKpIndex();
