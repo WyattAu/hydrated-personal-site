@@ -47,7 +47,7 @@ const canvasId = `${widgetId}-canvas`;
               var h = parseInt(el.dataset.height || '400', 10);
               var canvasId = el.id + '-canvas';
 
-              var wasmPath = '/wasm/hydrated_widgets.js';
+              var wasmPath = '/wasm/hydrated_widgets_v2.js';
               import(wasmPath)
                 .then(async function (mod) {
                   await mod.default();
