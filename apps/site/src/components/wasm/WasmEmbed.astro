@@ -72,16 +72,74 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
               el.innerHTML = '';
               el.appendChild(canvas);
 
-              // Wait for canvas to be in DOM before WASM call
-              setTimeout(function() {
-                var canvasEl = document.getElementById(canvas.id);
-                if (!canvasEl) {
-                  el.innerHTML = '<div class="wasm-error"><p>Canvas not found</p></div>';
-                  return;
-                }
+                // Wait for canvas to be in DOM and verify it works
+                function tryInit(attempts) {
+                  var canvasEl = document.getElementById(canvas.id);
+                  if (!canvasEl || attempts > 20) {
+                    el.innerHTML = '<div class="wasm-error"><p>Canvas not found</p></div>';
+                    return;
+                  }
 
-                var wasmPath = '/wasm/hw_1781798679.js';
-                import(wasmPath)
+                  // Verify canvas can get 2D context
+                  try {
+                    var testCtx = canvasEl.getContext('2d');
+                    if (!testCtx) {
+                      setTimeout(function() { tryInit(attempts + 1); }, 100);
+                      return;
+                    }
+                  } catch (e) {
+                    setTimeout(function() { tryInit(attempts + 1); }, 100);
+                    return;
+                  }
+
+                  var wasmPath = '/wasm/hw_1781798679.js';
+                  import(wasmPath)
+                    .then(async function (mod) {
+                      await mod.default();
+                      var createFn = mod['create_' + widget];
+                      if (createFn) {
+                        createFn(canvas.id, w, h);
+                      } else {
+                        throw new Error('Widget function create_' + widget + ' not found');
+                      }
+
+                      // Start animation loop
+                      var updateFn = mod['update_' + widget];
+                      if (updateFn) {
+                        var running = true;
+                        var startTime = performance.now();
+                        function animFrame() {
+                          if (!running) return;
+                          var elapsed = (performance.now() - startTime) / 1000.0;
+                          try { updateFn(canvas.id, w, h, elapsed); } catch (e) {}
+                          requestAnimationFrame(animFrame);
+                        }
+                        requestAnimationFrame(animFrame);
+                      }
+
+                      // Fetch data for data-driven widgets
+                      if (endpoint) {
+                        function fetchDataAndUpdate() {
+                          fetch(endpoint)
+                            .then(function (res) { if (!res.ok) throw new Error('fail'); return res.json(); })
+                            .then(function (data) {
+                              var dataFn = mod['update_' + widget];
+                              if (dataFn) dataFn(canvas.id, w, h, JSON.stringify(data));
+                            })
+                            .catch(function () {});
+                        }
+                        fetchDataAndUpdate();
+                        if (interval > 0) setInterval(fetchDataAndUpdate, interval);
+                      }
+                    })
+                    .catch(function (err) {
+                      el.innerHTML = '<div class="wasm-error"><p>Failed to load widget.</p><p class="wasm-error-detail">' + (err.message || err) + '</p></div>';
+                      console.error('WASM widget "' + widget + '" failed:', err);
+                    });
+
+                  observer.unobserve(el);
+                }
+                tryInit(0);
                   .then(async function (mod) {
                     await mod.default();
                     var createFn = mod['create_' + widget];
