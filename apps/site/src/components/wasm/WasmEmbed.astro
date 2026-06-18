@@ -18,8 +18,6 @@ const {
   dataInterval = 0,
 } = Astro.props;
 const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
-const canvasId = `${widgetId}-canvas`;
-const ariaLabel = `${widget.replace(/_/g, ' ')} widget`;
 ---
 
 <div
@@ -32,18 +30,11 @@ const ariaLabel = `${widget.replace(/_/g, ' ')} widget`;
   data-interval={dataInterval}
   style={`width: ${width}px; height: ${height}px;`}
 >
-  <canvas
-    id={canvasId}
-    width={width}
-    height={height}
-    tabindex="0"
-    role="application"
-    aria-label={ariaLabel}
-    style="display: block; width: 100%; height: 100%; outline: none;"
-  ></canvas>
+  <div class="wasm-skeleton">
+    <div class="skeleton-pulse"></div>
+    <span class="skeleton-text">Loading {widget}...</span>
+  </div>
 </div>
-
-<script is:inline src="/wasm-anim.js"></script>
 
 <script is:inline>
   (function () {
@@ -62,25 +53,65 @@ const ariaLabel = `${widget.replace(/_/g, ' ')} widget`;
               var widget = el.dataset.widget;
               var w = parseInt(el.dataset.width || '800', 10);
               var h = parseInt(el.dataset.height || '400', 10);
-              var canvasId = el.id + '-canvas';
               var endpoint = el.dataset.endpoint || '';
               var interval = parseInt(el.dataset.interval || '0', 10);
 
-              var wasmPath = '/wasm/hw_1781798679.js';
-              import(wasmPath)
-                .then(async function (mod) {
-                  await mod.default();
-                  var createFn = mod['create_' + widget];
-                  if (createFn) {
-                    var canvasEl = document.getElementById(canvasId);
-                    if (!canvasEl) {
-                      throw new Error('Canvas element ' + canvasId + ' not found in DOM');
-                    }
-                    createFn(canvasId, w, h);
+              // Create canvas in JavaScript (not Astro template)
+              var canvas = document.createElement('canvas');
+              canvas.id = el.id + '-canvas';
+              canvas.width = w;
+              canvas.height = h;
+              canvas.style.width = '100%';
+              canvas.style.height = '100%';
+              canvas.style.display = 'block';
+              canvas.tabIndex = 0;
+              canvas.setAttribute('role', 'application');
+              canvas.setAttribute('aria-label', widget + ' widget');
 
-                    // Fetch data and call update function if endpoint is specified
+              // Clear skeleton and append canvas
+              el.innerHTML = '';
+              el.appendChild(canvas);
+
+              // Wait for canvas to be in DOM before WASM call
+              setTimeout(function() {
+                var canvasEl = document.getElementById(canvas.id);
+                if (!canvasEl) {
+                  el.innerHTML = '<div class="wasm-error"><p>Canvas not found</p></div>';
+                  return;
+                }
+
+                var wasmPath = '/wasm/hw_1781798679.js';
+                import(wasmPath)
+                  .then(async function (mod) {
+                    await mod.default();
+                    var createFn = mod['create_' + widget];
+                    if (createFn) {
+                      createFn(canvas.id, w, h);
+                      console.log('WASM widget "' + widget + '" initialized successfully');
+                    } else {
+                      throw new Error('Widget function create_' + widget + ' not found');
+                    }
+
+                    // Start animation loop
                     var updateFn = mod['update_' + widget];
-                    if (endpoint && updateFn) {
+                    if (updateFn) {
+                      var running = true;
+                      var startTime = performance.now();
+                      function animFrame() {
+                        if (!running) return;
+                        var elapsed = (performance.now() - startTime) / 1000.0;
+                        try {
+                          updateFn(canvas.id, w, h, elapsed);
+                        } catch (e) {
+                          console.warn('WASM animation error for ' + widget + ':', e);
+                        }
+                        requestAnimationFrame(animFrame);
+                      }
+                      requestAnimationFrame(animFrame);
+                    }
+
+                    // Fetch data for data-driven widgets
+                    if (endpoint) {
                       function fetchDataAndUpdate() {
                         fetch(endpoint)
                           .then(function (res) {
@@ -88,10 +119,9 @@ const ariaLabel = `${widget.replace(/_/g, ' ')} widget`;
                             return res.json();
                           })
                           .then(function (data) {
-                            try {
-                              updateFn(canvasId, w, h, JSON.stringify(data));
-                            } catch (e) {
-                              console.warn('WASM update failed for ' + widget + ':', e);
+                            var dataFn = mod['update_' + widget];
+                            if (dataFn) {
+                              dataFn(canvas.id, w, h, JSON.stringify(data));
                             }
                           })
                           .catch(function (e) {
@@ -100,34 +130,21 @@ const ariaLabel = `${widget.replace(/_/g, ' ')} widget`;
                       }
                       fetchDataAndUpdate();
                       if (interval > 0) {
-                        el.__wasmDataInterval = setInterval(fetchDataAndUpdate, interval);
+                        setInterval(fetchDataAndUpdate, interval);
                       }
                     }
+                  })
+                  .catch(function (err) {
+                    el.innerHTML =
+                      '<div class="wasm-error">' +
+                      '<p>Failed to load widget.</p>' +
+                      '<p class="wasm-error-detail">' + (err.message || err) + '</p>' +
+                      '</div>';
+                    console.error('WASM widget "' + widget + '" failed:', err);
+                  });
 
-                    // Start animation loop after initial render
-                    if (window.__wasmAnim) {
-                      el.__wasmAnimLoop = window.__wasmAnim.startAnimationLoop(
-                        mod,
-                        widget,
-                        canvasId,
-                        w,
-                        h
-                      );
-                    }
-                  } else {
-                    throw new Error('Widget function create_' + widget + ' not found');
-                  }
-                })
-                .catch(function (err) {
-                  el.innerHTML =
-                    '<div class="wasm-error">' +
-                    '<p>Failed to load widget.</p>' +
-                    '<p class="wasm-error-detail">' + err.message + '</p>' +
-                    '</div>';
-                  console.error('WASM widget "' + widget + '" failed:', err);
-                });
-
-              observer.unobserve(el);
+                observer.unobserve(el);
+              }, 50); // Small delay to ensure canvas is painted
             }
           });
         },
@@ -151,7 +168,6 @@ const ariaLabel = `${widget.replace(/_/g, ' ')} widget`;
   .wasm-embed {
     position: relative;
     border: 1px solid #1a1a2e;
-    border-radius: 4px;
     overflow: hidden;
     background: #0a0a0a;
   }
