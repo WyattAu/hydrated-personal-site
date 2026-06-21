@@ -299,12 +299,41 @@ async function handleCryptoTicker(): Promise<Response> {
   const cached = getCached('crypto-ticker');
   if (cached) return json(cached);
 
+  // Primary: Binance 24hr ticker (comprehensive, fast).
   try {
     const data = await fetchJson('https://api.binance.com/api/v3/ticker/24hr', 'crypto-ticker');
     setCache('crypto-ticker', data, 10 * 1000);
     return json(data);
   } catch (e) {
-    log('error', 'crypto ticker fetch failed', { error: String(e) });
+    log('warn', 'Binance ticker unavailable, trying CoinGecko fallback', { error: String(e) });
+  }
+
+  // Fallback: CoinGecko markets (different shape but covers same assets).
+  // Binance geo-blocks some Cloudflare egress IPs; CoinGecko does not.
+  try {
+    const data = await fetchJson(
+      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h',
+      'crypto-ticker-cg',
+    );
+    // Normalise to a Binance-like shape so the client does not need a
+    // separate code path.
+    const normalised = (data as Array<Record<string, unknown>>).map((coin) => ({
+      symbol: `${coin.symbol?.toString().toUpperCase()}USDT`,
+      price: coin.current_price,
+      priceChange: coin.price_change_24h,
+      priceChangePercent: coin.price_change_percentage_24h,
+      volume: coin.total_volume,
+      quoteVolume: coin.market_cap,
+      lastPrice: coin.current_price,
+      highPrice: coin.high_24h,
+      lowPrice: coin.low_24h,
+    }));
+    setCache('crypto-ticker', normalised, 30 * 1000);
+    return json(normalised);
+  } catch (e) {
+    log('error', 'crypto ticker fetch failed (both upstreams)', { error: String(e) });
+    const stale = getCached('crypto-ticker');
+    if (stale) return json(stale);
     return error('Upstream crypto API unavailable', 502);
   }
 }

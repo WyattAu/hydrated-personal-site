@@ -6,7 +6,7 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   output: 'static',
-  site: 'https://wyatt.au',
+  site: 'https://wyattau.com',
   adapter: cloudflare(),
   integrations: [solid(), sitemap()],
   vite: {

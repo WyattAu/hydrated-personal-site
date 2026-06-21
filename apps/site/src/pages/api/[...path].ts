@@ -86,10 +86,30 @@ export const GET: APIRoute = async ({ url }) => {
   if (path === 'crypto-ticker') {
     const c = getCached('ct');
     if (c) return J(c);
+    // Primary: Binance. Fallback: CoinGecko (Binance geo-blocks some CF egress).
     const d = await safeFetch('https://api.binance.com/api/v3/ticker/24hr', 'ct');
     if (d) {
       setCache('ct', d, 10000);
       return J(d);
+    }
+    const cg = await safeFetch(
+      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h',
+      'ct-cg',
+    );
+    if (cg && Array.isArray(cg)) {
+      const normalised = cg.map((coin: Record<string, unknown>) => ({
+        symbol: `${String(coin.symbol || '').toUpperCase()}USDT`,
+        price: coin.current_price,
+        priceChange: coin.price_change_24h,
+        priceChangePercent: coin.price_change_percentage_24h,
+        volume: coin.total_volume,
+        quoteVolume: coin.market_cap,
+        lastPrice: coin.current_price,
+        highPrice: coin.high_24h,
+        lowPrice: coin.low_24h,
+      }));
+      setCache('ct', normalised, 30000);
+      return J(normalised);
     }
     return J(getCached('ct') || { error: 'unavailable' });
   }
