@@ -190,3 +190,23 @@ export interface EtfPerformance {
   sharpe_ratio: number;
   max_drawdown: number;
 }
+
+// API client types
+
+export interface CryptoPrice {
+  symbol: string;
+  price: string;
+  change24h: string;
+  changePercent24h: string;
+}
+
+export interface WeatherData {
+  temperature: number;
+  condition: string;
+  location: string;
+}
+
+export interface HealthResponse {
+  status: string;
+  timestamp: string;
+}

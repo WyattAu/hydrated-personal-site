@@ -165,14 +165,14 @@ describe('API Client', () => {
 
   describe('getKpIndex', () => {
     it('returns kp index data', async () => {
-      const mockData = { kp: 3, timestamp: '2025-01-01T00:00:00Z' };
+      const mockData = { timestamp_tag: '2025-01-01T00:00:00Z', kp_index: '3' };
       mockFetch.mockReturnValue(jsonResponse(mockData));
 
       const result = await getKpIndex();
 
-      expect(result).toHaveProperty('kp');
-      expect(result).toHaveProperty('timestamp');
-      expect(result.kp).toBe(3);
+      expect(result).toHaveProperty('timestamp_tag');
+      expect(result).toHaveProperty('kp_index');
+      expect(result.kp_index).toBe('3');
     });
   });
 
