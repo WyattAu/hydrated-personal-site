@@ -19,6 +19,7 @@ impl Body {
 }
 
 #[wasm_bindgen]
+#[allow(dead_code)]
 pub struct NBodySimulation {
     bodies: Vec<Body>,
     dt: f64,

@@ -2,6 +2,7 @@ export interface Env {
   ENVIRONMENT: string;
   GUESTBOOK?: KVNamespace;
   ADMIN_TOKEN?: string;
+  AA_API_KEY?: string;
 }
 
 // --- In-Memory Cache (with SWR) ---
@@ -34,7 +35,6 @@ function log(level: string, message: string, meta: Record<string, unknown> = {})
   } else if (level === 'warn') {
     console.warn(entry);
   } else {
-    console.log(entry);
   }
 }
 
@@ -49,7 +49,7 @@ const securityHeaders: Record<string, string> = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   'Content-Security-Policy':
     "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.coingecko.com https://api.binance.com https://api.github.com https://api.alternative.me https://fcc-weather-api.glitch.me https://api.mempool.space https://blockchain.info https://news.ycombinator.com https://api.exchangerate-api.com https://www.jpl.nasa.gov https://data.giss.nasa.gov https://www.reddit.com https://query1.finance.yahoo.com; report-uri /api/csp-report;",
-  'Access-Control-Allow-Origin': 'https://wyattau.com',
+  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
@@ -199,8 +199,9 @@ async function fetchJson(url: string, endpoint: string, init?: RequestInit): Pro
 
   // Request deduplication
   const dedupKey = `${endpoint}:${url}`;
-  if (inflight.has(dedupKey)) {
-    return inflight.get(dedupKey)!;
+  const inflightPromise = inflight.get(dedupKey);
+  if (inflightPromise) {
+    return inflightPromise;
   }
 
   const promise = (async () => {
@@ -491,21 +492,219 @@ async function handleGithubTrending(): Promise<Response> {
   }
 }
 
-async function handleLlmBenchmarks(): Promise<Response> {
+async function handleLlmBenchmarks(env: Env): Promise<Response> {
   const cached = getCached('llm-benchmarks');
   if (cached) return json(cached);
 
-  try {
-    const data = await fetchJson(
-      'https://raw.githubusercontent.com/mlabonne/llm-leaderboard/main/data/llm_leaderboard.json',
-      'llm-benchmarks',
-    );
-    setCache('llm-benchmarks', data, 6 * 60 * 60 * 1000);
-    return json(data);
-  } catch (e) {
-    log('error', 'llm benchmarks fetch failed', { error: String(e) });
-    return error('Upstream LLM leaderboard unavailable', 502);
+  const apiKey = env.AA_API_KEY;
+  if (apiKey) {
+    try {
+      const resp = await fetch('https://artificialanalysis.ai/api/v2/data/llms/models', {
+        headers: { 'x-api-key': apiKey, Accept: 'application/json' },
+        signal: AbortSignal.timeout(15000),
+      });
+      if (resp.ok) {
+        const raw = (await resp.json()) as { data?: Array<Record<string, unknown>> };
+        const models = (raw.data || [])
+          .map((m) => ({
+            model: (m.name as string) || 'Unknown',
+            parameter_count: (m.parameter_count as string) || '?',
+            average_score:
+              ((m.evaluations as Record<string, unknown>)
+                ?.artificial_analysis_intelligence_index as number) || 0,
+            mmlu: ((m.evaluations as Record<string, unknown>)?.gpqa as number) || 0,
+            humaneval:
+              ((m.evaluations as Record<string, unknown>)
+                ?.artificial_analysis_coding_index as number) || 0,
+            hellaswag: 0,
+            gsm8k: 0,
+            arc: 0,
+            truthfulqa: 0,
+            price_per_m_token:
+              ((m.pricing as Record<string, unknown>)?.price_1m_input_tokens as number) || 0,
+            tokens_per_sec: (m.median_output_tokens_per_second as number) || 0,
+          }))
+          .filter((m) => m.model !== 'Unknown');
+        if (models.length > 0) {
+          setCache('llm-benchmarks', models, 6 * 60 * 60 * 1000);
+          return json(models);
+        }
+      }
+    } catch (e) {
+      log('warn', 'artificialanalysis.ai fetch failed', { error: String(e) });
+    }
   }
+
+  // Fallback: embedded sample data
+  const sample = [
+    {
+      model: 'GPT-4o',
+      parameter_count: '?',
+      average_score: 88.7,
+      mmlu: 88.7,
+      humaneval: 90.2,
+      hellaswag: 95.3,
+      gsm8k: 95.3,
+      arc: 96.3,
+      truthfulqa: 89.1,
+    },
+    {
+      model: 'Claude 3.5 Sonnet',
+      parameter_count: '?',
+      average_score: 88.1,
+      mmlu: 88.7,
+      humaneval: 92.0,
+      hellaswag: 94.8,
+      gsm8k: 96.4,
+      arc: 96.7,
+      truthfulqa: 87.2,
+    },
+    {
+      model: 'Gemini 1.5 Pro',
+      parameter_count: '?',
+      average_score: 85.9,
+      mmlu: 85.9,
+      humaneval: 84.1,
+      hellaswag: 93.2,
+      gsm8k: 91.7,
+      arc: 94.4,
+      truthfulqa: 86.4,
+    },
+    {
+      model: 'Llama 3.1 405B',
+      parameter_count: '405B',
+      average_score: 83.6,
+      mmlu: 88.6,
+      humaneval: 89.0,
+      hellaswag: 88.0,
+      gsm8k: 96.8,
+      arc: 96.9,
+      truthfulqa: 82.6,
+    },
+    {
+      model: 'Llama 3.1 70B',
+      parameter_count: '70B',
+      average_score: 80.4,
+      mmlu: 83.6,
+      humaneval: 80.5,
+      hellaswag: 88.0,
+      gsm8k: 95.1,
+      arc: 94.1,
+      truthfulqa: 79.1,
+    },
+    {
+      model: 'Llama 3.1 8B',
+      parameter_count: '8B',
+      average_score: 72.9,
+      mmlu: 73.0,
+      humaneval: 62.2,
+      hellaswag: 81.4,
+      gsm8k: 84.5,
+      arc: 83.4,
+      truthfulqa: 69.4,
+    },
+    {
+      model: 'Mistral Large 2',
+      parameter_count: '123B',
+      average_score: 84.0,
+      mmlu: 84.0,
+      humaneval: 92.7,
+      hellaswag: 89.5,
+      gsm8k: 91.2,
+      arc: 94.0,
+      truthfulqa: 78.4,
+    },
+    {
+      model: 'Qwen2 72B',
+      parameter_count: '72B',
+      average_score: 82.3,
+      mmlu: 84.2,
+      humaneval: 86.4,
+      hellaswag: 87.5,
+      gsm8k: 91.6,
+      arc: 93.0,
+      truthfulqa: 80.2,
+    },
+    {
+      model: 'Gemma 2 27B',
+      parameter_count: '27B',
+      average_score: 78.1,
+      mmlu: 75.2,
+      humaneval: 71.3,
+      hellaswag: 85.3,
+      gsm8k: 82.8,
+      arc: 90.1,
+      truthfulqa: 73.5,
+    },
+    {
+      model: 'Phi-3 Medium',
+      parameter_count: '14B',
+      average_score: 77.6,
+      mmlu: 78.0,
+      humaneval: 62.4,
+      hellaswag: 83.8,
+      gsm8k: 89.6,
+      arc: 88.0,
+      truthfulqa: 75.2,
+    },
+    {
+      model: 'Yi-1.5 34B',
+      parameter_count: '34B',
+      average_score: 76.4,
+      mmlu: 76.8,
+      humaneval: 67.8,
+      hellaswag: 84.6,
+      gsm8k: 87.2,
+      arc: 89.6,
+      truthfulqa: 72.4,
+    },
+    {
+      model: 'Command R+',
+      parameter_count: '104B',
+      average_score: 74.8,
+      mmlu: 75.7,
+      humaneval: 71.2,
+      hellaswag: 83.2,
+      gsm8k: 79.6,
+      arc: 86.2,
+      truthfulqa: 68.9,
+    },
+    {
+      model: 'DeepSeek V2',
+      parameter_count: '236B',
+      average_score: 81.2,
+      mmlu: 81.5,
+      humaneval: 83.5,
+      hellaswag: 86.7,
+      gsm8k: 92.2,
+      arc: 91.4,
+      truthfulqa: 76.3,
+    },
+    {
+      model: 'Dbrx Instruct',
+      parameter_count: '132B',
+      average_score: 74.2,
+      mmlu: 73.2,
+      humaneval: 74.4,
+      hellaswag: 81.6,
+      gsm8k: 82.4,
+      arc: 85.0,
+      truthfulqa: 67.8,
+    },
+    {
+      model: 'Mixtral 8x22B',
+      parameter_count: '141B',
+      average_score: 77.8,
+      mmlu: 77.8,
+      humaneval: 75.6,
+      hellaswag: 84.8,
+      gsm8k: 78.6,
+      arc: 88.4,
+      truthfulqa: 72.4,
+    },
+  ];
+  setCache('llm-benchmarks', sample, 6 * 60 * 60 * 1000);
+  return json(sample);
 }
 
 async function handleExchangeRates(): Promise<Response> {
@@ -522,6 +721,62 @@ async function handleExchangeRates(): Promise<Response> {
   } catch (e) {
     log('error', 'exchange rates fetch failed', { error: String(e) });
     return error('Upstream exchange rate API unavailable', 502);
+  }
+}
+
+async function handleStockQuote(url: URL): Promise<Response> {
+  const raw = url.searchParams.get('symbols') || '';
+  if (!raw) return error('Missing symbols parameter', 400);
+  const symbols = raw
+    .toUpperCase()
+    .replace(/[^A-Z0-9.,^=-]/g, '')
+    .split(',')
+    .filter(Boolean)
+    .slice(0, 20);
+  if (!symbols.length) return error('No valid symbols', 400);
+
+  const cacheKey = `stock-quote:${symbols.sort().join(',')}`;
+  const cached = getCached(cacheKey);
+  if (cached) return json(cached);
+
+  try {
+    const results = await Promise.all(
+      symbols.map(async (sym) => {
+        try {
+          const url2 = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=1d&interval=5m`;
+          const resp = await fetch(url2, {
+            headers: { 'User-Agent': 'HydratedSite/1.0' },
+            signal: AbortSignal.timeout(8000),
+          });
+          if (!resp.ok) return null;
+          const data = (await resp.json()) as {
+            chart?: { result?: Array<{ meta?: Record<string, number> }> | null };
+          };
+          const meta = data?.chart?.result?.[0]?.meta;
+          if (!meta) return null;
+          const price = meta.regularMarketPrice ?? 0;
+          const prevClose = meta.previousClose ?? meta.chartPreviousClose ?? price;
+          const change = price - prevClose;
+          const changePct = prevClose ? (change / prevClose) * 100 : 0;
+          return {
+            symbol: sym,
+            name: meta.shortName || meta.longName || sym,
+            price,
+            change,
+            changePct,
+            prevClose,
+          };
+        } catch {
+          return null;
+        }
+      }),
+    );
+    const filtered = results.filter(Boolean);
+    const out = { data: filtered };
+    setCache(cacheKey, out, 60 * 1000);
+    return json(out);
+  } catch (_e) {
+    return error('Stock quote fetch failed', 502);
   }
 }
 
@@ -655,6 +910,60 @@ async function handleSocialSentiment(): Promise<Response> {
   }
 }
 
+async function handleRestCountries(code: string): Promise<Response> {
+  const sanitized = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!sanitized) return error('Missing code parameter', 400);
+  const cacheKey = `restcountries:${sanitized}`;
+  const cached = getCached(cacheKey);
+  if (cached) return json(cached);
+  try {
+    const resp = await fetch(
+      `https://restcountries.com/v3.1/alpha/${encodeURIComponent(sanitized)}?fields=name,population,area,region,subregion,capital,languages,currencies,timezones,flags`,
+      { signal: AbortSignal.timeout(8000) },
+    );
+    if (!resp.ok) return error('Country not found', 404);
+    const data = await resp.json();
+    setCache(cacheKey, data, 24 * 60 * 60 * 1000);
+    return json(data);
+  } catch {
+    return error('Upstream countries API unavailable', 502);
+  }
+}
+
+async function handleWorldBank(url: URL): Promise<Response> {
+  const countryCode = (url.searchParams.get('country') || '').toUpperCase();
+  const indicators = (url.searchParams.get('indicators') || '').split(',').filter(Boolean);
+  if (!countryCode || indicators.length === 0) return error('country and indicators required', 400);
+  const cacheKey = `worldbank:${countryCode}:${indicators.join(',')}`;
+  const cached = getCached(cacheKey);
+  if (cached) return json(cached);
+  try {
+    const results: Record<string, unknown> = {};
+    await Promise.all(
+      indicators.map(async (ind) => {
+        try {
+          const resp = await fetch(
+            `https://api.worldbank.org/v2/country/${encodeURIComponent(countryCode)}/indicator/${encodeURIComponent(ind)}?format=json&date=2020:2024&per_page=100`,
+            { signal: AbortSignal.timeout(8000) },
+          );
+          if (resp.ok) {
+            const raw = await resp.json();
+            if (Array.isArray(raw) && raw.length > 1) {
+              const entries = raw[1] || [];
+              const latest = entries.find((e: { value: unknown }) => e.value != null);
+              results[ind] = latest ? { value: latest.value, date: latest.date } : null;
+            }
+          }
+        } catch {}
+      }),
+    );
+    setCache(cacheKey, results, 60 * 60 * 1000);
+    return json(results);
+  } catch {
+    return error('World Bank API unavailable', 502);
+  }
+}
+
 async function handleEtfPrice(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const ticker = url.searchParams.get('ticker');
@@ -707,10 +1016,10 @@ async function handleEtfPrice(request: Request): Promise<Response> {
 
 async function handleGuestbookGet(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
-  const page = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10) || 1);
+  const page = Math.max(1, Number.parseInt(url.searchParams.get('page') || '1', 10) || 1);
   const limit = Math.min(
     50,
-    Math.max(1, parseInt(url.searchParams.get('limit') || '20', 10) || 20),
+    Math.max(1, Number.parseInt(url.searchParams.get('limit') || '20', 10) || 20),
   );
 
   const fallbackEntries = [
@@ -784,7 +1093,7 @@ async function handleGuestbookPost(request: Request, env: Env, ip: string): Prom
   }
 
   // Body size check
-  const contentLength = parseInt(request.headers.get('content-length') || '0', 10);
+  const contentLength = Number.parseInt(request.headers.get('content-length') || '0', 10);
   if (contentLength > MAX_BODY_SIZE) {
     return error('Request body too large', 413);
   }
@@ -823,7 +1132,7 @@ async function handleGuestbookDelete(request: Request, env: Env): Promise<Respon
   }
 
   // Body size check
-  const contentLength = parseInt(request.headers.get('content-length') || '0', 10);
+  const contentLength = Number.parseInt(request.headers.get('content-length') || '0', 10);
   if (contentLength > MAX_BODY_SIZE) {
     return error('Request body too large', 413);
   }
@@ -895,11 +1204,6 @@ async function handleCspReport(request: Request): Promise<Response> {
 const SUPPORTED_VERSIONS = ['v1'];
 const LATEST_VERSION = 'v1';
 
-interface ApiVersionResult {
-  version: string;
-  route: string;
-}
-
 function resolveVersionedRoute(path: string): {
   version: string | null;
   route: string;
@@ -959,7 +1263,7 @@ export default {
       return new Response(null, {
         status: 204,
         headers: {
-          'Access-Control-Allow-Origin': 'https://wyattau.com',
+          'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization',
           'Access-Control-Max-Age': '86400',
@@ -1008,13 +1312,20 @@ export default {
       } else if (routePath === '/api/github-trending') {
         response = await handleGithubTrending();
       } else if (routePath === '/api/llm-benchmarks') {
-        response = await handleLlmBenchmarks();
+        response = await handleLlmBenchmarks(env);
       } else if (routePath === '/api/exchange-rates') {
         response = await handleExchangeRates();
+      } else if (routePath === '/api/stock-quote') {
+        response = await handleStockQuote(new URL(request.url));
       } else if (routePath === '/api/fred') {
         response = await handleFred();
       } else if (routePath === '/api/social-sentiment') {
         response = await handleSocialSentiment();
+      } else if (routePath === '/api/restcountries') {
+        const code = new URL(request.url).searchParams.get('code') || '';
+        response = await handleRestCountries(code);
+      } else if (routePath === '/api/world-bank') {
+        response = await handleWorldBank(new URL(request.url));
       } else if (routePath === '/api/etf-price') {
         response = await handleEtfPrice(request);
       } else if (routePath === '/api/metrics') {

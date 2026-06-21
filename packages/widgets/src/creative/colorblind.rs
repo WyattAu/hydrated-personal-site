@@ -100,18 +100,39 @@ fn apply_matrix(pixels: &[u8], w: u32, h: u32, matrix: &[[f64; 3]; 3]) -> Vec<u8
 }
 
 fn draw_colorblind_placeholder(ctx: &CanvasRenderingContext2d, width: u32, height: u32) -> Result<(), JsValue> {
-    let w = width as f64;
-    let h = height as f64;
+    // Generate a color test pattern instead of showing placeholder text
+    let img_w = 120u32;
+    let img_h = 80u32;
+    let mut pixels: Vec<u8> = Vec::with_capacity((img_w * img_h * 4) as usize);
 
-    ctx.set_fill_style(&"#0a0a0a".into());
-    ctx.fill_rect(0.0, 0.0, w, h);
+    for y in 0..img_h {
+        for x in 0..img_w {
+            let hue = (x as f64 / img_w as f64 * 360.0) as u32;
+            let sat = 0.8;
+            let lum = 0.3 + (y as f64 / img_h as f64) * 0.5;
 
-    ctx.set_fill_style(&"#ffffff".into());
-    ctx.set_font("12px monospace");
-    ctx.fill_text("Color Blindness Simulator", 10.0, 20.0)?;
-    ctx.fill_text("Waiting for image data...", w / 2.0 - 70.0, h / 2.0)?;
+            // Simple HSV to RGB
+            let c = (1.0 - (2.0 * lum - 1.0).abs()) * sat;
+            let x_val = c * (1.0 - ((hue as f64 / 60.0) % 2.0 - 1.0).abs());
+            let m = lum - c / 2.0;
 
-    Ok(())
+            let (r, g, b) = match hue {
+                0..=59 => (c, x_val, 0.0),
+                60..=119 => (x_val, c, 0.0),
+                120..=179 => (0.0, c, x_val),
+                180..=239 => (0.0, x_val, c),
+                240..=299 => (x_val, 0.0, c),
+                _ => (c, 0.0, x_val),
+            };
+
+            pixels.push(((r + m) * 255.0) as u8);
+            pixels.push(((g + m) * 255.0) as u8);
+            pixels.push(((b + m) * 255.0) as u8);
+            pixels.push(255);
+        }
+    }
+
+    draw_colorblind_comparison(ctx, width, height, &pixels, img_w, img_h)
 }
 
 fn draw_colorblind_comparison(

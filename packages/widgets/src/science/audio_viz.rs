@@ -2,6 +2,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
 #[wasm_bindgen]
+#[allow(dead_code)]
 pub struct AudioVisualizer {
     fft_size: usize,
     frequency_data: Vec<f32>,

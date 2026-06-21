@@ -36,25 +36,35 @@ pub fn update_treemap(canvas_id: &str, width: u32, height: u32, data_json: &str)
         .ok_or_else(|| JsValue::from_str("Failed to get 2d context"))?
         .dyn_into::<CanvasRenderingContext2d>()?;
 
-    let data: JsValue = js_sys::JSON::parse(data_json)?;
-    let items = js_sys::Array::from(&data);
+    // Skip error responses — keep placeholder data
+    if data_json.contains("\"error\"") {
+        return Ok(());
+    }
 
+    let data: JsValue = js_sys::JSON::parse(data_json)?;
+
+    // Try standard format: [{name, cap, change}]
+    let items = js_sys::Array::from(&data);
     let mut entries: Vec<(String, f64, f64)> = Vec::new();
+
     for item in items.iter() {
-        let name = js_sys::Reflect::get(&item, &"name".into())
-            .ok()
-            .and_then(|v| v.as_string())
-            .unwrap_or_default();
-        let cap = js_sys::Reflect::get(&item, &"cap".into())
-            .ok()
-            .and_then(|v| v.as_f64())
-            .unwrap_or(0.0);
-        let change = js_sys::Reflect::get(&item, &"change".into())
-            .ok()
-            .and_then(|v| v.as_f64())
-            .unwrap_or(0.0);
-        if cap > 0.0 {
-            entries.push((name, cap, change));
+        // Check if it has "name" (standard format) or "symbol" (Binance format)
+        let name_val = js_sys::Reflect::get(&item, &"name".into())
+            .or_else(|_| js_sys::Reflect::get(&item, &"symbol".into()));
+        let name = name_val.ok().and_then(|v| v.as_string()).unwrap_or_default();
+
+        let cap_val = js_sys::Reflect::get(&item, &"cap".into())
+            .or_else(|_| js_sys::Reflect::get(&item, &"quoteVolume".into()));
+        let cap = cap_val.ok().and_then(|v| v.as_f64()).unwrap_or(0.0);
+
+        let change_val = js_sys::Reflect::get(&item, &"change".into())
+            .or_else(|_| js_sys::Reflect::get(&item, &"priceChangePercent".into()));
+        let change = change_val.ok().and_then(|v| v.as_f64()).unwrap_or(0.0);
+
+        if cap > 0.0 && !name.is_empty() {
+            // Strip USDT/BUSD suffix for display
+            let display_name = name.replace("USDT", "").replace("BUSD", "").replace("USD", "");
+            entries.push((display_name, cap, change));
         }
     }
 
@@ -66,18 +76,20 @@ pub fn update_treemap(canvas_id: &str, width: u32, height: u32, data_json: &str)
 }
 
 fn draw_treemap_placeholder(ctx: &CanvasRenderingContext2d, width: u32, height: u32) -> Result<(), JsValue> {
-    let w = width as f64;
-    let h = height as f64;
-
-    ctx.set_fill_style(&"#0a0a0a".into());
-    ctx.fill_rect(0.0, 0.0, w, h);
-
-    ctx.set_fill_style(&"#ffffff".into());
-    ctx.set_font("12px monospace");
-    ctx.fill_text("Market Treemap", 10.0, 20.0)?;
-    ctx.fill_text("Waiting for data...", w / 2.0 - 50.0, h / 2.0)?;
-
-    Ok(())
+    // Render sample crypto market data
+    let sample = vec![
+        ("BTC".to_string(), 1_300_000_000_000.0, 2.1),
+        ("ETH".to_string(), 390_000_000_000.0, -0.8),
+        ("USDT".to_string(), 110_000_000_000.0, 0.1),
+        ("BNB".to_string(), 85_000_000_000.0, 1.5),
+        ("SOL".to_string(), 65_000_000_000.0, 3.2),
+        ("XRP".to_string(), 35_000_000_000.0, -1.4),
+        ("ADA".to_string(), 18_000_000_000.0, 0.7),
+        ("DOGE".to_string(), 15_000_000_000.0, -0.3),
+        ("AVAX".to_string(), 12_000_000_000.0, 1.1),
+        ("DOT".to_string(), 8_000_000_000.0, -0.5),
+    ];
+    draw_treemap(ctx, width, height, &sample)
 }
 
 fn draw_treemap(

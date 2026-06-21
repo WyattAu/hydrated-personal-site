@@ -64,18 +64,21 @@ pub fn update_correlation(canvas_id: &str, width: u32, height: u32, data_json: &
 }
 
 fn draw_correlation_placeholder(ctx: &CanvasRenderingContext2d, width: u32, height: u32) -> Result<(), JsValue> {
-    let w = width as f64;
-    let h = height as f64;
-
-    ctx.set_fill_style(&"#0a0a0a".into());
-    ctx.fill_rect(0.0, 0.0, w, h);
-
-    ctx.set_fill_style(&"#ffffff".into());
-    ctx.set_font("12px monospace");
-    ctx.fill_text("Asset Correlation Network", 10.0, 20.0)?;
-    ctx.fill_text("Waiting for data...", w / 2.0 - 50.0, h / 2.0)?;
-
-    Ok(())
+    // Sample correlation network: common ETFs with known correlations
+    let names = vec![
+        "SPY".to_string(), "QQQ".to_string(), "IWM".to_string(),
+        "EFA".to_string(), "EEM".to_string(), "TLT".to_string(),
+        "GLD".to_string(), "VNQ".to_string(), "XLE".to_string(),
+        "HYG".to_string(),
+    ];
+    let edges = vec![
+        (0, 1, 0.92), (0, 2, 0.88), (0, 3, 0.75), (0, 4, 0.65),
+        (0, 7, 0.58), (0, 8, 0.45), (1, 2, 0.82), (1, 3, 0.68),
+        (3, 4, 0.72), (5, 6, 0.35), (5, 0, -0.42), (5, 9, 0.61),
+        (6, 0, -0.05), (7, 0, 0.58), (8, 0, 0.45), (9, 0, 0.38),
+        (9, 5, 0.61), (4, 6, 0.18), (2, 7, 0.41),
+    ];
+    draw_correlation_graph(ctx, width, height, &names, &edges)
 }
 
 fn draw_correlation_graph(

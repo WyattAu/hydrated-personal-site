@@ -37,21 +37,53 @@ pub fn update_order_book(canvas_id: &str, width: u32, height: u32, data_json: &s
         .dyn_into::<CanvasRenderingContext2d>()?;
 
     let data: JsValue = js_sys::JSON::parse(data_json)?;
-    let bids = js_sys::Reflect::get(&data, &"bids".into())?;
-    let asks = js_sys::Reflect::get(&data, &"asks".into())?;
 
-    let bids_arr: Vec<f64> = js_sys::Array::from(&bids)
-        .iter()
-        .filter_map(|v| v.as_f64())
-        .collect();
-    let asks_arr: Vec<f64> = js_sys::Array::from(&asks)
-        .iter()
-        .filter_map(|v| v.as_f64())
-        .collect();
+    // Try standard order book format: {bids: [...], asks: [...]}
+    let bids_val = js_sys::Reflect::get(&data, &"bids".into());
+    let asks_val = js_sys::Reflect::get(&data, &"asks".into());
+
+    let (bids_arr, asks_arr): (Vec<f64>, Vec<f64>) = if let (Ok(bids), Ok(asks)) = (&bids_val, &asks_val) {
+        if !bids.is_undefined() && !asks.is_undefined() {
+            let b: Vec<f64> = js_sys::Array::from(bids).iter().filter_map(|v| v.as_f64()).collect();
+            let a: Vec<f64> = js_sys::Array::from(asks).iter().filter_map(|v| v.as_f64()).collect();
+            (b, a)
+        } else {
+            fallback_from_mempool(&data)
+        }
+    } else {
+        fallback_from_mempool(&data)
+    };
 
     draw_order_book_data(&ctx, width, height, &bids_arr, &asks_arr)?;
 
     Ok(())
+}
+
+fn fallback_from_mempool(data: &JsValue) -> (Vec<f64>, Vec<f64>) {
+    // Adapt mempool fee_histogram: [[fee, vsize], ...] → bids (lower fees) and asks (higher fees)
+    let mempool = js_sys::Reflect::get(data, &"mempool".into()).ok().unwrap_or_default();
+    let histogram = js_sys::Reflect::get(&mempool, &"fee_histogram".into()).ok().unwrap_or_default();
+    let arr = js_sys::Array::from(&histogram);
+
+    let mut bids = Vec::new();
+    let mut asks = Vec::new();
+
+    for item in arr.iter() {
+        let pair = js_sys::Array::from(&item);
+        if pair.length() >= 2 {
+            let fee = pair.get(0).as_f64().unwrap_or(0.0);
+            let vsize = pair.get(1).as_f64().unwrap_or(0.0);
+            if fee > 1.0 {
+                asks.push(vsize / 1000.0); // Normalize to KB
+            } else {
+                bids.push(vsize / 1000.0);
+            }
+        }
+    }
+
+    bids.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+    asks.sort_by(|a, b| b.partial_cmp(a).unwrap_or(std::cmp::Ordering::Equal));
+    (bids, asks)
 }
 
 fn draw_order_book(ctx: &CanvasRenderingContext2d, width: u32, height: u32) -> Result<(), JsValue> {

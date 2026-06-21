@@ -54,18 +54,22 @@ pub fn update_climate(canvas_id: &str, width: u32, height: u32, csv_data: &str) 
 }
 
 fn draw_climate_placeholder(ctx: &CanvasRenderingContext2d, width: u32, height: u32) -> Result<(), JsValue> {
-    let w = width as f64;
-    let h = height as f64;
+    // Render default NASA GISS global temperature anomaly data
+    let sample = "1880,-0.16\n1885,-0.25\n1890,-0.34\n1895,-0.23\n1900,-0.08\n1905,-0.27\n1910,-0.42\n1915,-0.14\n1920,-0.23\n1925,-0.17\n1930,-0.09\n1935,-0.14\n1940,0.10\n1945,0.04\n1950,-0.16\n1955,-0.14\n1960,0.02\n1965,-0.11\n1970,0.02\n1975,-0.01\n1980,0.26\n1985,0.12\n1990,0.40\n1995,0.42\n2000,0.39\n2005,0.67\n2010,0.72\n2015,0.87\n2020,1.02\n2024,1.29";
 
-    ctx.set_fill_style(&"#0a0a0a".into());
-    ctx.fill_rect(0.0, 0.0, w, h);
+    let mut anomalies: Vec<(u32, f64)> = Vec::new();
+    for line in sample.lines() {
+        let parts: Vec<&str> = line.split(',').collect();
+        if parts.len() >= 2 {
+            if let Ok(year) = parts[0].trim().parse::<u32>() {
+                if let Ok(anomaly) = parts[1].trim().parse::<f64>() {
+                    anomalies.push((year, anomaly));
+                }
+            }
+        }
+    }
 
-    ctx.set_fill_style(&"#ffffff".into());
-    ctx.set_font("12px monospace");
-    ctx.fill_text("Climate Data Explorer", 10.0, 20.0)?;
-    ctx.fill_text("Waiting for data...", w / 2.0 - 50.0, h / 2.0)?;
-
-    Ok(())
+    draw_climate(ctx, width, height, &anomalies)
 }
 
 fn draw_climate(
