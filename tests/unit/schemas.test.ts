@@ -1,20 +1,20 @@
-import { describe, expect, it } from 'vitest';
 import * as v from 'valibot';
+import { describe, expect, it } from 'vitest';
 import {
-  CryptoPriceSchema,
-  WeatherDataSchema,
-  EarthquakeFeatureSchema,
-  FearGreedDataSchema,
-  HackerNewsStorySchema,
-  GlobalDataSchema,
-  KpIndexSchema,
-  HealthResponseSchema,
-  MempoolDataSchema,
   BinanceKlineSchema,
-  LLMBenchmarkModelSchema,
-  EtfHoldingSchema,
+  CryptoPriceSchema,
+  EarthquakeFeatureSchema,
   EtfEntrySchema,
+  EtfHoldingSchema,
   EtfPerformanceSchema,
+  FearGreedDataSchema,
+  GlobalDataSchema,
+  HackerNewsStorySchema,
+  HealthResponseSchema,
+  KpIndexSchema,
+  LLMBenchmarkModelSchema,
+  MempoolDataSchema,
+  WeatherDataSchema,
 } from '../../apps/site/src/lib/schemas';
 
 function check<T>(schema: v.BaseSchema<T>, data: unknown): { ok: true; data: T } | { ok: false } {

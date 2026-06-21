@@ -1,7 +1,7 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import * as fc from 'fast-check';
-import { cn, isValidTheme } from '../../apps/site/src/lib/utils';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Theme } from '../../apps/site/src/lib/types';
+import { cn, isValidTheme } from '../../apps/site/src/lib/utils';
 
 // --- Property: cn() ---
 
@@ -26,7 +26,7 @@ describe('Property-Based: cn()', () => {
         fc.array(fc.oneof(fc.string(), fc.constant(false), fc.constant(null))),
         (inputs) => {
           const result = cn(...inputs);
-          const parts = result.split(' ').filter(Boolean);
+          const _parts = result.split(' ').filter(Boolean);
           // Every truthy input should appear in the result
           for (const input of inputs) {
             if (input && typeof input === 'string') {

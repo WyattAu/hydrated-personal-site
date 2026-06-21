@@ -51,9 +51,9 @@ afterEach(() => {
 describe('Advanced Worker Tests', () => {
   describe('Request deduplication', () => {
     it('two concurrent identical requests share one upstream call', async () => {
-      let fetchCallCount = 0;
+      let _fetchCallCount = 0;
       const mockFetch = vi.fn().mockImplementation(async () => {
-        fetchCallCount++;
+        _fetchCallCount++;
         await new Promise((r) => setTimeout(r, 50));
         return {
           ok: true,

@@ -331,7 +331,7 @@ describe('Guestbook Integration', () => {
         }),
         mockEnv,
       );
-      const data = await res.json();
+      const _data = await res.json();
       expect(res.status).toBe(400);
     });
 
