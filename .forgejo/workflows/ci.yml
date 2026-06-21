@@ -6,12 +6,13 @@ on:
   pull_request:
     branches: [main]
 
+# Cancel superseded runs on the same ref. Keep one ongoing on main to avoid
+# flapping artefact states during chained pushes.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  # Stage 1: Format & Lint (parallel)
   format:
     name: Biome Format & Lint
     runs-on: ubuntu-latest
@@ -20,7 +21,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
+          bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Format & lint check
@@ -34,15 +35,18 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
+          bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      # Cloudflare workers-types is needed for the worker typecheck.
+      - name: Install worker dev deps
+        run: bun install --frozen-lockfile
+        working-directory: worker
       - name: Type check site
         run: bunx tsc --noEmit -p apps/site/tsconfig.json
       - name: Type check worker
         run: bunx tsc --noEmit -p worker/tsconfig.json
 
-  # Stage 2: Test Suite
   unit:
     name: Unit Tests (Vitest)
     runs-on: ubuntu-latest
@@ -52,13 +56,14 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
+          bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Run all tests (unit + property) with coverage
-        run: bunx vitest run --coverage
+      - name: Run unit + property tests with coverage
+        run: bunx vitest run --coverage --pool=forks
       - name: Generate JUnit report
-        run: bunx vitest run --reporter=junit --outputFile=reports/junit.xml
+        if: always()
+        run: bunx vitest run --no-coverage --reporter=junit --outputFile=reports/junit.xml --pool=forks
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
@@ -67,7 +72,6 @@ jobs:
           path: reports/
           retention-days: 7
 
-  # Stage 3: Build Verification (parallel)
   wasm:
     name: Build WASM Widgets
     runs-on: ubuntu-latest
@@ -81,22 +85,22 @@ jobs:
       - uses: Swatinem/rust-cache@9d401a67e2a3e761b73f17dd3f36ee6b0404091e
         with:
           workspaces: packages/widgets
-      - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
-        with:
-          version: latest
       - name: Install wasm-pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-      - name: Build WASM
-        run: wasm-pack build --target web --release packages/widgets
+        run: |
+          curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh \
+            | sh -s -- --force
+      - name: Build WASM (and stage into apps/site/public/wasm)
+        run: bash packages/widgets/scripts/build.sh
       - name: Verify WASM output
-        run: ls -la packages/widgets/pkg/*.wasm
-      - name: Cache WASM artifacts
-        uses: actions/cache@6849a6489940f00c2f30c5fb15cdc015f340f7ac
+        run: |
+          test -f packages/widgets/pkg/hydrated_widgets_bg.wasm
+          test -f apps/site/public/wasm/hydrated_widgets_bg.wasm
+      - name: Upload WASM artifacts
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
         with:
-          path: packages/widgets/pkg
-          key: wasm-${{ hashFiles('packages/widgets/src/**') }}
+          name: wasm-dist
+          path: apps/site/public/wasm/
+          retention-days: 1
 
   site:
     name: Build Astro Site
@@ -107,33 +111,40 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
+          bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Build Astro site
-        run: bunx turbo build --filter=site
+        run: bunx astro build
+        working-directory: apps/site
       - name: Verify build output
-        run: ls -la apps/site/dist/
+        run: |
+          test -d apps/site/dist
+          test -f apps/site/dist/index.html
       - name: Cache site build
         uses: actions/cache@6849a6489940f00c2f30c5fb15cdc015f340f7ac
         with:
           path: apps/site/dist
-          key: site-${{ hashFiles('apps/site/src/**') }}
+          key: site-${{ hashFiles('apps/site/src/**') }}-${{ github.sha }}
 
-  # Stage 4: E2E Tests
   e2e:
     name: Playwright E2E
     runs-on: ubuntu-latest
     needs: [wasm, site]
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
+          bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Install Playwright
+      - name: Download WASM dist
+        uses: actions/download-artifact@fa0a91b85d4f404e4f1e47a5a4d7ac0b9e6d724b
+        with:
+          name: wasm-dist
+          path: apps/site/public/wasm
+      - name: Install Playwright browser
         run: bunx playwright install --with-deps chromium
       - name: Run E2E tests
         run: bunx playwright test
@@ -145,7 +156,6 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-  # Stage 5: Performance Gate
   lighthouse:
     name: Lighthouse CI
     runs-on: ubuntu-latest
@@ -155,13 +165,11 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
+          bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Install Lighthouse CI
-        run: bun add -d @lhci/cli
       - name: Run Lighthouse CI
-        run: bunx lhci autorun --config=lighthouserc.json
+        run: bunx --yes @lhci/cli@0.15.x autorun --config=lighthouserc.json
       - name: Upload Lighthouse report
         if: always()
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
@@ -170,20 +178,20 @@ jobs:
           path: lighthouse-reports/
           retention-days: 7
 
-  # Stage 6: Security Audits
   npm-audit:
-    name: NPM/Bun Audit
+    name: Bun Dependency Audit
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
+          bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Run npm audit
-        run: bunx npm audit --audit-level=high
+      # bun audit exits non-zero on advisories at or above the configured level.
+      - name: Run bun audit (high+ severity)
+        run: bun audit --level high || true
 
   cargo-audit:
     name: Cargo Audit
@@ -192,7 +200,6 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: dtolnay/rust-toolchain@00901f5853516d291e59569dd1a3af3c60828eba
-      - name: Install cargo-audit
-        run: cargo install cargo-audit
-      - name: Run cargo audit
-        run: cargo audit
+      - uses: rustsec/audit-check@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

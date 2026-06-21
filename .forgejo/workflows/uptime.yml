@@ -2,7 +2,7 @@ name: Uptime Check
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Every 6 hours
+    - cron: '0 */6 * * *' # Every 6 hours
   workflow_dispatch:
   push:
     branches: [main]
@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     strategy:
+      fail-fast: false
       matrix:
         check:
           - name: Homepage
@@ -29,7 +30,7 @@ jobs:
       - name: Check ${{ matrix.check.name }}
         run: |
           for i in 1 2 3; do
-            status=$(curl -sf -o /dev/null -w '%{http_code}' ${{ matrix.check.url }} || true)
+            status=$(curl -sf -o /dev/null -w '%{http_code}' "${{ matrix.check.url }}" || true)
             if [ "$status" -eq 200 ]; then
               echo "${{ matrix.check.name }}: OK (HTTP $status)"
               exit 0
@@ -45,6 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     strategy:
+      fail-fast: false
       matrix:
         asset:
           - name: Favicon
@@ -52,12 +54,12 @@ jobs:
           - name: robots.txt
             url: https://wyattau.com/robots.txt
           - name: Sitemap
-            url: https://wyattau.com/sitemap.xml
+            url: https://wyattau.com/sitemap-index.xml
     steps:
       - name: Check ${{ matrix.asset.name }}
         run: |
           for i in 1 2 3; do
-            status=$(curl -sf -o /dev/null -w '%{http_code}' ${{ matrix.asset.url }} || true)
+            status=$(curl -sf -o /dev/null -w '%{http_code}' "${{ matrix.asset.url }}" || true)
             if [ "$status" -eq 200 ]; then
               echo "${{ matrix.asset.name }}: OK (HTTP $status)"
               exit 0
@@ -73,6 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     strategy:
+      fail-fast: false
       matrix:
         endpoint:
           - name: Health
@@ -88,7 +91,8 @@ jobs:
           - name: Hacker News
             path: /api/hacker-news
           - name: Weather (Hong Kong)
-            path: /api/weather?lat=22.32&lng=114.17
+            # Open-Meteo takes ?lat=&lon= (not lng=).
+            path: /api/weather?lat=22.32&lon=114.17
           - name: Exchange Rates
             path: /api/exchange-rates
     steps:
@@ -96,6 +100,8 @@ jobs:
         run: |
           for i in 1 2 3; do
             status=$(curl -sf -o /dev/null -w '%{http_code}' "https://wyattau.com${{ matrix.endpoint.path }}" || true)
+            # 200 = healthy, 400 = upstream rejected our request as invalid
+            # (still means the worker is alive and responding sensibly).
             if [ "$status" -eq 200 ] || [ "$status" -eq 400 ]; then
               echo "${{ matrix.endpoint.name }}: OK (HTTP $status)"
               exit 0

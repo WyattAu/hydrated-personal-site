@@ -6,22 +6,22 @@ on:
   workflow_dispatch:
     inputs:
       skip_tests:
-        description: 'Skip test suite'
+        description: Skip pre-deploy validation gates
         required: false
         type: boolean
         default: false
 
+# Never cancel an in-flight production deploy; queue instead.
 concurrency:
-  group: deploy
+  group: deploy-production
   cancel-in-progress: false
 
+# Cloudflare deploys use API tokens, not the GitHub Pages OIDC chain.
+# Keep contents:read for checkout and the implicit actions write for artefacts.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
-  # Stage 1: Validate (reuses CI pipeline logic)
   validate:
     name: Validate
     runs-on: ubuntu-latest
@@ -31,9 +31,12 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
+          bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      - name: Install worker dev deps
+        run: bun install --frozen-lockfile
+        working-directory: worker
       - name: Lint & format check
         run: bunx biome check .
       - name: Type check site
@@ -41,9 +44,8 @@ jobs:
       - name: Type check worker
         run: bunx tsc --noEmit -p worker/tsconfig.json
       - name: Run all tests
-        run: bunx vitest run --coverage
+        run: bunx vitest run --coverage --pool=forks
 
-  # Stage 2: Build all artifacts
   build-wasm:
     name: Build WASM
     runs-on: ubuntu-latest
@@ -56,81 +58,93 @@ jobs:
       - uses: Swatinem/rust-cache@9d401a67e2a3e761b73f17dd3f36ee6b0404091e
         with:
           workspaces: packages/widgets
-      - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
-        with:
-          version: latest
       - name: Install wasm-pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-      - name: Build WASM
-        run: wasm-pack build --target web --release packages/widgets
+        run: |
+          curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh \
+            | sh -s -- --force
+      - name: Build WASM (stages into apps/site/public/wasm)
+        run: bash packages/widgets/scripts/build.sh
       - name: Verify WASM output
-        run: ls -la packages/widgets/pkg/*.wasm
-      - name: Upload WASM artifacts
+        run: |
+          test -f packages/widgets/pkg/hydrated_widgets_bg.wasm
+          test -f apps/site/public/wasm/hydrated_widgets_bg.wasm
+      - name: Upload WASM dist
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
         with:
           name: wasm-dist
-          path: packages/widgets/pkg/
+          path: apps/site/public/wasm/
           retention-days: 1
 
   build-site:
     name: Build Site
     runs-on: ubuntu-latest
+    needs: [build-wasm]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
+          bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      - name: Download WASM dist (staged into public)
+        uses: actions/download-artifact@fa0a91b85d4f404e4f1e47a5a4d7ac0b9e6d724b
+        with:
+          name: wasm-dist
+          path: apps/site/public/wasm
       - name: Build Astro site
-        run: bunx turbo build --filter=site
+        run: bunx astro build
+        working-directory: apps/site
       - name: Verify build output
-        run: ls -la apps/site/dist/
-      - name: Upload site artifacts
+        run: |
+          test -d apps/site/dist
+          test -f apps/site/dist/index.html
+          test -f apps/site/dist/wasm/hydrated_widgets_bg.wasm
+      - name: Upload site dist
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
         with:
           name: site-dist
           path: apps/site/dist/
           retention-days: 1
 
-  build-worker:
-    name: Build Worker
+  # The Worker has no separate build step; wrangler bundles src/index.ts at
+  # deploy time. This job exists to mirror the matrix and gate downstream
+  # deploy on a successful typecheck of the worker package.
+  verify-worker:
+    name: Verify Worker types
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
-      - name: Install dependencies
+          bun-version: 1.3.11
+      - name: Install worker dev deps
         run: bun install --frozen-lockfile
-      - name: Build CF Worker
-        run: bunx turbo build --filter=worker
-      - name: Upload worker artifacts
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
-        with:
-          name: worker-dist
-          path: worker/dist/
-          retention-days: 1
+        working-directory: worker
+      - name: Typecheck
+        run: bunx tsc --noEmit
+        working-directory: worker
 
-  # Stage 3: E2E Tests (if not skipped)
   e2e:
     name: Playwright E2E
     runs-on: ubuntu-latest
-    needs: [build-wasm, build-site, build-worker]
-    timeout-minutes: 20
+    needs: [build-wasm, build-site, verify-worker]
     if: ${{ !inputs.skip_tests }}
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
+          bun-version: 1.3.11
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Install Playwright
+      - name: Download WASM dist
+        uses: actions/download-artifact@fa0a91b85d4f404e4f1e47a5a4d7ac0b9e6d724b
+        with:
+          name: wasm-dist
+          path: apps/site/public/wasm
+      - name: Install Playwright browser
         run: bunx playwright install --with-deps chromium
       - name: Run E2E tests
         run: bunx playwright test
@@ -142,11 +156,10 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-  # Stage 4: Deploy to Cloudflare
   deploy-pages:
-    name: Deploy to CF Pages
+    name: Deploy to Cloudflare Pages
     runs-on: ubuntu-latest
-    needs: [build-wasm, build-site, build-worker]
+    needs: [build-site, verify-worker]
     environment:
       name: production
       url: https://wyattau.com
@@ -155,45 +168,39 @@ jobs:
         with:
           name: site-dist
           path: dist
-      - name: Deploy CF Pages
-        run: npx wrangler pages deploy dist --project-name=hydrated-site
+      - name: Deploy with Wrangler
+        run: bunx wrangler@3 pages deploy dist --project-name=hydrated-site --branch=main
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
 
   deploy-worker:
-    name: Deploy CF Worker
+    name: Deploy Cloudflare Worker
     runs-on: ubuntu-latest
-    needs: [build-wasm, build-site, build-worker]
+    needs: [verify-worker]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: oven-sh/setup-bun@735343b667d3e6bfb3dd40e3b1db06b07838c21e
         with:
-          version: latest
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-      - uses: actions/download-artifact@fa0a91b85d4f404e4f1e47a5a4d7ac0b9e6d724b
-        with:
-          name: worker-dist
-          path: worker/dist
-      - name: Deploy Worker
-        run: npx wrangler deploy
+          bun-version: 1.3.11
+      - name: Deploy with Wrangler
+        run: bunx wrangler@3 deploy
+        working-directory: worker
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           AA_API_KEY: ${{ secrets.AA_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
 
-  # Stage 5: Post-Deploy Smoke Test
   smoke-test:
     name: Post-Deploy Smoke Test
     runs-on: ubuntu-latest
     needs: [deploy-pages, deploy-worker]
     timeout-minutes: 5
     steps:
-      - name: Wait for deployment propagation
+      - name: Wait for edge propagation
         run: sleep 30
-      - name: Check homepage
+      - name: Probe homepage
         run: |
           for i in 1 2 3; do
             status=$(curl -sf -o /dev/null -w '%{http_code}' https://wyattau.com/ || true)
@@ -203,19 +210,19 @@ jobs:
           done
           echo "Homepage: FAILED"
           exit 1
-      - name: Check API health
+      - name: Probe API health
         run: |
           status=$(curl -sf -o /dev/null -w '%{http_code}' https://wyattau.com/api/health || true)
           [ "$status" -eq 200 ] && echo "API Health: OK" || (echo "API Health: FAILED (HTTP $status)"; exit 1)
-      - name: Check crypto ticker
+      - name: Probe crypto ticker
         run: |
           status=$(curl -sf -o /dev/null -w '%{http_code}' https://wyattau.com/api/crypto-ticker || true)
           [ "$status" -eq 200 ] && echo "Crypto Ticker: OK" || (echo "Crypto Ticker: FAILED (HTTP $status)"; exit 1)
-      - name: Check world monitor page
+      - name: Probe world page
         run: |
           status=$(curl -sf -o /dev/null -w '%{http_code}' https://wyattau.com/world || true)
           [ "$status" -eq 200 ] && echo "World Monitor: OK" || (echo "World Monitor: FAILED (HTTP $status)"; exit 1)
-      - name: Check ETF page
+      - name: Probe ETF page
         run: |
           status=$(curl -sf -o /dev/null -w '%{http_code}' https://wyattau.com/etf || true)
           [ "$status" -eq 200 ] && echo "ETF Page: OK" || (echo "ETF Page: FAILED (HTTP $status)"; exit 1)
