@@ -1,4 +1,5 @@
 import { For, Show, createSignal, onCleanup, onMount } from 'solid-js';
+import { formatPrice } from '../../lib/utils';
 
 interface TickerItem {
   symbol: string;
@@ -35,15 +36,6 @@ export default function TickerBar() {
       console.error('Ticker fetch error:', err);
       setError(true);
     }
-  }
-
-  function formatPrice(price: string): string {
-    const num = Number.parseFloat(price);
-    if (Number.isNaN(num)) return price;
-    if (num >= 1000) return num.toLocaleString('en-US', { maximumFractionDigits: 0 });
-    if (num >= 1)
-      return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return num.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
   }
 
   function isPositive(change: string): boolean {

@@ -1,5 +1,6 @@
 import { For, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { getThemeColors } from '../../lib/theme-colors';
+import { formatPrice } from '../../lib/utils';
 import { recordFetch } from './StaleIndicator';
 
 interface Kline {
@@ -51,12 +52,6 @@ function parseKlines(raw: unknown[]): Kline[] {
       volume: Number.parseFloat(arr[5] as string),
     };
   });
-}
-
-function formatPrice(p: number): string {
-  if (p >= 10000) return `$${p.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-  if (p >= 100) return `$${p.toLocaleString(undefined, { maximumFractionDigits: 1 })}`;
-  return `$${p.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 }
 
 function formatDate(ts: number): string {
@@ -293,7 +288,9 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
       ctx.font = '10px "JetBrains Mono", monospace';
       ctx.textAlign = 'right';
       const label =
-        viewMode() === 'pct' ? `${val >= 0 ? '+' : ''}${val.toFixed(1)}%` : formatPrice(val);
+        viewMode() === 'pct'
+          ? `${val >= 0 ? '+' : ''}${val.toFixed(1)}%`
+          : formatPrice(val, { currency: true });
       ctx.fillText(label, padLeft - 8, y + 3);
     }
 
@@ -355,7 +352,7 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
       const endLabel =
         viewMode() === 'pct'
           ? `${lastVal >= 0 ? '+' : ''}${lastVal.toFixed(1)}%`
-          : `${sym} ${formatPrice(lastVal)}`;
+          : `${sym} ${formatPrice(lastVal, { currency: true })}`;
       ctx.fillText(endLabel, toX(lastIdx) + 4, endY - 6);
     });
 
@@ -384,7 +381,7 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
         const valLabel =
           viewMode() === 'pct'
             ? `${v.symbol}: ${v.value >= 0 ? '+' : ''}${v.value.toFixed(1)}%`
-            : `${v.symbol}: ${formatPrice(v.price)}`;
+            : `${v.symbol}: ${formatPrice(v.price, { currency: true })}`;
         ctx.fillText(valLabel, ch.x + 10, y + 3 - i * 14);
       });
 
