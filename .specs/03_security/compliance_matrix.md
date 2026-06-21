@@ -323,13 +323,13 @@ Cache-Control: no-store (for API responses with auth tokens)
 
 | Response Type | HSTS | CSP | X-Frame-Options | Permissions-Policy | Cache-Control |
 |---------------|------|-----|-----------------|-------------------|---------------|
-| Static HTML | ✅ | ✅ | ✅ | ✅ | `public, max-age=0, must-revalidate` |
-| Static CSS/JS | ✅ | ✅ | ✅ | ✅ | `public, max-age=31536000, immutable` |
-| Static WASM | ✅ | ✅ | ✅ | ✅ | `public, max-age=31536000, immutable` |
-| API GET (public) | ✅ | ✅ | ✅ | ✅ | `public, max-age=[cache-ttl]` |
-| API POST (guestbook) | ✅ | ✅ | ✅ | ✅ | `no-store` |
-| API DELETE (admin) | ✅ | ✅ | ✅ | ✅ | `no-store` |
-| Error responses (4xx/5xx) | ✅ | ✅ | ✅ | ✅ | `no-store` |
+| Static HTML | Y | Y | Y | Y | `public, max-age=0, must-revalidate` |
+| Static CSS/JS | Y | Y | Y | Y | `public, max-age=31536000, immutable` |
+| Static WASM | Y | Y | Y | Y | `public, max-age=31536000, immutable` |
+| API GET (public) | Y | Y | Y | Y | `public, max-age=[cache-ttl]` |
+| API POST (guestbook) | Y | Y | Y | Y | `no-store` |
+| API DELETE (admin) | Y | Y | Y | Y | `no-store` |
+| Error responses (4xx/5xx) | Y | Y | Y | Y | `no-store` |
 
 ---
 
@@ -337,9 +337,9 @@ Cache-Control: no-store (for API responses with auth tokens)
 
 | Standard | Coverage | Status |
 |----------|----------|--------|
-| OWASP Top 10 (2021) | 10/10 categories addressed | ✅ Complete |
-| NIST SP 800-53 | 18 controls applicable, all implemented | ✅ Complete |
-| CSP Level 3 | Full directive set | ✅ Complete |
+| OWASP Top 10 (2021) | 10/10 categories addressed | Y Complete |
+| NIST SP 800-53 | 18 controls applicable, all implemented | Y Complete |
+| CSP Level 3 | Full directive set | Y Complete |
 | HSTS Preload | Configured, pending submission | ⏳ Pending |
-| Permissions-Policy | All dangerous features disabled | ✅ Complete |
-| WCAG 2.1 AA | Accessibility (separate audit) | ✅ Separate track |
+| Permissions-Policy | All dangerous features disabled | Y Complete |
+| WCAG 2.1 AA | Accessibility (separate audit) | Y Separate track |

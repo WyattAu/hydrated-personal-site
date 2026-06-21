@@ -1,66 +1,57 @@
-# Hydrated Personal Site -- Version Tracking
+# Version
 
-## Current State
+## Current
 
-- **Phase:** 4 (Documentation Overhaul)
-- **Version:** 2.1.0
-- **Status:** Audit complete -- 89 tests, full CI/CD pipeline, design compliance verified
-- **Last Updated:** 2026-06-18
+- **Phase:** 5 (Commit & Push; CI Debug Loop)
+- **Version:** 3.0.0
+- **Status:** In Progress — full audit pass complete, ready for commit and remote CI verification
+- **Last updated:** 2026-06-21
 
-## Audit Summary
+## v3.0.0 — Audit and Refactor Pass
 
-| Category | Before | After | Delta |
-|----------|--------|-------|-------|
-| Unit Tests | 74 | 89 | +15 (property-based) |
-| Lint Errors | 156 | 0 (blocking) | -156 |
-| Lint Warnings | 119 | ~16 (non-blocking) | -103 |
-| Build Status | Failing | Passing | Fixed |
-| Pre-commit Hook | None | Active | Added |
-| CI/CD Pipeline | Broken (missing a11y, lighthouse) | Fixed | Repaired |
-| GUI Tests | Basic E2E | Full traversal (9 routes, 4 viewports) | Enhanced |
-| README | Empty | Complete | Written |
-| Design Compliance | Unverified | Verified (Spatial Materialism, Amoebic UI) | Verified |
+Goals: zero lint errors, zero TypeScript errors, zero Rust warnings, zero emojis in source/docs, deterministic pre-commit gate, CI/CD pipeline repaired, dependency conflicts resolved, documentation rewritten to match reality.
 
-## Key Fixes Applied
+### Deltas from v2.1.0
 
-1. Fixed `packageManager` field in root `package.json` (unblocked Turborepo)
-2. Fixed missing `BaseLayout` import in `404.astro` (unblocked build)
-3. Restored 8 Astro pages with component imports removed by Biome auto-fix
-4. Restored 10+ template variables incorrectly prefixed with underscore by Biome
-5. Restored `widgetId` variable in `WasmEmbed.astro`
-6. Added `type="button"` to all interactive button elements (a11y compliance)
-7. Added `aria-label` and `<title>` to SVG elements (a11y compliance)
-8. Added `aria-controls` to combobox in SearchBar (a11y compliance)
-9. Added keyboard event handler to CommandPalette overlay (a11y compliance)
-10. Removed dead code (`getColor`, `BAR_COLORS` in PortfolioComparison)
-11. Added biome-ignore comments for Astro template variables (false positives)
-12. Created `lighthouserc.json` for Lighthouse CI integration
-13. Simplified CI pipeline (removed duplicate jobs, fixed broken stages)
-14. Added `fast-check` dependency for property-based testing
-15. Created `tests/unit/property.test.ts` with 15 property-based tests
+- **Lint:** 102 errors / 185 warnings to **0 / 0**. Biome config tightened with `.astro` and test overrides.
+- **TypeScript:** 28 site errors and 65 worker errors to **0 / 0**. Root cause: missing Astro component imports, broken `createContext` import, conflicting DOM vs workers-types globals, kebab-case CSS props.
+- **Rust:** 109 warnings (mostly deprecated web-sys setters, plus dead-code) to **0**. Crate-level `#![allow(deprecated)]` documented with rationale.
+- **Build:** Astro site previously failed at prerender (`BaseLayout is not defined`, `SEO is not defined`, `renderedDocs is not defined`). All fixed; build now produces all 9 pages + RSS + sitemap.
+- **Pre-commit hook:** Version-controlled at `scripts/pre-commit`, installed via `bun run prepare`. Gates on Biome, TypeScript, Vitest, and Cargo (Rust-only).
+- **Dependency conflicts resolved:** Astro 5/6, Vitest 1/4, Playwright 1.40/1.61, Cloudflare adapter 12/13 all consolidated. App deps moved into `apps/site/package.json`; root now holds only workspace-wide dev tools. `@astrojs/sitemap` and `@astrojs/rss` now declared.
+- **Worker types:** `lib: ["ES2022"]` excludes DOM globals that conflicted with `@cloudflare/workers-types`. `@cloudflare/workers-types` declared in `worker/package.json`.
+- **CI/CD workflows:** All three (`ci.yml`, `deploy.yml`, `uptime.yml`) rewritten.
+  - Removed GitHub Pages OIDC permissions (we deploy to Cloudflare).
+  - Replaced non-existent `turbo build --filter=worker` step with `tsc --noEmit` verification.
+  - Wired WASM dist into Pages deploy via build artifact.
+  - Replaced `npx` with `bunx`; removed `bun add -d` (which mutated lockfile in CI).
+  - Switched npm-audit to `bun audit`.
+  - Fixed uptime weather probe (`lng` -> `lon`).
+  - Pinned Bun to 1.3.11 to match local.
+- **Emoji audit:** 6 source occurrences and 56 docs occurrences purged. GUI traversal E2E enforces no-emoji invariant on every route.
+- **GUI traversal:** Enhanced to capture per-viewport screenshots (4 viewports x 9 routes), added Spatial Materialism z-index token chain assertions, shadow light-source assertions, cubic-bezier easing assertions, `prefers-reduced-motion` respect check.
+- **Documentation:** README rewritten to reflect actual widget count (16, not 13), endpoint count (24, not 20), test count (195 unit, not 89), correct page list.
+- **Test pool:** Vitest switched to `forks` pool to avoid esbuild service-terminated panics seen with the default `threads` pool on Node.js >= 23 under load.
 
-## Migration Context
+### Verified state at release
 
-| Attribute | Source (SSR_personal_site) | Target (hydrated_personal_site) |
-|-----------|---------------------------|--------------------------------|
-| Framework | Leptos 0.8.15 (Rust/WASM) | Astro 5.x + SolidJS 1.9 |
-| CSS | Tailwind CSS 3.4.19 | Tailwind CSS 4.x |
-| Build | wasm-bindgen + Node.js | wasm-pack + Turborepo + Bun |
-| Package Manager | npm/pnpm | Bun |
-| Linting | N/A | Biome |
-| Testing | Rust unit + Puppeteer E2E | Vitest + Playwright + fast-check |
-| Deployment | CF Pages Advanced Mode | CF Pages + Workers |
-| API Endpoints | 27 | 20 (ported) |
-| Routes | 9 | 9 (404 added) |
-| WASM | 1.4MB monolith (SSG) | 13 standalone widgets (70-130KB each) |
+```
+Biome check . ............... 0 errors, 0 warnings
+tsc --noEmit (apps/site) .... 0 errors
+tsc --noEmit (worker) ....... 0 errors
+cargo check (wasm32) ........ 0 warnings
+vitest run .................. 195 / 195 passing
+astro build ................. complete (9 pages + rss + sitemap)
+```
 
 ## History
 
-| Date | Phase | Version | Status | Notes |
-|------|-------|---------|--------|-------|
-| 2026-06-17 | -1 to 9 | 0.0.0 - 0.9.0 | Completed | R&D cycle |
-| 2026-06-18 | 0 | 1.0.0 | Completed | Foundation |
-| 2026-06-18 | 1-5 | 1.1.0 - 1.5.0 | Completed | Implementation |
-| 2026-06-18 | 6 | 1.6.0 | Completed | Launch ready |
-| 2026-06-18 | - | 2.0.0 | Completed | Full content + 13 WASM widgets |
-| 2026-06-18 | 1-4 | 2.1.0 | Completed | Audit: 89 tests, CI/CD fixed, a11y compliance, GUI traversal |
+| Version   | Date       | Summary                                                                                |
+| --------- | ---------- | -------------------------------------------------------------------------------------- |
+| 0.0.0-0.9 | 2026-06-17 | R&D lifecycle (Phases -1 through 9). Yellow/blue papers, ADRs, threat model, CI config. |
+| 1.0.0     | 2026-06-17 | Foundation: 9 pages, CF Worker (16 endpoints), Biome, Forgejo CI/CD.                    |
+| 1.1.0-1.5 | 2026-06-17 | Implementation: SolidJS components, themes, WASM widgets, tests.                        |
+| 1.6.0     | 2026-06-17 | Launch ready: 3 WASM widgets, 16/16 tests pass.                                         |
+| 2.0.0     | 2026-06-17 | Full content + 13 WASM widgets, 74 unit + ~73 E2E tests, build ~7.5 s.                  |
+| 2.1.0     | 2026-06-18 | Audit pass: +15 property tests, lint cleanup, pre-commit hook, CI/CD repair.           |
+| 3.0.0     | 2026-06-21 | Full audit and refactor: zero lint/type/rust warnings, dependency cleanup, doc rewrite, CI fixes, emoji purge, GUI traversal hardening. |

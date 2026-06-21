@@ -221,21 +221,21 @@ Content-Security-Policy: [see BP-CF-WORKER-001]
 
 | Requirement | BP-ASTRO | BP-CFW | BP-WASM | BP-Solid |
 |-------------|----------|--------|---------|----------|
-| FR-2.1: Page Structure | ✓ | | | |
-| FR-2.2.1: Theme System | | | | ✓ |
-| FR-2.2.2: Navigation | ✓ | | | ✓ |
-| FR-2.2.3: World Monitor | | | ✓ | ✓ |
-| FR-2.2.4: ETF Intelligence | | | ✓ | ✓ |
-| FR-2.2.5: Guestbook | | ✓ | | ✓ |
-| FR-2.2.6: WASM Widgets | | | ✓ | |
-| FR-2.3: API Endpoints | | ✓ | | |
-| FR-3.1: Performance | ✓ | ✓ | ✓ | ✓ |
-| FR-3.2: SEO | ✓ | | | |
-| FR-3.3: Accessibility | ✓ | | ✓ | ✓ |
-| FR-3.4: Security | | ✓ | | |
-| FR-3.5: Reliability | ✓ | ✓ | ✓ | ✓ |
-| FR-4.1: CF Platform | ✓ | ✓ | | |
-| FR-4.4: Build Tools | ✓ | | ✓ | ✓ |
+| FR-2.1: Page Structure | Y | | | |
+| FR-2.2.1: Theme System | | | | Y |
+| FR-2.2.2: Navigation | Y | | | Y |
+| FR-2.2.3: World Monitor | | | Y | Y |
+| FR-2.2.4: ETF Intelligence | | | Y | Y |
+| FR-2.2.5: Guestbook | | Y | | Y |
+| FR-2.2.6: WASM Widgets | | | Y | |
+| FR-2.3: API Endpoints | | Y | | |
+| FR-3.1: Performance | Y | Y | Y | Y |
+| FR-3.2: SEO | Y | | | |
+| FR-3.3: Accessibility | Y | | Y | Y |
+| FR-3.4: Security | | Y | | |
+| FR-3.5: Reliability | Y | Y | Y | Y |
+| FR-4.1: CF Platform | Y | Y | | |
+| FR-4.4: Build Tools | Y | | Y | Y |
 
 ---
 

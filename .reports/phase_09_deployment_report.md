@@ -10,7 +10,7 @@
 
 | Artifact | Location | Status |
 |----------|----------|--------|
-| Deployment Runbook | `.docs/deployment_runbook.md` | ✅ Complete |
+| Deployment Runbook | `.docs/deployment_runbook.md` | Y Complete |
 
 ---
 
@@ -114,11 +114,11 @@
 
 | Source Document | Coverage |
 |----------------|----------|
-| architecture.md §5 (Deployment) | ✅ Build pipeline and deployment flow documented |
-| architecture.md §6 (Security) | ✅ Security headers and API security in runbook |
-| architecture.md §7 (Monitoring) | ✅ Monitoring setup documented |
-| plan.md §8 (Launch) | ✅ All launch tasks covered in runbook |
-| ADR-004 (CF Pages + Workers) | ✅ Deployment model matches decision |
+| architecture.md §5 (Deployment) | Y Build pipeline and deployment flow documented |
+| architecture.md §6 (Security) | Y Security headers and API security in runbook |
+| architecture.md §7 (Monitoring) | Y Monitoring setup documented |
+| plan.md §8 (Launch) | Y All launch tasks covered in runbook |
+| ADR-004 (CF Pages + Workers) | Y Deployment model matches decision |
 
 ---
 

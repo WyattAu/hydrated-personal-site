@@ -177,7 +177,7 @@ Prop 11: forall marker positions in valid lat/lng range,
 | `name` field | Length: 10,000 chars | Rejected (max 100) |
 | `message` field | Empty string | Rejected (min 1 char) |
 | `message` field | 10,001 chars | Rejected (max 10,000) |
-| `message` field | Unicode emoji: `🎉🚀🔥` | Stored as-is |
+| `message` field | Unicode emoji: `` | Stored as-is |
 | `name` + `message` | Both empty | Rejected (400) |
 | `name` + `message` | Both whitespace only | Rejected (400) |
 | `name` + `message` | Binary bytes: `\x00\x01\x02` | Rejected or sanitized |

@@ -10,7 +10,7 @@
 
 | Artifact | Location | Status |
 |----------|----------|--------|
-| Master Plan (TOML) | `.specs/08_roadmap/master_plan.toml` | ✅ Complete |
+| Master Plan (TOML) | `.specs/08_roadmap/master_plan.toml` | Y Complete |
 
 ---
 
@@ -106,13 +106,13 @@ Verified: all task prerequisites form a DAG (directed acyclic graph). No cycles 
 
 | Source Document | Coverage |
 |----------------|----------|
-| requirements.md §2.1 (Pages) | ✅ All 9 routes covered in Phase 1 + Phase 2 + Phase 3 |
-| requirements.md §2.2 (Interactive Features) | ✅ Theme, nav, command palette, world monitor, ETF, guestbook |
-| requirements.md §2.3 (API Endpoints) | ✅ All 16 endpoints covered in Phase 0 Task 0.5 |
-| requirements.md §2.4 (Data Sources) | ✅ All proxied through CF Worker |
-| requirements.md §3 (Non-Functional) | ✅ Phase 5 covers performance, accessibility, SEO |
-| architecture.md §1.3 (WASM Widgets) | ✅ All 13 widgets covered in Phase 4 |
-| plan.md (Original Plan) | ✅ Extended with more granularity, TOML format, verification criteria |
+| requirements.md §2.1 (Pages) | Y All 9 routes covered in Phase 1 + Phase 2 + Phase 3 |
+| requirements.md §2.2 (Interactive Features) | Y Theme, nav, command palette, world monitor, ETF, guestbook |
+| requirements.md §2.3 (API Endpoints) | Y All 16 endpoints covered in Phase 0 Task 0.5 |
+| requirements.md §2.4 (Data Sources) | Y All proxied through CF Worker |
+| requirements.md §3 (Non-Functional) | Y Phase 5 covers performance, accessibility, SEO |
+| architecture.md §1.3 (WASM Widgets) | Y All 13 widgets covered in Phase 4 |
+| plan.md (Original Plan) | Y Extended with more granularity, TOML format, verification criteria |
 
 ---
 

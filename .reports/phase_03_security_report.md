@@ -85,16 +85,16 @@ Phase 3 Security Engineering produced four artifacts covering threat modeling, s
 
 | Category | Status | Notes |
 |----------|--------|-------|
-| A01: Broken Access Control | ✅ | CORS same-origin; admin token required |
-| A02: Cryptographic Failures | ✅ | TLS 1.2+; HSTS; no sensitive data in URLs |
-| A03: Injection | ✅ | Valibot validation; HTML encoding; no SQL/OS injection vectors |
-| A04: Insecure Design | ✅ | Threat model completed; defense in depth |
-| A05: Security Misconfiguration | ✅ | All security headers configured; minimal attack surface |
+| A01: Broken Access Control | Y | CORS same-origin; admin token required |
+| A02: Cryptographic Failures | Y | TLS 1.2+; HSTS; no sensitive data in URLs |
+| A03: Injection | Y | Valibot validation; HTML encoding; no SQL/OS injection vectors |
+| A04: Insecure Design | Y | Threat model completed; defense in depth |
+| A05: Security Misconfiguration | Y | All security headers configured; minimal attack surface |
 | A06: Vulnerable Components | ⏳ | `pnpm audit` + `cargo audit` require CI integration |
-| A07: Authentication Failures | ✅ | No user auth; admin token with constant-time compare |
+| A07: Authentication Failures | Y | No user auth; admin token with constant-time compare |
 | A08: Integrity Failures | ⏳ | SRI on scripts; lockfile enforcement require CI integration |
 | A09: Logging Failures | ⏳ | CSP reporting requires implementation |
-| A10: SSRF | ✅ | No user-supplied URLs; fixed external API whitelist |
+| A10: SSRF | Y | No user-supplied URLs; fixed external API whitelist |
 
 ### 4.2 NIST SP 800-53 Coverage
 
