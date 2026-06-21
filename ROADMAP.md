@@ -1,218 +1,254 @@
-# ROADMAP.md -- Hydrated Personal Site
+# Roadmap
 
-Technical roadmap from current state (v2.1.0) to full production.
+This document outlines the technical path from the current state (v3.0.0, post-audit) toward full production hardening, scaling, and future feature integration. Each phase has explicit scope, success criteria, and dependencies.
 
----
+**Current state:** v3.0.0 — full audit complete. 195/195 unit tests pass, 0 Biome diagnostics, 0 TypeScript errors, 0 Rust warnings, build green, live site verified healthy, CI/CD workflows valid (Forgejo runner offline; infrastructure-side).
 
-## Current State (v2.1.0)
-
-| Metric | Value |
-|--------|-------|
-| Pages | 9 (including 404) |
-| SolidJS Components | 18 |
-| WASM Widgets | 13 |
-| API Endpoints | 20 |
-| Unit Tests | 74 |
-| Property-Based Tests | 15 |
-| E2E Test Specs | 9 |
-| CI/CD Pipelines | 3 (CI, Deploy, Uptime) |
-| Themes | 5 |
-| Deployment Target | Cloudflare Pages + Workers |
+**Last updated:** 2026-06-21
 
 ---
 
-## Phase 1: Stabilization (Week 1-2)
+## Phase A — CI Runner Restoration (Blocking)
 
-### 1.1 Forgejo Actions Pipeline Validation
-- [ ] Resolve Forgejo server resource exhaustion (pre-receive hook crashes)
-- [ ] Push outstanding commits (refactor commit pending)
-- [ ] Verify CI pipeline triggers on push/PR
-- [ ] Validate E2E tests execute in CI environment
-- [ ] Confirm Lighthouse CI integration with lighthouserc.json
-- [ ] Test deploy pipeline end-to-end (CF Pages + Workers)
+**Why blocking:** Until the Forgejo Actions runner is online, no automated validation runs on push. All downstream phases depend on a green pipeline.
 
-### 1.2 Test Coverage Expansion
-- [ ] Add unit tests for SolidJS components (WorldMap, PriceChart, ScatterPlots)
-- [ ] Add unit tests for WasmEmbed.astro widget loader
-- [ ] Add integration tests for GuestbookForm/GuestbookList (mocked KV)
-- [ ] Add integration tests for SearchBar with database filtering
-- [ ] Achieve >90% branch coverage on critical paths (currently ~80%)
-- [ ] Add property-based tests for worker rate limiter edge cases
+- [ ] Diagnose the runner host (CachyOS). The runner registration was being tested in commit `460bcfb` (`ci: test CachyOS runner`) and has not picked up a job since. Verify:
+  - Forgejo Runner service status on the host (`systemctl status forgejo-runner` or equivalent).
+  - Runner registration token validity against `https://forgejo.wyattau.com/api/v1/actions/runners/registration-token`.
+  - Runner labels: workflows use `runs-on: ubuntu-latest`; the registered runner must advertise `ubuntu-latest` (or `ubuntu-22.04`/`ubuntu-24.04`) as a label.
+- [ ] Confirm the smoke workflow (`.forgejo/workflows/smoke.yml`) succeeds after runner restoration.
+- [ ] Delete `.forgejo/workflows/smoke.yml` once CI is stable.
+- [ ] Validate full `ci.yml` pipeline reaches green on a no-op push to `main`.
 
-### 1.3 Type Safety
-- [ ] Resolve remaining TypeScript strict mode issues
-- [ ] Add explicit return types to all exported functions
-- [ ] Eliminate remaining `any` types (currently in SolidJS component props)
-- [ ] Add Zod or Valibot validation schemas for API request/response types
+**Success criteria:** `ci.yml` reports `success` on a clean push to `main`. Smoke workflow removed.
 
 ---
 
-## Phase 2: Performance (Week 3-4)
+## Phase B — Stabilisation (Weeks 1-2)
 
-### 2.1 Frontend Performance
-- [ ] Implement route-based code splitting for Astro pages
-- [ ] Add `loading="lazy"` to non-critical images
-- [ ] Optimize Leaflet map initialization (defer until viewport intersection)
-- [ ] Implement virtual scrolling for large lists (DataPanels, ETF database)
-- [ ] Add service worker for offline caching of static assets
-- [ ] Measure and optimize Core Web Vitals (LCP, FID, CLS)
+### B.1 Domain canonicalisation
 
-### 2.2 Worker Performance
-- [ ] Replace in-memory cache with Cloudflare KV for cross-request persistence
-- [ ] Implement request deduplication for concurrent identical upstream calls
-- [ ] Add circuit breaker pattern for unreliable upstream APIs
-- [ ] Optimize HackerNews handler to fetch top stories in parallel batches
-- [ ] Implement stale-while-revalidate caching strategy
+- [ ] Choose one canonical domain. Currently `astro.config.mjs` declares `site: 'https://wyatt.au'` but deploys and uptime probes target `https://wyattau.com`. JSON-LD `url` field also points at `wyatt.au`. Either:
+  - Make `wyatt.au` canonical and configure Cloudflare to redirect `wyattau.com` → `wyatt.au` (or vice versa).
+  - Update `astro.config.mjs` `site:` and BaseLayout JSON-LD `url` to match the chosen canonical.
+- [ ] Verify all internal links in built HTML use the canonical host.
+- [ ] Add a `rel=canonical` audit to the GUI traversal E2E suite.
 
-### 2.3 WASM Performance
-- [ ] Profile WASM widget initialization time
-- [ ] Implement shared WebAssembly.Module caching across widgets
-- [ ] Add Web Worker offloading for compute-heavy widgets (Fourier, Climate)
-- [ ] Optimize WASM binary size (currently ~140KB total, target <100KB)
+### B.2 Test coverage uplift
 
----
+Current: 195 unit tests across 8 files, 80% coverage thresholds. Gaps:
 
-## Phase 3: Feature Expansion (Week 5-8)
+- [ ] SolidJS component tests. No `.test.tsx` files exist. Add at least:
+  - `ThemeToggle.test.tsx` — theme cycle and persistence.
+  - `ContactForm.test.tsx` — validation paths and submit success/failure.
+  - `GuestbookForm.test.tsx` — honeypot and rate-limit handling.
+  - `CommandPalette.test.tsx` — keyboard navigation and route dispatch.
+- [ ] Wire `apps/site/src/lib/api.ts` into production code or remove it. It currently exists only to back `tests/unit/api.test.ts`. If kept, components should consume it instead of issuing raw `fetch()` so the tests have production coverage.
+- [ ] Wire `apps/site/src/lib/schemas.ts` (valibot) into the worker response path or remove it. Same reasoning.
+- [ ] Reconcile the type drift between `api.ts` and `types.ts`. Concrete examples: `HackerNewsStory.by` vs `HNStory.author`; `KpIndex` vs `KpIndexResponse`; `GlobalData` vs `CoinGeckoGlobalData`. The valibot schemas in `schemas.ts` agree with `types.ts`, so `api.ts` is the outlier — delete or rewrite its types to import from `types.ts`.
 
-### 3.1 Docs Page Enhancement
-- [ ] Integrate WyattsNotes content via MDX or Astro content collections
-- [ ] Add search functionality to docs page
-- [ ] Implement table of contents navigation
-- [ ] Add code syntax highlighting for technical documentation
+### B.3 Crypto-ticker resilience
 
-### 3.2 Guestbook Improvements
-- [ ] Enable Cloudflare KV binding for persistent guestbook storage
-- [ ] Add markdown support for guestbook messages
-- [ ] Implement pagination for guestbook entries
-- [ ] Add admin dashboard for entry moderation (token-based)
-
-### 3.3 World Monitor Enhancements
-- [ ] Add historical data persistence (localStorage or KV) for metric trends
-- [ ] Implement WebSocket connections for real-time price updates
-- [ ] Add configurable dashboard layouts (drag-and-drop grid)
-- [ ] Integrate additional data sources (social sentiment, on-chain analytics)
-
-### 3.4 ETF Intelligence Enhancements
-- [ ] Add portfolio optimization calculator (mean-variance, risk parity)
-- [ ] Implement backtesting engine integration with WASM backtest widget
-- [ ] Add real-time ETF price tracking via Yahoo Finance API
-- [ ] Implement ETF comparison export (PDF/CSV report generation)
-
-### 3.5 New WASM Widgets
-- [ ] FFT-based audio visualizer (Web Audio API + WASM)
-- [ ] N-body gravitational simulation
-- [ ] Procedural terrain generator (Perlin noise)
-- [ ] Mini SQL query engine (SQLite WASM)
+- [ ] The live `/api/crypto-ticker` returns `{"error":"unavailable"}` from some Cloudflare egress IPs because Binance geo-blocks. Options:
+  - Add a fallback upstream (CoinGecko `/coins/markets` with `vs_currency=usd&order=market_cap_desc`).
+  - Increase cache TTL on the worker for stale-while-revalidate.
+  - Document the upstream limitation in the worker response (`x-upstream-status` header).
 
 ---
 
-## Phase 4: Security Hardening (Week 9-10)
+## Phase C — Performance (Weeks 3-4)
 
-### 4.1 Content Security Policy
-- [ ] Audit and tighten CSP headers (remove `unsafe-inline` for scripts)
-- [ ] Implement nonce-based script loading for inline scripts
-- [ ] Add report-uri directive for CSP violation monitoring
+### C.1 Bundle audit
 
-### 4.2 API Security
-- [ ] Implement API key authentication for sensitive endpoints
-- [ ] Add request body size limits (currently unlimited for POST)
-- [ ] Implement CORS headers on worker responses
-- [ ] Add input sanitization for guestbook messages (XSS prevention)
-- [ ] Rate limit all endpoints (currently only guestbook is rate-limited)
+- [ ] Run `bunx astro build` and capture per-route JS sizes. Current biggest chunks: `leaflet-src.js` (150 KB raw / 44 KB gzip on `/world`), `EtfApp.js` (37 KB / 11 KB gzip on `/etf`), `index.js` (38 KB / 11 KB gzip on `/`).
+- [ ] Lazy-load Leaflet via dynamic `import('leaflet')` (already done in `WorldMap.tsx`) and verify it is excluded from the initial bundle of `/world` via a network-waterfall check in the GUI traversal E2E.
+- [ ] Audit SolidJS islands: every `client:load` directive should be `client:visible` or `client:idle` unless it is above the fold.
 
-### 4.3 Dependency Security
-- [ ] Enable automated dependency scanning (Renovate/Dependabot equivalent)
-- [ ] Pin all GitHub Actions to SHA (currently using version tags)
-- [ ] Audit Rust crate dependencies for known vulnerabilities
-- [ ] Generate and verify SBOM for WASM components
+### C.2 WASM payload
 
----
+Current: 256 KB total in `apps/site/public/wasm/` (one shared `hydrated_widgets_bg.wasm`). Per-widget code-splitting would require restructuring `lib.rs` into per-widget crates or using `wasm-split`. Trade-off: 16 small fetches vs 1 large. Keep the monolith unless Lighthouse flags it.
 
-## Phase 5: Observability (Week 11-12)
+- [ ] Add a Lighthouse budget (`lighthouserc.json` `resourceCounts` and `resourceSizes`) that fails CI if WASM exceeds 300 KB.
+- [ ] Verify the WASM is served with `content-encoding: br` or `gz` from Cloudflare.
 
-### 5.1 Monitoring
-- [ ] Add structured logging to Cloudflare Worker (JSON format)
-- [ ] Implement error tracking (Sentry or similar)
-- [ ] Add performance monitoring for API response times
-- [ ] Create Grafana dashboard for worker metrics (request count, latency, errors)
+### C.3 Image strategy
 
-### 5.2 Alerting
-- [ ] Configure uptime monitoring alerts (beyond current HTTP probes)
-- [ ] Add API health check degradation alerts
-- [ ] Implement error rate threshold alerts
-- [ ] Add certificate expiry monitoring
+- [ ] `apps/site/public/images/` ships both AVIF and WebP for each image but pages reference them via static `<img>`. Convert to `<picture>` with `source` elements so the browser picks AVIF when supported. Astro's `<Image>` component from `astro:assets` would handle this automatically — migrate.
 
-### 5.3 Analytics
-- [ ] Implement privacy-respecting analytics (Plausible or Umami)
-- [ ] Add page view tracking for route popularity
-- [ ] Track WASM widget usage and performance metrics
-- [ ] Monitor Core Web Vitals over time
+### C.4 Cloudflare cache
+
+- [ ] Configure Cloudflare Cache Reserve for the WASM and `_astro/*` assets to extend edge TTL beyond the default.
+- [ ] Verify `cache-control: public, max-age=31536000, immutable` is honoured on `_astro/*` (currently set by Astro build).
 
 ---
 
-## Phase 6: Scale & Polish (Ongoing)
+## Phase D — Feature Expansion (Weeks 5-8)
 
-### 6.1 Internationalization
-- [ ] Add i18n framework (Astro i18n integration)
-- [ ] Translate pages to at least EN, ZH, JA
-- [ ] Implement RTL support for AR/FA languages
-- [ ] Add language switcher to navigation
+### D.1 Documentation site
 
-### 6.2 PWA Capabilities
-- [ ] Generate Web App Manifest with proper icons
-- [ ] Implement service worker with Workbox
-- [ ] Add offline support for critical pages
-- [ ] Implement push notifications for guestbook replies
+The `/docs` page currently renders three stub markdown files (`api-reference`, `architecture`, `getting-started`). Either:
 
-### 6.3 Advanced Features
-- [ ] Implement server-side rendering for SEO-critical pages
-- [ ] Add API versioning (v1/v2) for backward compatibility
-- [ ] Implement webhook system for real-time data updates
-- [ ] Add collaborative editing for guestbook (OT/CRDT)
+- [ ] Migrate to Astro Starlight for a proper docs site at `/docs/` with sidebar, search, versioning. This addresses the user's preference for `solidJS+astro+starlight`.
+- [ ] Or remove `/docs` entirely and link to WyattsNotes external site.
 
-### 6.4 Code Quality
-- [ ] Achieve 100% branch coverage on critical paths
-- [ ] Implement mutation testing (Stryker or cargo-mutants for Rust)
-- [ ] Add property-based tests for all data transformation functions
-- [ ] Implement contract testing between frontend and worker
+### D.2 Landing page
+
+The current landing page is hand-rolled. If a separate marketing landing page is desired:
+
+- [ ] Stand up an Astro + Starlight (or Astro + SolidJS) landing at the apex domain.
+- [ ] Move the personal-site content to a sub-path or sub-domain.
+
+### D.3 Guestbook hardening
+
+- [ ] Wire Cloudflare KV for the guestbook (currently returns hardcoded sample entries from the same-origin API). The standalone Worker has the KV plumbing; the Astro SSR catch-all does not.
+- [ ] Add markdown rendering for guestbook messages (with sanitisation).
+- [ ] Add an admin moderation endpoint behind `ADMIN_TOKEN`.
+
+### D.4 World monitor history
+
+- [ ] Persist metric snapshots to Cloudflare D1 or KV so the world page can show historical trends.
+- [ ] Add WebSocket or SSE for real-time price updates (currently polls every 10-15s).
+
+### D.5 ETF intelligence
+
+- [ ] The ETF database is a 97 KB JSON blob loaded client-side. Move to a build-time data fetch and prerender comparison/correlation pages for popular ETF pairs.
 
 ---
 
-## Milestones
+## Phase E — Security Hardening (Weeks 9-10)
 
-| Milestone | Target | Dependencies |
-|-----------|--------|-------------|
-| Pipeline Green | Week 2 | Forgejo server stability |
-| 90% Test Coverage | Week 4 | Phase 1.2 complete |
-| Core Web Vitals Pass | Week 4 | Phase 2.1 complete |
-| Docs Integration | Week 6 | Phase 3.1 complete |
-| Guestbook Persistent | Week 6 | Cloudflare KV configured |
-| Security Audit Pass | Week 10 | Phase 4 complete |
-| Monitoring Active | Week 12 | Phase 5 complete |
-| i18n Launch | Week 16 | Phase 6.1 complete |
-| PWA Launch | Week 18 | Phase 6.2 complete |
+### E.1 CSP tightening
+
+- [ ] Current CSP allows `'unsafe-inline'` for styles. Replace with nonce-based or hash-based style CSP. Astro supports per-request nonces via `astro.config.mjs`.
+- [ ] Add `frame-ancestors 'none'` to CSP to prevent clickjacking.
+- [ ] Verify the `report-uri /api/csp-report` endpoint is receiving reports (it exists in the worker; confirm it is wired in the Astro SSR API).
+
+### E.2 Input validation
+
+- [ ] Apply the valibot schemas from `schemas.ts` to every worker response before returning to the client. Currently schemas are test-only.
+- [ ] Add body-size limits to the guestbook POST (currently checks `name.length > 50` and `message.length > 500` but does not reject the request early on raw body size).
+
+### E.3 Dependency hygiene
+
+- [ ] Replace `curl | sh` for `wasm-pack` install in CI with a pinned download of the binary tarball.
+- [ ] Pin all GitHub/Forgejo Actions to specific minor versions (currently SHAs; the SHAs need rotation policy).
+- [ ] Add Dependabot/Renovate equivalent for Forgejo (the user runs a self-hosted instance; may need a scheduled workflow that runs `bunx npm-check-updates`).
+
+### E.4 Authentication
+
+- [ ] Add an admin route (`/admin`) protected by Cloudflare Access for guestbook moderation and metrics inspection.
+
+---
+
+## Phase F — Observability (Weeks 11-12)
+
+### F.1 Structured logging
+
+- [ ] The worker has a `log()` function that emits JSON. Wire it to Cloudflare Logpush for retention beyond the Workers runtime log buffer.
+- [ ] Add a request-id header (`x-request-id`) propagated from edge to upstream.
+
+### F.2 Error tracking
+
+- [ ] Integrate Sentry (or Cloudflare Workers Analytics) for client-side errors. The `ErrorBoundary.tsx` component logs to `console.error` in dev; production needs an external sink.
+
+### F.3 Performance monitoring
+
+- [ ] Configure Cloudflare Web Analytics (privacy-preserving, no cookies) on the production domain. The `BaseLayout` already loads Plausible; either keep Plausible or migrate to Cloudflare WA.
+- [ ] Add Real User Monitoring (RUM) for Core Web Vitals. Lighthouse CI runs synthetically; RUM captures the long tail.
+
+### F.4 Alerting
+
+- [ ] Wire the `uptime.yml` workflow failures to a notification channel (webhook to email/Discord/Slack).
+- [ ] Add a `scripts/health-check.sh` cron on a non-Forgejo host (e.g. a separate VPS or UptimeRobot) so the alert fires even when Forgejo Actions is down.
+
+---
+
+## Phase G — Scale and Polish (Ongoing)
+
+### G.1 Internationalisation
+
+- [ ] The dead `i18n.ts` (removed in v3.0.0) had EN/ZH/JA dictionaries. If i18n is actually a goal, re-introduce using `@solid-primitives/i18n` (translator pattern, not the removed createContext pattern) and wire into the dead-but-to-be-resurrected `LanguageSwitcher.tsx`.
+- [ ] Add RTL support if Arabic/Farsi is planned.
+
+### G.2 PWA
+
+- [ ] The service worker at `apps/site/public/sw.js` exists but is minimal. Add a proper cache strategy (NetworkFirst for HTML, CacheFirst for `_astro/*` and WASM) using Workbox or a hand-rolled SW.
+- [ ] Add a web app manifest with `display: standalone` and an install prompt.
+
+### G.3 API versioning
+
+- [ ] The standalone worker supports `/api/v1/*` routing but the Astro SSR API does not. Decide whether versioning is needed (if the API is only consumed by this site, probably not).
+
+### G.4 Mutation testing
+
+- [ ] Add `cargo-mutants` for the Rust widgets and `stryker` (or equivalent) for the TS codebase. Mutation testing catches tests that pass for the wrong reasons.
+
+---
+
+## Tech Debt Register
+
+Tracked items that should be addressed but are not blocking:
+
+| ID | Item | Impact | Effort |
+|----|------|--------|--------|
+| TD-001 | `apps/site/src/lib/api.ts` is test-only; components bypass it | Type drift, no central cache | 4h |
+| TD-002 | `apps/site/src/lib/schemas.ts` is test-only; no runtime validation | Unvalidated upstream responses | 4h |
+| TD-003 | `CommandPalette.tsx` uses `role='dialog'` instead of native `<dialog>` | A11y, but requires showModal refactor | 6h |
+| TD-004 | Worker and Astro SSR API have feature drift (worker has CSP/versioning/metrics; SSR does not) | Security and observability gap | 16h |
+| TD-005 | JSON-LD `url` field uses `wyatt.au`; deploy targets `wyattau.com` | SEO canonical confusion | 1h |
+| TD-006 | No SolidJS component tests (`.test.tsx`) | Refactor risk | 16h |
+| TD-007 | Forgejo Actions SHAs need rotation policy | Supply-chain risk | 2h |
+| TD-008 | Lighthouse CI thresholds are warn-level, not fail-level | Quality drift | 1h |
+| TD-009 | WASM checked into git (`apps/site/public/wasm/`) | Repo bloat, drift risk | 2h (CI rebuilds anyway) |
+| TD-010 | `design.md` ASCII art uses box-drawing chars; not emoji but worth verifying render across markdown viewers | Cosmetic | 1h |
 
 ---
 
 ## Risk Register
 
-| Risk | Probability | Impact | Mitigation |
-|------|------------|--------|-----------|
-| Forgejo server instability | High | High | Implement retry logic, monitor server health |
-| Cloudflare KV cold start | Medium | Medium | Use in-memory cache as fallback, warm KV on deploy |
-| Upstream API rate limiting | High | Medium | Implement circuit breakers, add fallback data sources |
-| WASM browser compatibility | Low | Medium | Progressive enhancement, fallback to JS implementations |
-| CSP policy conflicts | Medium | High | Test CSP in staging before production deployment |
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|-----------|
+| Forgejo runner stays offline | High | Blocks all CI | Phase A is the first priority; have a fallback plan to migrate to GitHub Actions or self-hosted Gitea Actions if the CachyOS runner cannot be stabilised. |
+| Cloudflare rate-limits the worker on traffic spikes | Medium | API unavailability | Implement KV-backed cache (Phase D.4) so stale data is served when upstream fails. |
+| Binance geo-blocks more Cloudflare egress | Medium | Crypto-ticker 500s | Phase B.3: add CoinGecko fallback. |
+| Astro 6 release removes/breaks Cloudflare adapter | Low | Build failure | Pin to `astro@^5.18` (already done). Test 6.x in a branch before upgrading. |
+| Cloudflare Pages deploy quota exceeded | Low | Deploy failure | Monitor Pages usage; consider Workers Sites as alternative. |
 
 ---
 
-## Technical Debt Inventory
+## Milestones
 
-| Item | Severity | Effort | Phase |
-|------|----------|--------|-------|
-| Duplicate `formatPrice` in PriceChart/TickerBar | Low | 1h | Phase 7 (done) |
-| LLM benchmarks fetched in both DataPanels and ScatterPlots | Low | 2h | Phase 2 |
-| In-memory cache loses state on worker restart | Medium | 4h | Phase 2.2 |
-| No error boundaries in SolidJS components | Medium | 4h | Phase 1.2 |
-| CSP uses `unsafe-inline` for scripts | High | 8h | Phase 4.1 |
-| No API authentication on sensitive endpoints | High | 4h | Phase 4.2 |
+| Milestone | Target | Phase |
+|-----------|--------|-------|
+| CI green on push to main | Week 1 | A |
+| Canonical domain decided and configured | Week 2 | B.1 |
+| Component test coverage >70% | Week 4 | B.2 |
+| Lighthouse >0.9 across all routes (CI fails on regression) | Week 6 | C.1, C.2 |
+| Starlight docs live at `/docs/` | Week 8 | D.1 |
+| Guestbook backed by Cloudflare KV | Week 9 | D.3 |
+| CSP nonce-based, no `unsafe-inline` | Week 10 | E.1 |
+| Sentry + RUM integrated | Week 12 | F.2, F.3 |
+| PWA installable | Week 16 | G.2 |
+
+---
+
+## Decision Log
+
+| Decision | Rationale | Date |
+|----------|-----------|------|
+| Stick with Astro 5.18, not 6.x | 5.18 is the current tested and building version. Astro 6 upgrade deferred to a deliberate migration sprint. | 2026-06-21 |
+| Keep the standalone Worker as fallback | The same-origin Astro SSR API is primary; the worker at `hydrated-worker.wyatt-au.workers.dev` is referenced by `llm-data.ts` as a fallback. Removing it would degrade resilience. | 2026-06-21 |
+| Delete Pages Functions, keep Astro SSR API | Cloudflare Pages Functions were shadowed by the Astro-generated `_worker.js`. Two API surfaces in one Pages deployment was a footgun. | 2026-06-21 |
+| Delete i18n.ts + LanguageSwitcher.tsx | Both were dead code with no live call sites. Re-introducing i18n is a Phase G task with proper `@solid-primitives/i18n` usage. | 2026-06-21 |
+| Pre-commit hook via plain shell script, not Husky | Avoids a Node dependency for hook management; the `prepare` package script handles installation on `bun install`. | 2026-06-21 |
+| Vitest forks pool, not threads | The default threads pool panics with esbuild service-terminated under high parallelism on Node.js >= 23. Forks pool is more robust at a small wall-clock cost. | 2026-06-21 |
+
+---
+
+## Review Cadence
+
+This roadmap should be reviewed:
+
+- At the start of each phase (confirm scope, blockers, dependencies).
+- On any change to the canonical stack (Astro major version, Cloudflare adapter, Worker runtime).
+- Quarterly for the long-term items in Phase G.
