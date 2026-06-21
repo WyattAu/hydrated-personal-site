@@ -49,9 +49,12 @@ jobs:
         run: bun install --frozen-lockfile
         working-directory: worker
       - name: Type check site
-        # Run from apps/site so bunx resolves the workspace-pinned typescript
-        # (5.x) rather than the latest from the public registry (6.x).
-        run: bunx tsc --noEmit
+        # Run astro sync first to generate .astro/types.d.ts and the
+        # astro:content module declarations. Without this, tsc cannot
+        # resolve astro:content or ImportMeta.env.
+        run: |
+          bunx astro sync
+          bunx tsc --noEmit
         working-directory: apps/site
       - name: Type check worker
         run: bunx tsc --noEmit
