@@ -13,15 +13,20 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
+  # Reusable Bun install: forgejo-runner v6.3.1 cannot execute oven-sh/setup-bun
+  # v2 (requires node24 runtime, runner only supports up to node20). Direct
+  # curl install is portable across runner versions and avoids the action
+  # runtime mismatch entirely.
   format:
     name: Biome Format & Lint
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.11
+      - name: Install Bun 1.3.11
+        run: |
+          curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.11"
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Format & lint check
@@ -33,9 +38,10 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.11
+      - name: Install Bun 1.3.11
+        run: |
+          curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.11"
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Install dependencies
         run: bun install --frozen-lockfile
       # Cloudflare workers-types is needed for the worker typecheck.
@@ -54,9 +60,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.11
+      - name: Install Bun 1.3.11
+        run: |
+          curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.11"
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Run unit + property tests with coverage
@@ -89,10 +96,10 @@ jobs:
         run: |
           curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh \
             | sh -s -- --force
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.11
+      - name: Install Bun 1.3.11
+        run: |
+          curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.11"
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Build WASM (and stage into apps/site/public/wasm)
@@ -115,9 +122,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.11
+      - name: Install Bun 1.3.11
+        run: |
+          curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.11"
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Build Astro site
@@ -140,9 +148,10 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.11
+      - name: Install Bun 1.3.11
+        run: |
+          curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.11"
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Download WASM dist
@@ -170,9 +179,10 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.11
+      - name: Install Bun 1.3.11
+        run: |
+          curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.11"
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Run Lighthouse CI
@@ -192,9 +202,10 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.11
+      - name: Install Bun 1.3.11
+        run: |
+          curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.11"
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
       - name: Install dependencies
         run: bun install --frozen-lockfile
       # bun audit exits non-zero on advisories at or above the configured level.
