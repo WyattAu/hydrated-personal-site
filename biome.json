@@ -57,14 +57,42 @@
       "node_modules",
       "dist",
       ".astro",
-      "packages/widgets/pkg",
-      "packages/widgets/target",
+      ".turbo",
+      ".wrangler",
+      "bun.lock",
       "coverage",
       "playwright-report",
       "test-results",
-      "apps/site/public/wasm/hydrated_widgets.js",
-      "apps/site/public/wasm/hydrated_widgets.d.ts",
-      "apps/site/public/wasm/hydrated_widgets_bg.wasm.d.ts"
+      "packages/widgets/pkg",
+      "packages/widgets/target",
+      "apps/site/public/wasm",
+      "apps/site/public/wasm-anim.js"
     ]
-  }
+  },
+  "overrides": [
+    {
+      "include": ["*.astro"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["*.test.ts", "*.spec.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNonNullAssertion": "off"
+          },
+          "complexity": {
+            "noForEach": "off"
+          }
+        }
+      }
+    }
+  ]
 }

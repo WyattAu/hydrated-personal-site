@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
+    "build": "echo 'no build step; wrangler bundles at deploy time'",
     "deploy": "wrangler deploy"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250101.0",
     "wrangler": "^3.0.0",
     "typescript": "^5.0.0"
   }

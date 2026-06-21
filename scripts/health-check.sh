@@ -27,10 +27,10 @@ check_endpoint() {
   local duration_ms=$(( (end_time - start_time) / 1000000 ))
 
   if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 400 ]; then
-    echo "✓ ${name}: HTTP ${http_code} (${duration_ms}ms)"
+    echo "PASS ${name}: HTTP ${http_code} (${duration_ms}ms)"
     return 0
   else
-    echo "✗ ${name}: HTTP ${http_code} (${duration_ms}ms)"
+    echo "FAIL ${name}: HTTP ${http_code} (${duration_ms}ms)"
     return 1
   fi
 }

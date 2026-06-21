@@ -9,15 +9,17 @@
     "test": "turbo test",
     "test:e2e": "turbo test:e2e",
     "lint": "biome check .",
-    "format": "biome check --write ."
+    "format": "biome check --write .",
+    "setup": "scripts/install-hooks.sh",
+    "prepare": "scripts/install-hooks.sh"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.0.0",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@biomejs/biome": "^1.9.0",
+    "@vitest/coverage-v8": "^4.1.0",
     "fast-check": "^4.8.0",
-    "happy-dom": "^20.10.5",
-    "valibot": "^1.0.0",
+    "happy-dom": "^20.10.0",
     "turbo": "^2.0.0",
-    "vitest": "^4.1.9"
+    "valibot": "^1.0.0",
+    "vitest": "^4.1.0"
   }
 }

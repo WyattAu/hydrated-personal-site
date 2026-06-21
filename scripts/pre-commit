@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+# Pre-commit gate for hydrated-personal-site.
+#
+# Runs against staged files only. Fails the commit on:
+#   - unresolved Biome formatting / lint diagnostics
+#   - any failing TypeScript typecheck (apps/site, worker)
+#   - any failing Vitest unit test
+#
+# Designed to be installed via `bun run setup` (prepare script). Direct
+# invocation from .git/hooks/pre-commit is also supported.
+set -euo pipefail
+
+# Locate repo root regardless of where the hook was invoked from.
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+YELLOW=$'\033[33m'
+GREEN=$'\033[32m'
+RED=$'\033[31m'
+DIM=$'\033[2m'
+RESET=$'\033[0m'
+
+log() { printf '%spre-commit%s %s\n' "$YELLOW" "$RESET" "$*"; }
+ok() { printf '%spre-commit%s %s%s%s\n' "$YELLOW" "$RESET" "$GREEN" "$*" "$RESET"; }
+die() { printf '%spre-commit%s %s%s%s\n' "$YELLOW" "$RESET" "$RED" "$*" "$RESET" >&2; exit 1; }
+
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if [ -z "$STAGED" ]; then
+  ok "no staged files; skipping"
+  exit 0
+fi
+
+# ---------------------------------------------------------------------------
+# Stage 1: Biome format + lint on staged files only.
+# ---------------------------------------------------------------------------
+STAGED_LINTABLE=$(printf '%s\n' "$STAGED" | grep -E '\.(ts|tsx|js|mjs|cjs|jsx|astro|json|jsonc)$' || true)
+
+if [ -n "$STAGED_LINTABLE" ]; then
+  lint_count=$(printf '%s\n' "$STAGED_LINTABLE" | grep -c . || true)
+  log "biome format + lint ($lint_count files)"
+  # Format first (rewrites), then lint-check (read-only).
+  printf '%s\n' "$STAGED_LINTABLE" | tr '\n' '\0' | xargs -0 bunx biome format --write >/dev/null
+  printf '%s\n' "$STAGED_LINTABLE" | tr '\n' '\0' | xargs -0 bunx biome check >/dev/null
+  # Re-stage formatted files.
+  printf '%s\n' "$STAGED_LINTABLE" | while IFS= read -r f; do
+    [ -n "$f" ] && git add -- "$f"
+  done
+  ok "biome clean"
+fi
+
+# ---------------------------------------------------------------------------
+# Stage 2: TypeScript typecheck on touched packages.
+# ---------------------------------------------------------------------------
+TS_SITE_CHANGED=$(printf '%s\n' "$STAGED" | grep -E '^(apps/site/|apps/site/src/)' || true)
+TS_WORKER_CHANGED=$(printf '%s\n' "$STAGED" | grep -E '^worker/' || true)
+
+if [ -n "$TS_SITE_CHANGED" ]; then
+  log "tsc --noEmit (apps/site)"
+  (cd apps/site && bunx tsc --noEmit)
+  ok "apps/site types clean"
+fi
+
+if [ -n "$TS_WORKER_CHANGED" ]; then
+  log "tsc --noEmit (worker)"
+  (cd worker && bunx tsc --noEmit)
+  ok "worker types clean"
+fi
+
+# ---------------------------------------------------------------------------
+# Stage 3: Vitest unit tests (only when *.ts/*.tsx changed).
+# ---------------------------------------------------------------------------
+TS_CHANGED=$(printf '%s\n' "$STAGED" | grep -E '\.(ts|tsx)$' || true)
+TEST_CHANGED=$(printf '%s\n' "$STAGED" | grep -E '(tests/unit|vitest\.config\.ts|apps/site/src/lib/)' || true)
+
+if [ -n "$TS_CHANGED" ] || [ -n "$TEST_CHANGED" ]; then
+  log "vitest run"
+  # Forks pool: avoids esbuild service-terminated panics under high parallelism.
+  if ! bunx vitest run --no-coverage --pool=forks --reporter=dot >/tmp/precommit-vitest.log 2>&1; then
+    tail -n 60 /tmp/precommit-vitest.log >&2
+    rm -f /tmp/precommit-vitest.log
+    die "vitest failed; see output above"
+  fi
+  rm -f /tmp/precommit-vitest.log
+  ok "vitest green"
+fi
+
+# ---------------------------------------------------------------------------
+# Stage 4: Cargo check on WASM crate (only when Rust changed).
+# ---------------------------------------------------------------------------
+RUST_CHANGED=$(printf '%s\n' "$STAGED" | grep -E '^(packages/widgets/|Cargo\.toml|Cargo\.lock)' || true)
+
+if [ -n "$RUST_CHANGED" ]; then
+  log "cargo check (wasm32)"
+  if ! (cd packages/widgets && cargo check --target wasm32-unknown-unknown --quiet) >/tmp/precommit-cargo.log 2>&1; then
+    tail -n 60 /tmp/precommit-cargo.log >&2
+    rm -f /tmp/precommit-cargo.log
+    die "cargo check failed; see output above"
+  fi
+  rm -f /tmp/precommit-cargo.log
+  ok "cargo clean"
+fi
+
+ok "all gates passed"
