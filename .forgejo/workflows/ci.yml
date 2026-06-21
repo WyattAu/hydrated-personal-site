@@ -49,15 +49,15 @@ jobs:
         run: bun install --frozen-lockfile
         working-directory: worker
       - name: Type check site
-        # Run astro sync first to generate .astro/types.d.ts and the
-        # astro:content module declarations. Without this, tsc cannot
-        # resolve astro:content or ImportMeta.env.
+        # Use the workspace-installed binaries directly to guarantee the
+        # pinned typescript version (5.9.3) rather than bunx fetching 6.x.
+        # astro sync generates .astro/types.d.ts needed by tsc.
         run: |
-          bunx astro sync
-          bunx tsc --noEmit
+          ../../node_modules/.bin/astro sync
+          ../../node_modules/.bin/tsc --noEmit
         working-directory: apps/site
       - name: Type check worker
-        run: bunx tsc --noEmit
+        run: ../../node_modules/.bin/tsc --noEmit
         working-directory: worker
 
   unit:

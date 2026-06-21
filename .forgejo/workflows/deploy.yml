@@ -40,14 +40,12 @@ jobs:
       - name: Lint & format check
         run: bunx biome check .
       - name: Type check site
-        # Run astro sync first to generate .astro/types.d.ts and the
-        # astro:content module declarations.
         run: |
-          bunx astro sync
-          bunx tsc --noEmit
+          ../../node_modules/.bin/astro sync
+          ../../node_modules/.bin/tsc --noEmit
         working-directory: apps/site
       - name: Type check worker
-        run: bunx tsc --noEmit
+        run: ../../node_modules/.bin/tsc --noEmit
         working-directory: worker
       - name: Run all tests
         run: bunx vitest run --coverage --pool=forks
