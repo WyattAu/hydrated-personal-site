@@ -34,7 +34,14 @@ fi
 # ---------------------------------------------------------------------------
 # Stage 1: Biome format + lint on staged files only.
 # ---------------------------------------------------------------------------
-STAGED_LINTABLE=$(printf '%s\n' "$STAGED" | grep -E '\.(ts|tsx|js|mjs|cjs|jsx|astro|json|jsonc)$' || true)
+# Files matching biome.json's `files.ignore` are filtered out here because
+# biome's CLI ignores the configured `ignore` list when paths are passed
+# explicitly on the command line.
+STAGED_LINTABLE=$(printf '%s\n' "$STAGED" \
+  | grep -E '\.(ts|tsx|js|mjs|cjs|jsx|astro|json|jsonc)$' \
+  | grep -vE '^(\.turbo|\.wrangler|node_modules|dist|coverage|playwright-report|test-results|bun\.lock|packages/widgets/(pkg|target)|apps/site/public/(wasm|wasm-anim\.js))/' \
+  | grep -vE '\.astro/$' \
+  || true)
 
 if [ -n "$STAGED_LINTABLE" ]; then
   lint_count=$(printf '%s\n' "$STAGED_LINTABLE" | grep -c . || true)
