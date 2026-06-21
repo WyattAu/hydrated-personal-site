@@ -40,9 +40,13 @@ jobs:
       - name: Lint & format check
         run: bunx biome check .
       - name: Type check site
-        run: bunx tsc --noEmit -p apps/site/tsconfig.json
+        # Run from apps/site so bunx resolves the workspace-pinned typescript
+        # (5.x) rather than the latest from the public registry (6.x).
+        run: bunx tsc --noEmit
+        working-directory: apps/site
       - name: Type check worker
-        run: bunx tsc --noEmit -p worker/tsconfig.json
+        run: bunx tsc --noEmit
+        working-directory: worker
       - name: Run all tests
         run: bunx vitest run --coverage --pool=forks
 
