@@ -1,5 +1,14 @@
 name: Smoke
 
+# Minimal runner-health probe. Verifies the forgejo-runner container can:
+#   1. Pull the action image (catthehacker/ubuntu:act-latest).
+#   2. Execute a shell step.
+#   3. Reach the public internet (for action fetches).
+#
+# Deliberately does NOT depend on Bun, Rust, or any project-specific
+# toolchain. If this workflow fails, the runner itself is broken. If it
+# succeeds and ci.yml fails, the issue is in ci.yml's toolchain setup.
+
 on:
   push:
     branches: [main]
@@ -11,5 +20,9 @@ jobs:
     timeout-minutes: 2
     steps:
       - run: echo "smoke ok"
-      - run: bun --version
-      - run: node --version
+      - run: uname -a
+      - run: |
+          echo "node: $(node --version 2>&1 || echo missing)"
+          echo "git: $(git --version 2>&1 || echo missing)"
+          echo "curl: $(curl --version 2>&1 | head -1 || echo missing)"
+      - run: curl -sI https://forgejo.wyattau.com/ | head -1
