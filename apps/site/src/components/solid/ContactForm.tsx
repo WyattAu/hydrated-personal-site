@@ -1,13 +1,11 @@
 import { createSignal } from 'solid-js';
+import { toast } from 'solid-sonner';
 
 export default function ContactForm() {
   const [name, setName] = createSignal('');
   const [email, setEmail] = createSignal('');
   const [message, setMessage] = createSignal('');
   const [loading, setLoading] = createSignal(false);
-  const [feedback, setFeedback] = createSignal<{ type: 'success' | 'error'; text: string } | null>(
-    null,
-  );
 
   function validateEmail(value: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -24,11 +22,10 @@ export default function ContactForm() {
 
   async function handleSubmit(e: Event) {
     e.preventDefault();
-    setFeedback(null);
 
     const error = validate();
     if (error) {
-      setFeedback({ type: 'error', text: error });
+      toast.error(error);
       return;
     }
 
@@ -39,15 +36,12 @@ export default function ContactForm() {
 
       window.location.href = mailtoUrl;
 
-      setFeedback({ type: 'success', text: 'Opening your email client...' });
+      toast.success('Opening your email client...');
       setName('');
       setEmail('');
       setMessage('');
     } catch {
-      setFeedback({
-        type: 'error',
-        text: 'Could not open email client. Please copy the address manually.',
-      });
+      toast.error('Could not open email client. Please copy the address manually.');
     } finally {
       setLoading(false);
     }
@@ -118,15 +112,6 @@ export default function ContactForm() {
           {message().length}/2000
         </p>
       </div>
-
-      {feedback() && (
-        <p
-          class="font-mono text-xs font-bold"
-          style={feedback()?.type === 'success' ? 'color: #69f0ae;' : 'color: var(--accent-warm);'}
-        >
-          {feedback()?.text}
-        </p>
-      )}
 
       <button
         type="submit"

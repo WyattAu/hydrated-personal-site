@@ -1,5 +1,12 @@
 import { For, createSignal, onCleanup, onMount } from 'solid-js';
 
+/** Call this after a successful API fetch to record the timestamp for stale tracking. */
+export function recordFetch(sourceKey: string): void {
+  try {
+    localStorage.setItem(`lastFetch:${sourceKey}`, String(Date.now()));
+  } catch {}
+}
+
 interface DataSourceStatus {
   key: string;
   label: string;
@@ -18,14 +25,11 @@ const DATA_SOURCES: { key: string; label: string; ttlMs: number }[] = [
   { key: 'llm-benchmarks', label: 'LLM Data', ttlMs: 6 * 60 * 60_000 },
 ];
 
-const UNREACHABLE_SOURCES = new Set(['llm-benchmarks', 'github-trending']);
-
 function freshnessClass(
   timestamp: number,
   ttlMs: number,
-  key: string,
+  _key: string,
 ): { color: string; label: string } {
-  if (UNREACHABLE_SOURCES.has(key)) return { color: '#9e9e9e', label: 'UNAVAILABLE' };
   const age = Date.now() - timestamp;
   if (age < ttlMs * 0.5) return { color: '#69f0ae', label: 'FRESH' };
   if (age < ttlMs) return { color: '#ffff00', label: 'AGING' };

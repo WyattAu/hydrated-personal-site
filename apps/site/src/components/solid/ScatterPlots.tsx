@@ -1,19 +1,11 @@
 import { createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { useLlmData } from '../../lib/llm-data';
+import { getThemeColors } from '../../lib/theme-colors';
 
 interface Point {
   x: number;
   y: number;
   label: string;
-}
-
-function parseParams(params: string): number {
-  if (!params || params === '?') return 0;
-  const lower = params.toLowerCase();
-  if (lower.includes('t')) return Number.parseFloat(lower) * 1000;
-  if (lower.includes('b')) return Number.parseFloat(lower) * 1;
-  if (lower.includes('m')) return Number.parseFloat(lower) / 1000;
-  return Number.parseFloat(lower) || 0;
 }
 
 function ScatterCanvas(props: {
@@ -73,14 +65,14 @@ function ScatterCanvas(props: {
     const toX = (v: number) => padLeft + ((v - xLo) / xR) * chartW;
     const toY = (v: number) => padTop + (1 - (v - yLo) / yR) * chartH;
 
-    const bg = getComputedStyle(document.documentElement);
-    const bgColor = bg.getPropertyValue('--bg-card').trim() || '#0c0c0c';
-    const accent = bg.getPropertyValue('--accent').trim() || '#00e5ff';
+    const colors = getThemeColors();
+    const bgColor = colors.bgCard || '#0c0c0c';
+    const _accent = colors.accent || '#00e5ff';
 
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, w, h);
 
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.04)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 5; i++) {
       const yv = yLo + (yR * i) / 5;
@@ -89,7 +81,7 @@ function ScatterCanvas(props: {
       ctx.moveTo(padLeft, y);
       ctx.lineTo(w - padRight, y);
       ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
       ctx.font = '10px "JetBrains Mono", monospace';
       ctx.textAlign = 'right';
       ctx.fillText(yv.toFixed(1), padLeft - 8, y + 3);
@@ -104,7 +96,7 @@ function ScatterCanvas(props: {
       ctx.fillText(xv.toFixed(1), x, h - padBottom + 16);
     }
 
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.4)';
     ctx.font = '11px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText(props.xLabel, padLeft + chartW / 2, h - 4);
@@ -114,26 +106,46 @@ function ScatterCanvas(props: {
     ctx.fillText(props.yLabel, 0, 0);
     ctx.restore();
 
-    pts.forEach((p) => {
+    pts.forEach((p, i) => {
       const x = toX(p.x);
       const y = toY(p.y);
 
+      // Cycle through a palette of distinct colors
+      const palette = [
+        '#00e5ff',
+        '#ff4081',
+        '#69f0ae',
+        '#ffab40',
+        '#7c4dff',
+        '#ff6b6b',
+        '#40c4ff',
+        '#ffcc00',
+        '#b388ff',
+        '#64ffda',
+        '#ff8a65',
+        '#80deea',
+        '#a5d6a7',
+        '#ce93d8',
+        '#fff176',
+      ];
+      const color = palette[i % palette.length];
+
       ctx.beginPath();
       ctx.arc(x, y, 5, 0, Math.PI * 2);
-      ctx.fillStyle = accent;
-      ctx.globalAlpha = 0.7;
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.8;
       ctx.fill();
       ctx.globalAlpha = 1;
 
-      ctx.strokeStyle = accent;
+      ctx.strokeStyle = color;
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      if (pts.length <= 15) {
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      if (pts.length <= 20) {
+        ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.6)';
         ctx.font = '9px "JetBrains Mono", monospace';
         ctx.textAlign = 'left';
-        const shortLabel = p.label.length > 12 ? `${p.label.slice(0, 12)}...` : p.label;
+        const shortLabel = p.label.length > 14 ? `${p.label.slice(0, 14)}…` : p.label;
         ctx.fillText(shortLabel, x + 8, y + 3);
       }
     });
@@ -170,17 +182,23 @@ function ScatterCanvas(props: {
 
     const xs = pts.map((p) => p.x);
     const ys = pts.map((p) => p.y);
-    const xLo = Math.min(...xs) * 0.9;
-    const xHi = Math.max(...xs) * 1.1;
-    const yLo = Math.min(...ys) * 0.9;
-    const yHi = Math.max(...ys) * 1.1;
+    const xMin = Math.min(...xs);
+    const xMax = Math.max(...xs);
+    const yMin = Math.min(...ys);
+    const yMax = Math.max(...ys);
+    const xRange = xMax - xMin || 1;
+    const yRange = yMax - yMin || 1;
+    const xLo = xMin - xRange * 0.1;
+    const xHi = xMax + xRange * 0.1;
+    const yLo = yMin - yRange * 0.1;
+    const yHi = yMax + yRange * 0.1;
     const xR = xHi - xLo;
     const yR = yHi - yLo;
 
     let closest: { x: number; y: number; label: string } | null = null;
     let minDist = 20;
 
-    pts.forEach((p) => {
+    for (const p of pts) {
       const px = padLeft + ((p.x - xLo) / xR) * chartW;
       const py = padTop + (1 - (p.y - yLo) / yR) * chartH;
       const dist = Math.sqrt((mx - px) ** 2 + (my - py) ** 2);
@@ -188,7 +206,7 @@ function ScatterCanvas(props: {
         minDist = dist;
         closest = { x: px, y: py, label: p.label };
       }
-    });
+    }
 
     setTooltip(closest);
   }
@@ -212,8 +230,8 @@ function ScatterCanvas(props: {
         <div
           class="absolute px-2 py-1 font-mono text-xs pointer-events-none"
           style={{
-            left: `${tooltip()?.x + 12}px`,
-            top: `${tooltip()?.y - 28}px`,
+            left: `${(tooltip()?.x ?? 0) + 12}px`,
+            top: `${(tooltip()?.y ?? 0) - 28}px`,
             background: 'var(--bg-card)',
             border: '1px solid var(--border)',
             color: 'var(--text-primary)',
@@ -231,9 +249,9 @@ export default function ScatterPlots() {
 
   const intelligenceVsPrice = (): Point[] => {
     return data()
-      .filter((m) => m.average_score > 0)
+      .filter((m) => m.average_score > 0 && (m.price_per_m_token ?? 0) > 0)
       .map((m) => ({
-        x: parseParams(m.parameter_count),
+        x: m.price_per_m_token ?? 0,
         y: m.average_score,
         label: m.model,
       }));
@@ -241,9 +259,9 @@ export default function ScatterPlots() {
 
   const intelligenceVsSpeed = (): Point[] => {
     return data()
-      .filter((m) => m.average_score > 0 && m.humaneval > 0)
+      .filter((m) => m.average_score > 0 && (m.tokens_per_sec ?? 0) > 0)
       .map((m) => ({
-        x: m.humaneval,
+        x: m.tokens_per_sec ?? 0,
         y: m.average_score,
         label: m.model,
       }));
@@ -258,15 +276,15 @@ export default function ScatterPlots() {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <ScatterCanvas
             points={intelligenceVsPrice}
-            xLabel="Parameters (B)"
-            yLabel="Average Score"
-            title="LLM Intelligence vs. Size"
+            xLabel="Price ($/1M tokens)"
+            yLabel="Intelligence Index"
+            title="Intelligence vs. Price"
           />
           <ScatterCanvas
             points={intelligenceVsSpeed}
-            xLabel="HumanEval Score"
-            yLabel="Average Score"
-            title="LLM Intelligence vs. Coding"
+            xLabel="Output Tokens/sec"
+            yLabel="Intelligence Index"
+            title="Intelligence vs. Speed"
           />
         </div>
       )}

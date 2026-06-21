@@ -1,4 +1,5 @@
-import { For, Show, createSignal, createEffect, onCleanup, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 
 interface CorrelationMatrixProps {
@@ -65,8 +66,8 @@ function drawMatrix(
   if (!ctx) return;
   ctx.scale(dpr, dpr);
 
-  const bg =
-    getComputedStyle(document.documentElement).getPropertyValue('--bg-card').trim() || '#0c0c0c';
+  const colors = getThemeColors();
+  const bg = colors.bgCard || '#0c0c0c';
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
@@ -105,9 +106,7 @@ function drawMatrix(
   }
 
   // Ticker labels
-  const textColor =
-    getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim() ||
-    '#888';
+  const textColor = colors.textSecondary || '#888';
   ctx.fillStyle = textColor;
   ctx.font = '9px "JetBrains Mono", monospace';
 
@@ -214,8 +213,7 @@ export default function CorrelationMatrix(props: CorrelationMatrixProps) {
   }
 
   const accentColor = () => {
-    const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-    return v || '#00e5ff';
+    return getThemeColors().accent || '#00e5ff';
   };
 
   const [addQuery, setAddQuery] = createSignal('');
@@ -368,12 +366,12 @@ export default function CorrelationMatrix(props: CorrelationMatrixProps) {
       {/* Hover tooltip */}
       <Show when={hoverIdx()}>
         <div class="mt-2 font-mono text-xs" style={{ color: 'var(--text-secondary)' }}>
-          <span style={{ color: accentColor() }}>{selectedTickers()[hoverIdx()?.row]}</span>
+          <span style={{ color: accentColor() }}>{selectedTickers()[hoverIdx()?.row ?? 0]}</span>
           {' × '}
-          <span style={{ color: accentColor() }}>{selectedTickers()[hoverIdx()?.col]}</span>
+          <span style={{ color: accentColor() }}>{selectedTickers()[hoverIdx()?.col ?? 0]}</span>
           {' = '}
           <span class="font-bold" style={{ color: 'var(--text-primary)' }}>
-            {matrix()[hoverIdx()?.row][hoverIdx()?.col].toFixed(4)}
+            {matrix()[hoverIdx()?.row ?? 0][hoverIdx()?.col ?? 0].toFixed(4)}
           </span>
         </div>
       </Show>

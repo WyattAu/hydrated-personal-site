@@ -1,7 +1,9 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Nav from '../components/astro/Nav.astro';
 import Footer from '../components/astro/Footer.astro';
+import Nav from '../components/astro/Nav.astro';
+import DynamicRepos from '../components/solid/DynamicRepos';
+import ThemeToggle from '../components/solid/ThemeToggle';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
 import '../styles/animations.css';
 
@@ -9,14 +11,13 @@ import { getCollection } from 'astro:content';
 
 const allProjects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
 const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologies))].sort();
 ---
 
 <BaseLayout title="Projects — Wyatt Au" description="Open-source projects and technical work by Wyatt Au.">
   <Nav />
 
-  <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-28">
     <section class="py-16 px-6 md:px-12 lg:px-24">
       <p class="label mb-6 cinematic-enter" style="color: var(--accent);">PROJECTS</p>
       <h1 class="text-3xl md:text-5xl font-bold mb-4 cinematic-enter cinematic-enter-delay-1">Projects</h1>
@@ -32,7 +33,7 @@ const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologi
         <button
           class="project-filter font-mono text-[10px] px-3 py-1.5 border uppercase tracking-wider transition-all"
           data-filter="all"
-          style="border-color: var(--accent); color: var(--accent); background: rgba(0, 229, 255, 0.1);"
+          style="border-color: var(--accent); color: var(--accent); background: var(--accent-tint);"
         >
           All ({allProjects.length})
         </button>
@@ -52,7 +53,7 @@ const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologi
         <button
           class="project-sort font-mono text-[10px] px-3 py-1.5 border uppercase tracking-wider transition-all active"
           data-sort="order"
-          style="border-color: var(--accent); color: var(--accent); background: rgba(0, 229, 255, 0.1);"
+          style="border-color: var(--accent); color: var(--accent); background: var(--accent-tint);"
         >
           Featured
         </button>
@@ -104,9 +105,24 @@ const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologi
         ))}
       </div>
     </section>
+
+    <!-- Live GitHub Repos -->
+    <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <div class="flex items-center gap-3 mb-6 reveal">
+        <p class="label" style="color: var(--accent);">LIVE FROM GITHUB</p>
+        <span class="block w-2 h-2 rounded-full animate-pulse" style="background: var(--accent);" />
+      </div>
+      <p class="text-sm mb-6 reveal" style="color: var(--text-secondary); max-width: 640px;">
+        Real-time repository data synced from GitHub. Sorted by most recently updated.
+      </p>
+      <div class="reveal">
+        <DynamicRepos client:load />
+      </div>
+    </section>
   </main>
 
   <Footer />
+  <ThemeToggle client:load />
 
   <script>
     const observer = new IntersectionObserver(
@@ -159,7 +175,7 @@ const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologi
         });
         btn.style.borderColor = 'var(--accent)';
         btn.style.color = 'var(--accent)';
-        btn.style.background = 'rgba(0, 229, 255, 0.1)';
+        btn.style.background = 'var(--accent-tint)';
         applyFilters();
       });
     });
@@ -174,7 +190,7 @@ const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologi
         });
         btn.style.borderColor = 'var(--accent)';
         btn.style.color = 'var(--accent)';
-        btn.style.background = 'rgba(0, 229, 255, 0.1)';
+        btn.style.background = 'var(--accent-tint)';
         applyFilters();
       });
     });

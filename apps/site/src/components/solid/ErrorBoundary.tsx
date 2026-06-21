@@ -1,4 +1,4 @@
-import { ErrorBoundary, createSignal, type JSX } from 'solid-js';
+import { ErrorBoundary, type JSX, createSignal } from 'solid-js';
 
 interface Props {
   children: JSX.Element;
@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function AppErrorBoundary(props: Props) {
-  const [retryKey, setRetryKey] = createSignal(0);
+  const [_retryKey, setRetryKey] = createSignal(0);
 
   return (
     <ErrorBoundary
@@ -26,6 +26,7 @@ export default function AppErrorBoundary(props: Props) {
               {err?.message || 'An unexpected error occurred.'}
             </p>
             <button
+              type="button"
               class="px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider border"
               style="border-color: var(--border); color: var(--text-secondary);"
               onClick={() => {

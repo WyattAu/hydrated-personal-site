@@ -1,12 +1,12 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Nav from '../components/astro/Nav.astro';
 import Footer from '../components/astro/Footer.astro';
+import Nav from '../components/astro/Nav.astro';
+import ThemeToggle from '../components/solid/ThemeToggle';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
 import '../styles/animations.css';
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
 const expertiseCategories = [
   {
     title: 'Programming Languages',
@@ -108,7 +108,6 @@ const expertiseCategories = [
   },
 ];
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
 const employment = [
   {
     role: 'Founder & Backend Engineer',
@@ -136,7 +135,6 @@ const employment = [
   },
 ];
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
 const education = [
   {
     degree: 'International Baccalaureate (IB)',
@@ -151,7 +149,7 @@ const education = [
 <BaseLayout title="Dossier — Wyatt Au" description="Personal dossier, timeline, and detailed biography of Wyatt Au.">
   <Nav />
 
-  <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-28">
     <!-- Header -->
     <section class="py-16 px-6 md:px-12 lg:px-24">
       <p class="label mb-6 cinematic-enter" style="color: var(--accent);">DOSSIER</p>
@@ -240,28 +238,29 @@ const education = [
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Climate Data Explorer</p>
           <p class="text-sm mb-4" style="color: var(--text-secondary);">Visualize historical climate datasets with interactive charts and filtering.</p>
-          <WasmEmbed widget="climate" width={600} height={350} />
+          <WasmEmbed widget="climate" width={500} height={350} />
         </div>
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Cellular Automata</p>
           <p class="text-sm mb-4" style="color: var(--text-secondary);">Conway's Game of Life and custom rulesets running at 60fps in WASM.</p>
-          <WasmEmbed widget="cellular_automata" width={600} height={350} />
+          <WasmEmbed widget="cellular_automata" width={500} height={350} />
         </div>
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Physics Sandbox</p>
           <p class="text-sm mb-4" style="color: var(--text-secondary);">Real-time rigid body simulation with collision detection and gravity.</p>
-          <WasmEmbed widget="physics" width={600} height={350} />
+          <WasmEmbed widget="physics" width={500} height={350} />
         </div>
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Color Blindness Simulator</p>
           <p class="text-sm mb-4" style="color: var(--text-secondary);">Preview designs under protanopia, deuteranopia, and tritanopia filters.</p>
-          <WasmEmbed widget="colorblind" width={600} height={350} />
+          <WasmEmbed widget="colorblind" width={500} height={350} />
         </div>
       </div>
     </section>
   </main>
 
   <Footer />
+  <ThemeToggle client:load />
 
   <script>
     const observer = new IntersectionObserver(

@@ -296,10 +296,10 @@
 
 @keyframes glow-pulse {
   0% {
-    box-shadow: 0 0 5px rgba(0, 229, 255, 0.1);
+    box-shadow: 0 0 5px var(--accent-tint);
   }
   100% {
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+    box-shadow: 0 0 20px var(--accent-glow);
   }
 }
 

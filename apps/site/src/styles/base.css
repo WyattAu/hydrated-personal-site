@@ -18,7 +18,7 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
   --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.7);
-  --shadow-glow: 0 0 40px rgba(0, 229, 255, 0.15);
+  --shadow-glow: 0 0 40px var(--accent-glow);
 
   /* Animation easing */
   --ease-brutal: cubic-bezier(0.16, 1, 0.3, 1);
@@ -116,7 +116,7 @@ ol {
   font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1;
-  text-shadow: 0 0 40px rgba(0, 229, 255, 0.3);
+  text-shadow: 0 0 40px var(--accent-text-shadow);
 }
 
 .stat-value {
@@ -124,7 +124,7 @@ ol {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 900;
   letter-spacing: -0.02em;
-  text-shadow: 0 0 30px rgba(0, 229, 255, 0.2);
+  text-shadow: 0 0 30px var(--accent-text-shadow);
 }
 
 .code-text {
@@ -221,7 +221,7 @@ ol {
     top: 0;
     bottom: 0;
     width: calc((100vw - 1800px) / 2);
-    background: linear-gradient(to right, rgba(0,0,0,0.3), transparent);
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.3), transparent);
     z-index: 9997;
     pointer-events: none;
   }
@@ -230,7 +230,7 @@ ol {
   }
   body::after {
     right: 0;
-    background: linear-gradient(to left, rgba(0,0,0,0.3), transparent);
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.3), transparent);
   }
 }
 
@@ -311,6 +311,152 @@ ol {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
+}
+
+/* ============================================================
+   HERO IMAGES — Cinematic Ken Burns Pan
+   ============================================================ */
+
+.hero-images {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero-img {
+  position: absolute;
+  top: -10%;
+  width: 50%;
+  height: 120%;
+  object-fit: cover;
+  opacity: 0.45;
+  filter: grayscale(20%) contrast(1.05);
+  will-change: object-position;
+  backface-visibility: hidden;
+  animation-play-state: paused;
+}
+
+.hero-img-left {
+  left: 0;
+  object-position: 30% 50%;
+  animation: pan-left 40s linear infinite;
+}
+
+.hero-img-right {
+  right: 0;
+  object-position: 70% 50%;
+  animation: pan-right 40s linear infinite;
+}
+
+.hero-img.animate {
+  animation-play-state: running;
+}
+
+@keyframes pan-left {
+  0% {
+    object-position: 30% 50%;
+  }
+  50% {
+    object-position: 70% 50%;
+  }
+  100% {
+    object-position: 30% 50%;
+  }
+}
+
+@keyframes pan-right {
+  0% {
+    object-position: 70% 50%;
+  }
+  50% {
+    object-position: 30% 50%;
+  }
+  100% {
+    object-position: 70% 50%;
+  }
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 5, 5, 0.6) 0%,
+    rgba(5, 5, 5, 0.3) 40%,
+    rgba(5, 5, 5, 0.5) 70%,
+    rgba(5, 5, 5, 0.85) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    top: 0;
+  }
+  .hero-img-left {
+    clip-path: inset(0 0 50% 0);
+  }
+  .hero-img-right {
+    clip-path: inset(50% 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-img {
+    opacity: 0.25;
+    animation: none;
+  }
+}
+
+/* ============================================================
+   SPATIAL MATERIALISM — Section Spacing & Visual Hierarchy
+   ============================================================ */
+
+section + section {
+  border-top: none;
+}
+
+section.border-t {
+  border-top-width: 1px;
+  border-top-style: solid;
+}
+
+/* Ensure consistent section breathing room */
+.py-16 {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+.py-24 {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+/* Card hover lift for amoebic interaction */
+.amoebic-morph {
+  transition: all 0.4s var(--ease-amoeba);
+}
+
+.amoebic-morph:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Panel cards — consistent base */
+.panel-card {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  padding: 1.5rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.panel-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
 }
 
 /* ============================================================

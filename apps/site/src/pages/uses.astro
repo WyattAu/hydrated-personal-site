@@ -1,12 +1,12 @@
 ---
-
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Nav from '../components/astro/Nav.astro';
 import Footer from '../components/astro/Footer.astro';
+import Nav from '../components/astro/Nav.astro';
+import ThemeToggle from '../components/solid/ThemeToggle';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
 import '../styles/base.css';
 import '../styles/animations.css';
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
 const developmentTools = [
   {
     category: 'Editors',
@@ -87,7 +87,6 @@ const developmentTools = [
   },
 ];
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
 const infrastructureTools = [
   {
     category: 'Hosting & Edge',
@@ -158,7 +157,7 @@ const infrastructureTools = [
 <BaseLayout title="Uses — Wyatt Au" description="Tools and software I use daily for development, infrastructure, and productivity.">
   <Nav />
 
-  <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-28">
     <!-- Header -->
     <section class="py-16 px-6 md:px-12 lg:px-24">
       <p class="label mb-6 cinematic-enter" style="color: var(--accent);">USES</p>
@@ -226,6 +225,7 @@ const infrastructureTools = [
   </main>
 
   <Footer />
+  <ThemeToggle client:load />
 
   <script>
     const observer = new IntersectionObserver(

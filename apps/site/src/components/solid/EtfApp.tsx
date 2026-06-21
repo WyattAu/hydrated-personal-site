@@ -1,5 +1,6 @@
-import { For, Show, createSignal, createEffect, onMount } from 'solid-js';
+import { For, Show, createSignal, onMount } from 'solid-js';
 import { exportToCsv } from '../../lib/csv-export';
+import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 import CorrelationMatrix from './CorrelationMatrix';
 import EtfDetail from './EtfDetail';
@@ -26,8 +27,7 @@ export default function EtfApp() {
   });
 
   const accentColor = () => {
-    const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-    return v || '#00e5ff';
+    return getThemeColors().accent || '#00e5ff';
   };
 
   function handleExportCsv() {
@@ -123,33 +123,37 @@ export default function EtfApp() {
       </Show>
 
       {/* Selected ETF Detail */}
-      <Show when={selectedEtf()}>
-        <div class="mb-8">
-          <EtfDetail etf={selectedEtf()!} />
-        </div>
+      <Show when={selectedEtf()} keyed>
+        {(etf) => (
+          <>
+            <div class="mb-8">
+              <EtfDetail etf={etf} />
+            </div>
 
-        {/* Performance Metrics */}
-        <div class="mb-8">
-          <PerformanceMetrics etf={selectedEtf()!} />
-        </div>
+            {/* Performance Metrics */}
+            <div class="mb-8">
+              <PerformanceMetrics etf={etf} />
+            </div>
 
-        {/* Add to optimization button */}
-        <div class="mb-8">
-          <button
-            type="button"
-            class="border px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors"
-            style={{
-              'border-color': accentColor(),
-              background: 'var(--bg-card)',
-              color: accentColor(),
-            }}
-            onClick={() => toggleOptSelected(selectedEtf()!)}
-          >
-            {selectedForOpt().find((e) => e.ticker === selectedEtf()?.ticker)
-              ? 'Remove from Optimization'
-              : 'Add to Optimization'}
-          </button>
-        </div>
+            {/* Add to optimization button */}
+            <div class="mb-8">
+              <button
+                type="button"
+                class="border px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors"
+                style={{
+                  'border-color': accentColor(),
+                  background: 'var(--bg-card)',
+                  color: accentColor(),
+                }}
+                onClick={() => toggleOptSelected(etf)}
+              >
+                {selectedForOpt().find((e) => e.ticker === etf.ticker)
+                  ? 'Remove from Optimization'
+                  : 'Add to Optimization'}
+              </button>
+            </div>
+          </>
+        )}
       </Show>
 
       {/* Quick Picks */}

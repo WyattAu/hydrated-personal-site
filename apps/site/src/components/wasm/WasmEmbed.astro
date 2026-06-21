@@ -8,7 +8,6 @@ interface Props {
   dataInterval?: number;
 }
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template
 const {
   widget,
   width = 800,
@@ -28,7 +27,7 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
   data-height={height}
   data-endpoint={dataEndpoint}
   data-interval={dataInterval}
-  style={`width: ${width}px; height: ${height}px;`}
+  style={`aspect-ratio: ${width} / ${height};`}
 >
   <div class="wasm-skeleton">
     <div class="skeleton-pulse"></div>
@@ -40,6 +39,18 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
   (function () {
     if (window.__wasmInit) return;
     window.__wasmInit = true;
+
+    // Shared WASM module promise — loaded once, reused by all widgets
+    var wasmModPromise = null;
+    function getWasmMod() {
+      if (!wasmModPromise) {
+        wasmModPromise = import('/wasm/hydrated_widgets.js').then(async function(mod) {
+          await mod.default();
+          return mod;
+        });
+      }
+      return wasmModPromise;
+    }
 
     function initWasmEmbeds() {
       var observer = new IntersectionObserver(
@@ -56,10 +67,16 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
               var endpoint = el.dataset.endpoint || '';
               var interval = parseInt(el.dataset.interval || '0', 10);
 
+              // Use actual rendered size for sharp canvas
+              var dpr = window.devicePixelRatio || 1;
+              var rect = el.getBoundingClientRect();
+              var rw = Math.floor(rect.width) || w;
+              var rh = Math.floor(rect.height) || h;
+
               var canvas = document.createElement('canvas');
               canvas.id = el.id + '-canvas';
-              canvas.width = w;
-              canvas.height = h;
+              canvas.width = rw * dpr;
+              canvas.height = rh * dpr;
               canvas.style.width = '100%';
               canvas.style.height = '100%';
               canvas.style.display = 'block';
@@ -82,27 +99,127 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
                   if (!ctx) { setTimeout(function() { tryInit(attempts + 1); }, 100); return; }
                 } catch (e) { setTimeout(function() { tryInit(attempts + 1); }, 100); return; }
 
-                import('/wasm/hw_1781798679.js').then(async function(mod) {
-                  await mod.default();
+                getWasmMod().then(function(mod) {
                   var fn = mod['create_' + widget];
                   if (!fn) throw new Error('create_' + widget + ' not found');
-                  fn(canvas.id, w, h);
+                  fn(canvas.id, rw, rh);
 
-                  var upd = mod['update_' + widget];
-                  if (upd) {
-                    var t0 = performance.now();
-                    (function loop() { upd(canvas.id, w, h, (performance.now() - t0) / 1000); requestAnimationFrame(loop); })();
+                  // Reset button for widgets that support it
+                  var resetWidgets = { cellular_automata: 'Reset' };
+                  if (resetWidgets[widget]) {
+                    var btn = document.createElement('button');
+                    btn.className = 'wasm-reset-btn';
+                    btn.textContent = resetWidgets[widget];
+                    btn.setAttribute('aria-label', 'Reset ' + widget);
+                    btn.addEventListener('click', function() {
+                      fn(canvas.id, rw, rh);
+                    });
+                    el.appendChild(btn);
                   }
 
+                  // Time-animated widgets need requestAnimationFrame
+                  var timeAnimatedWidgets = {
+                    fourier_viz: true,
+                    generative: function(cid, cw, ch, t) { return [cid, cw, ch, 42, 1.0, 100, t]; },
+                    cellular_automata: true,
+                    physics: true,
+                  };
+
+                  if (timeAnimatedWidgets[widget]) {
+                    var upd = mod['update_' + widget];
+                    if (upd) {
+                      var t0 = performance.now();
+                      var argBuilder = typeof timeAnimatedWidgets[widget] === 'function' ? timeAnimatedWidgets[widget] : null;
+                      (function loop() {
+                        var elapsed = (performance.now() - t0) / 1000;
+                        if (argBuilder) {
+                          upd.apply(null, argBuilder(canvas.id, rw, rh, elapsed));
+                        } else {
+                          upd(canvas.id, rw, rh, elapsed);
+                        }
+                        requestAnimationFrame(loop);
+                      })();
+                    }
+                  }
+
+                  // Data-driven widgets update via endpoint fetch
                   if (endpoint) {
                     function fetchData() {
                       fetch(endpoint).then(function(r) { return r.json(); }).then(function(d) {
+                        if (d && d.error) return; // skip error responses
                         var dfn = mod['update_' + widget];
-                        if (dfn) dfn(canvas.id, w, h, JSON.stringify(d));
+                        if (dfn) dfn(canvas.id, rw, rh, JSON.stringify(d));
                       }).catch(function() {});
                     }
                     fetchData();
                     if (interval > 0) setInterval(fetchData, interval);
+                  }
+
+                  // Interactive widgets: regex playground
+                  if (widget === 'regex_playground') {
+                    var rxState = { pattern: '', test: '', cursor_pos: 0, focused: 'pattern', cursor_blink: true };
+                    var rxUpd = mod['update_regex_playground'];
+
+                    function rxRender() {
+                      if (rxUpd) rxUpd(canvas.id, rw, rh, JSON.stringify(rxState));
+                    }
+
+                    // Cursor blink interval
+                    setInterval(function() {
+                      rxState.cursor_blink = !rxState.cursor_blink;
+                      rxRender();
+                    }, 530);
+
+                    // Click to focus fields
+                    canvas.addEventListener('click', function(e) {
+                      var rect = canvas.getBoundingClientRect();
+                      var scaleX = canvas.width / rect.width;
+                      var scaleY = canvas.height / rect.height;
+                      var y = (e.clientY - rect.top) * scaleY;
+                      rxState.focused = y < 75 ? 'pattern' : 'test';
+                      rxState.cursor_pos = rxState.focused === 'pattern' ? rxState.pattern.length : rxState.test.length;
+                      rxRender();
+                    });
+
+                    // Keyboard handling
+                    canvas.addEventListener('keydown', function(e) {
+                      e.preventDefault();
+                      var field = rxState.focused === 'pattern' ? 'pattern' : 'test';
+                      var str = rxState[field];
+
+                      if (e.key === 'Backspace') {
+                        if (rxState.cursor_pos > 0) {
+                          rxState[field] = str.slice(0, rxState.cursor_pos - 1) + str.slice(rxState.cursor_pos);
+                          rxState.cursor_pos--;
+                        }
+                      } else if (e.key === 'Delete') {
+                        if (rxState.cursor_pos < str.length) {
+                          rxState[field] = str.slice(0, rxState.cursor_pos) + str.slice(rxState.cursor_pos + 1);
+                        }
+                      } else if (e.key === 'ArrowLeft') {
+                        if (rxState.cursor_pos > 0) rxState.cursor_pos--;
+                      } else if (e.key === 'ArrowRight') {
+                        if (rxState.cursor_pos < str.length) rxState.cursor_pos++;
+                      } else if (e.key === 'Home') {
+                        rxState.cursor_pos = 0;
+                      } else if (e.key === 'End') {
+                        rxState.cursor_pos = str.length;
+                      } else if (e.key === 'Tab') {
+                        rxState.focused = rxState.focused === 'pattern' ? 'test' : 'pattern';
+                        rxState.cursor_pos = rxState.focused === 'pattern' ? rxState.pattern.length : rxState.test.length;
+                      } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+                        rxState[field] = str.slice(0, rxState.cursor_pos) + e.key + str.slice(rxState.cursor_pos);
+                        rxState.cursor_pos++;
+                      } else {
+                        return; // unhandled
+                      }
+
+                      rxState.cursor_blink = true;
+                      rxRender();
+                    });
+
+                    canvas.focus();
+                    rxRender();
                   }
                 }).catch(function(err) {
                   el.innerHTML = '<div class="wasm-error"><p>Failed to load widget.</p><p class="wasm-error-detail">' + (err.message || err) + '</p></div>';
@@ -129,11 +246,14 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
 </script>
 
 <style>
-  .wasm-embed { position: relative; border: 1px solid #1a1a2e; overflow: hidden; background: #0a0a0a; }
+  .wasm-embed { position: relative; border: 1px solid var(--border); overflow: hidden; background: var(--bg-secondary); max-width: 100%; width: 100%; }
+  .wasm-reset-btn { position: absolute; top: 8px; right: 8px; background: var(--bg-card); color: var(--accent); border: 1px solid var(--accent); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 11px; opacity: 0; transition: opacity 0.2s; z-index: 10; }
+  .wasm-embed:hover .wasm-reset-btn { opacity: 1; }
+  .wasm-reset-btn:hover { background: var(--accent); color: var(--bg-primary); }
   .wasm-skeleton { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 12px; }
-  .skeleton-pulse { width: 60%; height: 8px; background: linear-gradient(90deg, #1a1a2e 25%, #2a2a4e 50%, #1a1a2e 75%); background-size: 200% 100%; animation: pulse 1.5s ease-in-out infinite; border-radius: 4px; }
-  .skeleton-text { color: #666; font-size: 12px; font-family: monospace; }
-  .wasm-error { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; color: #ff6b6b; font-family: monospace; font-size: 13px; text-align: center; padding: 16px; }
-  .wasm-error-detail { color: #888; font-size: 11px; margin-top: 8px; }
+  .skeleton-pulse { width: 60%; height: 8px; background: linear-gradient(90deg, var(--border) 25%, var(--bg-card) 50%, var(--border) 75%); background-size: 200% 100%; animation: pulse 1.5s ease-in-out infinite; border-radius: 4px; }
+  .skeleton-text { color: var(--text-secondary); font-size: 12px; font-family: monospace; }
+  .wasm-error { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--accent-warm); font-family: monospace; font-size: 13px; text-align: center; padding: 16px; }
+  .wasm-error-detail { color: var(--text-secondary); font-size: 11px; margin-top: 8px; }
   @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 </style>

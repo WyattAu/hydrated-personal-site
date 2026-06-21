@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal } from 'solid-js';
+import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry, EtfPerformance } from '../../lib/types';
 
 interface PerformanceMetricsProps {
@@ -31,26 +32,25 @@ function MetricCard(props: {
   negative?: boolean;
 }) {
   const accentColor = () => {
-    const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    const v = getThemeColors().accent;
     return v || '#00e5ff';
   };
 
   return (
-    <div
-      class="p-4 border transition-colors"
+    <output
+      class="p-4 border block transition-colors"
       style={{
         'border-color': 'var(--border)',
         background: 'var(--bg-card)',
       }}
-      role="status"
       aria-label={`${props.label}: ${props.value}`}
     >
       <p
         class="font-mono font-bold tracking-wider mb-1"
         style={{
           color: 'var(--text-secondary)',
-          fontSize: '9px',
-          letterSpacing: '0.3em',
+          'font-size': '9px',
+          'letter-spacing': '0.3em',
         }}
       >
         {props.label.toUpperCase()}
@@ -73,7 +73,7 @@ function MetricCard(props: {
           {props.sublabel}
         </p>
       </Show>
-    </div>
+    </output>
   );
 }
 
@@ -89,7 +89,7 @@ export default function PerformanceMetrics(props: PerformanceMetricsProps) {
   const formatDrawdown = (v: number) => `${v.toFixed(2)}%`;
 
   const accentColor = () => {
-    const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    const v = getThemeColors().accent;
     return v || '#00e5ff';
   };
 
@@ -114,26 +114,26 @@ export default function PerformanceMetrics(props: PerformanceMetricsProps) {
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           <MetricCard
             label="Total Return"
-            value={formatPct(perf()?.total_return)}
-            color={perf()?.total_return >= 0 ? '#69f0ae' : '#f44336'}
+            value={formatPct(perf()?.total_return ?? 0)}
+            color={(perf()?.total_return ?? 0) >= 0 ? '#69f0ae' : '#f44336'}
           />
           <MetricCard
             label="Annualized Return"
-            value={formatPct(perf()?.annualized_return)}
-            color={perf()?.annualized_return >= 0 ? '#69f0ae' : '#f44336'}
+            value={formatPct(perf()?.annualized_return ?? 0)}
+            color={(perf()?.annualized_return ?? 0) >= 0 ? '#69f0ae' : '#f44336'}
           />
           <MetricCard
             label="Volatility"
-            value={`${perf()?.volatility.toFixed(2)}%`}
+            value={`${(perf()?.volatility ?? 0).toFixed(2)}%`}
             sublabel="Annualized std dev"
           />
           <MetricCard
             label="Sharpe Ratio"
-            value={formatRatio(perf()?.sharpe_ratio)}
+            value={formatRatio(perf()?.sharpe_ratio ?? 0)}
             color={
-              perf()?.sharpe_ratio >= 1
+              (perf()?.sharpe_ratio ?? 0) >= 1
                 ? '#69f0ae'
-                : perf()?.sharpe_ratio >= 0
+                : (perf()?.sharpe_ratio ?? 0) >= 0
                   ? accentColor()
                   : '#f44336'
             }
@@ -141,7 +141,7 @@ export default function PerformanceMetrics(props: PerformanceMetricsProps) {
           />
           <MetricCard
             label="Max Drawdown"
-            value={formatDrawdown(perf()?.max_drawdown)}
+            value={formatDrawdown(perf()?.max_drawdown ?? 0)}
             negative
             sublabel="Peak to trough"
           />

@@ -1,5 +1,18 @@
 import { createSignal, onCleanup, onMount } from 'solid-js';
 import type { EarthquakeFeature } from '../../lib/types';
+import { recordFetch } from './StaleIndicator';
+
+interface CountryData {
+  name: string;
+  capital?: string;
+  population?: number;
+  area?: number;
+  region?: string;
+  languages?: Record<string, string>;
+  currencies?: Record<string, { name: string; symbol: string }>;
+  gdp?: number;
+  lifeExpectancy?: number;
+}
 
 interface MapInstance {
   remove: () => void;
@@ -96,7 +109,7 @@ const COUNTRIES = [
 
 function findCountry(lat: number, lon: number): string {
   let closest = 'Unknown Location';
-  let minDist = Infinity;
+  let minDist = Number.POSITIVE_INFINITY;
   for (const c of COUNTRIES) {
     const dist = Math.sqrt((lat - c.lat) ** 2 + (lon - c.lon) ** 2);
     if (dist < minDist) {
@@ -142,11 +155,102 @@ export default function WorldMap() {
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
   const [selectedCountry, setSelectedCountry] = createSignal<string | null>(null);
+  const [countryData, setCountryData] = createSignal<CountryData | null>(null);
+  const [countryLoading, setCountryLoading] = createSignal(false);
 
   let mapRef: HTMLDivElement | undefined;
   let map: MapInstance | undefined;
   const markers: Marker[] = [];
+  const earthquakeMarkers: Marker[] = [];
   let tileLayer: TileLayer | undefined;
+
+  const COUNTRY_NAME_TO_CODE: Record<string, string> = {
+    'United States': 'US',
+    Canada: 'CA',
+    Mexico: 'MX',
+    Brazil: 'BR',
+    Argentina: 'AR',
+    'United Kingdom': 'GB',
+    France: 'FR',
+    Germany: 'DE',
+    Italy: 'IT',
+    Spain: 'ES',
+    Poland: 'PL',
+    Ukraine: 'UA',
+    Russia: 'RU',
+    China: 'CN',
+    Japan: 'JP',
+    'South Korea': 'KR',
+    India: 'IN',
+    Australia: 'AU',
+    'South Africa': 'ZA',
+    Nigeria: 'NG',
+    Egypt: 'EG',
+    Turkey: 'TR',
+    'Saudi Arabia': 'SA',
+    Indonesia: 'ID',
+    Pakistan: 'PK',
+    Bangladesh: 'BD',
+    Vietnam: 'VN',
+    Thailand: 'TH',
+    Iran: 'IR',
+    Iraq: 'IQ',
+    Israel: 'IL',
+    Sweden: 'SE',
+    Norway: 'NO',
+    Finland: 'FI',
+    Denmark: 'DK',
+    Ireland: 'IE',
+    Switzerland: 'CH',
+    Austria: 'AT',
+    Belgium: 'BE',
+    Netherlands: 'NL',
+    Portugal: 'PT',
+    Greece: 'GR',
+    'Czech Republic': 'CZ',
+    Colombia: 'CO',
+    Peru: 'PE',
+    Chile: 'CL',
+    Kenya: 'KE',
+    Ethiopia: 'ET',
+    Morocco: 'MA',
+    Algeria: 'DZ',
+    Tanzania: 'TZ',
+    Cuba: 'CU',
+    Venezuela: 'VE',
+    Philippines: 'PH',
+    Malaysia: 'MY',
+    Singapore: 'SG',
+    'New Zealand': 'NZ',
+    Iceland: 'IS',
+    Croatia: 'HR',
+    Serbia: 'RS',
+    Romania: 'RO',
+    Hungary: 'HU',
+    Bulgaria: 'BG',
+    Slovakia: 'SK',
+    Lithuania: 'LT',
+    Latvia: 'LV',
+    Estonia: 'EE',
+    Slovenia: 'SI',
+    Cyprus: 'CY',
+    Luxembourg: 'LU',
+    Malta: 'MT',
+    Lebanon: 'LB',
+    Jordan: 'JO',
+    Kuwait: 'KW',
+    Qatar: 'QA',
+    Bahrain: 'BH',
+    Oman: 'OM',
+    UAE: 'AE',
+    Nepal: 'NP',
+    'Sri Lanka': 'LK',
+    Myanmar: 'MM',
+    Cambodia: 'KH',
+    Laos: 'LA',
+    Mongolia: 'MN',
+    Afghanistan: 'AF',
+  };
 
   function getMagnitudeColor(mag: number | null): string {
     if (mag === null) return '#888888';
@@ -165,11 +269,11 @@ export default function WorldMap() {
   }
 
   function addEarthquakeMarkers(
-    leafletMap: any,
+    leafletMap: import('leaflet').Map,
     features: EarthquakeFeature[],
     L: typeof import('leaflet'),
   ) {
-    features.forEach((eq: EarthquakeFeature) => {
+    for (const eq of features) {
       const [lon, lat] = eq.geometry.coordinates;
       const mag = eq.properties.mag;
       const color = getMagnitudeColor(mag);
@@ -190,8 +294,8 @@ export default function WorldMap() {
           </div>`,
         )
         .addTo(leafletMap);
-      markers.push(m);
-    });
+      earthquakeMarkers.push(m);
+    }
   }
 
   onMount(async () => {
@@ -233,7 +337,7 @@ export default function WorldMap() {
         pane: 'overlayPane',
       }).addTo(leafletMap);
 
-      CAPITALS.forEach((cap) => {
+      for (const cap of CAPITALS) {
         const m = L.circleMarker([cap.lat, cap.lon], {
           radius: 4,
           color: '#00e5ff',
@@ -248,7 +352,7 @@ export default function WorldMap() {
           })
           .addTo(leafletMap);
         markers.push(m);
-      });
+      }
 
       // Load cached earthquakes immediately
       const cached = loadCachedEarthquakes();
@@ -265,18 +369,56 @@ export default function WorldMap() {
 
         if (data.features) {
           storeCachedEarthquakes(data.features);
-          // Clear old markers (capitals stay), add fresh earthquake markers
-          if (cached.length === 0) {
-            addEarthquakeMarkers(leafletMap, data.features, L);
-          }
+          // Clear old earthquake markers (keep capitals), add fresh ones
+          for (const m of earthquakeMarkers) m.remove();
+          earthquakeMarkers.length = 0;
+          addEarthquakeMarkers(leafletMap, data.features, L);
+          setLoading(false);
+          recordFetch('earthquakes');
         }
       } catch {
         // Cache fallback already displayed
       }
 
-      leafletMap.on('click', (e: { latlng: { lat: number; lng: number } }) => {
+      leafletMap.on('click', async (e: { latlng: { lat: number; lng: number } }) => {
         const country = findCountry(e.latlng.lat, e.latlng.lng);
         setSelectedCountry(country);
+        setCountryData(null);
+        setCountryLoading(true);
+
+        const code = COUNTRY_NAME_TO_CODE[country];
+        if (!code) {
+          setCountryLoading(false);
+          return;
+        }
+
+        try {
+          const [countryRes, wbRes] = await Promise.all([
+            fetch(`/api/restcountries?code=${code}`),
+            fetch(
+              `/api/world-bank?country=${code}&indicators=SP.DYN.LE00.IN,SP.POP.TOTL,NY.GDP.MKTP.CD,EN.ATM.CO2E.PC,SP.URB.TOTL.IN.ZS`,
+            ),
+          ]);
+
+          const cData = countryRes.ok ? await countryRes.json() : null;
+          const wbData = wbRes.ok ? await wbRes.json() : {};
+
+          if (cData) {
+            setCountryData({
+              name: cData.name?.common || country,
+              capital: cData.capital?.[0],
+              population: cData.population,
+              area: cData.area,
+              region: cData.region,
+              languages: cData.languages,
+              currencies: cData.currencies,
+              gdp: wbData['NY.GDP.MKTP.CD']?.value,
+              lifeExpectancy: wbData['SP.DYN.LE00.IN']?.value,
+            });
+          }
+          recordFetch('restcountries');
+        } catch {}
+        setCountryLoading(false);
       });
 
       map = leafletMap;
@@ -288,7 +430,8 @@ export default function WorldMap() {
   });
 
   onCleanup(() => {
-    markers.forEach((m) => m.remove());
+    for (const m of markers) m.remove();
+    for (const m of earthquakeMarkers) m.remove();
     tileLayer?.remove();
     map?.remove();
   });
@@ -338,17 +481,119 @@ export default function WorldMap() {
 
       {selectedCountry() && (
         <div
-          class="absolute bottom-4 left-4 px-3 py-2 border font-mono text-xs z-10"
-          style="background: var(--bg-card); border-color: var(--border); color: var(--text-secondary); backdrop-filter: blur(8px);"
+          class="absolute bottom-4 left-4 right-4 md:right-auto md:max-w-sm p-4 border font-mono text-xs z-10"
+          style="background: var(--bg-card); border-color: var(--border); color: var(--text-secondary); backdrop-filter: blur(12px);"
         >
-          {selectedCountry()}
+          <div class="flex items-center justify-between mb-3">
+            <p class="font-mono text-sm font-bold" style="color: var(--accent);">
+              {countryData()?.name || selectedCountry()}
+            </p>
+            <button
+              type="button"
+              class="text-xs cursor-pointer"
+              style="color: var(--text-secondary);"
+              onClick={() => {
+                setSelectedCountry(null);
+                setCountryData(null);
+              }}
+            >
+              Close
+            </button>
+          </div>
+
+          {countryLoading() && (
+            <div class="space-y-2">
+              <div
+                class="h-2 w-full"
+                style="background: var(--border); animation: pulse 1.5s infinite;"
+              />
+              <div
+                class="h-2 w-2/3"
+                style="background: var(--border); animation: pulse 1.5s infinite;"
+              />
+              <div
+                class="h-2 w-1/2"
+                style="background: var(--border); animation: pulse 1.5s infinite;"
+              />
+            </div>
+          )}
+
+          {!countryLoading() && countryData() && (
+            <div class="space-y-1.5">
+              {countryData()?.capital && (
+                <div class="flex justify-between">
+                  <span>Capital</span>
+                  <span style="color: var(--text-primary);">{countryData()?.capital}</span>
+                </div>
+              )}
+              {countryData()?.population && (
+                <div class="flex justify-between">
+                  <span>Population</span>
+                  <span style="color: var(--text-primary);">
+                    {((countryData()?.population ?? 0) / 1e6).toFixed(1)}M
+                  </span>
+                </div>
+              )}
+              {countryData()?.area && (
+                <div class="flex justify-between">
+                  <span>Area</span>
+                  <span style="color: var(--text-primary);">
+                    {(countryData()?.area ?? 0).toLocaleString()} km²
+                  </span>
+                </div>
+              )}
+              {countryData()?.region && (
+                <div class="flex justify-between">
+                  <span>Region</span>
+                  <span style="color: var(--text-primary);">{countryData()?.region}</span>
+                </div>
+              )}
+              {countryData()?.lifeExpectancy && (
+                <div class="flex justify-between">
+                  <span>Life Exp.</span>
+                  <span style="color: var(--text-primary);">
+                    {countryData()?.lifeExpectancy?.toFixed(1)} yrs
+                  </span>
+                </div>
+              )}
+              {countryData()?.gdp && (
+                <div class="flex justify-between">
+                  <span>GDP</span>
+                  <span style="color: var(--accent);">
+                    ${((countryData()?.gdp ?? 0) / 1e12).toFixed(2)}T
+                  </span>
+                </div>
+              )}
+              {countryData()?.languages && (
+                <div class="pt-1 border-t" style="border-color: var(--border);">
+                  <span class="block mb-1">Languages</span>
+                  <span style="color: var(--text-primary);">
+                    {Object.values(countryData()?.languages ?? {}).join(', ')}
+                  </span>
+                </div>
+              )}
+              {countryData()?.currencies && (
+                <div class="pt-1 border-t" style="border-color: var(--border);">
+                  <span class="block mb-1">Currency</span>
+                  <span style="color: var(--text-primary);">
+                    {Object.values(countryData()?.currencies ?? {})
+                      .map((c) => `${c.name} (${c.symbol || ''})`)
+                      .join(', ')}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!countryLoading() && !countryData() && selectedCountry() && (
+            <p style="color: var(--text-secondary);">No data available for this location.</p>
+          )}
         </div>
       )}
 
       <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
         .leaflet-popup-content-wrapper {
           background: var(--bg-card) !important;
           color: var(--text-primary) !important;

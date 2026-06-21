@@ -60,7 +60,7 @@ export default function TickerBar() {
   });
 
   return (
-    <div
+    <output
       style={{
         display: 'flex',
         'align-items': 'center',
@@ -72,7 +72,6 @@ export default function TickerBar() {
         'font-size': '11px',
         overflow: 'hidden',
       }}
-      role="status"
       aria-label="Cryptocurrency price ticker"
     >
       <For each={tickers()}>
@@ -119,6 +118,6 @@ export default function TickerBar() {
           })}
         </span>
       </Show>
-    </div>
+    </output>
   );
 }

@@ -1,199 +1,199 @@
 import { For, createSignal, onCleanup, onMount } from 'solid-js';
-import { storeMetric, getMetricTrend } from '../../lib/metrics-history';
+import { recordFetch } from './StaleIndicator';
 
-// biome-ignore lint/correctness/noUnusedVariables: interface used for type documentation
-interface Metric {
-  key: string;
-  label: string;
-  value: () => string;
-  change?: () => number | null;
-  refreshMs: number;
-}
+// ─── Data Hooks ─────────────────────────────────────────────────────
 
-function useCryptoPrice(symbol: string) {
-  const [price, setPrice] = createSignal<number | null>(null);
-  const [prev, setPrev] = createSignal<number | null>(null);
-
-  async function fetch_() {
-    try {
-      const res = await fetch('/api/crypto-ticker');
-      const data = await res.json();
-      const match = Array.isArray(data)
-        ? data.find((t: { symbol: string }) => t.symbol === symbol)
-        : null;
-      if (match) {
-        setPrev(price());
-        setPrice(Number.parseFloat(match.lastPrice));
-        storeMetric(symbol, Number.parseFloat(match.lastPrice));
-      }
-    } catch {}
-  }
-
-  onMount(() => {
+function useCryptoTicker() {
+  const [data, setData] = createSignal<
+    Record<string, { price: number; change: number; volume: number }>
+  >({});
+  onMount(async () => {
+    async function fetch_() {
+      try {
+        const res = await fetch('/api/crypto-ticker');
+        if (!res.ok) return;
+        const raw = await res.json();
+        const map: Record<string, { price: number; change: number; volume: number }> = {};
+        for (const e of (raw.data || []) as Array<{
+          symbol: string;
+          price: number;
+          change?: number;
+          volume?: number;
+        }>) {
+          map[e.symbol] = { price: e.price || 0, change: e.change || 0, volume: e.volume || 0 };
+        }
+        setData(map);
+        recordFetch('crypto-ticker');
+      } catch {}
+    }
     fetch_();
-    const id = setInterval(fetch_, 10_000);
+    const id = setInterval(fetch_, 15_000);
     onCleanup(() => clearInterval(id));
   });
-
-  return {
-    value: () => {
-      const p = price();
-      return p !== null ? `$${p.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : 'N/A';
-    },
-    change: () => {
-      const p = price();
-      const pr = prev();
-      if (p === null || pr === null || pr === 0) return null;
-      return ((p - pr) / pr) * 100;
-    },
-    trend: () => getMetricTrend(symbol),
-  };
+  return data;
 }
 
-function useSp500() {
-  const [price, setPrice] = createSignal<number | null>(null);
-  const [change, setChange] = createSignal<number | null>(null);
-
-  async function fetch_() {
-    try {
-      const res = await fetch('/api/stock-chart?symbol=^GSPC&range=1d&interval=5m');
-      const data = await res.json();
-      const quotes = data?.chart?.result?.[0]?.indicators?.quote?.[0];
-      if (quotes?.close) {
-        const closes = quotes.close.filter((v: number | null) => v !== null);
-        if (closes.length >= 2) {
-          setPrice(closes[closes.length - 1]);
-          setChange(((closes[closes.length - 1] - closes[0]) / closes[0]) * 100);
-          storeMetric('SP500', closes[closes.length - 1]);
+function useStockQuote(symbols: string) {
+  const [data, setData] = createSignal<
+    Record<string, { price: number; change: number; changePct: number; name: string }>
+  >({});
+  onMount(async () => {
+    async function fetch_() {
+      try {
+        const res = await fetch(`/api/stock-quote?symbols=${symbols}`);
+        if (!res.ok) return;
+        const raw = await res.json();
+        const map: Record<
+          string,
+          { price: number; change: number; changePct: number; name: string }
+        > = {};
+        for (const e of (raw.data || []) as Array<{
+          symbol: string;
+          price: number;
+          change: number;
+          changePct: number;
+          name: string;
+        }>) {
+          map[e.symbol] = {
+            price: e.price || 0,
+            change: e.change || 0,
+            changePct: e.changePct || 0,
+            name: e.name || e.symbol,
+          };
         }
-      }
-    } catch {}
-  }
-
-  onMount(() => {
+        setData(map);
+        recordFetch('stock-quote');
+      } catch {}
+    }
     fetch_();
     const id = setInterval(fetch_, 60_000);
     onCleanup(() => clearInterval(id));
   });
+  return data;
+}
 
-  return {
-    value: () => {
-      const p = price();
-      return p !== null ? p.toLocaleString(undefined, { maximumFractionDigits: 2 }) : 'N/A';
-    },
-    change,
-    trend: () => getMetricTrend('SP500'),
-  };
+function useMempool() {
+  const [data, setData] = createSignal<{ fastest: number; halfHour: number; hour: number } | null>(
+    null,
+  );
+  onMount(async () => {
+    async function fetch_() {
+      try {
+        const res = await fetch('/api/mempool');
+        if (!res.ok) return;
+        const raw = await res.json();
+        if (raw.fees)
+          setData({
+            fastest: raw.fees.fastestFee,
+            halfHour: raw.fees.halfHourFee,
+            hour: raw.fees.hourFee,
+          });
+        recordFetch('mempool');
+      } catch {}
+    }
+    fetch_();
+    const id = setInterval(fetch_, 60_000);
+    onCleanup(() => clearInterval(id));
+  });
+  return data;
+}
+
+function useBinanceFutures() {
+  const [data, setData] = createSignal<{
+    fundingRate: number;
+    openInterest: number;
+    longShortRatio: number;
+    takerBuySellRatio: number;
+  } | null>(null);
+  onMount(async () => {
+    try {
+      const res = await fetch('/api/binance-futures');
+      if (!res.ok) return;
+      const raw = await res.json();
+      setData({
+        fundingRate: raw.funding_rate || 0,
+        openInterest: raw.open_interest || 0,
+        longShortRatio: raw.long_short_ratio || 0,
+        takerBuySellRatio: raw.taker_buy_sell_ratio || 0,
+      });
+      recordFetch('binance-futures');
+    } catch {}
+  });
+  return data;
 }
 
 function useFearGreed() {
-  const [value, setValue] = createSignal<number | null>(null);
-  const [label, setLabel] = createSignal<string>('');
-
-  async function fetch_() {
+  const [data, setData] = createSignal<{ value: string; classification: string } | null>(null);
+  onMount(async () => {
     try {
       const res = await fetch('/api/fear-greed');
-      const data = await res.json();
-      if (data?.data?.[0]) {
-        const v = Number.parseInt(data.data[0].value);
-        setValue(v);
-        setLabel(data.data[0].value_classification);
-        storeMetric('fear-greed', v);
+      if (!res.ok) return;
+      const raw = await res.json();
+      if (raw.data?.[0]) {
+        setData({ value: raw.data[0].value, classification: raw.data[0].value_classification });
+        recordFetch('fear-greed');
       }
     } catch {}
-  }
-
-  onMount(() => {
-    fetch_();
-    const id = setInterval(fetch_, 5 * 60_000);
-    onCleanup(() => clearInterval(id));
   });
-
-  return {
-    value: () => {
-      const v = value();
-      return v !== null ? `${v}` : 'N/A';
-    },
-    displayLabel: label,
-    change: () => null,
-    trend: () => getMetricTrend('fear-greed'),
-  };
+  return data;
 }
 
 function useKpIndex() {
-  const [kp, setKp] = createSignal<number | null>(null);
-
-  async function fetch_() {
+  const [data, setData] = createSignal<string>('N/A');
+  onMount(async () => {
     try {
       const res = await fetch('/api/kp-index');
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        const latest = data[data.length - 1];
-        const v = Number.parseFloat(latest.kp_index);
-        setKp(v);
-        storeMetric('kp-index', v);
+      if (!res.ok) return;
+      const raw = await res.json();
+      if (Array.isArray(raw) && raw.length > 0) {
+        const latest = raw[raw.length - 1];
+        setData(Array.isArray(latest) ? String(latest[1]) : String(latest.kp_index));
+        recordFetch('kp-index');
       }
     } catch {}
-  }
-
-  onMount(() => {
-    fetch_();
-    const id = setInterval(fetch_, 10 * 60_000);
-    onCleanup(() => clearInterval(id));
   });
-
-  return {
-    value: () => {
-      const k = kp();
-      return k !== null ? k.toFixed(1) : 'N/A';
-    },
-    change: () => null,
-    trend: () => getMetricTrend('kp-index'),
-  };
+  return data;
 }
 
-function useMempoolFees() {
-  const [fees, setFees] = createSignal<{ fastest: number; mid: number } | null>(null);
-
-  async function fetch_() {
+function useEarthquakes() {
+  const [count, setCount] = createSignal(0);
+  onMount(async () => {
     try {
-      const res = await fetch('/api/mempool');
-      const data = await res.json();
-      if (data?.fees) {
-        setFees({
-          fastest: data.fees.fastestFee,
-          mid: data.fees.halfHourFee,
-        });
-        storeMetric('mempool', data.fees.fastestFee);
-      }
+      const res = await fetch('/api/earthquakes');
+      if (!res.ok) return;
+      const raw = await res.json();
+      setCount((raw.features || []).length);
+      recordFetch('earthquakes');
     } catch {}
-  }
-
-  onMount(() => {
-    fetch_();
-    const id = setInterval(fetch_, 60_000);
-    onCleanup(() => clearInterval(id));
   });
-
-  return {
-    value: () => {
-      const f = fees();
-      return f !== null ? `${f.fastest} sat` : 'N/A';
-    },
-    change: () => null,
-    trend: () => getMetricTrend('mempool'),
-  };
+  return count;
 }
+
+function useExchangeRates() {
+  const [rates, setRates] = createSignal<Record<string, number>>({});
+  onMount(async () => {
+    try {
+      const res = await fetch('/api/exchange-rates');
+      if (!res.ok) return;
+      const raw = await res.json();
+      setRates(raw.rates || {});
+      recordFetch('exchange-rates');
+    } catch {}
+  });
+  return rates;
+}
+
+// ─── Shared Components ──────────────────────────────────────────────
 
 function SkeletonCard() {
   return (
-    <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+    <div class="p-3 border" style="border-color: var(--border); background: var(--bg-card);">
       <div
-        class="h-2 w-16 mb-3"
+        class="h-2 w-16 mb-2"
         style="background: var(--border); animation: pulse 1.5s infinite;"
       />
       <div
-        class="h-6 w-24 mb-1"
+        class="h-5 w-20 mb-1"
         style="background: var(--border); animation: pulse 1.5s infinite;"
       />
       <div class="h-2 w-12" style="background: var(--border); animation: pulse 1.5s infinite;" />
@@ -201,127 +201,249 @@ function SkeletonCard() {
   );
 }
 
-function TrendArrow(props: { trend: 'increasing' | 'decreasing' | 'stable' }) {
-  return (
-    <span
-      class="trend-arrow"
-      style={{
-        color:
-          props.trend === 'increasing'
-            ? '#69f0ae'
-            : props.trend === 'decreasing'
-              ? '#f44336'
-              : 'var(--text-secondary)',
-        'font-size': '11px',
-        'margin-left': '4px',
-        'vertical-align': 'middle',
-      }}
-    >
-      {props.trend === 'increasing' ? '\u25B2' : props.trend === 'decreasing' ? '\u25BC' : '\u25C0'}
-    </span>
-  );
-}
-
 function MetricCard(props: {
   label: string;
   value: string;
-  change?: number | null;
   sublabel?: string;
-  trend?: 'increasing' | 'decreasing' | 'stable';
+  color?: string;
 }) {
   return (
-    <div
-      class="p-4 border transition-colors"
+    <output
+      class="p-3 border block"
       style="border-color: var(--border); background: var(--bg-card);"
-      role="status"
       aria-label={`${props.label}: ${props.value}`}
     >
       <p
-        class="code-text mb-1 font-bold tracking-wider"
-        style="color: var(--text-secondary); font-size: 9px; letter-spacing: 0.3em;"
+        class="font-mono font-bold tracking-wider mb-1"
+        style={{ color: 'var(--text-secondary)', 'font-size': '9px', 'letter-spacing': '0.3em' }}
       >
-        {props.label.toUpperCase()}
-        {props.trend && props.trend !== 'stable' && <TrendArrow trend={props.trend} />}
+        {props.label}
       </p>
-      <p class="font-mono text-xl font-bold" style="color: var(--text-primary);">
+      <p
+        class="font-mono text-lg font-bold"
+        style={{ color: props.color || 'var(--text-primary)' }}
+      >
         {props.value}
       </p>
-      {props.change !== null && props.change !== undefined && (
-        <p
-          class="code-text mt-1"
-          style={{
-            color:
-              props.change > 0 ? '#69f0ae' : props.change < 0 ? '#f44336' : 'var(--text-secondary)',
-          }}
-        >
-          {props.change > 0 ? '+' : ''}
-          {props.change?.toFixed(2)}%
-        </p>
-      )}
       {props.sublabel && (
-        <p class="code-text mt-1" style="color: var(--text-secondary);">
+        <p class="font-mono text-[10px] mt-0.5" style="color: var(--text-secondary)">
           {props.sublabel}
         </p>
       )}
+    </output>
+  );
+}
+
+function SectionHeader(props: { title: string; source: string }) {
+  return (
+    <div class="flex items-center gap-3 mb-3 mt-6">
+      <p class="label" style="color: var(--accent);">
+        {props.title}
+      </p>
+      <span class="font-mono text-[9px]" style="color: var(--text-secondary);">
+        {props.source}
+      </span>
     </div>
   );
 }
 
+// ─── Main Component ─────────────────────────────────────────────────
+
 export default function MetricCards() {
-  const btc = useCryptoPrice('BTCUSDT');
-  const eth = useCryptoPrice('ETHUSDT');
-  const sp = useSp500();
+  const crypto = useCryptoTicker();
+  const macro = useStockQuote('^VIX,DX-Y.NYB,^TNX,GC=F,SI=F,HG=F,CL=F,BZ=F,^IRX');
+  const spQuote = useStockQuote('^GSPC,^NDX');
+  const mp = useMempool();
+  const futures = useBinanceFutures();
   const fg = useFearGreed();
   const kp = useKpIndex();
-  const mp = useMempoolFees();
+  const quakes = useEarthquakes();
+  const _rates = useExchangeRates();
 
   const [loaded, setLoaded] = createSignal(false);
-
   onMount(() => {
     const t = setTimeout(() => setLoaded(true), 500);
     onCleanup(() => clearTimeout(t));
   });
 
+  const fmt = (v: number, d = 2) => v.toLocaleString(undefined, { maximumFractionDigits: d });
+  const btc = () => crypto().BTCUSDT;
+  const eth = () => crypto().ETHUSDT;
+
   return (
     <div>
-      <p class="label mb-3" style="color: var(--accent);">
-        METRICS
-      </p>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {loaded() ? (
-          <>
-            <MetricCard label="BTC" value={btc.value()} change={btc.change()} trend={btc.trend()} />
-            <MetricCard label="ETH" value={eth.value()} change={eth.change()} trend={eth.trend()} />
+      {loaded() ? (
+        <>
+          {/* ── MACRO RATES ── */}
+          <SectionHeader title="MACRO RATES" source="LIVE · YAHOO / FRED" />
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mb-2">
+            <MetricCard
+              label="VIX"
+              value={macro()['^VIX'] ? fmt(macro()['^VIX'].price) : 'N/A'}
+              sublabel="CBOE"
+            />
+            <MetricCard
+              label="DXY"
+              value={macro()['DX-Y.NYB'] ? fmt(macro()['DX-Y.NYB'].price, 3) : 'N/A'}
+              sublabel="US DOLLAR INDEX"
+            />
+            <MetricCard
+              label="10Y YIELD"
+              value={macro()['^TNX'] ? `${fmt(macro()['^TNX'].price, 3)}%` : 'N/A'}
+              sublabel="US TREASURY"
+            />
+            <MetricCard
+              label="GOLD"
+              value={macro()['GC=F'] ? `$${fmt(macro()['GC=F'].price)}` : 'N/A'}
+              sublabel="COMEX"
+              color="var(--accent)"
+            />
+            <MetricCard
+              label="SILVER"
+              value={macro()['SI=F'] ? `$${fmt(macro()['SI=F'].price, 3)}` : 'N/A'}
+              sublabel="COMEX"
+            />
+            <MetricCard
+              label="COPPER"
+              value={macro()['HG=F'] ? `$${fmt(macro()['HG=F'].price, 4)}` : 'N/A'}
+              sublabel="COMEX HG"
+              color="var(--accent)"
+            />
+            <MetricCard
+              label="OIL WTI"
+              value={macro()['CL=F'] ? `$${fmt(macro()['CL=F'].price)}` : 'N/A'}
+              sublabel="NYMEX"
+            />
+            <MetricCard
+              label="OIL BRENT"
+              value={macro()['BZ=F'] ? `$${fmt(macro()['BZ=F'].price)}` : 'N/A'}
+              sublabel="ICE"
+            />
+          </div>
+
+          {/* ── RISK ASSETS ── */}
+          <SectionHeader title="RISK ASSETS" source="LIVE · YAHOO / BINANCE" />
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mb-2">
             <MetricCard
               label="S&P 500"
-              value={sp.value()}
-              change={sp.change()}
-              trend={sp.trend()}
+              value={spQuote()['^GSPC'] ? fmt(spQuote()['^GSPC'].price) : 'N/A'}
+              sublabel={spQuote()['^GSPC']?.name || 'US EQUITIES'}
             />
             <MetricCard
-              label="Fear & Greed"
-              value={fg.value()}
-              sublabel={fg.displayLabel()}
-              trend={fg.trend()}
+              label="NASDAQ 100"
+              value={spQuote()['^NDX'] ? fmt(spQuote()['^NDX'].price) : 'N/A'}
+              sublabel="US TECH"
             />
-            <MetricCard label="Kp Index" value={kp.value()} trend={kp.trend()} />
             <MetricCard
-              label="Mempool"
-              value={mp.value()}
-              sublabel="fastest fee"
-              trend={mp.trend()}
+              label="BTC / USD"
+              value={btc() ? `$${fmt(btc()?.price)}` : 'N/A'}
+              sublabel="BINANCE"
+              color="var(--accent)"
             />
-          </>
-        ) : (
-          <For each={[1, 2, 3, 4, 5, 6]}>{() => <SkeletonCard />}</For>
-        )}
-      </div>
+            <MetricCard
+              label="ETH / USD"
+              value={eth() ? `$${fmt(eth()?.price)}` : 'N/A'}
+              sublabel="BINANCE"
+            />
+            <MetricCard
+              label="ETH/BTC"
+              value={btc() && eth() ? (eth()?.price / btc()?.price).toFixed(4) : 'N/A'}
+              sublabel="RATIO"
+            />
+            <MetricCard
+              label="GOLD/S&P"
+              value={
+                macro()['GC=F'] && spQuote()['^GSPC']
+                  ? (macro()['GC=F'].price / spQuote()['^GSPC'].price).toFixed(4)
+                  : 'N/A'
+              }
+              sublabel="RATIO"
+            />
+            <MetricCard
+              label="OIL SPREAD"
+              value={
+                macro()['CL=F'] && macro()['BZ=F']
+                  ? `$${fmt(macro()['BZ=F'].price - macro()['CL=F'].price)}`
+                  : 'N/A'
+              }
+              sublabel="BRENT - WTI"
+            />
+            <MetricCard
+              label="FEAR & GREED"
+              value={fg() ? (fg()?.value ?? 'N/A') : 'N/A'}
+              sublabel={fg()?.classification || ''}
+              color="var(--accent)"
+            />
+          </div>
+
+          {/* ── CRYPTO STRUCTURE ── */}
+          <SectionHeader title="CRYPTO STRUCTURE" source="BINANCE PERPETUALS" />
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mb-2">
+            <MetricCard
+              label="BTC MARKET CAP"
+              value={btc() ? `$${fmt((btc()?.price ?? 0) * 19_850_000, 0)}` : 'N/A'}
+              sublabel="ESTIMATED"
+            />
+            <MetricCard
+              label="24H VOLUME"
+              value={btc() ? `$${fmt((btc()?.volume ?? 0) / 1e9, 1)}B` : 'N/A'}
+              sublabel="BINANCE USDT"
+            />
+            <MetricCard
+              label="FUNDING RATE"
+              value={futures() ? `${((futures()?.fundingRate ?? 0) * 100).toFixed(4)}%` : 'N/A'}
+              sublabel="BTC PERP"
+            />
+            <MetricCard
+              label="BTC OI"
+              value={futures() ? fmt(futures()?.openInterest ?? 0, 0) : 'N/A'}
+              sublabel="OPEN INTEREST"
+            />
+            <MetricCard
+              label="LONG/SHORT"
+              value={futures() ? (futures()?.longShortRatio ?? 0).toFixed(2) : 'N/A'}
+              sublabel="BTC TOP TRADERS"
+            />
+            <MetricCard
+              label="NET TAKER"
+              value={futures() ? (futures()?.takerBuySellRatio ?? 0).toFixed(2) : 'N/A'}
+              sublabel="BTC 24H"
+            />
+            <MetricCard label="BTC NVT" value="N/A" sublabel="RATIO" />
+            <MetricCard
+              label="24H CHG"
+              value={btc() ? `${btc()?.change >= 0 ? '+' : ''}${btc()?.change.toFixed(2)}%` : 'N/A'}
+              sublabel="BTCUSDT"
+              color={btc() && btc()?.change >= 0 ? '#69f0ae' : '#f44336'}
+            />
+          </div>
+
+          {/* ── SENTIMENT ── */}
+          <SectionHeader title="SENTIMENT" source="FEAR & GREED / NOAA" />
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
+            <MetricCard
+              label="FEAR & GREED"
+              value={fg() ? (fg()?.value ?? 'N/A') : 'N/A'}
+              sublabel={fg()?.classification || ''}
+              color="var(--accent)"
+            />
+            <MetricCard
+              label="BTC MEMPOOL"
+              value={mp() ? `${mp()?.fastest} sat` : 'N/A'}
+              sublabel="FASTEST FEE"
+            />
+            <MetricCard label="QUAKES (M4.5+)" value={String(quakes())} sublabel="PAST 24H" />
+            <MetricCard label="GEOMAGNETIC" value={kp()} sublabel="KP INDEX · NOAA" />
+          </div>
+        </>
+      ) : (
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+          <For each={Array(16)}>{() => <SkeletonCard />}</For>
+        </div>
+      )}
 
       <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
+        @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
       `}</style>
     </div>
   );

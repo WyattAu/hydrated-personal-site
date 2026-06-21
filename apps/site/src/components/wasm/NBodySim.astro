@@ -20,7 +20,7 @@ const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
   data-height={height}
   data-dt={dt}
   data-g={g}
-  style={`width: ${width}px; height: ${height}px;`}
+  style={`aspect-ratio: ${width} / ${height}; max-width: ${width}px;`}
 >
   <div class="wasm-skeleton">
     <div class="skeleton-pulse"></div>
@@ -187,14 +187,15 @@ const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
     align-items: center;
     gap: 12px;
     padding: 8px 12px;
-    background: #111;
-    border-top: 1px solid #1a1a2e;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
   }
 
   .nbody-sim :global(.nbody-btn) {
-    background: #1a1a2e;
-    color: #00e5ff;
-    border: 1px solid #00e5ff;
+    background: var(--bg-card);
+    color: var(--accent);
+    border: 1px solid var(--accent);
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
@@ -204,12 +205,12 @@ const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
   }
 
   .nbody-sim :global(.nbody-btn:hover) {
-    background: #00e5ff;
-    color: #0a0a0a;
+    background: var(--accent);
+    color: var(--bg-primary);
   }
 
   .nbody-sim :global(.nbody-label) {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 11px;
     font-family: monospace;
     display: flex;
@@ -219,11 +220,11 @@ const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
 
   .nbody-sim :global(.nbody-label input[type="range"]) {
     width: 100px;
-    accent-color: #00e5ff;
+    accent-color: var(--accent);
   }
 
   .nbody-sim :global(.nbody-label span) {
-    color: #00e5ff;
+    color: var(--accent);
     min-width: 36px;
   }
 </style>

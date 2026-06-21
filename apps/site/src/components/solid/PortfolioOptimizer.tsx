@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal } from 'solid-js';
+import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 
 interface PortfolioOptimizerProps {
@@ -19,7 +20,7 @@ function equalWeight(n: number): number[] {
 
 function minimumVariance(
   returns: number[],
-  n: number,
+  _n: number,
 ): { weights: number[]; volatility: number; expectedReturn: number } {
   // Simplified: inverse-volatility weighting
   const vols = returns.map((r) => Math.abs(r) + 0.01);
@@ -32,7 +33,7 @@ function minimumVariance(
 
 function riskParity(
   returns: number[],
-  n: number,
+  _n: number,
 ): { weights: number[]; volatility: number; expectedReturn: number } {
   const vols = returns.map((r) => Math.abs(r) + 0.01);
   const totalInvVol = vols.reduce((s, v) => s + 1 / v, 0);
@@ -88,7 +89,7 @@ const COLORS = [
   '#ff5722',
 ];
 
-function drawPieChart(canvas: HTMLCanvasElement, weights: number[], tickers: string[]) {
+function drawPieChart(canvas: HTMLCanvasElement, weights: number[], _tickers: string[]) {
   const dpr = window.devicePixelRatio || 1;
   const size = Math.min(canvas.clientWidth, 300);
   canvas.width = size * dpr;
@@ -215,8 +216,7 @@ export default function PortfolioOptimizer(props: PortfolioOptimizerProps) {
 
   const accentColor = () => {
     if (typeof document === 'undefined') return '#00e5ff';
-    const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-    return v || '#00e5ff';
+    return getThemeColors().accent || '#00e5ff';
   };
 
   createEffect(() => {

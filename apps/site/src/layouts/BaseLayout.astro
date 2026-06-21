@@ -1,10 +1,13 @@
 ---
+import { SEO } from 'astro-seo';
+
 export interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
   canonical?: string;
   type?: string;
+  noindex?: boolean;
 }
 
 const {
@@ -13,13 +16,13 @@ const {
   ogImage = '/og-image.png',
   canonical = Astro.url.href,
   type = 'website',
+  noindex = false,
 } = Astro.props;
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template below
 const siteName = 'wyatt_au';
 const siteUrl = 'https://wyatt.au';
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template below
+// JSON-LD Schemas
 const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -54,7 +57,6 @@ const personSchema = {
   },
 };
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template below
 const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -71,7 +73,6 @@ const websiteSchema = {
   },
 };
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template below
 const webPageSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -89,30 +90,37 @@ const webPageSchema = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content={type} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={`${siteUrl}${ogImage}`} />
-    <meta property="og:site_name" content={siteName} />
-    <meta property="og:locale" content="en_GB" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={`${siteUrl}${ogImage}`} />
-    <meta name="twitter:creator" content="@_WyattAu_" />
+    <SEO
+      title={title}
+      description={description}
+      canonical={canonical}
+      noindex={noindex}
+      openGraph={{
+        basic: {
+          title: title,
+          type: type,
+          url: canonical,
+          image: `${siteUrl}${ogImage}`,
+        },
+        optional: {
+          siteName: siteName,
+          locale: 'en_GB',
+          description: description,
+        },
+      }}
+      twitter={{
+        card: 'summary_large_image',
+        title: title,
+        description: description,
+        image: `${siteUrl}${ogImage}`,
+        creator: '@_WyattAu_',
+      }}
+    />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#050505" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
     <meta name="author" content="Wyatt Au" />
 
     <!-- Fonts: Inter + JetBrains Mono -->
@@ -123,7 +131,7 @@ const webPageSchema = {
       rel="stylesheet"
     />
 
-    <!-- JSON-LD -->
+    <!-- JSON-LD Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(webPageSchema)} />

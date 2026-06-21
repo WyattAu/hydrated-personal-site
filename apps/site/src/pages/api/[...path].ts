@@ -15,11 +15,12 @@ function setCache(key: string, data: unknown, ttlMs: number): void {
 }
 
 async function fetchJson(url: string, ep: string, init?: RequestInit): Promise<unknown> {
-  const k = ep + ':' + url;
-  if (inflight.has(k)) return inflight.get(k)!;
+  const k = `${ep}:${url}`;
+  const pending = inflight.get(k);
+  if (pending) return pending;
   const p = (async () => {
     const res = await fetch(url, init);
-    if (!res.ok) throw new Error('Upstream ' + res.status);
+    if (!res.ok) throw new Error(`Upstream ${res.status}`);
     return res.json();
   })();
   inflight.set(k, p);
@@ -36,15 +37,6 @@ async function safeFetch(url: string, ep: string, init?: RequestInit): Promise<u
   } catch {
     return null;
   }
-}
-
-function cached(key: string, fetcher: () => Promise<unknown>, ttl: number): Promise<unknown> {
-  const c = getCached(key);
-  if (c) return Promise.resolve(c);
-  return fetcher().then((d: unknown) => {
-    if (d) setCache(key, d, ttl);
-    return d || getCached(key);
-  });
 }
 
 function san(s: string): string {
@@ -83,7 +75,7 @@ export const OPTIONS: APIRoute = () => {
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ url, request }) => {
+export const GET: APIRoute = async ({ url }) => {
   const path = url.pathname.replace(/^\/api\//, '');
 
   if (path === 'health')
@@ -232,7 +224,7 @@ export const GET: APIRoute = async ({ url, request }) => {
     const sym = url.searchParams.get('symbol') || 'BTCUSDT';
     const iv = url.searchParams.get('interval') || '1h';
     const lm = url.searchParams.get('limit') || '100';
-    const ck = 'kl:' + sym + ':' + iv + ':' + lm;
+    const ck = `kl:${sym}:${iv}:${lm}`;
     const c = getCached(ck);
     if (c) return J(c);
     const d = await safeFetch(
@@ -250,7 +242,7 @@ export const GET: APIRoute = async ({ url, request }) => {
     const rng = url.searchParams.get('range') || '1d';
     const iv = url.searchParams.get('interval') || '5m';
     if (!sym) return E('symbol required');
-    const ck = 'st:' + sym + ':' + rng + ':' + iv;
+    const ck = `st:${sym}:${rng}:${iv}`;
     const c = getCached(ck);
     if (c) return J(c);
     const d = await safeFetch(
@@ -267,7 +259,7 @@ export const GET: APIRoute = async ({ url, request }) => {
     const lat = url.searchParams.get('lat');
     const lon = url.searchParams.get('lon');
     if (!lat || !lon) return E('lat and lon required');
-    const ck = 'wx:' + lat + ':' + lon;
+    const ck = `wx:${lat}:${lon}`;
     const c = getCached(ck);
     if (c) return J(c);
     const d = await safeFetch(

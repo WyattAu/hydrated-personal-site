@@ -148,6 +148,10 @@ export interface LLMBenchmarkModel {
   truthfulqa: number;
   gsm8k: number;
   humaneval: number;
+  /** Optional cost in USD per million tokens. Populated from upstream leaderboard when available. */
+  price_per_m_token?: number;
+  /** Optional inference throughput. Populated from upstream leaderboard when available. */
+  tokens_per_sec?: number;
 }
 
 export interface PriceChartProps {

@@ -1,5 +1,4 @@
 ---
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template below
 const navItems = [
   { label: 'PROJECTS', href: '/projects' },
   { label: 'DOSSIER', href: '/dossier' },
@@ -12,7 +11,6 @@ const navItems = [
 
 const currentPath = Astro.url.pathname;
 
-// biome-ignore lint/correctness/noUnusedVariables: used in Astro template below
 function isActive(href: string): boolean {
   if (href === '/') return currentPath === '/';
   return currentPath.startsWith(href) || currentPath === `${href}/`;
@@ -26,7 +24,7 @@ function isActive(href: string): boolean {
     border-color: var(--border);
     backdrop-filter: blur(12px) saturate(180%);
     -webkit-backdrop-filter: blur(12px) saturate(180%);
-    background: rgba(5, 5, 5, 0.6);
+    background: var(--nav-bg);
   "
   role="navigation"
   aria-label="Main navigation"
@@ -86,7 +84,7 @@ function isActive(href: string): boolean {
   <div
     id="mobile-menu"
     class="md:hidden hidden border-t"
-    style="border-color: var(--border); background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(12px);"
+    style="border-color: var(--border); background: var(--nav-bg-solid); backdrop-filter: blur(12px);"
   >
     <div class="flex flex-col px-6 py-4 gap-3">
       {navItems.map((item) => (

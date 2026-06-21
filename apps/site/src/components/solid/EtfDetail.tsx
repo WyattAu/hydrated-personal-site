@@ -1,4 +1,5 @@
 import { For, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 
 interface EtfDetailProps {
@@ -36,8 +37,8 @@ function drawBarChart(canvas: HTMLCanvasElement, data: Record<string, number>) {
   if (!ctx) return;
   ctx.scale(dpr, dpr);
 
-  const bg =
-    getComputedStyle(document.documentElement).getPropertyValue('--bg-card').trim() || '#0c0c0c';
+  const colors = getThemeColors();
+  const bg = colors.bgCard || '#0c0c0c';
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
@@ -59,7 +60,7 @@ function drawBarChart(canvas: HTMLCanvasElement, data: Record<string, number>) {
     ctx.fillStyle = CHART_COLORS[i % CHART_COLORS.length];
     ctx.fillRect(padLeft, y, barW, barH);
 
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.7)';
     ctx.font = '10px "JetBrains Mono", monospace';
     ctx.textAlign = 'right';
     ctx.fillText(label, padLeft - 8, y + barH / 2 + 3);
@@ -82,8 +83,8 @@ function drawDonutChart(canvas: HTMLCanvasElement, data: Record<string, number>)
   if (!ctx) return;
   ctx.scale(dpr, dpr);
 
-  const bg =
-    getComputedStyle(document.documentElement).getPropertyValue('--bg-card').trim() || '#0c0c0c';
+  const colors = getThemeColors();
+  const bg = colors.bgCard || '#0c0c0c';
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
@@ -113,15 +114,14 @@ function drawDonutChart(canvas: HTMLCanvasElement, data: Record<string, number>)
   ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
   ctx.fill();
 
-  const textColor =
-    getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#fff';
+  const textColor = colors.textPrimary || '#fff';
   ctx.fillStyle = textColor;
   ctx.font = 'bold 16px "JetBrains Mono", monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(`${entries.length}`, cx, cy - 8);
   ctx.font = '9px "JetBrains Mono", monospace';
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
   ctx.fillText('REGIONS', cx, cy + 8);
 }
 
@@ -156,7 +156,7 @@ export default function EtfDetail(props: EtfDetailProps) {
   });
 
   const accentColor = () => {
-    const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    const v = getThemeColors().accent;
     return v || '#00e5ff';
   };
 
@@ -256,7 +256,7 @@ export default function EtfDetail(props: EtfDetailProps) {
           TOP 10 HOLDINGS
         </p>
         <div
-          class="border overflow-hidden"
+          class="border overflow-x-auto"
           style={{
             'border-color': 'var(--border)',
           }}

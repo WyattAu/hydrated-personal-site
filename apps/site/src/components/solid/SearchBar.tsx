@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onCleanup } from 'solid-js';
+import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 
 interface SearchBarProps {
@@ -78,8 +79,7 @@ export default function SearchBar(props: SearchBarProps) {
   }
 
   const accentColor = () => {
-    const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-    return v || '#00e5ff';
+    return getThemeColors().accent || '#00e5ff';
   };
 
   return (

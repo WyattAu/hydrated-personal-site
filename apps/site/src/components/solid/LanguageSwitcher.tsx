@@ -1,4 +1,4 @@
-import { Show, createSignal, onMount, For } from 'solid-js';
+import { For, Show, createSignal, onMount } from 'solid-js';
 import type { Lang } from '../../lib/i18n';
 
 const languages: { code: Lang; label: string; native: string }[] = [
@@ -27,7 +27,7 @@ export default function LanguageSwitcher() {
     const pathname = window.location.pathname;
     const stripped = pathname.replace(/^\/(en|zh|ja)(\/|$)/, '/');
     const segments = stripped.split('/').filter(Boolean).map(encodeURIComponent);
-    const newPath = `/${lang}${segments.length > 0 ? '/' + segments.join('/') : '/'}`;
+    const newPath = `/${lang}${segments.length > 0 ? `/${segments.join('/')}` : '/'}`;
     window.location.href = newPath;
   }
 
@@ -51,7 +51,6 @@ export default function LanguageSwitcher() {
       </button>
       <Show when={open()}>
         <ul
-          role="listbox"
           class="absolute right-0 mt-1 min-w-[100px] border"
           style={`
             border-color: var(--border);
@@ -63,9 +62,15 @@ export default function LanguageSwitcher() {
           <For each={languages}>
             {(lang) => (
               <li
-                role="option"
+                tabindex={0}
                 aria-selected={current() === lang.code}
                 onClick={() => switchLang(lang.code)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    switchLang(lang.code);
+                  }
+                }}
                 class="font-mono text-xs font-bold tracking-widest uppercase px-3 py-2 cursor-pointer transition-all"
                 style={`
                   color: ${current() === lang.code ? 'var(--accent)' : 'var(--text-secondary)'};

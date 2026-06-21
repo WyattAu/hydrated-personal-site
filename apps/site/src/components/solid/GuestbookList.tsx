@@ -1,3 +1,4 @@
+import autoAnimate from '@formkit/auto-animate';
 import { For, createSignal, onMount } from 'solid-js';
 
 interface GuestbookEntry {
@@ -11,6 +12,7 @@ export default function GuestbookList() {
   const [entries, setEntries] = createSignal<GuestbookEntry[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
+  let listRef!: HTMLDivElement;
 
   async function fetchEntries() {
     try {
@@ -27,6 +29,10 @@ export default function GuestbookList() {
   }
 
   onMount(() => {
+    autoAnimate(listRef, {
+      duration: 300,
+      easing: 'ease-out',
+    });
     fetchEntries();
     const interval = setInterval(fetchEntries, 30000);
     return () => clearInterval(interval);
@@ -61,23 +67,25 @@ export default function GuestbookList() {
         </p>
       )}
 
-      <For each={entries()}>
-        {(entry) => (
-          <div class="py-4 border-b" style="border-color: var(--border);">
-            <div class="flex items-baseline justify-between mb-1 gap-2">
-              <span class="font-mono text-sm font-bold" style="color: var(--text-primary);">
-                {entry.name}
-              </span>
-              <span class="font-mono text-[10px] shrink-0" style="color: var(--text-secondary);">
-                {formatTime(entry.created_at)}
-              </span>
+      <div ref={listRef}>
+        <For each={entries()}>
+          {(entry) => (
+            <div class="py-4 border-b" style="border-color: var(--border);">
+              <div class="flex items-baseline justify-between mb-1 gap-2">
+                <span class="font-mono text-sm font-bold" style="color: var(--text-primary);">
+                  {entry.name}
+                </span>
+                <span class="font-mono text-[10px] shrink-0" style="color: var(--text-secondary);">
+                  {formatTime(entry.created_at)}
+                </span>
+              </div>
+              <p class="text-sm" style="color: var(--text-secondary);">
+                {entry.message}
+              </p>
             </div>
-            <p class="text-sm" style="color: var(--text-secondary);">
-              {entry.message}
-            </p>
-          </div>
-        )}
-      </For>
+          )}
+        </For>
+      </div>
     </div>
   );
 }

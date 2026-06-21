@@ -116,6 +116,7 @@ export default function CommandPalette() {
           background: 'rgba(0, 0, 0, 0.6)',
           'backdrop-filter': 'blur(8px)',
         }}
+        // biome-ignore lint/a11y/useSemanticElements: native <dialog> requires showModal/close refactor; tracked as tech debt in ROADMAP
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"

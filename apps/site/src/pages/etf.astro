@@ -1,11 +1,11 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Nav from '../components/astro/Nav.astro';
 import Footer from '../components/astro/Footer.astro';
-import ThemeToggle from '../components/solid/ThemeToggle';
-import EtfApp from '../components/solid/EtfApp';
+import Nav from '../components/astro/Nav.astro';
 import AppErrorBoundary from '../components/solid/ErrorBoundary';
+import EtfApp from '../components/solid/EtfApp';
+import ThemeToggle from '../components/solid/ThemeToggle';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
 ---
 
@@ -15,7 +15,7 @@ import '../styles/base.css';
 >
   <Nav />
 
-  <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-28">
     <section class="px-6 md:px-12 lg:px-24 pb-6">
       <p class="label mb-2" style="color: var(--accent);">ETF INTELLIGENCE</p>
       <h1 class="text-2xl md:text-3xl font-bold mb-1">ETF Database & Analysis</h1>
@@ -40,7 +40,7 @@ import '../styles/base.css';
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Correlation Network</p>
           <p class="text-sm mb-4" style="color: var(--text-secondary);">Force-directed graph of ETF correlations based on daily returns.</p>
-          <WasmEmbed widget="correlation" width={600} height={450} />
+          <WasmEmbed widget="correlation" width={500} height={400} />
         </div>
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">How It Works</p>

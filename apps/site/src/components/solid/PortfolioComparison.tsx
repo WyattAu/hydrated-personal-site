@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 
 interface PortfolioComparisonProps {
@@ -17,11 +18,9 @@ function drawComparison(canvas: HTMLCanvasElement, a: EtfEntry, b: EtfEntry) {
   if (!ctx) return;
   ctx.scale(dpr, dpr);
 
-  const bg =
-    getComputedStyle(document.documentElement).getPropertyValue('--bg-card').trim() || '#0c0c0c';
-  const textColor =
-    getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim() ||
-    '#888';
+  const colors = getThemeColors();
+  const bg = colors.bgCard || '#0c0c0c';
+  const textColor = colors.textSecondary || '#888';
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
@@ -44,8 +43,7 @@ function drawComparison(canvas: HTMLCanvasElement, a: EtfEntry, b: EtfEntry) {
   const groupH = chartH / sectors.length;
   const barH = Math.min(12, groupH / 2 - 2);
 
-  const accent =
-    getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#00e5ff';
+  const accent = colors.accent || '#00e5ff';
 
   sectors.forEach((sector, i) => {
     const y = padTop + i * groupH + groupH / 2;
@@ -175,8 +173,7 @@ export default function PortfolioComparison(props: PortfolioComparisonProps) {
   let canvasRef: HTMLCanvasElement | undefined;
 
   const accentColor = () => {
-    const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-    return v || '#00e5ff';
+    return getThemeColors().accent || '#00e5ff';
   };
 
   createEffect(() => {
@@ -228,53 +225,60 @@ export default function PortfolioComparison(props: PortfolioComparisonProps) {
       </div>
 
       {/* Chart */}
-      <Show when={etfA() && etfB()}>
-        <div
-          class="border mb-4"
-          style={{
-            'border-color': 'var(--border)',
-            background: 'var(--bg-secondary)',
-          }}
-        >
-          <canvas
-            ref={canvasRef}
-            class="w-full"
-            style={{ height: '320px' }}
-            role="img"
-            aria-label="Sector allocation comparison chart"
-          />
-        </div>
+      <Show
+        when={etfA() && etfB() ? ([etfA(), etfB()] as [EtfEntry, EtfEntry] | null) : null}
+        keyed
+      >
+        {([a, b]) => (
+          <>
+            <div
+              class="border mb-4"
+              style={{
+                'border-color': 'var(--border)',
+                background: 'var(--bg-secondary)',
+              }}
+            >
+              <canvas
+                ref={canvasRef}
+                class="w-full"
+                style={{ height: '320px' }}
+                role="img"
+                aria-label="Sector allocation comparison chart"
+              />
+            </div>
 
-        {/* Legend */}
-        <div
-          class="flex items-center gap-6 mb-4 font-mono text-xs"
-          style={{ color: 'var(--text-secondary)' }}
-        >
-          <div class="flex items-center gap-2">
-            <span class="inline-block w-3 h-3" style={{ background: accentColor() }} />
-            <span>{etfA()?.ticker}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="inline-block w-3 h-3" style={{ background: '#b388ff' }} />
-            <span>{etfB()?.ticker}</span>
-          </div>
-        </div>
+            {/* Legend */}
+            <div
+              class="flex items-center gap-6 mb-4 font-mono text-xs"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <div class="flex items-center gap-2">
+                <span class="inline-block w-3 h-3" style={{ background: accentColor() }} />
+                <span>{a.ticker}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="inline-block w-3 h-3" style={{ background: '#b388ff' }} />
+                <span>{b.ticker}</span>
+              </div>
+            </div>
 
-        {/* Summary Stats */}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <SummaryCard
-            label="A SECTORS"
-            value={`${Object.keys(etfA()?.sector_allocation).length}`}
-            accent={accentColor()}
-          />
-          <SummaryCard
-            label="B SECTORS"
-            value={`${Object.keys(etfB()?.sector_allocation).length}`}
-            accent="#b388ff"
-          />
-          <SummaryCard label="A TOP SECTOR" value={getTopSector(etfA()!)} accent={accentColor()} />
-          <SummaryCard label="B TOP SECTOR" value={getTopSector(etfB()!)} accent="#b388ff" />
-        </div>
+            {/* Summary Stats */}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <SummaryCard
+                label="A SECTORS"
+                value={`${Object.keys(a.sector_allocation).length}`}
+                accent={accentColor()}
+              />
+              <SummaryCard
+                label="B SECTORS"
+                value={`${Object.keys(b.sector_allocation).length}`}
+                accent="#b388ff"
+              />
+              <SummaryCard label="A TOP SECTOR" value={getTopSector(a)} accent={accentColor()} />
+              <SummaryCard label="B TOP SECTOR" value={getTopSector(b)} accent="#b388ff" />
+            </div>
+          </>
+        )}
       </Show>
 
       <Show when={!etfA() || !etfB()}>
@@ -303,7 +307,7 @@ function SummaryCard(props: { label: string; value: string; accent: string }) {
     >
       <p
         class="font-mono text-xs tracking-wider mb-1"
-        style={{ color: 'var(--text-secondary)', fontSize: '9px' }}
+        style={{ color: 'var(--text-secondary)', 'font-size': '9px' }}
       >
         {props.label}
       </p>

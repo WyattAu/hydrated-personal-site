@@ -1,13 +1,11 @@
 import { createSignal } from 'solid-js';
+import { toast } from 'solid-sonner';
 
 export default function GuestbookForm() {
   const [name, setName] = createSignal('');
   const [message, setMessage] = createSignal('');
   const [website, setWebsite] = createSignal('');
   const [loading, setLoading] = createSignal(false);
-  const [feedback, setFeedback] = createSignal<{ type: 'success' | 'error'; text: string } | null>(
-    null,
-  );
 
   const maxLength = 500;
 
@@ -22,13 +20,12 @@ export default function GuestbookForm() {
 
   async function handleSubmit(e: Event) {
     e.preventDefault();
-    setFeedback(null);
 
     if (website().trim()) return;
 
     const error = validate();
     if (error) {
-      setFeedback({ type: 'error', text: error });
+      toast.error(error);
       return;
     }
 
@@ -44,17 +41,17 @@ export default function GuestbookForm() {
       });
 
       if (res.ok) {
-        setFeedback({ type: 'success', text: 'Entry submitted!' });
+        toast.success('Entry submitted!');
         setName('');
         setMessage('');
       } else if (res.status === 429) {
-        setFeedback({ type: 'error', text: 'Slow down — rate limited. Try again shortly.' });
+        toast.error('Slow down — rate limited. Try again shortly.');
       } else {
         const data = await res.json().catch(() => null);
-        setFeedback({ type: 'error', text: data?.error || 'Something went wrong.' });
+        toast.error(data?.error || 'Something went wrong.');
       }
     } catch {
-      setFeedback({ type: 'error', text: 'Network error. Please try again.' });
+      toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -119,15 +116,6 @@ export default function GuestbookForm() {
           autocomplete="off"
         />
       </div>
-
-      {feedback() && (
-        <p
-          class="font-mono text-xs font-bold"
-          style={feedback()?.type === 'success' ? 'color: #69f0ae;' : 'color: var(--accent-warm);'}
-        >
-          {feedback()?.text}
-        </p>
-      )}
 
       <button
         type="submit"
