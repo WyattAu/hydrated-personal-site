@@ -49,16 +49,19 @@ jobs:
         run: bun install --frozen-lockfile
         working-directory: worker
       - name: Type check site
-        # Use the workspace-local binaries to guarantee the pinned
-        # typescript version (5.9.3). astro sync generates the
-        # .astro/types.d.ts needed by tsc for astro:content and
-        # ImportMeta.env types.
+        # Use node directly to run the workspace's typescript, avoiding
+        # any bunx/npx resolution ambiguity. astro sync generates
+        # .astro/types.d.ts for astro:content and ImportMeta.env.
         run: |
-          ./node_modules/.bin/astro sync
-          ./node_modules/.bin/tsc --noEmit
+          echo "=== TS version ==="
+          node node_modules/typescript/lib/tsc.js --version
+          echo "=== astro sync ==="
+          node node_modules/astro/astro.js sync
+          echo "=== tsc ==="
+          node node_modules/typescript/lib/tsc.js --noEmit
         working-directory: apps/site
       - name: Type check worker
-        run: ./node_modules/.bin/tsc --noEmit
+        run: node node_modules/typescript/lib/tsc.js --noEmit
         working-directory: worker
 
   unit:

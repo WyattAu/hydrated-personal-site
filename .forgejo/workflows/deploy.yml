@@ -41,11 +41,11 @@ jobs:
         run: bunx biome check .
       - name: Type check site
         run: |
-          ./node_modules/.bin/astro sync
-          ./node_modules/.bin/tsc --noEmit
+          node node_modules/astro/astro.js sync
+          node node_modules/typescript/lib/tsc.js --noEmit
         working-directory: apps/site
       - name: Type check worker
-        run: ./node_modules/.bin/tsc --noEmit
+        run: node node_modules/typescript/lib/tsc.js --noEmit
         working-directory: worker
       - name: Run all tests
         run: bunx vitest run --coverage --pool=forks
