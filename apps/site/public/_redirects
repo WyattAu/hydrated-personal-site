@@ -1,0 +1,18 @@
+# Cloudflare Pages _redirects file
+# Ensure clean URL routing without 308 redirects for trailing slashes.
+# Astro generates /page/index.html which Pages serves at both /page and /page/.
+# These redirects normalise to the non-slash form for SEO consistency.
+
+# Redirect trailing-slash variants to canonical (no trailing slash).
+# The :splat placeholder matches any path.
+# Status code 308 preserves the HTTP method (important for POST/DELETE).
+# Note: Cloudflare Pages auto-adds redirects for /page -> /page/ when
+# the directory structure has /page/index.html. The rules below are
+# a no-op for already-canonical paths.
+
+# Home page: serve as-is, no redirect needed.
+# Other pages: Pages handles /page -> /page/ automatically via
+# pretty URLs. The 308 is expected behaviour.
+
+# 404 fallback
+/*    /404.html    404

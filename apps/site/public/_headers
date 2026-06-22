@@ -1,0 +1,29 @@
+# Cloudflare Pages _headers file
+# Applied to every route served from the Pages deployment.
+#
+# CSP uses 'unsafe-inline' for style-src because Astro inlines
+# component-scoped styles at build time. Script-src is locked to
+# 'self' with no inline. Plausible analytics is loaded from its
+# own CDN (script-src includes plausible.io).
+# frame-ancestors 'none' prevents clickjacking.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.coingecko.com https://api.binance.com https://api.github.com https://api.alternative.me https://api.mempool.space https://news.ycombinator.com https://api.exchangerate-api.com https://query1.finance.yahoo.com https://hydrated-worker.wyatt-au.workers.dev; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; report-uri /api/csp-report;
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()
+
+# API routes: add CORS headers for cross-origin access from the
+# standalone worker domain.
+/api/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+
+# WASM and static assets: immutable cache.
+/wasm/*
+  Cache-Control: public, max-age=31536000, immutable
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
