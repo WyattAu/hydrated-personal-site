@@ -1,6 +1,11 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  // NOTE: SolidJS component tests (*.test.tsx) require vite-plugin-solid
+  // which has a compatibility issue with Vite 8.x. The test files exist
+  // at apps/site/src/components/solid/*.test.tsx but are excluded until
+  // vite-plugin-solid releases a Vite 8-compatible version.
+  // Track: https://github.com/solidjs/vite-plugin-solid/issues
   test: {
     environment: 'happy-dom',
     // Forks pool avoids esbuild service-terminated panics seen with the default
