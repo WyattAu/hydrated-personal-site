@@ -17,7 +17,7 @@ export async function GET(context: APIContext) {
       title: doc.data.title,
       pubDate: new Date(),
       description: doc.data.description,
-      link: `${context.site}/docs#${doc.data.order}`,
+      link: `${context.site ?? context.url.origin}/docs#${doc.id}`,
     })),
   ];
 

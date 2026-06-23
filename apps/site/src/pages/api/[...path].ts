@@ -105,7 +105,17 @@ export const OPTIONS: APIRoute = () => {
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ url }) => {
+interface KVLike {
+  list(opts?: { limit?: number }): Promise<{ keys: Array<{ name: string }> }>;
+  get(key: string, type?: 'json' | 'text'): Promise<unknown>;
+  put(key: string, value: string): Promise<void>;
+  delete(key: string): Promise<void>;
+}
+
+export const GET: APIRoute = async (ctx) => {
+  const { url } = ctx;
+  const kv = (ctx.locals as { runtime?: { env?: Record<string, unknown> } } | undefined)?.runtime
+    ?.env?.GUESTBOOK as KVLike | undefined;
   const path = url.pathname.replace(/^\/api\//, '');
 
   if (path === 'health')
@@ -347,6 +357,24 @@ export const GET: APIRoute = async ({ url }) => {
   if (path === 'guestbook') {
     const c = getCached('gb');
     if (c) return J(c);
+    // When Cloudflare KV binding is configured, read real entries.
+    // Falls back to sample data for local dev / pre-KV setup.
+    if (kv) {
+      try {
+        const list = await kv.list({ limit: 50 });
+        const entries = await Promise.all(
+          list.keys.map(async (key: { name: string }) => {
+            const val = await kv.get(key.name, 'json');
+            return val;
+          }),
+        );
+        const valid = entries.filter(Boolean);
+        setCache('gb', { entries: valid }, 30000);
+        return J({ entries: valid });
+      } catch {
+        // KV read failed; fall through to sample data.
+      }
+    }
     return J({
       entries: [
         { id: '1', name: 'Visitor', message: 'Great site!', created: Date.now() - 86400000 },

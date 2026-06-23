@@ -1,4 +1,5 @@
 ---
+import { getCollection, render } from 'astro:content';
 import Footer from '../components/astro/Footer.astro';
 import Nav from '../components/astro/Nav.astro';
 import ThemeToggle from '../components/solid/ThemeToggle';
@@ -6,277 +7,135 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
 import '../styles/animations.css';
 
-import { getCollection, render } from 'astro:content';
-
 const allDocs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
-
 const renderedDocs = await Promise.all(
   allDocs.map(async (doc) => {
     const { Content } = await render(doc);
-    return { ...doc, Content };
+    return {
+      id: doc.id,
+      title: doc.data.title,
+      description: doc.data.description,
+      Content,
+    };
   }),
 );
 ---
 
 <BaseLayout title="Docs — Wyatt Au" description="Technical notes, architecture decisions, and infrastructure documentation.">
   <Nav />
+  <ThemeToggle client:load />
 
-    <main id="main-content" class="pt-28">
-    <section class="py-16 px-6 md:px-12 lg:px-24">
-      <p class="label mb-6 cinematic-enter" style="color: var(--accent);">DOCS</p>
-      <h1 class="text-3xl md:text-5xl font-bold mb-4 cinematic-enter cinematic-enter-delay-1">Technical Notes</h1>
-      <p class="text-lg cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 640px;">
-        Architecture decisions, infrastructure patterns, and engineering notes.
-      </p>
-    </section>
-
-    <!-- Search -->
-    <section class="px-6 md:px-12 lg:px-24 pb-6">
-      <div class="max-w-md reveal">
-        <div class="relative">
-          <input
-            type="text"
-            id="docs-search"
-            placeholder="Search docs..."
-            class="w-full px-4 py-3 font-mono text-sm border outline-none transition-colors"
-            style="border-color: var(--border); background: var(--bg-secondary); color: var(--text-primary);"
-          />
-          <span class="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px]" style="color: var(--text-secondary);">Cmd-K</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="py-8 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
-      <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Sidebar -->
-        <aside class="lg:w-56 shrink-0">
-          <nav class="lg:sticky lg:top-28">
-            <p class="label mb-4" style="color: var(--accent);">Contents</p>
-            <ul class="space-y-1" id="docs-toc">
-              {renderedDocs.map((doc) => (
-                <li>
-                  <a
-                    href={`#doc-${doc.data.order}`}
-                    class="doc-toc-link block px-3 py-2 font-mono text-xs transition-colors border-l-2"
-                    style="border-color: transparent; color: var(--text-secondary);"
-                    data-order={doc.data.order}
-                  >
-                    {doc.data.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <!-- External Link -->
-            <div class="mt-8 pt-6 border-t" style="border-color: var(--border);">
-              <p class="label mb-3" style="color: var(--accent);">External</p>
-              <a
-                href="https://wyattsnotes.wyattau.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="amoebic-hover block px-3 py-2 font-mono text-xs border-l-2"
-                style="border-color: transparent; color: var(--text-secondary);"
-              >
-                WyattsNotes ↗
-              </a>
-            </div>
-          </nav>
-        </aside>
-
-        <!-- Content -->
-        <div class="flex-1 min-w-0 max-w-3xl">
-          {renderedDocs.map((doc) => (
-            <article
-              id={`doc-${doc.data.order}`}
-              class="doc-article mb-16 pb-16 border-b last:border-b-0 reveal"
-              style="border-color: var(--border);"
-              data-title={doc.data.title.toLowerCase()}
+  <main class="min-h-screen px-6 md:px-12 lg:px-24 py-12 max-w-7xl mx-auto">
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Sidebar -->
+      <aside class="lg:w-64 shrink-0">
+        <p class="label mb-4" style="color: var(--accent);">DOCS</p>
+        <nav class="flex flex-col gap-1">
+          {renderedDocs.map((doc, i) => (
+            <a
+              href={`#${doc.slug}`}
+              class="font-mono text-xs uppercase tracking-wider px-3 py-2 border transition-colors amoebic-morph"
+              style="border-color: var(--border); color: var(--text-secondary);"
+              data-doc-index={i}
             >
-              <div class="mb-6">
-                <p class="font-mono text-[10px] font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">
-                  {doc.data.description}
-                </p>
-                <h2 class="text-2xl md:text-3xl font-bold" style="color: var(--text-primary);">
-                  {doc.data.title}
-                </h2>
-              </div>
-              <div class="prose prose-invert max-w-none">
-                <doc.Content />
-              </div>
+              {String(i + 1).padStart(2, '0')} {doc.title}
+            </a>
+          ))}
+        </nav>
+      </aside>
+
+      <!-- Content -->
+      <div class="flex-1 min-w-0 max-w-4xl">
+        <h1 class="hero-name mb-8" style="font-size: 2rem;">Documentation</h1>
+        <div class="flex flex-col gap-12">
+          {renderedDocs.map((doc) => (
+            <article id={doc.id} class="scroll-mt-20">
+              <h2 class="font-mono text-xl font-bold mb-2" style="color: var(--accent);">
+                {doc.title}
+              </h2>
+              <p class="text-sm mb-4" style="color: var(--text-secondary);">
+                {doc.description}
+              </p>
+              <div class="prose prose-invert max-w-none docs-content"><doc.Content /></div>
             </article>
           ))}
-          <div id="no-results" class="hidden py-16 text-center">
-            <p class="font-mono text-sm" style="color: var(--text-secondary);">No docs match your search.</p>
-          </div>
         </div>
       </div>
-    </section>
+    </div>
   </main>
 
   <Footer />
-  <ThemeToggle client:load />
-
-  <style>
-    /* Prose-like styles for doc content */
-    .prose :global(h1) {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: var(--text-primary);
-    }
-    .prose :global(h2) {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-top: 2rem;
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-      color: var(--text-primary);
-    }
-    .prose :global(h3) {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-top: 1.5rem;
-      margin-bottom: 0.5rem;
-      color: var(--text-primary);
-    }
-    .prose :global(p) {
-      margin-bottom: 1rem;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-    .prose :global(ul), .prose :global(ol) {
-      margin-bottom: 1rem;
-      padding-left: 1.5rem;
-    }
-    .prose :global(li) {
-      margin-bottom: 0.35rem;
-      color: var(--text-secondary);
-    }
-    .prose :global(ul li) {
-      list-style-type: disc;
-    }
-    .prose :global(ol li) {
-      list-style-type: decimal;
-    }
-    .prose :global(strong) {
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .prose :global(code) {
-      font-family: "JetBrains Mono", monospace;
-      font-size: 0.85em;
-      padding: 0.15em 0.4em;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      color: var(--accent);
-    }
-    .prose :global(pre) {
-      margin-bottom: 1rem;
-      padding: 1rem;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      overflow-x: auto;
-    }
-    .prose :global(pre code) {
-      padding: 0;
-      background: none;
-      border: none;
-      color: var(--text-primary);
-      font-size: 0.8rem;
-      line-height: 1.6;
-    }
-    .prose :global(a) {
-      color: var(--accent);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-    .prose :global(a:hover) {
-      color: var(--text-primary);
-    }
-    .prose :global(blockquote) {
-      border-left: 3px solid var(--accent);
-      padding-left: 1rem;
-      margin-bottom: 1rem;
-      color: var(--text-secondary);
-      font-style: italic;
-    }
-    .prose :global(hr) {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 2rem 0;
-    }
-  </style>
-
-  <script>
-    // TOC active state
-    const tocLinks = document.querySelectorAll<HTMLElement>('.doc-toc-link');
-    const articles = document.querySelectorAll<HTMLElement>('.doc-article');
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
-            const id = entry.target.id;
-            const order = id.replace('doc-', '');
-            tocLinks.forEach((link) => {
-              if (link.dataset.order === order) {
-                link.style.borderColor = 'var(--accent)';
-                link.style.color = 'var(--accent)';
-              } else {
-                link.style.borderColor = 'transparent';
-                link.style.color = 'var(--text-secondary)';
-              }
-            });
-          }
-        });
-      },
-      { threshold: 0.2, rootMargin: '-80px 0px -60% 0px' }
-    );
-
-    articles.forEach((article) => observer.observe(article));
-
-    // Reveal animations
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-    );
-
-    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
-
-    // Search
-    const searchInput = document.getElementById('docs-search') as HTMLInputElement;
-    const noResults = document.getElementById('no-results');
-
-    searchInput?.addEventListener('input', () => {
-      const query = searchInput.value.toLowerCase().trim();
-      let visibleCount = 0;
-
-      articles.forEach((article) => {
-        const title = article.dataset.title || '';
-        const text = article.textContent?.toLowerCase() || '';
-        const match = !query || title.includes(query) || text.includes(query);
-        article.style.display = match ? '' : 'none';
-        if (match) visibleCount++;
-      });
-
-      if (noResults) {
-        noResults.classList.toggle('hidden', visibleCount > 0);
-      }
-    });
-
-    // Keyboard shortcut
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        searchInput?.focus();
-      }
-    });
-  </script>
 </BaseLayout>
+
+<style>
+  .docs-content :global(h2) {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .docs-content :global(h3) {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .docs-content :global(p) {
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+  }
+  .docs-content :global(code) {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    background: var(--bg-secondary);
+    padding: 0.125rem 0.375rem;
+    border: 1px solid var(--border);
+  }
+  .docs-content :global(pre) {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .docs-content :global(pre code) {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .docs-content :global(ul),
+  .docs-content :global(ol) {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .docs-content :global(li) {
+    margin-bottom: 0.25rem;
+  }
+  .docs-content :global(a) {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  .docs-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .docs-content :global(th),
+  .docs-content :global(td) {
+    border: 1px solid var(--border);
+    padding: 0.5rem;
+    text-align: left;
+    font-size: 0.8rem;
+  }
+  .docs-content :global(th) {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+</style>

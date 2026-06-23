@@ -1,11 +1,16 @@
-const CACHE_NAME = 'site-cache-v1';
-const OFFLINE_URL = '/offline';
+const CACHE_VERSION = 'hydrated-v3.1.0';
+const STATIC_CACHE = `${CACHE_VERSION}-static`;
+const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
-const PRECACHE_ASSETS = ['/', '/offline', '/manifest.json'];
+const STATIC_ASSETS = ['/', '/offline/', '/favicon.svg', '/manifest.json', '/robots.txt'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS)));
-  self.skipWaiting();
+  event.waitUntil(
+    caches
+      .open(STATIC_CACHE)
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting()),
+  );
 });
 
 self.addEventListener('activate', (event) => {
@@ -13,68 +18,61 @@ self.addEventListener('activate', (event) => {
     caches
       .keys()
       .then((keys) =>
-        Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))),
-      ),
+        Promise.all(
+          keys
+            .filter(
+              (key) => key.startsWith('hydrated-') && key !== STATIC_CACHE && key !== RUNTIME_CACHE,
+            )
+            .map((key) => caches.delete(key)),
+        ),
+      )
+      .then(() => self.clients.claim()),
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (request.method !== 'GET') return;
+  // Skip cross-origin and API requests (they have their own caching).
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/api/')) return;
 
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(networkFirst(request));
+  // Network-first for HTML: always serve fresh content when online.
+  if (request.mode === 'navigate' || request.destination === 'document') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy));
+          return response;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match('/offline/'))),
+    );
     return;
   }
 
+  // Cache-first for static assets (_astro, wasm, fonts, images).
   if (
+    url.pathname.startsWith('/_astro/') ||
+    url.pathname.startsWith('/wasm/') ||
+    url.pathname.startsWith('/images/') ||
+    url.pathname.startsWith('/og-images/') ||
     request.destination === 'style' ||
     request.destination === 'script' ||
-    request.destination === 'font' ||
-    request.destination === 'image' ||
-    url.pathname.endsWith('.css') ||
-    url.pathname.endsWith('.js') ||
-    url.pathname.endsWith('.woff2') ||
-    url.pathname.endsWith('.png') ||
-    url.pathname.endsWith('.svg') ||
-    url.pathname.endsWith('.ico')
+    request.destination === 'font'
   ) {
-    event.respondWith(cacheFirst(request));
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((response) => {
+            const copy = response.clone();
+            caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy));
+            return response;
+          }),
+      ),
+    );
     return;
   }
-
-  event.respondWith(networkFirst(request));
 });
-
-async function cacheFirst(request) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    return caches.match(OFFLINE_URL);
-  }
-}
-
-async function networkFirst(request) {
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-    return caches.match(OFFLINE_URL);
-  }
-}
