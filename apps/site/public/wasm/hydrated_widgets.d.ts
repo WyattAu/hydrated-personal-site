@@ -87,6 +87,43 @@ export function create_treemap(canvas_id: string, width: number, height: number)
 
 export function main(): void;
 
+/**
+ * Correlation matrix from a returns matrix (N assets x T periods, row-major).
+ */
+export function quant_correlation_matrix(returns: Float64Array, n_assets: number, n_periods: number): string;
+
+/**
+ * GARCH(1,1) fit and forecast.
+ */
+export function quant_garch(returns: Float64Array, forecast_steps: number): string;
+
+/**
+ * Black-Scholes call Greeks across a spot price range.
+ * Returns JSON: { spot: [...], delta: [...], gamma: [...], theta: [...], vega: [...], rho: [...] }
+ */
+export function quant_greeks(spot_min: number, spot_max: number, num_points: number, strike: number, time_to_expiry: number, risk_free_rate: number, implied_vol: number, is_call: boolean): string;
+
+/**
+ * Monte Carlo GBM simulation from historical close prices.
+ * Returns JSON: { drift, volatility, s0, p5, p25, p50, p75, p95 }
+ */
+export function quant_montecarlo(closes: Float64Array, periods_per_year: number, horizon_days: number, num_paths: number): string;
+
+/**
+ * Seed the WASM PRNG from JS (use crypto.getRandomValues for entropy).
+ */
+export function quant_seed(s0: number, s1: number): void;
+
+/**
+ * Value at Risk and Expected Shortfall from a return series.
+ */
+export function quant_var(returns: Float64Array, alpha: number): string;
+
+/**
+ * Nelson-Siegel yield curve fit.
+ */
+export function quant_yield_curve(maturities: Float64Array, yields: Float64Array): string;
+
 export function update_backtest(canvas_id: string, width: number, height: number, data_json: string): void;
 
 export function update_btc_health(canvas_id: string, width: number, height: number, data_json: string): void;
@@ -165,6 +202,13 @@ export interface InitOutput {
     readonly nbodysimulation_set_dt: (a: number, b: number) => void;
     readonly nbodysimulation_set_gravity: (a: number, b: number) => void;
     readonly nbodysimulation_step: (a: number) => void;
+    readonly quant_correlation_matrix: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly quant_garch: (a: number, b: number, c: number) => [number, number];
+    readonly quant_greeks: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
+    readonly quant_montecarlo: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly quant_seed: (a: number, b: number) => void;
+    readonly quant_var: (a: number, b: number, c: number) => [number, number];
+    readonly quant_yield_curve: (a: number, b: number, c: number, d: number) => [number, number];
     readonly terraingenerator_generate: (a: number, b: number, c: number, d: number) => [number, number];
     readonly terraingenerator_get_height: (a: number, b: number, c: number) => number;
     readonly terraingenerator_new: (a: number, b: number, c: number) => number;

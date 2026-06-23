@@ -571,6 +571,152 @@ export function main() {
 }
 
 /**
+ * Correlation matrix from a returns matrix (N assets x T periods, row-major).
+ * @param {Float64Array} returns
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @returns {string}
+ */
+export function quant_correlation_matrix(returns, n_assets, n_periods) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_correlation_matrix(ptr0, len0, n_assets, n_periods);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * GARCH(1,1) fit and forecast.
+ * @param {Float64Array} returns
+ * @param {number} forecast_steps
+ * @returns {string}
+ */
+export function quant_garch(returns, forecast_steps) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_garch(ptr0, len0, forecast_steps);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Black-Scholes call Greeks across a spot price range.
+ * Returns JSON: { spot: [...], delta: [...], gamma: [...], theta: [...], vega: [...], rho: [...] }
+ * @param {number} spot_min
+ * @param {number} spot_max
+ * @param {number} num_points
+ * @param {number} strike
+ * @param {number} time_to_expiry
+ * @param {number} risk_free_rate
+ * @param {number} implied_vol
+ * @param {boolean} is_call
+ * @returns {string}
+ */
+export function quant_greeks(spot_min, spot_max, num_points, strike, time_to_expiry, risk_free_rate, implied_vol, is_call) {
+    let deferred1_0;
+    let deferred1_1;
+    try {
+        const ret = wasm.quant_greeks(spot_min, spot_max, num_points, strike, time_to_expiry, risk_free_rate, implied_vol, is_call);
+        deferred1_0 = ret[0];
+        deferred1_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+    }
+}
+
+/**
+ * Monte Carlo GBM simulation from historical close prices.
+ * Returns JSON: { drift, volatility, s0, p5, p25, p50, p75, p95 }
+ * @param {Float64Array} closes
+ * @param {number} periods_per_year
+ * @param {number} horizon_days
+ * @param {number} num_paths
+ * @returns {string}
+ */
+export function quant_montecarlo(closes, periods_per_year, horizon_days, num_paths) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(closes, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_montecarlo(ptr0, len0, periods_per_year, horizon_days, num_paths);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Seed the WASM PRNG from JS (use crypto.getRandomValues for entropy).
+ * @param {number} s0
+ * @param {number} s1
+ */
+export function quant_seed(s0, s1) {
+    wasm.quant_seed(s0, s1);
+}
+
+/**
+ * Value at Risk and Expected Shortfall from a return series.
+ * @param {Float64Array} returns
+ * @param {number} alpha
+ * @returns {string}
+ */
+export function quant_var(returns, alpha) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_var(ptr0, len0, alpha);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Nelson-Siegel yield curve fit.
+ * @param {Float64Array} maturities
+ * @param {Float64Array} yields
+ * @returns {string}
+ */
+export function quant_yield_curve(maturities, yields) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(maturities, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(yields, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_yield_curve(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
  * @param {string} canvas_id
  * @param {number} width
  * @param {number} height
@@ -1113,6 +1259,13 @@ function isLikeNone(x) {
 function passArrayF32ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 4, 4) >>> 0;
     getFloat32ArrayMemory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
+function passArrayF64ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 8, 8) >>> 0;
+    getFloat64ArrayMemory0().set(arg, ptr / 8);
     WASM_VECTOR_LEN = arg.length;
     return ptr;
 }
