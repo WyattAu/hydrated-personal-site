@@ -1,4 +1,16 @@
 import type { APIRoute } from 'astro';
+import * as v from 'valibot';
+import {
+  CryptoPriceSchema,
+  EarthquakeFeatureSchema,
+  FearGreedDataSchema,
+  GlobalDataSchema,
+  HackerNewsStorySchema,
+  KpIndexSchema,
+  LLMBenchmarkModelSchema,
+  MempoolDataSchema,
+  WeatherDataSchema,
+} from '../../lib/schemas';
 
 const cache = new Map<string, { data: unknown; expiry: number }>();
 const inflight = new Map<string, Promise<unknown>>();
@@ -37,6 +49,24 @@ async function safeFetch(url: string, ep: string, init?: RequestInit): Promise<u
   } catch {
     return null;
   }
+}
+
+/**
+ * Validate upstream data against a valibot schema without blocking the response.
+ * Always returns the original data so the response shape is unchanged. On a
+ * validation failure a warning is logged so malformed upstream data surfaces
+ * in logs while the request still succeeds.
+ */
+function validateOrPass(
+  schema: v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
+  data: unknown,
+  label: string,
+): unknown {
+  const result = v.safeParse(schema, data);
+  if (result.success) return data;
+  const issue = result.issues[0];
+  console.warn(`[schema] ${label} validation failed: ${issue?.message ?? 'unknown issue'}`);
+  return data;
 }
 
 function san(s: string): string {
@@ -89,8 +119,9 @@ export const GET: APIRoute = async ({ url }) => {
     // Primary: Binance. Fallback: CoinGecko (Binance geo-blocks some CF egress).
     const d = await safeFetch('https://api.binance.com/api/v3/ticker/24hr', 'ct');
     if (d) {
-      setCache('ct', d, 10000);
-      return J(d);
+      const validated = validateOrPass(v.array(CryptoPriceSchema), d, 'crypto-ticker');
+      setCache('ct', validated, 10000);
+      return J(validated);
     }
     const cg = await safeFetch(
       'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h',
@@ -108,8 +139,9 @@ export const GET: APIRoute = async ({ url }) => {
         highPrice: coin.high_24h,
         lowPrice: coin.low_24h,
       }));
-      setCache('ct', normalised, 30000);
-      return J(normalised);
+      const validated = validateOrPass(v.array(CryptoPriceSchema), normalised, 'crypto-ticker');
+      setCache('ct', validated, 30000);
+      return J(validated);
     }
     return J(getCached('ct') || { error: 'unavailable' });
   }
@@ -118,8 +150,13 @@ export const GET: APIRoute = async ({ url }) => {
     if (c) return J(c);
     const d = await safeFetch('https://api.alternative.me/fng/', 'fg');
     if (d) {
-      setCache('fg', d, 300000);
-      return J(d);
+      const validated = validateOrPass(
+        v.object({ data: v.array(FearGreedDataSchema) }),
+        d,
+        'fear-greed',
+      );
+      setCache('fg', validated, 300000);
+      return J(validated);
     }
     return J(getCached('fg') || { error: 'unavailable' });
   }
@@ -153,8 +190,8 @@ export const GET: APIRoute = async ({ url }) => {
         }
       }
     }
-    setCache('hn', stories, 300000);
-    return J(stories);
+    setCache('hn', validateOrPass(v.array(HackerNewsStorySchema), stories, 'hacker-news'), 300000);
+    return J(getCached('hn'));
   }
   if (path === 'earthquakes') {
     const c = getCached('eq');
@@ -164,8 +201,13 @@ export const GET: APIRoute = async ({ url }) => {
       'eq',
     );
     if (d) {
-      setCache('eq', d, 300000);
-      return J(d);
+      const validated = validateOrPass(
+        v.object({ features: v.array(EarthquakeFeatureSchema) }),
+        d,
+        'earthquakes',
+      );
+      setCache('eq', validated, 300000);
+      return J(validated);
     }
     return J(getCached('eq') || { error: 'unavailable' });
   }
@@ -177,8 +219,9 @@ export const GET: APIRoute = async ({ url }) => {
       'kp',
     );
     if (d) {
-      setCache('kp', d, 600000);
-      return J(d);
+      const validated = validateOrPass(v.array(KpIndexSchema), d, 'kp-index');
+      setCache('kp', validated, 600000);
+      return J(validated);
     }
     return J(getCached('kp') || { error: 'unavailable' });
   }
@@ -188,8 +231,13 @@ export const GET: APIRoute = async ({ url }) => {
     const f = await safeFetch('https://mempool.space/api/v1/fees/recommended', 'mpf');
     const s = await safeFetch('https://mempool.space/api/mempool', 'mps');
     if (f && s) {
-      setCache('mp', { fees: f, mempool: s }, 60000);
-      return J({ fees: f, mempool: s });
+      const validated = validateOrPass(
+        v.object({ fees: MempoolDataSchema, mempool: v.record(v.string(), v.number()) }),
+        { fees: f, mempool: s },
+        'mempool',
+      );
+      setCache('mp', validated, 60000);
+      return J(validated);
     }
     return J(getCached('mp') || { error: 'unavailable' });
   }
@@ -198,8 +246,9 @@ export const GET: APIRoute = async ({ url }) => {
     if (c) return J(c);
     const d = await safeFetch('https://api.coingecko.com/api/v3/global', 'cg');
     if (d) {
-      setCache('cg', d, 300000);
-      return J(d);
+      const validated = validateOrPass(GlobalDataSchema, d, 'coingecko-global');
+      setCache('cg', validated, 300000);
+      return J(validated);
     }
     return J(getCached('cg') || { error: 'unavailable' });
   }
@@ -221,8 +270,9 @@ export const GET: APIRoute = async ({ url }) => {
       'llm',
     );
     if (d) {
-      setCache('llm', d, 21600000);
-      return J(d);
+      const validated = validateOrPass(v.array(LLMBenchmarkModelSchema), d, 'llm-benchmarks');
+      setCache('llm', validated, 21600000);
+      return J(validated);
     }
     return J(getCached('llm') || { error: 'unavailable' });
   }
