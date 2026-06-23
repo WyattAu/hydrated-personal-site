@@ -61,10 +61,18 @@ const employment = [
   <main id="main-content">
     <!-- Hero -->
     <section class="min-h-screen flex flex-col justify-center px-6 md:px-12 lg:px-24 relative">
-      <!-- Hero background images -->
+      <!-- Hero background images (AVIF primary, WebP fallback) -->
       <div class="hero-images" aria-hidden="true">
-        <img src="/images/london_night.avif" alt="" loading="eager" fetchpriority="high" class="hero-img hero-img-left" />
-        <img src="/images/hong_kong_twilight.avif" alt="" loading="eager" fetchpriority="high" class="hero-img hero-img-right" />
+        <picture>
+          <source srcset="/images/london_night.avif" type="image/avif" />
+          <source srcset="/images/london_night.webp" type="image/webp" />
+          <img src="/images/london_night.webp" alt="" loading="eager" fetchpriority="high" class="hero-img hero-img-left" />
+        </picture>
+        <picture>
+          <source srcset="/images/hong_kong_twilight.avif" type="image/avif" />
+          <source srcset="/images/hong_kong_twilight.webp" type="image/webp" />
+          <img src="/images/hong_kong_twilight.webp" alt="" loading="eager" fetchpriority="high" class="hero-img hero-img-right" />
+        </picture>
       </div>
       <div class="hero-overlay"></div>
 

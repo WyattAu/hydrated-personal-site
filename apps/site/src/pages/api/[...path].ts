@@ -337,8 +337,9 @@ export const GET: APIRoute = async ({ url }) => {
       'wx',
     );
     if (d) {
-      setCache(ck, d, 300000);
-      return J(d);
+      const validated = validateOrPass(WeatherDataSchema, d, 'weather');
+      setCache(ck, validated, 300000);
+      return J(validated);
     }
     return J(getCached(ck) || { error: 'unavailable' });
   }
