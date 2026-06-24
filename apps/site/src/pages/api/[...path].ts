@@ -433,17 +433,21 @@ export const GET: APIRoute = async (ctx) => {
     ];
     const yields: Array<{ label: string; maturity: number; yield: number }> = [];
     for (const s of series) {
-      const d = await safeFetch(
-        `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${s.code}&cosd=2026-06-20&coed=2026-06-22`,
-        `yield-${s.code}`,
-      );
-      if (d && typeof d === 'string') {
-        const lines = (d as string).trim().split('\n');
+      try {
+        // FRED returns CSV text, not JSON. Use raw fetch.
+        const csvRes = await fetch(`https://fred.stlouisfed.org/graph/fredgraph.csv?id=${s.code}`, {
+          signal: AbortSignal.timeout(5000),
+        });
+        if (!csvRes.ok) continue;
+        const csv = await csvRes.text();
+        const lines = csv.trim().split('\n');
         const lastLine = lines[lines.length - 1];
         const val = Number.parseFloat(lastLine.split(',')[1]);
         if (!Number.isNaN(val)) {
           yields.push({ label: s.label, maturity: s.maturity, yield: val });
         }
+      } catch {
+        // skip this series on failure
       }
     }
     if (yields.length > 0) {
@@ -456,7 +460,15 @@ export const GET: APIRoute = async (ctx) => {
   if (path === 'funding-rates') {
     const c = getCached('funding');
     if (c) return J(c);
-    const d = await safeFetch('https://fapi.binance.com/fapi/v1/premiumIndex', 'funding');
+    let d: unknown = null;
+    try {
+      const fr = await fetch('https://fapi.binance.com/fapi/v1/premiumIndex', {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (fr.ok) d = await fr.json();
+    } catch {
+      // skip
+    }
     if (d && Array.isArray(d)) {
       const result = (d as Array<Record<string, string>>)
         .filter((item) => item.symbol?.endsWith('USDT'))
