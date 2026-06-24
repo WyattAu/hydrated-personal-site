@@ -383,6 +383,96 @@ export const GET: APIRoute = async (ctx) => {
     });
   }
 
+  // --- Quant Dashboard Endpoints ---
+
+  if (path === 'deribit-options') {
+    const c = getCached('deribit');
+    if (c) return J(c);
+    const currency = url.searchParams.get('currency') || 'BTC';
+    const d = await safeFetch(
+      `https://www.deribit.com/api/v2/public/get_book_summary_by_currency?currency=${currency}&kind=option`,
+      'deribit',
+    );
+    if (d && typeof d === 'object' && 'result' in d) {
+      const result = (d as { result: Array<Record<string, unknown>> }).result.map((opt) => {
+        const name = opt.instrument_name as string;
+        const parts = name.split('-');
+        return {
+          instrument: name,
+          underlying: parts[0],
+          expiry: parts[1],
+          strike: Number.parseFloat(parts[2]),
+          type: parts[3]?.startsWith('C') ? 'call' : 'put',
+          iv: opt.mark_iv,
+          mark_price: opt.mark_price,
+          volume: opt.volume,
+          open_interest: opt.open_interest,
+          underlying_price: opt.underlying_price,
+        };
+      });
+      setCache('deribit', result, 300000);
+      return J(result);
+    }
+    return J(getCached('deribit') || { error: 'unavailable' });
+  }
+
+  if (path === 'treasury-yields') {
+    const c = getCached('yields');
+    if (c) return J(c);
+    const series: Array<{ label: string; maturity: number; code: string }> = [
+      { label: '1MO', maturity: 0.083, code: 'DGS1MO' },
+      { label: '3MO', maturity: 0.25, code: 'DGS3MO' },
+      { label: '6MO', maturity: 0.5, code: 'DGS6MO' },
+      { label: '1Y', maturity: 1.0, code: 'DGS1' },
+      { label: '2Y', maturity: 2.0, code: 'DGS2' },
+      { label: '5Y', maturity: 5.0, code: 'DGS5' },
+      { label: '7Y', maturity: 7.0, code: 'DGS7' },
+      { label: '10Y', maturity: 10.0, code: 'DGS10' },
+      { label: '20Y', maturity: 20.0, code: 'DGS20' },
+      { label: '30Y', maturity: 30.0, code: 'DGS30' },
+    ];
+    const yields: Array<{ label: string; maturity: number; yield: number }> = [];
+    for (const s of series) {
+      const d = await safeFetch(
+        `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${s.code}&cosd=2026-06-20&coed=2026-06-22`,
+        `yield-${s.code}`,
+      );
+      if (d && typeof d === 'string') {
+        const lines = (d as string).trim().split('\n');
+        const lastLine = lines[lines.length - 1];
+        const val = Number.parseFloat(lastLine.split(',')[1]);
+        if (!Number.isNaN(val)) {
+          yields.push({ label: s.label, maturity: s.maturity, yield: val });
+        }
+      }
+    }
+    if (yields.length > 0) {
+      setCache('yields', yields, 3600000);
+      return J(yields);
+    }
+    return J(getCached('yields') || { error: 'unavailable' });
+  }
+
+  if (path === 'funding-rates') {
+    const c = getCached('funding');
+    if (c) return J(c);
+    const d = await safeFetch('https://fapi.binance.com/fapi/v1/premiumIndex', 'funding');
+    if (d && Array.isArray(d)) {
+      const result = (d as Array<Record<string, string>>)
+        .filter((item) => item.symbol?.endsWith('USDT'))
+        .map((item) => ({
+          symbol: item.symbol,
+          rate: Number.parseFloat(item.lastFundingRate || '0'),
+          nextFunding: item.nextFundingTime,
+        }))
+        .sort((a, b) => Math.abs(b.rate) - Math.abs(a.rate))
+        .slice(0, 50);
+      setCache('funding', result, 60000);
+      return J(result);
+    }
+    return J(getCached('funding') || { error: 'unavailable' });
+  }
+
   return E('Not found', 404);
 };
 

@@ -9,6 +9,16 @@ import ScatterPlots from '../components/solid/ScatterPlots';
 import StaleIndicator from '../components/solid/StaleIndicator';
 import ThemeToggle from '../components/solid/ThemeToggle';
 import WorldMap from '../components/solid/WorldMap';
+import CorrelationNetwork from '../components/solid/quant/CorrelationNetwork';
+import EfficientFrontier from '../components/solid/quant/EfficientFrontier';
+import FundingRateHeatmap from '../components/solid/quant/FundingRateHeatmap';
+import GreeksDashboard from '../components/solid/quant/GreeksDashboard';
+import MonteCarloFan from '../components/solid/quant/MonteCarloFan';
+import OptionsPayoff from '../components/solid/quant/OptionsPayoff';
+import RiskMetrics from '../components/solid/quant/RiskMetrics';
+import RollingCorrelationHeatmap from '../components/solid/quant/RollingCorrelationHeatmap';
+import VolatilityForecast from '../components/solid/quant/VolatilityForecast';
+import YieldCurveChart from '../components/solid/quant/YieldCurveChart';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
@@ -78,6 +88,83 @@ import '../styles/base.css';
     <!-- Scatter Plots -->
     <section class="px-6 md:px-12 lg:px-24 py-4">
       <ScatterPlots client:load />
+    </section>
+
+    <!-- Quant Dashboard -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">QUANT ANALYTICS</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-1">Client-Side Quantitative Engine</h2>
+      <p class="mb-6 text-sm" style="color: var(--text-secondary);">All computations run in Rust/WASM on your CPU. Zero server-side math.</p>
+
+      <!-- Row 1: Monte Carlo + GARCH -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <MonteCarloFan client:load symbol="BTCUSDT" />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <VolatilityForecast client:load symbol="BTCUSDT" />
+          </AppErrorBoundary>
+        </div>
+      </div>
+
+      <!-- Row 2: Efficient Frontier + Greeks -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <EfficientFrontier client:load />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <GreeksDashboard client:load />
+          </AppErrorBoundary>
+        </div>
+      </div>
+
+      <!-- Row 3: VaR + Options Payoff -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <RiskMetrics client:load symbol="BTCUSDT" />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <OptionsPayoff client:load />
+          </AppErrorBoundary>
+        </div>
+      </div>
+
+      <!-- Row 4: Correlation Network + Yield Curve -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <CorrelationNetwork client:load />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <YieldCurveChart client:load />
+          </AppErrorBoundary>
+        </div>
+      </div>
+
+      <!-- Row 5: Rolling Correlation + Funding Rates -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <RollingCorrelationHeatmap client:load />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <FundingRateHeatmap client:load />
+          </AppErrorBoundary>
+        </div>
+      </div>
     </section>
 
     <!-- Stale Indicator -->

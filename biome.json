@@ -93,6 +93,23 @@
           }
         }
       }
+    },
+    {
+      "include": ["apps/site/src/components/solid/quant/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "useJsxKeyInIterable": "off",
+            "noUnusedVariables": "off"
+          },
+          "style": {
+            "noNonNullAssertion": "off"
+          },
+          "suspicious": {
+            "noAssignInExpressions": "off"
+          }
+        }
+      }
     }
   ]
 }
