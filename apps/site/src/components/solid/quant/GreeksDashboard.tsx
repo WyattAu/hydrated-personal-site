@@ -186,7 +186,6 @@ export default function GreeksDashboard() {
   });
 
   const g = greeks();
-  if (g) setTimeout(draw, 10);
 
   return (
     <div>

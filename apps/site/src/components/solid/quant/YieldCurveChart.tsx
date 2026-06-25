@@ -156,7 +156,6 @@ export default function YieldCurveChart() {
     loadData();
   });
   const d = data();
-  if (d) setTimeout(draw, 10);
 
   return (
     <div>

@@ -75,7 +75,6 @@ export default function FundingRateHeatmap() {
     loadData();
   });
   const d = data();
-  if (d.length > 0) setTimeout(draw, 10);
 
   return (
     <div>

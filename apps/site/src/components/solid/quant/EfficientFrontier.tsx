@@ -221,7 +221,6 @@ export default function EfficientFrontier() {
     loadData();
   });
   const pts = points();
-  if (pts.length > 0) setTimeout(draw, 10);
 
   return (
     <div>

@@ -1,4 +1,4 @@
-import { Show, createSignal, onCleanup, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface MCResult {
@@ -174,12 +174,10 @@ export default function MonteCarloFan(props: { symbol?: string }) {
     onCleanup(() => clearInterval(interval));
   });
 
-  let firstDraw = false;
-  const r = result();
-  if (r && !firstDraw) {
-    firstDraw = true;
-    setTimeout(draw, 10);
-  }
+  createEffect(() => {
+    const v = result();
+    if (v) draw();
+  });
 
   return (
     <div>
@@ -224,11 +222,13 @@ export default function MonteCarloFan(props: { symbol?: string }) {
         </p>
       </Show>
       <canvas ref={canvasRef} class="w-full" style={{ height: '320px' }} />
-      <Show when={r}>
-        <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-          {symbol()} | 1000 GBM paths | annualized vol {((r?.volatility ?? 0) * 100).toFixed(1)}% |
-          drift {((r?.drift ?? 0) * 100).toFixed(1)}%
-        </p>
+      <Show when={result()} keyed>
+        {(mc) => (
+          <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
+            {symbol()} | 1000 GBM paths | annualized vol {(mc.volatility * 100).toFixed(1)}% | drift{' '}
+            {(mc.drift * 100).toFixed(1)}%
+          </p>
+        )}
       </Show>
     </div>
   );

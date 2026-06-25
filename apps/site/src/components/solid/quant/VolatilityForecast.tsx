@@ -155,7 +155,6 @@ export default function VolatilityForecast(props: { symbol?: string }) {
     loadData();
   });
   const d = data();
-  if (d) setTimeout(draw, 10);
 
   return (
     <div>

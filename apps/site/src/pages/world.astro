@@ -64,17 +64,17 @@ import '../styles/base.css';
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Order Book</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Real-time order book visualization with depth analysis.</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Bitcoin mempool fee structure visualised as a depth chart.</p>
           <WasmEmbed widget="order_book" width={380} height={300} dataEndpoint="/api/mempool" dataInterval={60000} />
         </div>
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Market Treemap</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Sector allocation treemap with size representing market cap.</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Crypto asset treemap. Cell size scales with trading volume.</p>
           <WasmEmbed widget="treemap" width={380} height={300} dataEndpoint="/api/crypto-ticker" dataInterval={30000} />
         </div>
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">BTC Health</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Mempool fees, hashrate, and network health indicators.</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Mempool count and recommended fees from mempool.space.</p>
           <WasmEmbed widget="btc_health" width={380} height={300} dataEndpoint="/api/mempool" dataInterval={60000} />
         </div>
       </div>

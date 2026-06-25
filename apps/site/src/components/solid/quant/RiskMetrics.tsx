@@ -139,7 +139,6 @@ export default function RiskMetrics(props: { symbol?: string }) {
     loadData();
   });
   const d = data();
-  if (d) setTimeout(draw, 10);
 
   return (
     <div>
