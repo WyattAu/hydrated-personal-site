@@ -57,6 +57,18 @@ pub fn update_treemap(canvas_id: &str, width: u32, height: u32, data_json: &str)
             .or_else(|_| js_sys::Reflect::get(&item, &"quoteVolume".into()));
         let cap = cap_val.ok().and_then(|v| v.as_f64()).unwrap_or(0.0);
 
+        // If cap is 0, try volume * price as fallback
+        let cap = if cap > 0.0 {
+            cap
+        } else {
+            let vol = js_sys::Reflect::get(&item, &"volume".into())
+                .ok().and_then(|v| v.as_f64()).unwrap_or(0.0);
+            let price = js_sys::Reflect::get(&item, &"price".into())
+                .or_else(|_| js_sys::Reflect::get(&item, &"lastPrice".into()))
+                .ok().and_then(|v| v.as_f64()).unwrap_or(0.0);
+            vol * price
+        };
+
         let change_val = js_sys::Reflect::get(&item, &"change".into())
             .or_else(|_| js_sys::Reflect::get(&item, &"priceChangePercent".into()));
         let change = change_val.ok().and_then(|v| v.as_f64()).unwrap_or(0.0);

@@ -13,8 +13,9 @@ function useCryptoTicker() {
         const res = await fetch('/api/crypto-ticker');
         if (!res.ok) return;
         const raw = await res.json();
+        const items = Array.isArray(raw) ? raw : raw.data || [];
         const map: Record<string, { price: number; change: number; volume: number }> = {};
-        for (const e of (raw.data || []) as Array<{
+        for (const e of items as Array<{
           symbol: string;
           price: number;
           change?: number;
@@ -43,11 +44,12 @@ function useStockQuote(symbols: string) {
         const res = await fetch(`/api/stock-quote?symbols=${symbols}`);
         if (!res.ok) return;
         const raw = await res.json();
+        const items = Array.isArray(raw) ? raw : raw.data || [];
         const map: Record<
           string,
           { price: number; change: number; changePct: number; name: string }
         > = {};
-        for (const e of (raw.data || []) as Array<{
+        for (const e of items as Array<{
           symbol: string;
           price: number;
           change: number;
