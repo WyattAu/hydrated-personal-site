@@ -30,8 +30,7 @@ export default function YieldCurveChart() {
     try {
       const res = await fetch('/api/treasury-yields');
       if (!res.ok) throw new Error('API');
-      const _resp = await res.json();
-      const yields = _resp.data || _resp;
+      const yields = await res.json();
       if (!Array.isArray(yields) || yields.length < 3) throw new Error('insufficient');
       setRaw(yields);
 

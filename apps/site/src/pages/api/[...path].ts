@@ -217,9 +217,9 @@ export const GET: APIRoute = async (ctx) => {
         lowPrice: '0',
       }));
       setCache('ct', data, 10000);
-      return J({ data, _source: result.source });
+      return J(data);
     }
-    return J(getCached('ct') || { error: 'unavailable', _blocked: ['binance', 'coingecko'] });
+    return J(getCached('ct') || { error: 'unavailable' });
   }
   if (path === 'fear-greed') {
     const c = getCached('fg');
@@ -377,9 +377,9 @@ export const GET: APIRoute = async (ctx) => {
     const result = await fetchKlines(sym, iv, lm);
     if (result) {
       setCache(ck, result.candles, 300000);
-      return J({ data: result.candles, _source: result.source });
+      return J(result.candles);
     }
-    return J(getCached(ck) || { error: 'unavailable', _blocked: ['binance'] });
+    return J(getCached(ck) || { error: 'unavailable' });
   }
   if (path === 'stock-chart') {
     const sym = url.searchParams.get('symbol');
@@ -458,9 +458,9 @@ export const GET: APIRoute = async (ctx) => {
     const result = await fetchDeribitOptions(currency);
     if (result) {
       setCache('deribit', result.options, 600000);
-      return J({ data: result.options, _source: result.source });
+      return J(result.options);
     }
-    return J(getCached('deribit') || { error: 'unavailable', _blocked: ['deribit-429'] });
+    return J(getCached('deribit') || { error: 'unavailable' });
   }
 
   if (path === 'treasury-yields') {
@@ -470,7 +470,7 @@ export const GET: APIRoute = async (ctx) => {
     const result = await fetchTreasuryYields();
     if (result) {
       setCache('yields', result.yields, 3600000);
-      return J({ data: result.yields, _source: result.source });
+      return J(result.yields);
     }
     return J(getCached('yields') || { error: 'unavailable' });
   }
@@ -482,9 +482,9 @@ export const GET: APIRoute = async (ctx) => {
     const result = await fetchFundingRates();
     if (result) {
       setCache('funding', result.rates, 60000);
-      return J({ data: result.rates, _source: result.source });
+      return J(result.rates);
     }
-    return J(getCached('funding') || { error: 'unavailable', _blocked: ['binance-futures'] });
+    return J(getCached('funding') || { error: 'unavailable' });
   }
 
   return E('Not found', 404);

@@ -38,8 +38,7 @@ export default function GreeksDashboard() {
     try {
       const res = await fetch('/api/deribit-options?currency=BTC');
       if (!res.ok) throw new Error('API failed');
-      const _raw = await res.json();
-      const data = _raw.data || _raw;
+      const data = await res.json();
       if (Array.isArray(data)) {
         const calls = data.filter((o: Opt) => o.type === 'call' && o.iv && o.iv > 0).slice(0, 20);
         if (calls.length > 0) {

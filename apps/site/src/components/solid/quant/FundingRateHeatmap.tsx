@@ -11,8 +11,7 @@ export default function FundingRateHeatmap() {
     try {
       const res = await fetch('/api/funding-rates');
       if (!res.ok) throw new Error('API');
-      const _raw = await res.json();
-      const d = _raw.data || _raw;
+      const d = await res.json();
       if (Array.isArray(d)) setData(d.slice(0, 30));
     } catch {
       /* skip */

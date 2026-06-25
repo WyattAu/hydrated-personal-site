@@ -12,8 +12,7 @@ function useCryptoTicker() {
       try {
         const res = await fetch('/api/crypto-ticker');
         if (!res.ok) return;
-        const _resp = await res.json();
-        const raw = _resp.data || _resp;
+        const raw = await res.json();
         const map: Record<string, { price: number; change: number; volume: number }> = {};
         for (const e of (raw.data || []) as Array<{
           symbol: string;
@@ -43,8 +42,7 @@ function useStockQuote(symbols: string) {
       try {
         const res = await fetch(`/api/stock-quote?symbols=${symbols}`);
         if (!res.ok) return;
-        const _resp = await res.json();
-        const raw = _resp.data || _resp;
+        const raw = await res.json();
         const map: Record<
           string,
           { price: number; change: number; changePct: number; name: string }
@@ -83,8 +81,7 @@ function useMempool() {
       try {
         const res = await fetch('/api/mempool');
         if (!res.ok) return;
-        const _resp = await res.json();
-        const raw = _resp.data || _resp;
+        const raw = await res.json();
         if (raw.fees)
           setData({
             fastest: raw.fees.fastestFee,

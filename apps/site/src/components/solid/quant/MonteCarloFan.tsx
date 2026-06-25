@@ -29,8 +29,7 @@ export default function MonteCarloFan(props: { symbol?: string }) {
     try {
       const res = await fetch(`/api/binance-klines?symbol=${symbol()}&interval=1d&limit=365`);
       if (!res.ok) throw new Error(`API ${res.status}`);
-      const _raw = await res.json();
-      const klines = _raw.data || _raw;
+      const klines = await res.json();
       const closes = klines.map((k: (string | number)[]) => Number.parseFloat(k[4] as string));
       if (closes.length < 30) throw new Error('insufficient data');
       setHistorical(closes);
