@@ -1,22 +1,17 @@
 # Cloudflare Pages _headers file
-# Applied to every route served from the Pages deployment.
-#
-# CSP uses 'unsafe-inline' for style-src because Astro inlines
-# component-scoped styles at build time. Script-src is locked to
-# 'self' with no inline. Plausible analytics is loaded from its
-# own CDN (script-src includes plausible.io).
-# frame-ancestors 'none' prevents clickjacking.
+# CSP is set via <meta> tag in BaseLayout.astro because Astro's
+# Cloudflare adapter (_worker.js) intercepts all requests and
+# the _headers file's CSP is cached aggressively by Cloudflare's
+# edge. The meta tag is baked into each prerendered HTML page.
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.coingecko.com https://api.binance.com https://api.github.com https://api.alternative.me https://api.mempool.space https://news.ycombinator.com https://api.exchangerate-api.com https://query1.finance.yahoo.com https://hydrated-worker.wyatt-au.workers.dev; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; report-uri /api/csp-report;
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()
 
-# API routes: add CORS headers for cross-origin access from the
-# standalone worker domain.
+# API routes: CORS headers.
 /api/*
   Access-Control-Allow-Origin: *
   Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS
