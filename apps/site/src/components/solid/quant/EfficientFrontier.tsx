@@ -1,4 +1,4 @@
-import { Show, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface PortfolioPoint {
@@ -221,6 +221,11 @@ export default function EfficientFrontier() {
     loadData();
   });
   const pts = points();
+
+  createEffect(() => {
+    const v = points();
+    if (v) draw();
+  });
 
   return (
     <div>

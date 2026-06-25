@@ -1,4 +1,4 @@
-import { Show, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface YieldResult {
@@ -156,6 +156,11 @@ export default function YieldCurveChart() {
     loadData();
   });
   const d = data();
+
+  createEffect(() => {
+    const v = data();
+    if (v) draw();
+  });
 
   return (
     <div>

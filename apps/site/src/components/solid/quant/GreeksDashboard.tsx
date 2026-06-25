@@ -1,4 +1,4 @@
-import { Show, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface GreeksResult {
@@ -42,14 +42,41 @@ export default function GreeksDashboard() {
       const data = _raw.data || _raw;
       if (Array.isArray(data)) {
         const calls = data.filter((o: Opt) => o.type === 'call' && o.iv && o.iv > 0).slice(0, 20);
-        setOptions(calls);
-        if (calls.length > 0 && !selected()) {
-          setSelected(calls[0].instrument);
+        if (calls.length > 0) {
+          setOptions(calls);
+          if (!selected()) setSelected(calls[0].instrument);
+          return;
         }
       }
     } catch {
-      /* options endpoint not critical */
+      /* Deribit rate-limited or unavailable */
     }
+    // Fallback: synthetic ATM option for demo
+    setOptions([
+      {
+        instrument: 'BTC-SYNTHETIC-ATM-C',
+        strike: 60000,
+        iv: 55,
+        type: 'call',
+        expiry: '2926',
+        mark_price: 0,
+        volume: 0,
+        open_interest: 0,
+        underlying_price: 60000,
+      },
+      {
+        instrument: 'BTC-SYNTHETIC-OTM-C',
+        strike: 70000,
+        iv: 65,
+        type: 'call',
+        expiry: '2926',
+        mark_price: 0,
+        volume: 0,
+        open_interest: 0,
+        underlying_price: 60000,
+      },
+    ]);
+    if (!selected()) setSelected('BTC-SYNTHETIC-ATM-C');
   }
 
   async function computeGreeks() {
@@ -186,6 +213,11 @@ export default function GreeksDashboard() {
   });
 
   const g = greeks();
+
+  createEffect(() => {
+    const v = greeks();
+    if (v) draw();
+  });
 
   return (
     <div>

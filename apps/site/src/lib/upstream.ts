@@ -84,14 +84,16 @@ export async function fetchKlines(
         const d = await res.json();
         const key = Object.keys(d?.result || {}).find((k) => k !== 'last');
         if (!key) throw new Error('no data');
-        return d.result[key].map((c: string[]) => [
-          Number.parseInt(c[0]),
-          Number.parseFloat(c[1]),
-          Number.parseFloat(c[2]),
-          Number.parseFloat(c[3]),
-          Number.parseFloat(c[4]),
-          Number.parseFloat(c[5]),
-        ]);
+        return d.result[key]
+          .slice(-limit)
+          .map((c: string[]) => [
+            Number.parseInt(c[0]),
+            Number.parseFloat(c[1]),
+            Number.parseFloat(c[2]),
+            Number.parseFloat(c[3]),
+            Number.parseFloat(c[4]),
+            Number.parseFloat(c[5]),
+          ]);
       },
     },
     {
@@ -103,14 +105,16 @@ export async function fetchKlines(
         const r = d?.chart?.result?.[0];
         if (!r) throw new Error('no data');
         const q = r.indicators.quote[0];
-        return r.timestamp.map((t: number, i: number) => [
-          t,
-          q.open[i] ?? q.close[i],
-          q.high[i] ?? q.close[i],
-          q.low[i] ?? q.close[i],
-          q.close[i],
-          q.volume[i] ?? 0,
-        ]);
+        return r.timestamp
+          .slice(-limit)
+          .map((t: number, i: number) => [
+            t,
+            q.open[i] ?? q.close[i],
+            q.high[i] ?? q.close[i],
+            q.low[i] ?? q.close[i],
+            q.close[i],
+            q.volume[i] ?? 0,
+          ]);
       },
     },
   ];

@@ -1,4 +1,4 @@
-import { createSignal, onMount } from 'solid-js';
+import { createEffect, createSignal, onMount } from 'solid-js';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface Leg {
@@ -123,6 +123,12 @@ export default function OptionsPayoff() {
 
   onMount(() => {
     setTimeout(draw, 10);
+  });
+
+  createEffect(() => {
+    legs();
+    spot();
+    draw();
   });
 
   return (
