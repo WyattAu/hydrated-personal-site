@@ -2,7 +2,7 @@ import { defineMiddleware } from 'astro:middleware';
 
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://plausible.io https://static.cloudflareinsights.com",
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://plausible.io https://static.cloudflareinsights.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https:",
   "font-src 'self' https://fonts.gstatic.com",
