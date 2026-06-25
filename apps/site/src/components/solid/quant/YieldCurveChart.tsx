@@ -30,7 +30,8 @@ export default function YieldCurveChart() {
     try {
       const res = await fetch('/api/treasury-yields');
       if (!res.ok) throw new Error('API');
-      const yields = await res.json();
+      const _resp = await res.json();
+      const yields = _resp.data || _resp;
       if (!Array.isArray(yields) || yields.length < 3) throw new Error('insufficient');
       setRaw(yields);
 
@@ -155,7 +156,6 @@ export default function YieldCurveChart() {
   onMount(() => {
     loadData();
   });
-  const d = data();
 
   createEffect(() => {
     const v = data();
@@ -173,11 +173,13 @@ export default function YieldCurveChart() {
         </p>
       </Show>
       <canvas ref={canvasRef} class="w-full" style={{ height: '280px' }} />
-      <Show when={d}>
-        <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-          FRED DGS1MO-DGS30 | NS fit: b0={d?.beta0.toFixed(2)} b1={d?.beta1.toFixed(2)} b2=
-          {d?.beta2.toFixed(2)} lam={d?.lambda.toFixed(1)}
-        </p>
+      <Show when={data()} keyed>
+        {(d) => (
+          <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
+            FRED DGS1MO-DGS30 | NS fit: b0={d.beta0.toFixed(2)} b1={d.beta1.toFixed(2)} b2=
+            {d.beta2.toFixed(2)} lam={d.lambda.toFixed(1)}
+          </p>
+        )}
       </Show>
     </div>
   );
