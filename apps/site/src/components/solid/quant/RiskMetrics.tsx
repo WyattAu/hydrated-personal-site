@@ -23,7 +23,8 @@ export default function RiskMetrics(props: { symbol?: string }) {
     try {
       const res = await fetch(`/api/binance-klines?symbol=${symbol()}&interval=1d&limit=365`);
       if (!res.ok) return;
-      const klines = await res.json();
+      const _raw = await res.json();
+      const klines = _raw.data || _raw;
       const closes: number[] = klines.map((k: (string | number)[]) =>
         Number.parseFloat(k[4] as string),
       );

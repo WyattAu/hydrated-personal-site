@@ -12,7 +12,8 @@ function useCryptoTicker() {
       try {
         const res = await fetch('/api/crypto-ticker');
         if (!res.ok) return;
-        const raw = await res.json();
+        const _resp = await res.json();
+        const raw = _resp.data || _resp;
         const map: Record<string, { price: number; change: number; volume: number }> = {};
         for (const e of (raw.data || []) as Array<{
           symbol: string;
@@ -42,7 +43,8 @@ function useStockQuote(symbols: string) {
       try {
         const res = await fetch(`/api/stock-quote?symbols=${symbols}`);
         if (!res.ok) return;
-        const raw = await res.json();
+        const _resp = await res.json();
+        const raw = _resp.data || _resp;
         const map: Record<
           string,
           { price: number; change: number; changePct: number; name: string }
@@ -81,7 +83,8 @@ function useMempool() {
       try {
         const res = await fetch('/api/mempool');
         if (!res.ok) return;
-        const raw = await res.json();
+        const _resp = await res.json();
+        const raw = _resp.data || _resp;
         if (raw.fees)
           setData({
             fastest: raw.fees.fastestFee,
@@ -109,7 +112,8 @@ function useBinanceFutures() {
     try {
       const res = await fetch('/api/binance-futures');
       if (!res.ok) return;
-      const raw = await res.json();
+      const _resp = await res.json();
+      const raw = _resp.data || _resp;
       setData({
         fundingRate: raw.funding_rate || 0,
         openInterest: raw.open_interest || 0,
@@ -128,7 +132,8 @@ function useFearGreed() {
     try {
       const res = await fetch('/api/fear-greed');
       if (!res.ok) return;
-      const raw = await res.json();
+      const _resp = await res.json();
+      const raw = _resp.data || _resp;
       if (raw.data?.[0]) {
         setData({ value: raw.data[0].value, classification: raw.data[0].value_classification });
         recordFetch('fear-greed');
@@ -144,7 +149,8 @@ function useKpIndex() {
     try {
       const res = await fetch('/api/kp-index');
       if (!res.ok) return;
-      const raw = await res.json();
+      const _resp = await res.json();
+      const raw = _resp.data || _resp;
       if (Array.isArray(raw) && raw.length > 0) {
         const latest = raw[raw.length - 1];
         setData(Array.isArray(latest) ? String(latest[1]) : String(latest.kp_index));
@@ -161,7 +167,8 @@ function useEarthquakes() {
     try {
       const res = await fetch('/api/earthquakes');
       if (!res.ok) return;
-      const raw = await res.json();
+      const _resp = await res.json();
+      const raw = _resp.data || _resp;
       setCount((raw.features || []).length);
       recordFetch('earthquakes');
     } catch {}
@@ -175,7 +182,8 @@ function useExchangeRates() {
     try {
       const res = await fetch('/api/exchange-rates');
       if (!res.ok) return;
-      const raw = await res.json();
+      const _resp = await res.json();
+      const raw = _resp.data || _resp;
       setRates(raw.rates || {});
       recordFetch('exchange-rates');
     } catch {}

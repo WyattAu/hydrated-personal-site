@@ -39,7 +39,8 @@ export default function CorrelationNetwork() {
       for (const sym of assets) {
         const res = await fetch(`/api/binance-klines?symbol=${sym}&interval=1d&limit=60`);
         if (!res.ok) continue;
-        const klines = await res.json();
+        const _raw = await res.json();
+        const klines = _raw.data || _raw;
         const closes = klines.map((k: (string | number)[]) => Number.parseFloat(k[4] as string));
         if (closes.length < 20) continue;
         const rets = closes.slice(1).map((c: number, i: number) => Math.log(c / closes[i]));

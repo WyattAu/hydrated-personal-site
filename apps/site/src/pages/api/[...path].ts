@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import * as v from 'valibot';
 import {
-  CryptoPriceSchema,
   EarthquakeFeatureSchema,
   FearGreedDataSchema,
   GlobalDataSchema,
@@ -11,6 +10,13 @@ import {
   MempoolDataSchema,
   WeatherDataSchema,
 } from '../../lib/schemas';
+import {
+  fetchCryptoTickers,
+  fetchDeribitOptions,
+  fetchFundingRates,
+  fetchKlines,
+  fetchTreasuryYields,
+} from '../../lib/upstream';
 
 const cache = new Map<string, { data: unknown; expiry: number }>();
 const inflight = new Map<string, Promise<unknown>>();
@@ -123,37 +129,97 @@ export const GET: APIRoute = async (ctx) => {
       headers: { 'Content-Type': 'application/json' },
     });
 
+  // --- Upstream connectivity diagnostics ---
+  if (path === 'diagnostics') {
+    const upstreams: Array<{ name: string; url: string; method?: string }> = [
+      { name: 'binance-spot', url: 'https://api.binance.com/api/v3/ping' },
+      { name: 'binance-futures', url: 'https://fapi.binance.com/fapi/v1/ping' },
+      { name: 'coingecko', url: 'https://api.coingecko.com/api/v3/ping' },
+      { name: 'deribit', url: 'https://www.deribit.com/api/v2/public/ping' },
+      { name: 'fred', url: 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10' },
+      {
+        name: 'usgs',
+        url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson',
+      },
+      {
+        name: 'hackernews',
+        url: 'https://hacker-news.firebaseio.com/v0/topstories.json?limitToFirst=1',
+      },
+      { name: 'feargreek', url: 'https://api.alternative.me/fng/?limit=1' },
+      { name: 'mempool', url: 'https://mempool.space/api/v1/fees/recommended' },
+      {
+        name: 'openmeteo',
+        url: 'https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&current=temperature_2m',
+      },
+      { name: 'exchangerate', url: 'https://api.exchangerate-api.com/v4/latest/USD' },
+      {
+        name: 'yahoo',
+        url: 'https://query2.finance.yahoo.com/v8/finance/chart/BTC-USD?range=1d&interval=1d',
+      },
+      { name: 'kraken', url: 'https://api.kraken.com/0/public/Time' },
+      { name: 'okx', url: 'https://www.okx.com/api/v5/public/time' },
+      { name: 'bybit', url: 'https://api.bybit.com/v5/market/time' },
+      {
+        name: 'treasury-gov',
+        url: 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026-06-21&_format=csv',
+      },
+    ];
+
+    const results = await Promise.all(
+      upstreams.map(async (up) => {
+        const start = Date.now();
+        try {
+          const res = await fetch(up.url, {
+            signal: AbortSignal.timeout(8000),
+            headers: up.name === 'yahoo' ? { 'User-Agent': 'Mozilla/5.0' } : {},
+          });
+          const elapsed = Date.now() - start;
+          const body = await res.text();
+          return {
+            name: up.name,
+            status: res.status,
+            ok: res.ok,
+            latency_ms: elapsed,
+            body_len: body.length,
+            body_preview: body.slice(0, 100),
+          };
+        } catch (e) {
+          return {
+            name: up.name,
+            status: 0,
+            ok: false,
+            latency_ms: Date.now() - start,
+            error: e instanceof Error ? e.message : String(e),
+          };
+        }
+      }),
+    );
+
+    return J(results);
+  }
+
   if (path === 'crypto-ticker') {
     const c = getCached('ct');
     if (c) return J(c);
-    // Primary: Binance. Fallback: CoinGecko (Binance geo-blocks some CF egress).
-    const d = await safeFetch('https://api.binance.com/api/v3/ticker/24hr', 'ct');
-    if (d) {
-      const validated = validateOrPass(v.array(CryptoPriceSchema), d, 'crypto-ticker');
-      setCache('ct', validated, 10000);
-      return J(validated);
-    }
-    const cg = await safeFetch(
-      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h',
-      'ct-cg',
-    );
-    if (cg && Array.isArray(cg)) {
-      const normalised = cg.map((coin: Record<string, unknown>) => ({
-        symbol: `${String(coin.symbol || '').toUpperCase()}USDT`,
-        price: coin.current_price,
-        priceChange: coin.price_change_24h,
-        priceChangePercent: coin.price_change_percentage_24h,
-        volume: coin.total_volume,
-        quoteVolume: coin.market_cap,
-        lastPrice: coin.current_price,
-        highPrice: coin.high_24h,
-        lowPrice: coin.low_24h,
+    // Multi-tier: OKX → Bybit → stale cache. Binance and CoinGecko are
+    // geo-blocked (403) from Cloudflare edge egress.
+    const result = await fetchCryptoTickers();
+    if (result) {
+      const data = result.tickers.map((t) => ({
+        symbol: t.symbol,
+        lastPrice: t.price.toString(),
+        price: t.price,
+        priceChange: t.change.toString(),
+        priceChangePercent: t.changePct.toFixed(2),
+        volume: t.volume.toString(),
+        quoteVolume: '0',
+        highPrice: '0',
+        lowPrice: '0',
       }));
-      const validated = validateOrPass(v.array(CryptoPriceSchema), normalised, 'crypto-ticker');
-      setCache('ct', validated, 30000);
-      return J(validated);
+      setCache('ct', data, 10000);
+      return J({ data, _source: result.source });
     }
-    return J(getCached('ct') || { error: 'unavailable' });
+    return J(getCached('ct') || { error: 'unavailable', _blocked: ['binance', 'coingecko'] });
   }
   if (path === 'fear-greed') {
     const c = getCached('fg');
@@ -302,20 +368,18 @@ export const GET: APIRoute = async (ctx) => {
   }
   if (path === 'binance-klines') {
     const sym = url.searchParams.get('symbol') || 'BTCUSDT';
-    const iv = url.searchParams.get('interval') || '1h';
-    const lm = url.searchParams.get('limit') || '100';
+    const iv = url.searchParams.get('interval') || '1d';
+    const lm = Number.parseInt(url.searchParams.get('limit') || '100', 10);
     const ck = `kl:${sym}:${iv}:${lm}`;
     const c = getCached(ck);
     if (c) return J(c);
-    const d = await safeFetch(
-      `https://api.binance.com/api/v3/klines?symbol=${sym}&interval=${iv}&limit=${lm}`,
-      'kl',
-    );
-    if (d) {
-      setCache(ck, d, 300000);
-      return J(d);
+    // Multi-tier: OKX → Kraken → Yahoo. Binance is geo-blocked (403).
+    const result = await fetchKlines(sym, iv, lm);
+    if (result) {
+      setCache(ck, result.candles, 300000);
+      return J({ data: result.candles, _source: result.source });
     }
-    return J(getCached(ck) || { error: 'unavailable' });
+    return J(getCached(ck) || { error: 'unavailable', _blocked: ['binance'] });
   }
   if (path === 'stock-chart') {
     const sym = url.searchParams.get('symbol');
@@ -389,70 +453,24 @@ export const GET: APIRoute = async (ctx) => {
     const c = getCached('deribit');
     if (c) return J(c);
     const currency = url.searchParams.get('currency') || 'BTC';
-    const d = await safeFetch(
-      `https://www.deribit.com/api/v2/public/get_book_summary_by_currency?currency=${currency}&kind=option`,
-      'deribit',
-    );
-    if (d && typeof d === 'object' && 'result' in d) {
-      const result = (d as { result: Array<Record<string, unknown>> }).result.map((opt) => {
-        const name = opt.instrument_name as string;
-        const parts = name.split('-');
-        return {
-          instrument: name,
-          underlying: parts[0],
-          expiry: parts[1],
-          strike: Number.parseFloat(parts[2]),
-          type: parts[3]?.startsWith('C') ? 'call' : 'put',
-          iv: opt.mark_iv,
-          mark_price: opt.mark_price,
-          volume: opt.volume,
-          open_interest: opt.open_interest,
-          underlying_price: opt.underlying_price,
-        };
-      });
-      setCache('deribit', result, 300000);
-      return J(result);
+    // Try Deribit (may rate-limit 429). OKX options as fallback.
+    // Deribit's 429 is per-IP, not per-account. Cache aggressively (10 min).
+    const result = await fetchDeribitOptions(currency);
+    if (result) {
+      setCache('deribit', result.options, 600000);
+      return J({ data: result.options, _source: result.source });
     }
-    return J(getCached('deribit') || { error: 'unavailable' });
+    return J(getCached('deribit') || { error: 'unavailable', _blocked: ['deribit-429'] });
   }
 
   if (path === 'treasury-yields') {
     const c = getCached('yields');
     if (c) return J(c);
-    const series: Array<{ label: string; maturity: number; code: string }> = [
-      { label: '1MO', maturity: 0.083, code: 'DGS1MO' },
-      { label: '3MO', maturity: 0.25, code: 'DGS3MO' },
-      { label: '6MO', maturity: 0.5, code: 'DGS6MO' },
-      { label: '1Y', maturity: 1.0, code: 'DGS1' },
-      { label: '2Y', maturity: 2.0, code: 'DGS2' },
-      { label: '5Y', maturity: 5.0, code: 'DGS5' },
-      { label: '7Y', maturity: 7.0, code: 'DGS7' },
-      { label: '10Y', maturity: 10.0, code: 'DGS10' },
-      { label: '20Y', maturity: 20.0, code: 'DGS20' },
-      { label: '30Y', maturity: 30.0, code: 'DGS30' },
-    ];
-    const yields: Array<{ label: string; maturity: number; yield: number }> = [];
-    for (const s of series) {
-      try {
-        // FRED returns CSV text, not JSON. Use raw fetch.
-        const csvRes = await fetch(`https://fred.stlouisfed.org/graph/fredgraph.csv?id=${s.code}`, {
-          signal: AbortSignal.timeout(5000),
-        });
-        if (!csvRes.ok) continue;
-        const csv = await csvRes.text();
-        const lines = csv.trim().split('\n');
-        const lastLine = lines[lines.length - 1];
-        const val = Number.parseFloat(lastLine.split(',')[1]);
-        if (!Number.isNaN(val)) {
-          yields.push({ label: s.label, maturity: s.maturity, yield: val });
-        }
-      } catch {
-        // skip this series on failure
-      }
-    }
-    if (yields.length > 0) {
-      setCache('yields', yields, 3600000);
-      return J(yields);
+    // FRED works from CF edge. Fallback: US Treasury direct CSV.
+    const result = await fetchTreasuryYields();
+    if (result) {
+      setCache('yields', result.yields, 3600000);
+      return J({ data: result.yields, _source: result.source });
     }
     return J(getCached('yields') || { error: 'unavailable' });
   }
@@ -460,29 +478,13 @@ export const GET: APIRoute = async (ctx) => {
   if (path === 'funding-rates') {
     const c = getCached('funding');
     if (c) return J(c);
-    let d: unknown = null;
-    try {
-      const fr = await fetch('https://fapi.binance.com/fapi/v1/premiumIndex', {
-        signal: AbortSignal.timeout(5000),
-      });
-      if (fr.ok) d = await fr.json();
-    } catch {
-      // skip
+    // Multi-tier: Bybit → OKX. Binance futures is geo-blocked (403).
+    const result = await fetchFundingRates();
+    if (result) {
+      setCache('funding', result.rates, 60000);
+      return J({ data: result.rates, _source: result.source });
     }
-    if (d && Array.isArray(d)) {
-      const result = (d as Array<Record<string, string>>)
-        .filter((item) => item.symbol?.endsWith('USDT'))
-        .map((item) => ({
-          symbol: item.symbol,
-          rate: Number.parseFloat(item.lastFundingRate || '0'),
-          nextFunding: item.nextFundingTime,
-        }))
-        .sort((a, b) => Math.abs(b.rate) - Math.abs(a.rate))
-        .slice(0, 50);
-      setCache('funding', result, 60000);
-      return J(result);
-    }
-    return J(getCached('funding') || { error: 'unavailable' });
+    return J(getCached('funding') || { error: 'unavailable', _blocked: ['binance-futures'] });
   }
 
   return E('Not found', 404);

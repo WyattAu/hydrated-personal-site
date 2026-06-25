@@ -33,7 +33,8 @@ export default function EfficientFrontier() {
       for (const sym of assets) {
         const res = await fetch(`/api/binance-klines?symbol=${sym}&interval=1d&limit=90`);
         if (!res.ok) continue;
-        const klines = await res.json();
+        const _raw = await res.json();
+        const klines = _raw.data || _raw;
         const closes = klines.map((k: (string | number)[]) => Number.parseFloat(k[4] as string));
         if (closes.length < 30) continue;
         nPeriods = closes.length - 1;

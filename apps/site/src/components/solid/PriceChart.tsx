@@ -100,7 +100,8 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
         : `/api/binance-klines?symbol=${sym}&interval=${tfConfig.interval}&limit=${tfConfig.limit}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`${sym}: HTTP ${res.status}`);
-      const raw = await res.json();
+      const _resp = await res.json();
+      const raw = _resp.data || _resp;
       if (raw?.error) throw new Error(`${sym}: ${raw.error}`);
 
       if (isStock) {

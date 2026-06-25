@@ -12,7 +12,8 @@ function useGithubTrending() {
     try {
       const res = await fetch('/api/github-trending');
       if (res.ok) {
-        const raw = await res.json();
+        const _resp = await res.json();
+        const raw = _resp.data || _resp;
         setRepos((raw?.items ?? (Array.isArray(raw) ? raw : [])).slice(0, 15));
         recordFetch('github-trending');
       }
