@@ -12,6 +12,18 @@ interface CountryData {
   currencies?: Record<string, { name: string; symbol: string }>;
   gdp?: number;
   lifeExpectancy?: number;
+  gdpPerCapita?: number;
+  unemployment?: number;
+  infantMortality?: number;
+  healthExpenditure?: number;
+  literacyRate?: number;
+  giniIndex?: number;
+  arableLand?: number;
+  electricyPerCapita?: number;
+  internetUsers?: number;
+  manufacturing?: number;
+  co2PerCapita?: number;
+  urbanPopulation?: number;
 }
 
 interface MapInstance {
@@ -583,25 +595,73 @@ export default function WorldMap() {
                 const [countryRes, wbRes] = await Promise.all([
                   fetch(`/api/restcountries?code=${iso}`),
                   fetch(
-                    `/api/world-bank?country=${iso}&indicators=SP.DYN.LE00.IN,SP.POP.TOTL,NY.GDP.MKTP.CD,EN.ATM.CO2E.PC,SP.URB.TOTL.IN.ZS`,
+                    `/api/world-bank?country=${iso}&indicators=SP.DYN.LE00.IN,SP.POP.TOTL,NY.GDP.MKTP.CD,NY.GDP.PCAP.CD,EN.ATM.CO2E.PC,SP.URB.TOTL.IN.ZS,SL.UEM.TOTL.ZS,SH.DYN.MORT,SH.XPD.CHEX.GD.ZS,SE.ADT.LITR.ZS,SI.POV.GINI,AG.LND.ARBL.HA.PC,EG.USE.ELEC.KH.PC,IT.NET.USER.ZS,NV.IND.MANF.ZS`,
                   ),
                 ]);
                 const cData = countryRes.ok ? await countryRes.json() : null;
                 const wbData = wbRes.ok ? await wbRes.json() : {};
                 if (cData) {
-                  const population = wbData['SP.POP.TOTL'];
-                  const gdp = wbData['NY.GDP.MKTP.CD'];
-                  const lifeExp = wbData['SP.DYN.LE00.IN'];
                   setCountryData({
                     name: cData.name?.common || name,
                     capital: Array.isArray(cData.capital) ? cData.capital[0] : cData.capital,
-                    population: typeof population === 'number' ? population : undefined,
+                    population:
+                      typeof wbData['SP.POP.TOTL'] === 'number' ? wbData['SP.POP.TOTL'] : undefined,
                     area: typeof cData.area === 'number' ? cData.area : undefined,
                     region: cData.region,
                     languages: cData.languages || {},
                     currencies: cData.currencies || {},
-                    gdp: typeof gdp === 'number' ? gdp : undefined,
-                    lifeExpectancy: typeof lifeExp === 'number' ? lifeExp : undefined,
+                    gdp:
+                      typeof wbData['NY.GDP.MKTP.CD'] === 'number'
+                        ? wbData['NY.GDP.MKTP.CD']
+                        : undefined,
+                    lifeExpectancy:
+                      typeof wbData['SP.DYN.LE00.IN'] === 'number'
+                        ? wbData['SP.DYN.LE00.IN']
+                        : undefined,
+                    gdpPerCapita:
+                      typeof wbData['NY.GDP.PCAP.CD'] === 'number'
+                        ? wbData['NY.GDP.PCAP.CD']
+                        : undefined,
+                    unemployment:
+                      typeof wbData['SL.UEM.TOTL.ZS'] === 'number'
+                        ? wbData['SL.UEM.TOTL.ZS']
+                        : undefined,
+                    infantMortality:
+                      typeof wbData['SH.DYN.MORT'] === 'number' ? wbData['SH.DYN.MORT'] : undefined,
+                    healthExpenditure:
+                      typeof wbData['SH.XPD.CHEX.GD.ZS'] === 'number'
+                        ? wbData['SH.XPD.CHEX.GD.ZS']
+                        : undefined,
+                    literacyRate:
+                      typeof wbData['SE.ADT.LITR.ZS'] === 'number'
+                        ? wbData['SE.ADT.LITR.ZS']
+                        : undefined,
+                    giniIndex:
+                      typeof wbData['SI.POV.GINI'] === 'number' ? wbData['SI.POV.GINI'] : undefined,
+                    arableLand:
+                      typeof wbData['AG.LND.ARBL.HA.PC'] === 'number'
+                        ? wbData['AG.LND.ARBL.HA.PC']
+                        : undefined,
+                    electricyPerCapita:
+                      typeof wbData['EG.USE.ELEC.KH.PC'] === 'number'
+                        ? wbData['EG.USE.ELEC.KH.PC']
+                        : undefined,
+                    internetUsers:
+                      typeof wbData['IT.NET.USER.ZS'] === 'number'
+                        ? wbData['IT.NET.USER.ZS']
+                        : undefined,
+                    manufacturing:
+                      typeof wbData['NV.IND.MANF.ZS'] === 'number'
+                        ? wbData['NV.IND.MANF.ZS']
+                        : undefined,
+                    co2PerCapita:
+                      typeof wbData['EN.ATM.CO2E.PC'] === 'number'
+                        ? wbData['EN.ATM.CO2E.PC']
+                        : undefined,
+                    urbanPopulation:
+                      typeof wbData['SP.URB.TOTL.IN.ZS'] === 'number'
+                        ? wbData['SP.URB.TOTL.IN.ZS']
+                        : undefined,
                   });
                 }
                 recordFetch('restcountries');
@@ -810,7 +870,7 @@ export default function WorldMap() {
           )}
 
           {!countryLoading() && countryData() && (
-            <div class="space-y-1.5">
+            <div class="space-y-1.5 max-h-[40vh] overflow-y-auto">
               {countryData()?.capital && (
                 <div class="flex justify-between">
                   <span>Capital</span>
@@ -855,24 +915,125 @@ export default function WorldMap() {
                   </span>
                 </div>
               )}
-              {countryData()?.languages && (
-                <div class="pt-1 border-t" style="border-color: var(--border);">
-                  <span class="block mb-1">Languages</span>
-                  <span style="color: var(--text-primary);">
-                    {Object.values(countryData()?.languages ?? {}).join(', ')}
+              {countryData()?.gdpPerCapita && (
+                <div class="flex justify-between">
+                  <span>GDP/Capita</span>
+                  <span style="color: var(--accent);">
+                    $
+                    {countryData()?.gdpPerCapita?.toLocaleString(undefined, {
+                      maximumFractionDigits: 0,
+                    })}
                   </span>
                 </div>
               )}
-              {countryData()?.currencies && (
-                <div class="pt-1 border-t" style="border-color: var(--border);">
-                  <span class="block mb-1">Currency</span>
+              {countryData()?.unemployment && (
+                <div class="flex justify-between">
+                  <span>Unemployment</span>
                   <span style="color: var(--text-primary);">
-                    {Object.values(countryData()?.currencies ?? {})
-                      .map((c) => `${c.name} (${c.symbol || ''})`)
-                      .join(', ')}
+                    {countryData()?.unemployment?.toFixed(1)}%
                   </span>
                 </div>
               )}
+              {countryData()?.infantMortality && (
+                <div class="flex justify-between">
+                  <span>Infant Mortality</span>
+                  <span style="color: var(--text-primary);">
+                    {countryData()?.infantMortality?.toFixed(1)}/1k
+                  </span>
+                </div>
+              )}
+              {countryData()?.healthExpenditure && (
+                <div class="flex justify-between">
+                  <span>Health Spending</span>
+                  <span style="color: var(--text-primary);">
+                    {countryData()?.healthExpenditure?.toFixed(1)}% GDP
+                  </span>
+                </div>
+              )}
+              {countryData()?.literacyRate && (
+                <div class="flex justify-between">
+                  <span>Literacy</span>
+                  <span style="color: var(--text-primary);">
+                    {countryData()?.literacyRate?.toFixed(1)}%
+                  </span>
+                </div>
+              )}
+              {countryData()?.giniIndex && (
+                <div class="flex justify-between">
+                  <span>Gini Index</span>
+                  <span style="color: var(--text-primary);">
+                    {countryData()?.giniIndex?.toFixed(1)}
+                  </span>
+                </div>
+              )}
+              {countryData()?.arableLand && (
+                <div class="flex justify-between">
+                  <span>Arable Land</span>
+                  <span style="color: var(--text-primary);">
+                    {countryData()?.arableLand?.toFixed(2)} ha/person
+                  </span>
+                </div>
+              )}
+              {countryData()?.electricyPerCapita && (
+                <div class="flex justify-between">
+                  <span>Electricity</span>
+                  <span style="color: var(--text-primary);">
+                    {countryData()?.electricyPerCapita?.toFixed(0)} kWh/cap
+                  </span>
+                </div>
+              )}
+              {countryData()?.internetUsers && (
+                <div class="flex justify-between">
+                  <span>Internet Users</span>
+                  <span style="color: var(--text-primary);">
+                    {countryData()?.internetUsers?.toFixed(1)}%
+                  </span>
+                </div>
+              )}
+              {countryData()?.manufacturing && (
+                <div class="flex justify-between">
+                  <span>Manufacturing</span>
+                  <span style="color: var(--text-primary);">
+                    {countryData()?.manufacturing?.toFixed(1)}% GDP
+                  </span>
+                </div>
+              )}
+              {countryData()?.co2PerCapita && (
+                <div class="flex justify-between">
+                  <span>CO2/Capita</span>
+                  <span style="color: var(--accent-warm);">
+                    {countryData()?.co2PerCapita?.toFixed(1)} t
+                  </span>
+                </div>
+              )}
+              {countryData()?.urbanPopulation && (
+                <div class="flex justify-between">
+                  <span>Urban Pop.</span>
+                  <span style="color: var(--text-primary);">
+                    {countryData()?.urbanPopulation?.toFixed(1)}%
+                  </span>
+                </div>
+              )}
+              {countryData()?.languages &&
+                Object.keys(countryData()?.languages ?? {}).length > 0 && (
+                  <div class="pt-1 border-t" style="border-color: var(--border);">
+                    <span class="block mb-1">Languages</span>
+                    <span style="color: var(--text-primary);">
+                      {Object.values(countryData()?.languages ?? {}).join(', ')}
+                    </span>
+                  </div>
+                )}
+              {countryData()?.currencies &&
+                Object.keys(countryData()?.currencies ?? {}).length > 0 && (
+                  <div class="pt-1 border-t" style="border-color: var(--border);">
+                    <span class="block mb-1">Currency</span>
+                    <span style="color: var(--text-primary);">
+                      {Object.values(countryData()?.currencies ?? {})
+                        .map((c) => `${c.name} (${c.symbol || ''})`)
+                        .join(', ')}
+                    </span>
+                  </div>
+                )}
             </div>
           )}
 

@@ -406,6 +406,7 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
   createEffect(() => {
     seriesData();
     viewMode();
+    crosshair();
     drawChart();
   });
 
