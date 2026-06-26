@@ -148,7 +148,11 @@ export async function fetchCryptoTickers(): Promise<{
         const d = await res.json();
         return (d?.data || [])
           .filter((t: Record<string, string>) => t.instId?.endsWith('-USDT'))
-          .slice(0, 100)
+          .sort(
+            (a: Record<string, string>, b: Record<string, string>) =>
+              Number.parseFloat(b.volCcy24h || '0') - Number.parseFloat(a.volCcy24h || '0'),
+          )
+          .slice(0, 50)
           .map((t: Record<string, string>) => ({
             symbol: t.instId.replace('-USDT', 'USDT'),
             price: Number.parseFloat(t.last),
