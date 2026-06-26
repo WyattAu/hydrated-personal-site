@@ -3,7 +3,6 @@ import * as v from 'valibot';
 import {
   EarthquakeFeatureSchema,
   FearGreedDataSchema,
-  GlobalDataSchema,
   HackerNewsStorySchema,
   KpIndexSchema,
   LLMBenchmarkModelSchema,
@@ -129,75 +128,6 @@ export const GET: APIRoute = async (ctx) => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-  // --- Upstream connectivity diagnostics ---
-  if (path === 'diagnostics') {
-    const upstreams: Array<{ name: string; url: string; method?: string }> = [
-      { name: 'binance-spot', url: 'https://api.binance.com/api/v3/ping' },
-      { name: 'binance-futures', url: 'https://fapi.binance.com/fapi/v1/ping' },
-      { name: 'coingecko', url: 'https://api.coingecko.com/api/v3/ping' },
-      { name: 'deribit', url: 'https://www.deribit.com/api/v2/public/ping' },
-      { name: 'fred', url: 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10' },
-      {
-        name: 'usgs',
-        url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson',
-      },
-      {
-        name: 'hackernews',
-        url: 'https://hacker-news.firebaseio.com/v0/topstories.json?limitToFirst=1',
-      },
-      { name: 'feargreek', url: 'https://api.alternative.me/fng/?limit=1' },
-      { name: 'mempool', url: 'https://mempool.space/api/v1/fees/recommended' },
-      {
-        name: 'openmeteo',
-        url: 'https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&current=temperature_2m',
-      },
-      { name: 'exchangerate', url: 'https://api.exchangerate-api.com/v4/latest/USD' },
-      {
-        name: 'yahoo',
-        url: 'https://query2.finance.yahoo.com/v8/finance/chart/BTC-USD?range=1d&interval=1d',
-      },
-      { name: 'kraken', url: 'https://api.kraken.com/0/public/Time' },
-      { name: 'okx', url: 'https://www.okx.com/api/v5/public/time' },
-      { name: 'bybit', url: 'https://api.bybit.com/v5/market/time' },
-      {
-        name: 'treasury-gov',
-        url: 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026-06-21&_format=csv',
-      },
-    ];
-
-    const results = await Promise.all(
-      upstreams.map(async (up) => {
-        const start = Date.now();
-        try {
-          const res = await fetch(up.url, {
-            signal: AbortSignal.timeout(8000),
-            headers: up.name === 'yahoo' ? { 'User-Agent': 'Mozilla/5.0' } : {},
-          });
-          const elapsed = Date.now() - start;
-          const body = await res.text();
-          return {
-            name: up.name,
-            status: res.status,
-            ok: res.ok,
-            latency_ms: elapsed,
-            body_len: body.length,
-            body_preview: body.slice(0, 100),
-          };
-        } catch (e) {
-          return {
-            name: up.name,
-            status: 0,
-            ok: false,
-            latency_ms: Date.now() - start,
-            error: e instanceof Error ? e.message : String(e),
-          };
-        }
-      }),
-    );
-
-    return J(results);
-  }
-
   if (path === 'crypto-ticker') {
     const c = getCached('ct');
     if (c) return J(c);
@@ -320,11 +250,33 @@ export const GET: APIRoute = async (ctx) => {
   if (path === 'coingecko-global') {
     const c = getCached('cg');
     if (c) return J(c);
-    const d = await safeFetch('https://api.coingecko.com/api/v3/global', 'cg');
-    if (d) {
-      const validated = validateOrPass(GlobalDataSchema, d, 'coingecko-global');
-      setCache('cg', validated, 300000);
-      return J(validated);
+    // CoinGecko blocked from CF edge. Use OKX as fallback.
+    try {
+      const okxRes = await fetch(
+        'https://www.okx.com/api/v5/public/instruments?instType=SPOT&instState=live',
+        {
+          signal: AbortSignal.timeout(5000),
+        },
+      );
+      if (okxRes.ok) {
+        const okxData = await okxRes.json();
+        const usdtPairs = (okxData?.data || []).filter((p: Record<string, string>) =>
+          p.instId?.endsWith('-USDT'),
+        );
+        const result = {
+          data: {
+            active_cryptocurrencies: usdtPairs.length,
+            markets: 0,
+            total_market_cap: { usd: 0 },
+            total_volume: { usd: 0 },
+            market_cap_percentage: { btc: 0, eth: 0 },
+          },
+        };
+        setCache('cg', result, 300000);
+        return J(result);
+      }
+    } catch {
+      // fall through
     }
     return J(getCached('cg') || { error: 'unavailable' });
   }
@@ -381,6 +333,36 @@ export const GET: APIRoute = async (ctx) => {
     }
     return J(getCached(ck) || { error: 'unavailable' });
   }
+  if (path === 'binance-futures') {
+    const c = getCached('bf');
+    if (c) return J(c);
+    // Binance futures blocked from CF. Use Bybit.
+    try {
+      const bybitRes = await fetch('https://api.bybit.com/v5/market/tickers?category=linear', {
+        signal: AbortSignal.timeout(8000),
+      });
+      if (bybitRes.ok) {
+        const d = await bybitRes.json();
+        const list = (d?.result?.list || []).filter((t: Record<string, string>) =>
+          t.symbol?.endsWith('USDT'),
+        );
+        const result = list.map((t: Record<string, string>) => ({
+          symbol: t.symbol,
+          fundingRate: t.fundingRate || '0',
+          openInterest: t.openInterest || '0',
+          volume24h: t.volume24h || '0',
+          turnover24h: t.turnover24h || '0',
+          lastPrice: t.lastPrice || '0',
+        }));
+        setCache('bf', result, 60000);
+        return J(result);
+      }
+    } catch {
+      // fall through
+    }
+    return J(getCached('bf') || { error: 'unavailable' });
+  }
+
   if (path === 'stock-chart') {
     const sym = url.searchParams.get('symbol');
     const rng = url.searchParams.get('range') || '1d';
@@ -389,13 +371,66 @@ export const GET: APIRoute = async (ctx) => {
     const ck = `st:${sym}:${rng}:${iv}`;
     const c = getCached(ck);
     if (c) return J(c);
-    const d = await safeFetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=${rng}&interval=${iv}`,
-      'st',
-    );
-    if (d) {
+    try {
+      const chartRes = await fetch(
+        `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=${rng}&interval=${iv}`,
+        { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(8000) },
+      );
+      if (!chartRes.ok) throw new Error(`Yahoo ${chartRes.status}`);
+      const d = await chartRes.json();
       setCache(ck, d, 300000);
       return J(d);
+    } catch {
+      return J(getCached(ck) || { error: 'unavailable' });
+    }
+  }
+
+  if (path === 'stock-quote') {
+    const symbols = url.searchParams.get('symbols') || '';
+    const ck = `sq:${symbols}`;
+    const c = getCached(ck);
+    if (c) return J(c);
+    // Yahoo v7 quote API is blocked. Use v8 chart endpoint per-symbol.
+    const symList = symbols
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const results: Array<{
+      symbol: string;
+      price: number;
+      change: number;
+      changePct: number;
+      name: string;
+    }> = [];
+    for (const sym of symList) {
+      try {
+        const chartRes = await fetch(
+          `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=2d&interval=1d`,
+          { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(5000) },
+        );
+        if (!chartRes.ok) continue;
+        const d = await chartRes.json();
+        const r = d?.chart?.result?.[0];
+        if (!r) continue;
+        const meta = r.meta || {};
+        const price = meta.regularMarketPrice || 0;
+        const prev = meta.chartPreviousClose || meta.previousClose || price;
+        const change = price - prev;
+        const changePct = prev > 0 ? (change / prev) * 100 : 0;
+        results.push({
+          symbol: sym,
+          price,
+          change,
+          changePct,
+          name: meta.shortName || meta.longName || sym,
+        });
+      } catch {
+        // skip this symbol
+      }
+    }
+    if (results.length > 0) {
+      setCache(ck, results, 60000);
+      return J(results);
     }
     return J(getCached(ck) || { error: 'unavailable' });
   }

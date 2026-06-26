@@ -112,14 +112,18 @@ function useBinanceFutures() {
       const res = await fetch('/api/binance-futures');
       if (!res.ok) return;
       const _resp = await res.json();
-      const raw = _resp.data || _resp;
-      setData({
-        fundingRate: raw.funding_rate || 0,
-        openInterest: raw.open_interest || 0,
-        longShortRatio: raw.long_short_ratio || 0,
-        takerBuySellRatio: raw.taker_buy_sell_ratio || 0,
-      });
-      recordFetch('binance-futures');
+      const items = Array.isArray(_resp) ? _resp : _resp.data || [];
+      // Find BTCUSDT in the list
+      const btc = items.find((t: Record<string, string>) => t.symbol === 'BTCUSDT');
+      if (btc) {
+        setData({
+          fundingRate: Number.parseFloat(btc.fundingRate || '0'),
+          openInterest: Number.parseFloat(btc.openInterest || '0'),
+          longShortRatio: 0,
+          takerBuySellRatio: 0,
+        });
+        recordFetch('binance-futures');
+      }
     } catch {}
   });
   return data;
@@ -132,9 +136,10 @@ function useFearGreed() {
       const res = await fetch('/api/fear-greed');
       if (!res.ok) return;
       const _resp = await res.json();
-      const raw = _resp.data || _resp;
-      if (raw.data?.[0]) {
-        setData({ value: raw.data[0].value, classification: raw.data[0].value_classification });
+      // fear-greed returns { name, data: [{ value, value_classification }] }
+      const fgData = _resp.data?.[0] || (Array.isArray(_resp) ? _resp[0] : null);
+      if (fgData) {
+        setData({ value: fgData.value, classification: fgData.value_classification });
         recordFetch('fear-greed');
       }
     } catch {}
@@ -152,7 +157,8 @@ function useKpIndex() {
       const raw = _resp.data || _resp;
       if (Array.isArray(raw) && raw.length > 0) {
         const latest = raw[raw.length - 1];
-        setData(Array.isArray(latest) ? String(latest[1]) : String(latest.kp_index));
+        const kpVal = Array.isArray(latest) ? latest[1] : (latest.kp_index ?? latest.Kp ?? '?');
+        setData(String(kpVal));
         recordFetch('kp-index');
       }
     } catch {}
