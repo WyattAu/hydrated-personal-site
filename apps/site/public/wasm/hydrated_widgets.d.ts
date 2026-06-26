@@ -2,55 +2,55 @@
 /* eslint-disable */
 
 export class AudioVisualizer {
-  free(): void;
-  [Symbol.dispose](): void;
-  fft_size(): number;
-  frequency_bins(): number;
-  get_frequency_data(): Float32Array;
-  get_time_data(): Float32Array;
-  constructor(canvas_id: string, width: number, height: number);
-  process_fft(input: Float32Array): Float32Array;
-  set_time_data(data: Float32Array): void;
+    free(): void;
+    [Symbol.dispose](): void;
+    fft_size(): number;
+    frequency_bins(): number;
+    get_frequency_data(): Float32Array;
+    get_time_data(): Float32Array;
+    constructor(canvas_id: string, width: number, height: number);
+    process_fft(input: Float32Array): Float32Array;
+    set_time_data(data: Float32Array): void;
 }
 
 export class Body {
-  free(): void;
-  [Symbol.dispose](): void;
-  constructor(x: number, y: number, vx: number, vy: number, mass: number);
-  mass: number;
-  vx: number;
-  vy: number;
-  x: number;
-  y: number;
+    free(): void;
+    [Symbol.dispose](): void;
+    constructor(x: number, y: number, vx: number, vy: number, mass: number);
+    mass: number;
+    vx: number;
+    vy: number;
+    x: number;
+    y: number;
 }
 
 export class NBodySimulation {
-  free(): void;
-  [Symbol.dispose](): void;
-  add_body(x: number, y: number, vx: number, vy: number, mass: number): void;
-  body_count(): number;
-  clear(): void;
-  get_masses(): Float64Array;
-  get_positions(): Float64Array;
-  constructor(canvas_id: string, width: number, height: number);
-  set_dt(dt: number): void;
-  set_gravity(g: number): void;
-  step(): void;
+    free(): void;
+    [Symbol.dispose](): void;
+    add_body(x: number, y: number, vx: number, vy: number, mass: number): void;
+    body_count(): number;
+    clear(): void;
+    get_masses(): Float64Array;
+    get_positions(): Float64Array;
+    constructor(canvas_id: string, width: number, height: number);
+    set_dt(dt: number): void;
+    set_gravity(g: number): void;
+    step(): void;
 }
 
 export class TerrainGenerator {
-  free(): void;
-  [Symbol.dispose](): void;
-  generate(width: number, height: number, scale: number): Float64Array;
-  get_height(x: number, y: number): number;
-  constructor(seed: number, octaves: number, persistence: number);
-  octaves(): number;
-  persistence(): number;
-  seed(): number;
-  set_octaves(octaves: number): void;
-  set_persistence(persistence: number): void;
-  set_scale(scale: number): void;
-  set_seed(seed: number): void;
+    free(): void;
+    [Symbol.dispose](): void;
+    generate(width: number, height: number, scale: number): Float64Array;
+    get_height(x: number, y: number): number;
+    constructor(seed: number, octaves: number, persistence: number);
+    octaves(): number;
+    persistence(): number;
+    seed(): number;
+    set_octaves(octaves: number): void;
+    set_persistence(persistence: number): void;
+    set_scale(scale: number): void;
+    set_seed(seed: number): void;
 }
 
 export function create_audio_visualizer(canvas_id: string, width: number, height: number): void;
@@ -90,11 +90,7 @@ export function main(): void;
 /**
  * Correlation matrix from a returns matrix (N assets x T periods, row-major).
  */
-export function quant_correlation_matrix(
-  returns: Float64Array,
-  n_assets: number,
-  n_periods: number,
-): string;
+export function quant_correlation_matrix(returns: Float64Array, n_assets: number, n_periods: number): string;
 
 /**
  * GARCH(1,1) fit and forecast.
@@ -105,27 +101,13 @@ export function quant_garch(returns: Float64Array, forecast_steps: number): stri
  * Black-Scholes call Greeks across a spot price range.
  * Returns JSON: { spot: [...], delta: [...], gamma: [...], theta: [...], vega: [...], rho: [...] }
  */
-export function quant_greeks(
-  spot_min: number,
-  spot_max: number,
-  num_points: number,
-  strike: number,
-  time_to_expiry: number,
-  risk_free_rate: number,
-  implied_vol: number,
-  is_call: boolean,
-): string;
+export function quant_greeks(spot_min: number, spot_max: number, num_points: number, strike: number, time_to_expiry: number, risk_free_rate: number, implied_vol: number, is_call: boolean): string;
 
 /**
  * Monte Carlo GBM simulation from historical close prices.
  * Returns JSON: { drift, volatility, s0, p5, p25, p50, p75, p95 }
  */
-export function quant_montecarlo(
-  closes: Float64Array,
-  periods_per_year: number,
-  horizon_days: number,
-  num_paths: number,
-): string;
+export function quant_montecarlo(closes: Float64Array, periods_per_year: number, horizon_days: number, num_paths: number): string;
 
 /**
  * Seed the WASM PRNG from JS (use crypto.getRandomValues for entropy).
@@ -142,337 +124,122 @@ export function quant_var(returns: Float64Array, alpha: number): string;
  */
 export function quant_yield_curve(maturities: Float64Array, yields: Float64Array): string;
 
-export function update_backtest(
-  canvas_id: string,
-  width: number,
-  height: number,
-  data_json: string,
-): void;
+export function update_backtest(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_btc_health(
-  canvas_id: string,
-  width: number,
-  height: number,
-  data_json: string,
-): void;
+export function update_btc_health(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_cellular_automata(
-  canvas_id: string,
-  width: number,
-  height: number,
-  _time: number,
-): void;
+export function update_cellular_automata(canvas_id: string, width: number, height: number, _time: number): void;
 
-export function update_climate(
-  canvas_id: string,
-  width: number,
-  height: number,
-  csv_data: string,
-): void;
+export function update_climate(canvas_id: string, width: number, height: number, csv_data: string): void;
 
-export function update_colorblind(
-  canvas_id: string,
-  width: number,
-  height: number,
-  img_data_json: string,
-): void;
+export function update_colorblind(canvas_id: string, width: number, height: number, img_data_json: string): void;
 
-export function update_correlation(
-  canvas_id: string,
-  width: number,
-  height: number,
-  data_json: string,
-): void;
+export function update_correlation(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_fourier_viz(
-  canvas_id: string,
-  width: number,
-  height: number,
-  time: number,
-): void;
+export function update_fourier_viz(canvas_id: string, width: number, height: number, time: number): void;
 
-export function update_generative(
-  canvas_id: string,
-  width: number,
-  height: number,
-  seed: number,
-  speed: number,
-  density: number,
-  time: number,
-): void;
+export function update_generative(canvas_id: string, width: number, height: number, seed: number, speed: number, density: number, time: number): void;
 
-export function update_network(
-  canvas_id: string,
-  width: number,
-  height: number,
-  data_json: string,
-): void;
+export function update_network(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_order_book(
-  canvas_id: string,
-  width: number,
-  height: number,
-  data_json: string,
-): void;
+export function update_order_book(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_physics(
-  canvas_id: string,
-  width: number,
-  height: number,
-  _time: number,
-): void;
+export function update_physics(canvas_id: string, width: number, height: number, _time: number): void;
 
-export function update_regex_playground(
-  canvas_id: string,
-  width: number,
-  height: number,
-  data_json: string,
-): void;
+export function update_regex_playground(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_treemap(
-  canvas_id: string,
-  width: number,
-  height: number,
-  data_json: string,
-): void;
+export function update_treemap(canvas_id: string, width: number, height: number, data_json: string): void;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
-  readonly memory: WebAssembly.Memory;
-  readonly __wbg_audiovisualizer_free: (a: number, b: number) => void;
-  readonly __wbg_body_free: (a: number, b: number) => void;
-  readonly __wbg_get_body_mass: (a: number) => number;
-  readonly __wbg_get_body_vx: (a: number) => number;
-  readonly __wbg_get_body_vy: (a: number) => number;
-  readonly __wbg_get_body_x: (a: number) => number;
-  readonly __wbg_get_body_y: (a: number) => number;
-  readonly __wbg_nbodysimulation_free: (a: number, b: number) => void;
-  readonly __wbg_set_body_mass: (a: number, b: number) => void;
-  readonly __wbg_set_body_vx: (a: number, b: number) => void;
-  readonly __wbg_set_body_vy: (a: number, b: number) => void;
-  readonly __wbg_set_body_x: (a: number, b: number) => void;
-  readonly __wbg_set_body_y: (a: number, b: number) => void;
-  readonly __wbg_terraingenerator_free: (a: number, b: number) => void;
-  readonly audiovisualizer_fft_size: (a: number) => number;
-  readonly audiovisualizer_frequency_bins: (a: number) => number;
-  readonly audiovisualizer_get_frequency_data: (a: number) => [number, number];
-  readonly audiovisualizer_get_time_data: (a: number) => [number, number];
-  readonly audiovisualizer_new: (a: number, b: number, c: number, d: number) => number;
-  readonly audiovisualizer_process_fft: (a: number, b: number, c: number) => [number, number];
-  readonly audiovisualizer_set_time_data: (a: number, b: number, c: number) => void;
-  readonly body_new: (a: number, b: number, c: number, d: number, e: number) => number;
-  readonly create_audio_visualizer: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-  ) => [number, number];
-  readonly create_backtest: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly create_btc_health: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly create_cellular_automata: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-  ) => [number, number];
-  readonly create_climate: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly create_colorblind: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly create_correlation: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly create_fourier_viz: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly create_generative: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly create_nbody_simulation: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-  ) => [number, number];
-  readonly create_network: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly create_order_book: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly create_physics: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly create_regex_playground: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-  ) => [number, number];
-  readonly create_terrain_generator: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-  ) => [number, number];
-  readonly create_treemap: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly main: () => void;
-  readonly nbodysimulation_add_body: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-  ) => void;
-  readonly nbodysimulation_body_count: (a: number) => number;
-  readonly nbodysimulation_clear: (a: number) => void;
-  readonly nbodysimulation_get_masses: (a: number) => [number, number];
-  readonly nbodysimulation_get_positions: (a: number) => [number, number];
-  readonly nbodysimulation_new: (a: number, b: number, c: number, d: number) => number;
-  readonly nbodysimulation_set_dt: (a: number, b: number) => void;
-  readonly nbodysimulation_set_gravity: (a: number, b: number) => void;
-  readonly nbodysimulation_step: (a: number) => void;
-  readonly quant_correlation_matrix: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-  ) => [number, number];
-  readonly quant_garch: (a: number, b: number, c: number) => [number, number];
-  readonly quant_greeks: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-    g: number,
-    h: number,
-  ) => [number, number];
-  readonly quant_montecarlo: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-  ) => [number, number];
-  readonly quant_seed: (a: number, b: number) => void;
-  readonly quant_var: (a: number, b: number, c: number) => [number, number];
-  readonly quant_yield_curve: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly terraingenerator_generate: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-  ) => [number, number];
-  readonly terraingenerator_get_height: (a: number, b: number, c: number) => number;
-  readonly terraingenerator_new: (a: number, b: number, c: number) => number;
-  readonly terraingenerator_octaves: (a: number) => number;
-  readonly terraingenerator_seed: (a: number) => number;
-  readonly terraingenerator_set_octaves: (a: number, b: number) => void;
-  readonly terraingenerator_set_persistence: (a: number, b: number) => void;
-  readonly terraingenerator_set_scale: (a: number, b: number) => void;
-  readonly terraingenerator_set_seed: (a: number, b: number) => void;
-  readonly update_backtest: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-  ) => [number, number];
-  readonly update_btc_health: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-  ) => [number, number];
-  readonly update_cellular_automata: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-  ) => [number, number];
-  readonly update_climate: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-  ) => [number, number];
-  readonly update_colorblind: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-  ) => [number, number];
-  readonly update_correlation: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-  ) => [number, number];
-  readonly update_fourier_viz: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-  ) => [number, number];
-  readonly update_generative: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-    g: number,
-    h: number,
-  ) => [number, number];
-  readonly update_network: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-  ) => [number, number];
-  readonly update_order_book: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-  ) => [number, number];
-  readonly update_physics: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-  ) => [number, number];
-  readonly update_regex_playground: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-  ) => [number, number];
-  readonly update_treemap: (
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-  ) => [number, number];
-  readonly terraingenerator_persistence: (a: number) => number;
-  readonly __wbindgen_malloc: (a: number, b: number) => number;
-  readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
-  readonly __wbindgen_exn_store: (a: number) => void;
-  readonly __externref_table_alloc: () => number;
-  readonly __wbindgen_externrefs: WebAssembly.Table;
-  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
-  readonly __externref_table_dealloc: (a: number) => void;
-  readonly __wbindgen_start: () => void;
+    readonly memory: WebAssembly.Memory;
+    readonly __wbg_audiovisualizer_free: (a: number, b: number) => void;
+    readonly __wbg_body_free: (a: number, b: number) => void;
+    readonly __wbg_get_body_mass: (a: number) => number;
+    readonly __wbg_get_body_vx: (a: number) => number;
+    readonly __wbg_get_body_vy: (a: number) => number;
+    readonly __wbg_get_body_x: (a: number) => number;
+    readonly __wbg_get_body_y: (a: number) => number;
+    readonly __wbg_nbodysimulation_free: (a: number, b: number) => void;
+    readonly __wbg_set_body_mass: (a: number, b: number) => void;
+    readonly __wbg_set_body_vx: (a: number, b: number) => void;
+    readonly __wbg_set_body_vy: (a: number, b: number) => void;
+    readonly __wbg_set_body_x: (a: number, b: number) => void;
+    readonly __wbg_set_body_y: (a: number, b: number) => void;
+    readonly __wbg_terraingenerator_free: (a: number, b: number) => void;
+    readonly audiovisualizer_fft_size: (a: number) => number;
+    readonly audiovisualizer_frequency_bins: (a: number) => number;
+    readonly audiovisualizer_get_frequency_data: (a: number) => [number, number];
+    readonly audiovisualizer_get_time_data: (a: number) => [number, number];
+    readonly audiovisualizer_new: (a: number, b: number, c: number, d: number) => number;
+    readonly audiovisualizer_process_fft: (a: number, b: number, c: number) => [number, number];
+    readonly audiovisualizer_set_time_data: (a: number, b: number, c: number) => void;
+    readonly body_new: (a: number, b: number, c: number, d: number, e: number) => number;
+    readonly create_audio_visualizer: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_backtest: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_btc_health: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_cellular_automata: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_climate: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_colorblind: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_correlation: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_fourier_viz: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_generative: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_nbody_simulation: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_network: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_order_book: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_physics: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_regex_playground: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_terrain_generator: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_treemap: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly main: () => void;
+    readonly nbodysimulation_add_body: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
+    readonly nbodysimulation_body_count: (a: number) => number;
+    readonly nbodysimulation_clear: (a: number) => void;
+    readonly nbodysimulation_get_masses: (a: number) => [number, number];
+    readonly nbodysimulation_get_positions: (a: number) => [number, number];
+    readonly nbodysimulation_new: (a: number, b: number, c: number, d: number) => number;
+    readonly nbodysimulation_set_dt: (a: number, b: number) => void;
+    readonly nbodysimulation_set_gravity: (a: number, b: number) => void;
+    readonly nbodysimulation_step: (a: number) => void;
+    readonly quant_correlation_matrix: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly quant_garch: (a: number, b: number, c: number) => [number, number];
+    readonly quant_greeks: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
+    readonly quant_montecarlo: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly quant_seed: (a: number, b: number) => void;
+    readonly quant_var: (a: number, b: number, c: number) => [number, number];
+    readonly quant_yield_curve: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly terraingenerator_generate: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly terraingenerator_get_height: (a: number, b: number, c: number) => number;
+    readonly terraingenerator_new: (a: number, b: number, c: number) => number;
+    readonly terraingenerator_octaves: (a: number) => number;
+    readonly terraingenerator_seed: (a: number) => number;
+    readonly terraingenerator_set_octaves: (a: number, b: number) => void;
+    readonly terraingenerator_set_persistence: (a: number, b: number) => void;
+    readonly terraingenerator_set_scale: (a: number, b: number) => void;
+    readonly terraingenerator_set_seed: (a: number, b: number) => void;
+    readonly update_backtest: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_btc_health: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_cellular_automata: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_climate: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_colorblind: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_correlation: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_fourier_viz: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_generative: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
+    readonly update_network: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_order_book: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_physics: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_regex_playground: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_treemap: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly terraingenerator_persistence: (a: number) => number;
+    readonly __wbindgen_malloc: (a: number, b: number) => number;
+    readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+    readonly __wbindgen_exn_store: (a: number) => void;
+    readonly __externref_table_alloc: () => number;
+    readonly __wbindgen_externrefs: WebAssembly.Table;
+    readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+    readonly __externref_table_dealloc: (a: number) => void;
+    readonly __wbindgen_start: () => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
@@ -495,9 +262,4 @@ export function initSync(module: { module: SyncInitInput } | SyncInitInput): Ini
  *
  * @returns {Promise<InitOutput>}
  */
-export default function __wbg_init(
-  module_or_path?:
-    | { module_or_path: InitInput | Promise<InitInput> }
-    | InitInput
-    | Promise<InitInput>,
-): Promise<InitOutput>;
+export default function __wbg_init (module_or_path?: { module_or_path: InitInput | Promise<InitInput> } | InitInput | Promise<InitInput>): Promise<InitOutput>;

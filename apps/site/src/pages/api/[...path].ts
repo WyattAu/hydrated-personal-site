@@ -480,16 +480,23 @@ export const GET: APIRoute = async (ctx) => {
     const result: Record<string, number | null> = {};
     for (const ind of indList) {
       try {
+        // most_recent_only=true returns the latest year which may have null value.
+        // Use date range to get the most recent non-null value.
         const res = await fetch(
-          `https://api.worldbank.org/v2/country/${encodeURIComponent(country)}/indicator/${encodeURIComponent(ind)}?format=json&most_recent_only=true`,
+          `https://api.worldbank.org/v2/country/${encodeURIComponent(country)}/indicator/${encodeURIComponent(ind)}?format=json&date=2018:2024&per_page=10`,
           { signal: AbortSignal.timeout(5000) },
         );
         if (!res.ok) continue;
         const d = await res.json();
-        const val = Array.isArray(d) && d[1]?.[0]?.value;
-        result[ind] = typeof val === 'number' ? val : null;
+        if (Array.isArray(d) && d[1]) {
+          // Find the most recent non-null value
+          const valid = d[1].find((item: { value: number | null }) => item.value !== null);
+          result[ind] = valid ? valid.value : null;
+        } else {
+          result[ind] = null;
+        }
       } catch {
-        // skip
+        result[ind] = null;
       }
     }
     setCache(ck, result, 86400000);

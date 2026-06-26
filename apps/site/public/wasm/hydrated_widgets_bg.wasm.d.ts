@@ -23,56 +23,24 @@ export const audiovisualizer_new: (a: number, b: number, c: number, d: number) =
 export const audiovisualizer_process_fft: (a: number, b: number, c: number) => [number, number];
 export const audiovisualizer_set_time_data: (a: number, b: number, c: number) => void;
 export const body_new: (a: number, b: number, c: number, d: number, e: number) => number;
-export const create_audio_visualizer: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-) => [number, number];
+export const create_audio_visualizer: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_backtest: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_btc_health: (a: number, b: number, c: number, d: number) => [number, number];
-export const create_cellular_automata: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-) => [number, number];
+export const create_cellular_automata: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_climate: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_colorblind: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_correlation: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_fourier_viz: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_generative: (a: number, b: number, c: number, d: number) => [number, number];
-export const create_nbody_simulation: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-) => [number, number];
+export const create_nbody_simulation: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_network: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_order_book: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_physics: (a: number, b: number, c: number, d: number) => [number, number];
-export const create_regex_playground: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-) => [number, number];
-export const create_terrain_generator: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-) => [number, number];
+export const create_regex_playground: (a: number, b: number, c: number, d: number) => [number, number];
+export const create_terrain_generator: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_treemap: (a: number, b: number, c: number, d: number) => [number, number];
 export const main: () => void;
-export const nbodysimulation_add_body: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-) => void;
+export const nbodysimulation_add_body: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
 export const nbodysimulation_body_count: (a: number) => number;
 export const nbodysimulation_clear: (a: number) => void;
 export const nbodysimulation_get_masses: (a: number) => [number, number];
@@ -81,39 +49,14 @@ export const nbodysimulation_new: (a: number, b: number, c: number, d: number) =
 export const nbodysimulation_set_dt: (a: number, b: number) => void;
 export const nbodysimulation_set_gravity: (a: number, b: number) => void;
 export const nbodysimulation_step: (a: number) => void;
-export const quant_correlation_matrix: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-) => [number, number];
+export const quant_correlation_matrix: (a: number, b: number, c: number, d: number) => [number, number];
 export const quant_garch: (a: number, b: number, c: number) => [number, number];
-export const quant_greeks: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-  g: number,
-  h: number,
-) => [number, number];
-export const quant_montecarlo: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-) => [number, number];
+export const quant_greeks: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
+export const quant_montecarlo: (a: number, b: number, c: number, d: number, e: number) => [number, number];
 export const quant_seed: (a: number, b: number) => void;
 export const quant_var: (a: number, b: number, c: number) => [number, number];
 export const quant_yield_curve: (a: number, b: number, c: number, d: number) => [number, number];
-export const terraingenerator_generate: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-) => [number, number];
+export const terraingenerator_generate: (a: number, b: number, c: number, d: number) => [number, number];
 export const terraingenerator_get_height: (a: number, b: number, c: number) => number;
 export const terraingenerator_new: (a: number, b: number, c: number) => number;
 export const terraingenerator_octaves: (a: number) => number;
@@ -122,109 +65,19 @@ export const terraingenerator_set_octaves: (a: number, b: number) => void;
 export const terraingenerator_set_persistence: (a: number, b: number) => void;
 export const terraingenerator_set_scale: (a: number, b: number) => void;
 export const terraingenerator_set_seed: (a: number, b: number) => void;
-export const update_backtest: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-) => [number, number];
-export const update_btc_health: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-) => [number, number];
-export const update_cellular_automata: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-) => [number, number];
-export const update_climate: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-) => [number, number];
-export const update_colorblind: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-) => [number, number];
-export const update_correlation: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-) => [number, number];
-export const update_fourier_viz: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-) => [number, number];
-export const update_generative: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-  g: number,
-  h: number,
-) => [number, number];
-export const update_network: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-) => [number, number];
-export const update_order_book: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-) => [number, number];
-export const update_physics: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-) => [number, number];
-export const update_regex_playground: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-) => [number, number];
-export const update_treemap: (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number,
-  f: number,
-) => [number, number];
+export const update_backtest: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+export const update_btc_health: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+export const update_cellular_automata: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+export const update_climate: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+export const update_colorblind: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+export const update_correlation: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+export const update_fourier_viz: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+export const update_generative: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
+export const update_network: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+export const update_order_book: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+export const update_physics: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+export const update_regex_playground: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+export const update_treemap: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
 export const terraingenerator_persistence: (a: number) => number;
 export const __wbindgen_malloc: (a: number, b: number) => number;
 export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
