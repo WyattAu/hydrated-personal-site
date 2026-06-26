@@ -739,8 +739,8 @@ export default function WorldMap() {
 
       {loading() && (
         <div
-          class="absolute inset-0 flex items-center justify-center z-10"
-          style="background: var(--bg-secondary);"
+          class="absolute inset-0 flex items-center justify-center"
+          style="z-index: 1000; background: var(--bg-secondary);"
         >
           <div class="text-center">
             <div
@@ -756,8 +756,8 @@ export default function WorldMap() {
 
       {error() && (
         <div
-          class="absolute inset-0 flex items-center justify-center p-6 z-10"
-          style="background: var(--bg-secondary);"
+          class="absolute inset-0 flex items-center justify-center p-6"
+          style="z-index: 1000; background: var(--bg-secondary);"
         >
           <div class="text-center">
             <p class="code-text mb-2" style="color: var(--accent-warm);">
@@ -772,8 +772,8 @@ export default function WorldMap() {
 
       {selectedCountry() && (
         <div
-          class="absolute bottom-4 left-4 right-4 md:right-auto md:max-w-sm p-4 border font-mono text-xs z-10"
-          style="background: var(--bg-card); border-color: var(--border); color: var(--text-secondary); backdrop-filter: blur(12px);"
+          class="absolute bottom-4 left-4 right-4 md:right-auto md:max-w-sm p-4 border font-mono text-xs"
+          style="background: var(--bg-card); border-color: var(--border); color: var(--text-secondary); backdrop-filter: blur(12px); z-index: 1000;"
         >
           <div class="flex items-center justify-between mb-3">
             <p class="font-mono text-sm font-bold" style="color: var(--accent);">
