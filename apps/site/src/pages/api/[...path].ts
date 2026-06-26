@@ -439,15 +439,32 @@ export const GET: APIRoute = async (ctx) => {
     const ck = `rc:${code}`;
     const c = getCached(ck);
     if (c) return J(c);
+    // restcountries.com is deprecated. Use World Bank countries API instead.
     try {
       const res = await fetch(
-        `https://restcountries.com/v3.1/alpha/${encodeURIComponent(code)}?fields=name,population,area,region,subregion,capital,languages,currencies,timezones,flags`,
+        `https://api.worldbank.org/v2/country/${encodeURIComponent(code)}?format=json`,
         { signal: AbortSignal.timeout(8000) },
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const d = await res.json();
-      setCache(ck, d, 86400000);
-      return J(d);
+      if (Array.isArray(d) && d[1]?.[0]) {
+        const country = d[1][0];
+        const data = {
+          name: { common: country.name },
+          population: null as number | null,
+          area: null as number | null,
+          region: country.region?.value || '',
+          subregion: country.adminregion?.value || '',
+          capital: [country.capitalCity] as string[],
+          capitalInfo: { latlng: [country.latitude, country.longitude] },
+          incomeLevel: country.incomeLevel?.value || '',
+          languages: {} as Record<string, string>,
+          currencies: {} as Record<string, { name: string; symbol: string }>,
+        };
+        setCache(ck, data, 86400000);
+        return J(data);
+      }
+      throw new Error('not found');
     } catch {
       return J(getCached(ck) || { error: 'unavailable' });
     }
