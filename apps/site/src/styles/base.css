@@ -32,22 +32,27 @@
 
 /* ============================================================
    BASE RESET — BRUTALIST
+   Wrapped in @layer base so Tailwind utilities (pt-32, etc.)
+   in @layer utilities correctly override these resets.
+   Unlayered CSS always wins over layered CSS in the cascade,
+   which was preventing pt-32 from applying.
    ============================================================ */
 
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  border-radius: 0 !important;
-}
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-radius: 0 !important;
+  }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
 body {
   font-family: "Inter", system-ui, -apple-system, sans-serif;
@@ -84,6 +89,7 @@ ul,
 ol {
   list-style: none;
 }
+} /* end @layer base */
 
 /* ============================================================
    TYPOGRAPHY
