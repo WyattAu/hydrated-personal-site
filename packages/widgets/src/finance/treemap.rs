@@ -55,17 +55,30 @@ pub fn update_treemap(canvas_id: &str, width: u32, height: u32, data_json: &str)
 
         let cap_val = js_sys::Reflect::get(&item, &"cap".into())
             .or_else(|_| js_sys::Reflect::get(&item, &"quoteVolume".into()));
-        let cap = cap_val.ok().and_then(|v| v.as_f64()).unwrap_or(0.0);
+        let cap = cap_val
+            .ok()
+            .and_then(|v| {
+                v.as_f64().or_else(|| {
+                    v.as_string()
+                        .and_then(|s| s.parse::<f64>().ok())
+                })
+            })
+            .unwrap_or(0.0);
 
         // If cap is 0, try volume * price as fallback
         let cap = if cap > 0.0 {
             cap
         } else {
-            let vol = js_sys::Reflect::get(&item, &"volume".into())
-                .ok().and_then(|v| v.as_f64()).unwrap_or(0.0);
-            let price = js_sys::Reflect::get(&item, &"price".into())
+            let vol_raw = js_sys::Reflect::get(&item, &"volume".into()).ok();
+            let vol = vol_raw
+                .and_then(|v| v.as_f64().or_else(|| v.as_string().and_then(|s| s.parse::<f64>().ok())))
+                .unwrap_or(0.0);
+            let price_raw = js_sys::Reflect::get(&item, &"price".into())
                 .or_else(|_| js_sys::Reflect::get(&item, &"lastPrice".into()))
-                .ok().and_then(|v| v.as_f64()).unwrap_or(0.0);
+                .ok();
+            let price = price_raw
+                .and_then(|v| v.as_f64().or_else(|| v.as_string().and_then(|s| s.parse::<f64>().ok())))
+                .unwrap_or(0.0);
             vol * price
         };
 

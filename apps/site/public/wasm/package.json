@@ -2,14 +2,8 @@
   "name": "hydrated-widgets",
   "type": "module",
   "version": "0.1.0",
-  "files": [
-    "hydrated_widgets_bg.wasm",
-    "hydrated_widgets.js",
-    "hydrated_widgets.d.ts"
-  ],
+  "files": ["hydrated_widgets_bg.wasm", "hydrated_widgets.js", "hydrated_widgets.d.ts"],
   "main": "hydrated_widgets.js",
   "types": "hydrated_widgets.d.ts",
-  "sideEffects": [
-    "./snippets/*"
-  ]
+  "sideEffects": ["./snippets/*"]
 }

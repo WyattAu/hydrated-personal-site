@@ -434,6 +434,51 @@ export const GET: APIRoute = async (ctx) => {
     }
     return J(getCached(ck) || { error: 'unavailable' });
   }
+  if (path === 'restcountries') {
+    const code = url.searchParams.get('code') || '';
+    const ck = `rc:${code}`;
+    const c = getCached(ck);
+    if (c) return J(c);
+    try {
+      const res = await fetch(
+        `https://restcountries.com/v3.1/alpha/${encodeURIComponent(code)}?fields=name,population,area,region,subregion,capital,languages,currencies,timezones,flags`,
+        { signal: AbortSignal.timeout(8000) },
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const d = await res.json();
+      setCache(ck, d, 86400000);
+      return J(d);
+    } catch {
+      return J(getCached(ck) || { error: 'unavailable' });
+    }
+  }
+
+  if (path === 'world-bank') {
+    const country = url.searchParams.get('country') || '';
+    const indicators = url.searchParams.get('indicators') || 'SP.POP.TOTL,NY.GDP.MKTP.CD';
+    const ck = `wb:${country}:${indicators}`;
+    const c = getCached(ck);
+    if (c) return J(c);
+    const indList = indicators.split(',').filter(Boolean);
+    const result: Record<string, number | null> = {};
+    for (const ind of indList) {
+      try {
+        const res = await fetch(
+          `https://api.worldbank.org/v2/country/${encodeURIComponent(country)}/indicator/${encodeURIComponent(ind)}?format=json&most_recent_only=true`,
+          { signal: AbortSignal.timeout(5000) },
+        );
+        if (!res.ok) continue;
+        const d = await res.json();
+        const val = Array.isArray(d) && d[1]?.[0]?.value;
+        result[ind] = typeof val === 'number' ? val : null;
+      } catch {
+        // skip
+      }
+    }
+    setCache(ck, result, 86400000);
+    return J(result);
+  }
+
   if (path === 'weather') {
     const lat = url.searchParams.get('lat');
     const lon = url.searchParams.get('lon');
