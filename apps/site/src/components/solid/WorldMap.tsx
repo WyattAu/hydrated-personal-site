@@ -263,19 +263,8 @@ const COUNTRIES = [
   { name: 'Czech Republic', lat: 49.8, lon: 15.5, radius: 4 },
 ];
 
-function findCountry(lat: number, lon: number): string {
-  let closest = 'Unknown Location';
-  let minDist = Number.POSITIVE_INFINITY;
-  for (const c of COUNTRIES) {
-    const dist = Math.sqrt((lat - c.lat) ** 2 + (lon - c.lon) ** 2);
-    if (dist < minDist) {
-      minDist = dist;
-      closest = c.name;
-    }
-  }
-  if (minDist > 30) return `Near ${closest}`;
-  return closest;
-}
+// GeoJSON borders loaded at runtime
+let geojsonLayer: any = null;
 
 function escapeHtml(str: string): string {
   return str
@@ -565,6 +554,78 @@ export default function WorldMap() {
     }
   }
 
+  function loadCountryBorders(L: typeof import('leaflet'), leafletMap: any) {
+    fetch(
+      'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson',
+    )
+      .then((r) => r.json())
+      .then((geojson) => {
+        geojsonLayer = L.geoJSON(geojson, {
+          style: {
+            color: 'var(--accent)',
+            weight: 1,
+            opacity: 0.3,
+            fillColor: 'transparent',
+            fillOpacity: 0,
+          },
+          onEachFeature: (feature: any, layer: any) => {
+            const name = feature.properties?.NAME || feature.properties?.ADMIN || 'Unknown';
+            const iso = feature.properties?.ISO_A2 || feature.properties?.ISO_A2_EH || '';
+            layer.on('click', async () => {
+              setSelectedCountry(name);
+              setCountryData(null);
+              setCountryLoading(true);
+              if (!iso || iso === '-99') {
+                setCountryLoading(false);
+                return;
+              }
+              try {
+                const [countryRes, wbRes] = await Promise.all([
+                  fetch(`/api/restcountries?code=${iso}`),
+                  fetch(
+                    `/api/world-bank?country=${iso}&indicators=SP.DYN.LE00.IN,SP.POP.TOTL,NY.GDP.MKTP.CD,EN.ATM.CO2E.PC,SP.URB.TOTL.IN.ZS`,
+                  ),
+                ]);
+                const cData = countryRes.ok ? await countryRes.json() : null;
+                const wbData = wbRes.ok ? await wbRes.json() : {};
+                if (cData) {
+                  const population = wbData['SP.POP.TOTL'];
+                  const gdp = wbData['NY.GDP.MKTP.CD'];
+                  const lifeExp = wbData['SP.DYN.LE00.IN'];
+                  setCountryData({
+                    name: cData.name?.common || name,
+                    capital: Array.isArray(cData.capital) ? cData.capital[0] : cData.capital,
+                    population: typeof population === 'number' ? population : undefined,
+                    area: typeof cData.area === 'number' ? cData.area : undefined,
+                    region: cData.region,
+                    languages: cData.languages || {},
+                    currencies: cData.currencies || {},
+                    gdp: typeof gdp === 'number' ? gdp : undefined,
+                    lifeExpectancy: typeof lifeExp === 'number' ? lifeExp : undefined,
+                  });
+                }
+                recordFetch('restcountries');
+              } catch {}
+              setCountryLoading(false);
+            });
+            // Highlight on hover
+            layer.on('mouseover', (e: any) => {
+              e.target.setStyle({
+                weight: 2,
+                opacity: 0.8,
+                fillColor: 'var(--accent)',
+                fillOpacity: 0.1,
+              });
+            });
+            layer.on('mouseout', (e: any) => {
+              geojsonLayer.resetStyle(e.target);
+            });
+          },
+        }).addTo(leafletMap);
+      })
+      .catch(() => {});
+  }
+
   onMount(async () => {
     if (!mapRef) return;
 
@@ -647,52 +708,8 @@ export default function WorldMap() {
         // Cache fallback already displayed
       }
 
-      leafletMap.on('click', async (e: { latlng: { lat: number; lng: number } }) => {
-        const country = findCountry(e.latlng.lat, e.latlng.lng);
-        setSelectedCountry(country);
-        setCountryData(null);
-        setCountryLoading(true);
-
-        const code = COUNTRY_NAME_TO_CODE[country];
-        if (!code) {
-          setCountryLoading(false);
-          return;
-        }
-
-        try {
-          const [countryRes, wbRes] = await Promise.all([
-            fetch(`/api/restcountries?code=${code}`),
-            fetch(
-              `/api/world-bank?country=${code}&indicators=SP.DYN.LE00.IN,SP.POP.TOTL,NY.GDP.MKTP.CD,EN.ATM.CO2E.PC,SP.URB.TOTL.IN.ZS`,
-            ),
-          ]);
-
-          const cData = countryRes.ok ? await countryRes.json() : null;
-          const wbData = wbRes.ok ? await wbRes.json() : {};
-
-          if (cData) {
-            // World Bank indicators endpoint returns flat { indicator_code: value }
-            // Population and area also come from World Bank, not restcountries
-            const population = wbData['SP.POP.TOTL'];
-            const gdp = wbData['NY.GDP.MKTP.CD'];
-            const lifeExp = wbData['SP.DYN.LE00.IN'];
-
-            setCountryData({
-              name: cData.name?.common || country,
-              capital: Array.isArray(cData.capital) ? cData.capital[0] : cData.capital,
-              population: typeof population === 'number' ? population : undefined,
-              area: typeof cData.area === 'number' ? cData.area : undefined,
-              region: cData.region,
-              languages: cData.languages || {},
-              currencies: cData.currencies || {},
-              gdp: typeof gdp === 'number' ? gdp : undefined,
-              lifeExpectancy: typeof lifeExp === 'number' ? lifeExp : undefined,
-            });
-          }
-          recordFetch('restcountries');
-        } catch {}
-        setCountryLoading(false);
-      });
+      // Country click handled by GeoJSON layer
+      loadCountryBorders(L, leafletMap);
 
       map = leafletMap;
       setLoading(false);
@@ -705,6 +722,7 @@ export default function WorldMap() {
   onCleanup(() => {
     for (const m of markers) m.remove();
     for (const m of earthquakeMarkers) m.remove();
+    geojsonLayer?.remove();
     tileLayer?.remove();
     map?.remove();
   });
