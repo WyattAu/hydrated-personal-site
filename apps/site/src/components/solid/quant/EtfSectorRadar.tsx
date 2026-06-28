@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { activeTicker } from '../../../lib/etf-store';
 import { getThemeColors } from '../../../lib/theme-colors';
-import TickerSelector from './EtfTickerSelector';
 
 const GICS_SECTORS = [
   'Technology',
@@ -37,7 +37,7 @@ interface EtfEntry {
 }
 
 export default function EtfSectorRadar() {
-  const [ticker, setTicker] = createSignal('SPY');
+  // Ticker from shared store
   const [allocations, setAllocations] = createSignal<Record<string, number>>({});
   const [loading, setLoading] = createSignal(true);
   let canvasRef: HTMLCanvasElement | undefined;
@@ -48,7 +48,7 @@ export default function EtfSectorRadar() {
       const res = await fetch('/data/etf-database.json');
       if (!res.ok) throw new Error('failed');
       const data: EtfEntry[] = await res.json();
-      const etf = data.find((e) => e.ticker === ticker());
+      const etf = data.find((e) => e.ticker === activeTicker());
       if (etf?.sector_allocation) {
         setAllocations(etf.sector_allocation);
       }
@@ -163,7 +163,7 @@ export default function EtfSectorRadar() {
 
   onMount(() => loadData());
   createEffect(() => {
-    ticker();
+    activeTicker();
     loadData();
   });
   createEffect(() => {
@@ -173,20 +173,17 @@ export default function EtfSectorRadar() {
 
   return (
     <div>
-      <div class="flex items-center justify-between mb-3">
-        <p class="label" style={{ color: 'var(--accent)' }}>
-          SECTOR ALLOCATION RADAR
-        </p>
-        <TickerSelector ticker={ticker} setTicker={setTicker} />
-      </div>
+      <p class="label mb-3" style={{ color: 'var(--accent)' }}>
+        SECTOR ALLOCATION: {activeTicker()}
+      </p>
       <Show when={loading()}>
         <p class="font-mono text-xs p-4" style={{ color: 'var(--text-secondary)' }}>
-          Loading {ticker()}...
+          Loading {activeTicker()}...
         </p>
       </Show>
       <canvas ref={canvasRef} class="w-full" style={{ height: '340px' }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-        {ticker()} 11 GICS sector allocation radar chart
+        {activeTicker()} 11 GICS sector allocation radar chart
       </p>
     </div>
   );

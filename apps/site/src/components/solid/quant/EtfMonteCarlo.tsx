@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { activeTicker } from '../../../lib/etf-store';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface MCResult {
@@ -24,7 +25,7 @@ interface ChartResponse {
 }
 
 export default function EtfMonteCarlo() {
-  const [ticker, setTicker] = createSignal('SPY');
+  // Ticker comes from the shared store - set by EtfApp search bar
   const [result, setResult] = createSignal<MCResult | null>(null);
   const [historical, setHistorical] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
@@ -37,7 +38,7 @@ export default function EtfMonteCarlo() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/stock-chart?symbol=${ticker()}&range=1y&interval=1d`);
+      const res = await fetch(`/api/stock-chart?symbol=${activeTicker()}&range=1y&interval=1d`);
       if (!res.ok) throw new Error(`API ${res.status}`);
       const json: ChartResponse = await res.json();
       if (json.error) throw new Error('chart unavailable');
@@ -183,7 +184,7 @@ export default function EtfMonteCarlo() {
   });
 
   createEffect(() => {
-    ticker();
+    activeTicker();
     loadData();
   });
 
@@ -194,23 +195,9 @@ export default function EtfMonteCarlo() {
 
   return (
     <div>
-      <div class="flex items-center justify-between mb-3">
-        <p class="label" style={{ color: 'var(--accent)' }}>
-          MONTE CARLO FORECAST
-        </p>
-        <Show
-          when={!loading()}
-          fallback={
-            <span class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-              SIMULATING...
-            </span>
-          }
-        >
-          <span class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-            {ticker()}
-          </span>
-        </Show>
-      </div>
+      <p class="label mb-3" style={{ color: 'var(--accent)' }}>
+        MONTE CARLO FORECAST: {activeTicker()}
+      </p>
       <Show when={error()}>
         <p class="font-mono text-xs p-4" style={{ color: 'var(--accent-warm)' }}>
           {error()}
@@ -220,8 +207,8 @@ export default function EtfMonteCarlo() {
       <Show when={result()} keyed>
         {(mc) => (
           <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-            {ticker()} | 1000 GBM paths | annualized vol {(mc.volatility * 100).toFixed(1)}% | drift{' '}
-            {(mc.drift * 100).toFixed(1)}%
+            {activeTicker()} | 1000 GBM paths | annualized vol {(mc.volatility * 100).toFixed(1)}% |
+            drift {(mc.drift * 100).toFixed(1)}%
           </p>
         )}
       </Show>

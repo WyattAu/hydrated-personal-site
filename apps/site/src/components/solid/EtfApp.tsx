@@ -1,5 +1,6 @@
 import { For, Show, createSignal, onMount } from 'solid-js';
 import { exportToCsv } from '../../lib/csv-export';
+import { setActiveTicker } from '../../lib/etf-store';
 import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 import CorrelationMatrix from './CorrelationMatrix';
@@ -11,8 +12,15 @@ import SearchBar from './SearchBar';
 
 export default function EtfApp() {
   const [database, setDatabase] = createSignal<EtfEntry[]>([]);
-  const [selectedEtf, setSelectedEtf] = createSignal<EtfEntry | null>(null);
+  const [selectedEtf, setSelectedEtfInternal] = createSignal<EtfEntry | null>(null);
   const [loading, setLoading] = createSignal(true);
+
+  // Wrap the setter so that selecting an ETF also updates the shared store
+  // that the quant components (Monte Carlo, VaR, Drawdown, Radar) read from.
+  const setSelectedEtf = (etf: EtfEntry | null) => {
+    setSelectedEtfInternal(etf);
+    if (etf) setActiveTicker(etf.ticker);
+  };
   const [selectedForOpt, setSelectedForOpt] = createSignal<EtfEntry[]>([]);
 
   onMount(async () => {

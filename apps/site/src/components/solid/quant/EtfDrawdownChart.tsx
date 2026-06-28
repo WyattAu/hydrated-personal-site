@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { activeTicker } from '../../../lib/etf-store';
 import { getThemeColors } from '../../../lib/theme-colors';
-import TickerSelector from './EtfTickerSelector';
 
 interface DDResult {
   underwater: number[];
@@ -16,14 +16,14 @@ interface DDResult {
 let sharedWasm: any = null;
 
 export default function EtfDrawdownChart() {
-  const [ticker, setTicker] = createSignal('SPY');
+  // Ticker from shared store
   const [result, setResult] = createSignal<DDResult | null>(null);
   const [loading, setLoading] = createSignal(true);
 
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/stock-chart?symbol=${ticker()}&range=1y&interval=1d`);
+      const res = await fetch(`/api/stock-chart?symbol=${activeTicker()}&range=1y&interval=1d`);
       if (!res.ok) throw new Error('API');
       const json = await res.json();
       const quote = json?.chart?.result?.[0]?.indicators?.quote?.[0];
@@ -117,7 +117,7 @@ export default function EtfDrawdownChart() {
 
   onMount(() => loadData());
   createEffect(() => {
-    ticker();
+    activeTicker();
     loadData();
   });
   createEffect(() => {
@@ -127,20 +127,17 @@ export default function EtfDrawdownChart() {
 
   return (
     <div>
-      <div class="flex items-center justify-between mb-3">
-        <p class="label" style={{ color: 'var(--accent)' }}>
-          DRAWDOWN ANALYSIS
-        </p>
-        <TickerSelector ticker={ticker} setTicker={setTicker} />
-      </div>
+      <p class="label mb-3" style={{ color: 'var(--accent)' }}>
+        DRAWDOWN ANALYSIS: {activeTicker()}
+      </p>
       <Show when={loading()}>
         <p class="font-mono text-xs p-4" style={{ color: 'var(--text-secondary)' }}>
-          Loading {ticker()}...
+          Loading {activeTicker()}...
         </p>
       </Show>
       <canvas id="etf-dd" class="w-full" style={{ height: '280px' }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-        {ticker()} 1Y daily underwater curve WASM drawdown
+        {activeTicker()} 1Y daily underwater curve WASM drawdown
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { activeTicker } from '../../../lib/etf-store';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface VarResult {
@@ -22,7 +23,7 @@ interface ChartResponse {
 }
 
 export default function EtfVaR() {
-  const [ticker, setTicker] = createSignal('SPY');
+  // Ticker from shared store
   const [data, setData] = createSignal<VarResult | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
@@ -34,7 +35,7 @@ export default function EtfVaR() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/stock-chart?symbol=${ticker()}&range=1y&interval=1d`);
+      const res = await fetch(`/api/stock-chart?symbol=${activeTicker()}&range=1y&interval=1d`);
       if (!res.ok) throw new Error(`API ${res.status}`);
       const json: ChartResponse = await res.json();
       if (json.error) throw new Error('chart unavailable');
@@ -154,7 +155,7 @@ export default function EtfVaR() {
   });
 
   createEffect(() => {
-    ticker();
+    activeTicker();
     loadData();
   });
 
@@ -165,23 +166,9 @@ export default function EtfVaR() {
 
   return (
     <div>
-      <div class="flex items-center justify-between mb-3">
-        <p class="label" style={{ color: 'var(--accent)' }}>
-          VALUE AT RISK
-        </p>
-        <Show
-          when={!loading()}
-          fallback={
-            <span class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-              COMPUTING...
-            </span>
-          }
-        >
-          <span class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-            {ticker()}
-          </span>
-        </Show>
-      </div>
+      <p class="label mb-3" style={{ color: 'var(--accent)' }}>
+        VALUE AT RISK: {activeTicker()}
+      </p>
       <Show when={error()}>
         <p class="font-mono text-xs p-4" style={{ color: 'var(--accent-warm)' }}>
           {error()}
@@ -191,8 +178,8 @@ export default function EtfVaR() {
       <Show when={data()} keyed>
         {(d) => (
           <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-            {ticker()} 1d log returns | VaR(95%): {(d.var_historical * 100).toFixed(2)}% | ES(95%):{' '}
-            {(d.es_historical * 100).toFixed(2)}%
+            {activeTicker()} 1d log returns | VaR(95%): {(d.var_historical * 100).toFixed(2)}% |
+            ES(95%): {(d.es_historical * 100).toFixed(2)}%
           </p>
         )}
       </Show>
