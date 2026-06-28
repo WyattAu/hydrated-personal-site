@@ -520,6 +520,50 @@ export const GET: APIRoute = async (ctx) => {
     }
     return J(getCached(ck) || { error: 'unavailable' });
   }
+  if (path === 'fred-sparklines') {
+    const c = getCached('fred-spark');
+    if (c) return J(c);
+    const series: Array<{ code: string; label: string }> = [
+      { code: 'CPIAUCSL', label: 'CPI' },
+      { code: 'UNRATE', label: 'UNEMP' },
+      { code: 'FEDFUNDS', label: 'FED' },
+      { code: 'M2SL', label: 'M2' },
+      { code: 'T10Y2Y', label: '10Y-2Y' },
+      { code: 'ICSA', label: 'CLAIMS' },
+      { code: 'UMCSENT', label: 'SENT' },
+      { code: 'INDPRO', label: 'IND' },
+    ];
+    const results = await Promise.all(
+      series.map(async (s) => {
+        try {
+          const res = await fetch(
+            `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${s.code}&limit=30`,
+            { signal: AbortSignal.timeout(5000) },
+          );
+          if (!res.ok) throw new Error('fail');
+          const csv = await res.text();
+          const lines = csv.trim().split('\n').slice(1); // skip header
+          const values = lines
+            .slice(-30)
+            .map((line: string) => {
+              const parts = line.split(',');
+              return parts.length >= 2 ? Number.parseFloat(parts[1]) : Number.NaN;
+            })
+            .filter((v: number) => !Number.isNaN(v));
+          return { code: s.code, label: s.label, values };
+        } catch {
+          return { code: s.code, label: s.label, values: [] };
+        }
+      }),
+    );
+    const valid = results.filter((s) => s.values.length > 0);
+    if (valid.length > 0) {
+      setCache('fred-spark', valid, 3600000);
+      return J(valid);
+    }
+    return J(getCached('fred-spark') || { error: 'unavailable' });
+  }
+
   if (path === 'metrics') return J({ status: 'ok', timestamp: Date.now() });
   if (path === 'guestbook') {
     const c = getCached('gb');

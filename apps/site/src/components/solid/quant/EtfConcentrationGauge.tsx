@@ -35,7 +35,7 @@ export default function EtfConcentrationGauge(props: { holdings: Holding[] }) {
       const weights = Float64Array.from(raw.map((w) => w / sum));
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js?v=j29';
+        const _w = '/wasm/hydrated_widgets.js?v=j30';
         wasmMod = await import(_w);
         await wasmMod.default();
       }

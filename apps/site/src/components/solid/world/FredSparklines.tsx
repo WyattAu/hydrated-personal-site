@@ -50,24 +50,14 @@ export default function FredSparklines() {
     setLoading(true);
     setErr(null);
     try {
-      const settled = await Promise.allSettled(
-        SERIES.map(async (s) => {
-          const res = await fetch(
-            `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${s.code}&limit=30`,
-            { signal: AbortSignal.timeout(5000) },
-          );
-          if (!res.ok) throw new Error(`${s.code}`);
-          const csv = await res.text();
-          const vals = parseFredCsv(csv).slice(-30);
-          return { code: s.code, label: s.label, values: vals } as Series;
-        }),
-      );
-      const ok: Series[] = [];
-      for (const r of settled) {
-        if (r.status === 'fulfilled' && r.value.values.length >= 2) ok.push(r.value);
-      }
-      if (ok.length === 0) throw new Error('No FRED data');
-      setSeries(ok);
+      // FRED doesn't send CORS headers, so direct browser fetch is blocked.
+      // Proxy through our API which fetches server-side.
+      const res = await fetch('/api/fred-sparklines');
+      if (!res.ok) throw new Error('API');
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      if (!Array.isArray(data) || data.length === 0) throw new Error('No FRED data');
+      setSeries(data);
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
     } finally {

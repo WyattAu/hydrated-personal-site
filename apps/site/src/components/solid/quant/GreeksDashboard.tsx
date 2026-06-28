@@ -86,7 +86,7 @@ export default function GreeksDashboard() {
     if (!opt || !opt.iv) return;
 
     if (!wasmMod) {
-      const _w = '/wasm/hydrated_widgets.js?v=j29';
+      const _w = '/wasm/hydrated_widgets.js?v=j30';
       wasmMod = await import(_w);
       await wasmMod.default();
     }
