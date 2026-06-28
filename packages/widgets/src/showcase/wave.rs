@@ -1,71 +1,56 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-/// wave visualization widget.
-/// Renders to canvas with create_wave / update_wave pattern.
+const WN: usize = 80;
 
 #[wasm_bindgen]
 pub fn create_wave(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or_else(|| JsValue::from_str("Canvas not found"))?;
+    let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
-    canvas.set_width(w);
-    canvas.set_height(h);
-    let ctx = canvas.get_context("2d")?
-        .ok_or_else(|| JsValue::from_str("No 2d context"))?
-        .dyn_into::<CanvasRenderingContext2d>()?;
-    ctx.set_fill_style(&"#0a0a0a".into());
-    ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
-    // Placeholder animation
-    let cx = w as f64 / 2.0;
-    let cy = h as f64 / 2.0;
-    for i in 0..200 {
-        let angle = i as f64 * 0.1;
-        let r = 50.0 + (i as f64 * 0.5);
-        let x = cx + r * angle.cos();
-        let y = cy + r * angle.sin();
-        let hue = (i as f64 * 1.8) % 360.0;
-        ctx.set_fill_style(&format!("hsl({}, 80%, 60%)", hue).into());
-        ctx.begin_path();
-        ctx.arc(x, y, 2.0, 0.0, std::f64::consts::TAU).ok();
-        ctx.fill();
-    }
+    canvas.set_width(w); canvas.set_height(h);
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
+    ctx.set_fill_style(&"#0a0a0a".into()); ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
     Ok(())
 }
 
 #[wasm_bindgen]
-pub fn update_wave(canvas_id: &str, w: u32, h: u32, params_json: &str) -> Result<(), JsValue> {
+pub fn update_wave(canvas_id: &str, w: u32, h: u32, _params: &str) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or_else(|| JsValue::from_str("Canvas not found"))?;
+    let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
-    let ctx = canvas.get_context("2d")?
-        .ok_or_else(|| JsValue::from_str("No 2d context"))?
-        .dyn_into::<CanvasRenderingContext2d>()?;
-    
-    // Fade trail
-    ctx.set_fill_style(&"rgba(10,10,10,0.05)".into());
-    ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
-    
-    let cx = w as f64 / 2.0;
-    let cy = h as f64 / 2.0;
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
+
     let t = js_sys::Date::now() as f64 / 1000.0;
-    
-    // Animated particle system unique to each widget
-    for i in 0..150 {
-        let phase = i as f64 * 0.04;
-        let r = 40.0 + 60.0 * (t * 0.5 + phase).sin().abs();
-        let angle = phase + t * 0.3;
-        let x = cx + r * angle.cos() * (1.0 + 0.3 * (t + phase).sin());
-        let y = cy + r * angle.sin() * (1.0 + 0.3 * (t * 1.1 + phase).cos());
-        let hue = (phase * 57.3 + t * 30.0) % 360.0;
-        ctx.set_fill_style(&format!("hsla({}, 80%, 60%, 0.8)", hue).into());
-        ctx.begin_path();
-        ctx.arc(x, y, 1.5, 0.0, std::f64::consts::TAU).ok();
-        ctx.fill();
+    let cw = w as f64 / WN as f64;
+    let ch = h as f64 / WN as f64;
+
+    // Render wave field: sum of sinusoidal sources
+    let sources = [
+        (WN as f64 * 0.3, WN as f64 * 0.3, 2.0),
+        (WN as f64 * 0.7, WN as f64 * 0.7, 1.5),
+        (WN as f64 * 0.5, WN as f64 * 0.2, 1.0),
+    ];
+
+    for j in 0..WN {
+        for i in 0..WN {
+            let mut val = 0.0f64;
+            for &(sx, sy, freq) in &sources {
+                let dx = i as f64 - sx;
+                let dy = j as f64 - sy;
+                let dist = (dx * dx + dy * dy).sqrt();
+                val += (dist * 0.3 - t * freq).sin() / (1.0 + dist * 0.05);
+            }
+            let intensity = ((val + 1.0) / 2.0 * 255.0).min(255.0) as u8;
+            if intensity > 20 {
+                let hue = 180.0 + (val.abs() * 90.0);
+                let alpha = (val.abs() * 0.6).min(1.0);
+                ctx.set_fill_style(&format!("hsla({},{},{}%,{})", hue, 80, 55, alpha).into());
+                ctx.fill_rect(i as f64 * cw, j as f64 * ch, cw + 1.0, ch + 1.0);
+            }
+        }
     }
     Ok(())
 }

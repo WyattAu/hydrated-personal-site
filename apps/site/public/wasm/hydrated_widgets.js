@@ -371,8 +371,6 @@ export function create_backtest(canvas_id, width, height) {
 }
 
 /**
- * boids visualization widget.
- * Renders to canvas with create_boids / update_boids pattern.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -531,8 +529,6 @@ export function create_gradient_descent(canvas_id, w, h) {
 }
 
 /**
- * kmeans visualization widget.
- * Renders to canvas with create_kmeans / update_kmeans pattern.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -563,8 +559,6 @@ export function create_lightning(canvas_id, w, h) {
 }
 
 /**
- * lorenz visualization widget.
- * Renders to canvas with create_lorenz / update_lorenz pattern.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -723,8 +717,6 @@ export function create_sankey(canvas_id, w, h) {
 }
 
 /**
- * solar visualization widget.
- * Renders to canvas with create_solar / update_solar pattern.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -847,8 +839,6 @@ export function create_voronoi(canvas_id, w, h) {
 }
 
 /**
- * wave visualization widget.
- * Renders to canvas with create_wave / update_wave pattern.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -1102,12 +1092,12 @@ export function update_backtest(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {string} _params
  */
-export function update_boids(canvas_id, w, h, params_json) {
+export function update_boids(canvas_id, w, h, _params) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const ptr1 = passStringToWasm0(_params, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
     const ret = wasm.update_boids(ptr0, len0, w, h, ptr1, len1);
     if (ret[1]) {
@@ -1286,12 +1276,12 @@ export function update_gradient_descent(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {string} _params
  */
-export function update_kmeans(canvas_id, w, h, params_json) {
+export function update_kmeans(canvas_id, w, h, _params) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const ptr1 = passStringToWasm0(_params, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
     const ret = wasm.update_kmeans(ptr0, len0, w, h, ptr1, len1);
     if (ret[1]) {
@@ -1320,12 +1310,12 @@ export function update_lightning(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {string} _params
  */
-export function update_lorenz(canvas_id, w, h, params_json) {
+export function update_lorenz(canvas_id, w, h, _params) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const ptr1 = passStringToWasm0(_params, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
     const ret = wasm.update_lorenz(ptr0, len0, w, h, ptr1, len1);
     if (ret[1]) {
@@ -1488,12 +1478,12 @@ export function update_sankey(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {string} _params
  */
-export function update_solar(canvas_id, w, h, params_json) {
+export function update_solar(canvas_id, w, h, _params) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const ptr1 = passStringToWasm0(_params, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
     const ret = wasm.update_solar(ptr0, len0, w, h, ptr1, len1);
     if (ret[1]) {
@@ -1607,12 +1597,12 @@ export function update_voronoi(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {string} _params
  */
-export function update_wave(canvas_id, w, h, params_json) {
+export function update_wave(canvas_id, w, h, _params) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const ptr1 = passStringToWasm0(_params, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
     const ret = wasm.update_wave(ptr0, len0, w, h, ptr1, len1);
     if (ret[1]) {
@@ -1653,6 +1643,9 @@ function __wbg_get_imports() {
         }, arguments); },
         __wbg_beginPath_c99b5be3516a2077: function(arg0) {
             arg0.beginPath();
+        },
+        __wbg_closePath_47136fd7a8a2f043: function(arg0) {
+            arg0.closePath();
         },
         __wbg_document_2634180a4c694068: function(arg0) {
             const ret = arg0.document;

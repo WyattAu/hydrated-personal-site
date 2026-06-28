@@ -43,7 +43,7 @@ const widgetId = `audio-viz-${Math.random().toString(36).slice(2, 8)}`;
       return;
     }
 
-    var wasmPath = '/wasm-v3/hydrated_widgets.js';
+    var wasmPath = '/wasm-v4/hydrated_widgets.js';
     import(wasmPath)
       .then(async function (mod) {
         await mod.default();

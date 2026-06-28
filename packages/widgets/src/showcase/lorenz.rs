@@ -1,71 +1,54 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-/// lorenz visualization widget.
-/// Renders to canvas with create_lorenz / update_lorenz pattern.
-
 #[wasm_bindgen]
 pub fn create_lorenz(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or_else(|| JsValue::from_str("Canvas not found"))?;
+    let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
-    canvas.set_width(w);
-    canvas.set_height(h);
-    let ctx = canvas.get_context("2d")?
-        .ok_or_else(|| JsValue::from_str("No 2d context"))?
-        .dyn_into::<CanvasRenderingContext2d>()?;
-    ctx.set_fill_style(&"#0a0a0a".into());
-    ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
-    // Placeholder animation
-    let cx = w as f64 / 2.0;
-    let cy = h as f64 / 2.0;
-    for i in 0..200 {
-        let angle = i as f64 * 0.1;
-        let r = 50.0 + (i as f64 * 0.5);
-        let x = cx + r * angle.cos();
-        let y = cy + r * angle.sin();
-        let hue = (i as f64 * 1.8) % 360.0;
-        ctx.set_fill_style(&format!("hsl({}, 80%, 60%)", hue).into());
-        ctx.begin_path();
-        ctx.arc(x, y, 2.0, 0.0, std::f64::consts::TAU).ok();
-        ctx.fill();
-    }
+    canvas.set_width(w); canvas.set_height(h);
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
+    ctx.set_fill_style(&"#0a0a0a".into()); ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
     Ok(())
 }
 
 #[wasm_bindgen]
-pub fn update_lorenz(canvas_id: &str, w: u32, h: u32, params_json: &str) -> Result<(), JsValue> {
+pub fn update_lorenz(canvas_id: &str, w: u32, h: u32, _params: &str) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or_else(|| JsValue::from_str("Canvas not found"))?;
+    let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
-    let ctx = canvas.get_context("2d")?
-        .ok_or_else(|| JsValue::from_str("No 2d context"))?
-        .dyn_into::<CanvasRenderingContext2d>()?;
-    
-    // Fade trail
-    ctx.set_fill_style(&"rgba(10,10,10,0.05)".into());
-    ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
-    
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
+    ctx.set_fill_style(&"rgba(10,10,10,0.03)".into()); ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
+
     let cx = w as f64 / 2.0;
     let cy = h as f64 / 2.0;
-    let t = js_sys::Date::now() as f64 / 1000.0;
-    
-    // Animated particle system unique to each widget
-    for i in 0..150 {
-        let phase = i as f64 * 0.04;
-        let r = 40.0 + 60.0 * (t * 0.5 + phase).sin().abs();
-        let angle = phase + t * 0.3;
-        let x = cx + r * angle.cos() * (1.0 + 0.3 * (t + phase).sin());
-        let y = cy + r * angle.sin() * (1.0 + 0.3 * (t * 1.1 + phase).cos());
-        let hue = (phase * 57.3 + t * 30.0) % 360.0;
-        ctx.set_fill_style(&format!("hsla({}, 80%, 60%, 0.8)", hue).into());
+    let scale = (w.min(h) as f64) / 60.0;
+    let dt = 0.005;
+    let sigma = 10.0; let rho = 28.0; let beta = 8.0 / 3.0;
+
+    // Two particles with slightly different initial conditions
+    let colors = ["#00e5ff", "#ff4081"];
+    for (ci, color) in colors.iter().enumerate() {
+        let offset = ci as f64 * 0.0001;
+        let mut x = 0.1 + offset; let mut y = 0.0; let mut z = 0.0;
+        ctx.set_stroke_style(&(*color).into());
+        ctx.set_line_width(1.0);
         ctx.begin_path();
-        ctx.arc(x, y, 1.5, 0.0, std::f64::consts::TAU).ok();
-        ctx.fill();
+        for step in 0..500 {
+            let dx = sigma * (y - x);
+            let dy = x * (rho - z) - y;
+            let dz = x * y - beta * z;
+            x += dx * dt; y += dy * dt; z += dz * dt;
+            let px = cx + x * scale;
+            let py = cy + (z - 25.0) * scale;
+            if step == 0 { ctx.move_to(px, py); } else { ctx.line_to(px, py); }
+        }
+        ctx.stroke();
+        // Mark current position
+        ctx.set_fill_style(&(*color).into());
+        ctx.begin_path(); ctx.arc(cx + x * scale, cy + (z - 25.0) * scale, 3.0, 0.0, std::f64::consts::TAU).ok(); ctx.fill();
     }
     Ok(())
 }

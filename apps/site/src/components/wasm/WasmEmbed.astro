@@ -44,7 +44,7 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
     var wasmModPromise = null;
     function getWasmMod() {
       if (!wasmModPromise) {
-        wasmModPromise = import('/wasm-v3/hydrated_widgets.js').then(async function(mod) {
+        wasmModPromise = import('/wasm-v4/hydrated_widgets.js').then(async function(mod) {
           await mod.default();
           return mod;
         });
@@ -123,6 +123,26 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
                     generative: function(cid, cw, ch, t) { return [cid, cw, ch, 42, 1.0, 100, t]; },
                     cellular_automata: true,
                     physics: true,
+                    // Showcase widgets - all animate via update_* with timestamp
+                    mandelbrot: false, // static render, no animation
+                    double_pendulum: true,
+                    fluids: true,
+                    reaction_diffusion: true,
+                    lorenz: true,
+                    solar: true,
+                    wave: true,
+                    kmeans: true,
+                    gradient_descent: true,
+                    boids: true,
+                    ca_explorer: true,
+                    neural_net: true,
+                    tsne: true,
+                    vol_surface: true,
+                    trade_flow: true,
+                    voronoi: true,
+                    sankey: true,
+                    lightning: true,
+                    spectrogram: true,
                   };
 
                   if (timeAnimatedWidgets[widget]) {

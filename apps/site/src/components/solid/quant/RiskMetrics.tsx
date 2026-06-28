@@ -31,7 +31,7 @@ export default function RiskMetrics(props: { symbol?: string }) {
       for (let i = 1; i < closes.length; i++) returns[i - 1] = Math.log(closes[i] / closes[i - 1]);
 
       if (!wasmMod) {
-        const _w = '/wasm-v3/hydrated_widgets.js';
+        const _w = '/wasm-v4/hydrated_widgets.js';
         wasmMod = await import(_w);
         await wasmMod.default();
       }

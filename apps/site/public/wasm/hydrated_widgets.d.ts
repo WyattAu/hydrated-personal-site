@@ -57,10 +57,6 @@ export function create_audio_visualizer(canvas_id: string, width: number, height
 
 export function create_backtest(canvas_id: string, width: number, height: number): void;
 
-/**
- * boids visualization widget.
- * Renders to canvas with create_boids / update_boids pattern.
- */
 export function create_boids(canvas_id: string, w: number, h: number): void;
 
 export function create_btc_health(canvas_id: string, width: number, height: number): void;
@@ -91,10 +87,6 @@ export function create_generative(canvas_id: string, width: number, height: numb
  */
 export function create_gradient_descent(canvas_id: string, w: number, h: number): void;
 
-/**
- * kmeans visualization widget.
- * Renders to canvas with create_kmeans / update_kmeans pattern.
- */
 export function create_kmeans(canvas_id: string, w: number, h: number): void;
 
 /**
@@ -103,10 +95,6 @@ export function create_kmeans(canvas_id: string, w: number, h: number): void;
  */
 export function create_lightning(canvas_id: string, w: number, h: number): void;
 
-/**
- * lorenz visualization widget.
- * Renders to canvas with create_lorenz / update_lorenz pattern.
- */
 export function create_lorenz(canvas_id: string, w: number, h: number): void;
 
 export function create_mandelbrot(canvas_id: string, w: number, h: number): void;
@@ -137,10 +125,6 @@ export function create_regex_playground(canvas_id: string, width: number, height
  */
 export function create_sankey(canvas_id: string, w: number, h: number): void;
 
-/**
- * solar visualization widget.
- * Renders to canvas with create_solar / update_solar pattern.
- */
 export function create_solar(canvas_id: string, w: number, h: number): void;
 
 /**
@@ -177,10 +161,6 @@ export function create_vol_surface(canvas_id: string, w: number, h: number): voi
  */
 export function create_voronoi(canvas_id: string, w: number, h: number): void;
 
-/**
- * wave visualization widget.
- * Renders to canvas with create_wave / update_wave pattern.
- */
 export function create_wave(canvas_id: string, w: number, h: number): void;
 
 export function main(): void;
@@ -242,7 +222,7 @@ export function quant_yield_curve(maturities: Float64Array, yields: Float64Array
 
 export function update_backtest(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_boids(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_boids(canvas_id: string, w: number, h: number, _params: string): void;
 
 export function update_btc_health(canvas_id: string, width: number, height: number, data_json: string): void;
 
@@ -264,11 +244,11 @@ export function update_generative(canvas_id: string, width: number, height: numb
 
 export function update_gradient_descent(canvas_id: string, w: number, h: number, params_json: string): void;
 
-export function update_kmeans(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_kmeans(canvas_id: string, w: number, h: number, _params: string): void;
 
 export function update_lightning(canvas_id: string, w: number, h: number, params_json: string): void;
 
-export function update_lorenz(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_lorenz(canvas_id: string, w: number, h: number, _params: string): void;
 
 export function update_mandelbrot(canvas_id: string, w: number, h: number, params_json: string): void;
 
@@ -288,7 +268,7 @@ export function update_regex_playground(canvas_id: string, width: number, height
 
 export function update_sankey(canvas_id: string, w: number, h: number, params_json: string): void;
 
-export function update_solar(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_solar(canvas_id: string, w: number, h: number, _params: string): void;
 
 export function update_spectrogram(canvas_id: string, w: number, h: number, params_json: string): void;
 
@@ -302,7 +282,7 @@ export function update_vol_surface(canvas_id: string, w: number, h: number, para
 
 export function update_voronoi(canvas_id: string, w: number, h: number, params_json: string): void;
 
-export function update_wave(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_wave(canvas_id: string, w: number, h: number, _params: string): void;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 

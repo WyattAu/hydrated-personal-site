@@ -68,7 +68,8 @@
       "apps/site/public/wasm",
       "apps/site/public/wasm-anim.js",
       "apps/site/public/wasm-v2",
-      "apps/site/public/wasm-v3"
+      "apps/site/public/wasm-v3",
+      "apps/site/public/wasm-v4"
     ]
   },
   "overrides": [
