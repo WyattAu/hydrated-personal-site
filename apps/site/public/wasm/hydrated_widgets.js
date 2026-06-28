@@ -571,6 +571,27 @@ export function main() {
 }
 
 /**
+ * Concentration analysis from portfolio weights.
+ * Returns JSON: { hhi, normalised_hhi, effective_n, entropy, max_entropy, top5, top10, gini, classification }
+ * @param {Float64Array} weights
+ * @returns {string}
+ */
+export function quant_concentration(weights) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(weights, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_concentration(ptr0, len0);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
  * Correlation matrix from a returns matrix (N assets x T periods, row-major).
  * @param {Float64Array} returns
  * @param {number} n_assets
@@ -589,6 +610,54 @@ export function quant_correlation_matrix(returns, n_assets, n_periods) {
         return getStringFromWasm0(ret[0], ret[1]);
     } finally {
         wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Drawdown analysis from price series.
+ * Returns JSON: { underwater, max_drawdown, max_dd_duration, current_drawdown, calmar, ulcer, pain }
+ * @param {Float64Array} prices
+ * @param {number} periods_per_year
+ * @returns {string}
+ */
+export function quant_drawdown(prices, periods_per_year) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(prices, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_drawdown(ptr0, len0, periods_per_year);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Factor exposure regression (OLS).
+ * Returns JSON: { alpha, betas, r_squared, adj_r_squared, f_statistic, t_stats }
+ * @param {Float64Array} y
+ * @param {Float64Array} x
+ * @param {number} n_factors
+ * @param {number} n_obs
+ * @returns {string}
+ */
+export function quant_factor_regression(y, x, n_factors, n_obs) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_factor_regression(ptr0, len0, ptr1, len1, n_factors, n_obs);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
     }
 }
 

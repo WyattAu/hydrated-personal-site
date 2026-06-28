@@ -88,9 +88,27 @@ export function create_treemap(canvas_id: string, width: number, height: number)
 export function main(): void;
 
 /**
+ * Concentration analysis from portfolio weights.
+ * Returns JSON: { hhi, normalised_hhi, effective_n, entropy, max_entropy, top5, top10, gini, classification }
+ */
+export function quant_concentration(weights: Float64Array): string;
+
+/**
  * Correlation matrix from a returns matrix (N assets x T periods, row-major).
  */
 export function quant_correlation_matrix(returns: Float64Array, n_assets: number, n_periods: number): string;
+
+/**
+ * Drawdown analysis from price series.
+ * Returns JSON: { underwater, max_drawdown, max_dd_duration, current_drawdown, calmar, ulcer, pain }
+ */
+export function quant_drawdown(prices: Float64Array, periods_per_year: number): string;
+
+/**
+ * Factor exposure regression (OLS).
+ * Returns JSON: { alpha, betas, r_squared, adj_r_squared, f_statistic, t_stats }
+ */
+export function quant_factor_regression(y: Float64Array, x: Float64Array, n_factors: number, n_obs: number): string;
 
 /**
  * GARCH(1,1) fit and forecast.
@@ -202,7 +220,10 @@ export interface InitOutput {
     readonly nbodysimulation_set_dt: (a: number, b: number) => void;
     readonly nbodysimulation_set_gravity: (a: number, b: number) => void;
     readonly nbodysimulation_step: (a: number) => void;
+    readonly quant_concentration: (a: number, b: number) => [number, number];
     readonly quant_correlation_matrix: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly quant_drawdown: (a: number, b: number, c: number) => [number, number];
+    readonly quant_factor_regression: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly quant_garch: (a: number, b: number, c: number) => [number, number];
     readonly quant_greeks: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
     readonly quant_montecarlo: (a: number, b: number, c: number, d: number, e: number) => [number, number];

@@ -6,3 +6,7 @@ pub mod risk;
 pub mod volatility;
 pub mod stats;
 pub mod yieldcurve;
+pub mod drawdown;
+pub mod concentration;
+pub mod factor;
+pub mod overlap;

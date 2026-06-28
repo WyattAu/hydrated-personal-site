@@ -60,6 +60,9 @@ use quant::volatility;
 use quant::stats;
 use quant::yieldcurve;
 use quant::rng;
+use quant::drawdown;
+use quant::concentration;
+use quant::factor;
 
 /// Monte Carlo GBM simulation from historical close prices.
 /// Returns JSON: { drift, volatility, s0, p5, p25, p50, p75, p95 }
@@ -205,4 +208,61 @@ pub fn quant_yield_curve(maturities: &[f64], yields: &[f64]) -> String {
 #[wasm_bindgen]
 pub fn quant_seed(s0: f64, s1: f64) {
     rng::seed(s0 as u64, s1 as u64);
+}
+
+/// Drawdown analysis from price series.
+/// Returns JSON: { underwater, max_drawdown, max_dd_duration, current_drawdown, calmar, ulcer, pain }
+#[wasm_bindgen]
+pub fn quant_drawdown(prices: &[f64], periods_per_year: u32) -> String {
+    let dd = drawdown::analyze_drawdowns(prices);
+    let calmar = drawdown::calmar_ratio(prices, periods_per_year);
+    let ulcer = drawdown::ulcer_index(prices);
+    let pain = drawdown::pain_index(prices);
+    serde_json::to_string(&serde_json::json!({
+        "underwater": dd.underwater,
+        "max_drawdown": dd.max_drawdown,
+        "max_dd_duration": dd.max_dd_duration,
+        "current_drawdown": dd.current_drawdown,
+        "calmar": calmar,
+        "ulcer_index": ulcer,
+        "pain_index": pain,
+    })).unwrap_or_else(|_| "{}".to_string())
+}
+
+/// Concentration analysis from portfolio weights.
+/// Returns JSON: { hhi, normalised_hhi, effective_n, entropy, max_entropy, top5, top10, gini, classification }
+#[wasm_bindgen]
+pub fn quant_concentration(weights: &[f64]) -> String {
+    let result = concentration::full_analysis(weights);
+    serde_json::to_string(&serde_json::json!({
+        "hhi": result.hhi,
+        "normalised_hhi": result.normalised_hhi,
+        "effective_n": result.effective_n,
+        "entropy": result.entropy,
+        "max_entropy": result.max_entropy,
+        "top5_concentration": result.top5_concentration,
+        "top10_concentration": result.top10_concentration,
+        "gini": result.gini,
+        "classification": result.classification,
+    })).unwrap_or_else(|_| "{}".to_string())
+}
+
+/// Factor exposure regression (OLS).
+/// Returns JSON: { alpha, betas, r_squared, adj_r_squared, f_statistic, t_stats }
+#[wasm_bindgen]
+pub fn quant_factor_regression(
+    y: &[f64],
+    x: &[f64],
+    n_factors: usize,
+    n_obs: usize,
+) -> String {
+    let result = factor::ols_regression(y, x, n_factors, n_obs);
+    serde_json::to_string(&serde_json::json!({
+        "alpha": result.alpha,
+        "betas": result.betas,
+        "r_squared": result.r_squared,
+        "adj_r_squared": result.adj_r_squared,
+        "f_statistic": result.f_statistic,
+        "t_stats": result.t_stats,
+    })).unwrap_or_else(|_| "{}".to_string())
 }
