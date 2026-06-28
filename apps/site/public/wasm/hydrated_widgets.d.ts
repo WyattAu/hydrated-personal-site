@@ -57,7 +57,19 @@ export function create_audio_visualizer(canvas_id: string, width: number, height
 
 export function create_backtest(canvas_id: string, width: number, height: number): void;
 
+/**
+ * boids visualization widget.
+ * Renders to canvas with create_boids / update_boids pattern.
+ */
+export function create_boids(canvas_id: string, w: number, h: number): void;
+
 export function create_btc_health(canvas_id: string, width: number, height: number): void;
+
+/**
+ * ca_explorer visualization widget.
+ * Renders to canvas with create_ca_explorer / update_ca_explorer pattern.
+ */
+export function create_ca_explorer(canvas_id: string, w: number, h: number): void;
 
 export function create_cellular_automata(canvas_id: string, width: number, height: number): void;
 
@@ -67,23 +79,109 @@ export function create_colorblind(canvas_id: string, width: number, height: numb
 
 export function create_correlation(canvas_id: string, width: number, height: number): void;
 
+export function create_fluids(canvas_id: string, w: number, h: number): void;
+
 export function create_fourier_viz(canvas_id: string, width: number, height: number): void;
 
 export function create_generative(canvas_id: string, width: number, height: number): void;
+
+/**
+ * gradient_descent visualization widget.
+ * Renders to canvas with create_gradient_descent / update_gradient_descent pattern.
+ */
+export function create_gradient_descent(canvas_id: string, w: number, h: number): void;
+
+/**
+ * kmeans visualization widget.
+ * Renders to canvas with create_kmeans / update_kmeans pattern.
+ */
+export function create_kmeans(canvas_id: string, w: number, h: number): void;
+
+/**
+ * lightning visualization widget.
+ * Renders to canvas with create_lightning / update_lightning pattern.
+ */
+export function create_lightning(canvas_id: string, w: number, h: number): void;
+
+/**
+ * lorenz visualization widget.
+ * Renders to canvas with create_lorenz / update_lorenz pattern.
+ */
+export function create_lorenz(canvas_id: string, w: number, h: number): void;
+
+export function create_mandelbrot(canvas_id: string, w: number, h: number): void;
 
 export function create_nbody_simulation(canvas_id: string, width: number, height: number): void;
 
 export function create_network(canvas_id: string, width: number, height: number): void;
 
+/**
+ * neural_net visualization widget.
+ * Renders to canvas with create_neural_net / update_neural_net pattern.
+ */
+export function create_neural_net(canvas_id: string, w: number, h: number): void;
+
 export function create_order_book(canvas_id: string, width: number, height: number): void;
+
+export function create_pendulum(canvas_id: string, w: number, h: number): void;
 
 export function create_physics(canvas_id: string, width: number, height: number): void;
 
+export function create_reaction_diffusion(canvas_id: string, w: number, h: number): void;
+
 export function create_regex_playground(canvas_id: string, width: number, height: number): void;
+
+/**
+ * sankey visualization widget.
+ * Renders to canvas with create_sankey / update_sankey pattern.
+ */
+export function create_sankey(canvas_id: string, w: number, h: number): void;
+
+/**
+ * solar visualization widget.
+ * Renders to canvas with create_solar / update_solar pattern.
+ */
+export function create_solar(canvas_id: string, w: number, h: number): void;
+
+/**
+ * spectrogram visualization widget.
+ * Renders to canvas with create_spectrogram / update_spectrogram pattern.
+ */
+export function create_spectrogram(canvas_id: string, w: number, h: number): void;
 
 export function create_terrain_generator(canvas_id: string, width: number, height: number): void;
 
+/**
+ * trade_flow visualization widget.
+ * Renders to canvas with create_trade_flow / update_trade_flow pattern.
+ */
+export function create_trade_flow(canvas_id: string, w: number, h: number): void;
+
 export function create_treemap(canvas_id: string, width: number, height: number): void;
+
+/**
+ * tsne visualization widget.
+ * Renders to canvas with create_tsne / update_tsne pattern.
+ */
+export function create_tsne(canvas_id: string, w: number, h: number): void;
+
+/**
+ * vol_surface visualization widget.
+ * Renders to canvas with create_vol_surface / update_vol_surface pattern.
+ */
+export function create_vol_surface(canvas_id: string, w: number, h: number): void;
+
+/**
+ * voronoi visualization widget.
+ * Renders to canvas with create_voronoi / update_voronoi pattern.
+ */
+export function create_voronoi(canvas_id: string, w: number, h: number): void;
+
+/**
+ * wave visualization widget.
+ * Renders to canvas with create_wave / update_wave pattern.
+ */
+export function create_wave(canvas_id: string, w: number, h: number): void;
 
 export function main(): void;
 
@@ -144,7 +242,11 @@ export function quant_yield_curve(maturities: Float64Array, yields: Float64Array
 
 export function update_backtest(canvas_id: string, width: number, height: number, data_json: string): void;
 
+export function update_boids(canvas_id: string, w: number, h: number, params_json: string): void;
+
 export function update_btc_health(canvas_id: string, width: number, height: number, data_json: string): void;
+
+export function update_ca_explorer(canvas_id: string, w: number, h: number, params_json: string): void;
 
 export function update_cellular_automata(canvas_id: string, width: number, height: number, _time: number): void;
 
@@ -154,19 +256,53 @@ export function update_colorblind(canvas_id: string, width: number, height: numb
 
 export function update_correlation(canvas_id: string, width: number, height: number, data_json: string): void;
 
+export function update_fluids(canvas_id: string, w: number, h: number, params_json: string): void;
+
 export function update_fourier_viz(canvas_id: string, width: number, height: number, time: number): void;
 
 export function update_generative(canvas_id: string, width: number, height: number, seed: number, speed: number, density: number, time: number): void;
 
+export function update_gradient_descent(canvas_id: string, w: number, h: number, params_json: string): void;
+
+export function update_kmeans(canvas_id: string, w: number, h: number, params_json: string): void;
+
+export function update_lightning(canvas_id: string, w: number, h: number, params_json: string): void;
+
+export function update_lorenz(canvas_id: string, w: number, h: number, params_json: string): void;
+
+export function update_mandelbrot(canvas_id: string, w: number, h: number, params_json: string): void;
+
 export function update_network(canvas_id: string, width: number, height: number, data_json: string): void;
+
+export function update_neural_net(canvas_id: string, w: number, h: number, params_json: string): void;
 
 export function update_order_book(canvas_id: string, width: number, height: number, data_json: string): void;
 
+export function update_pendulum(canvas_id: string, w: number, h: number, params_json: string): void;
+
 export function update_physics(canvas_id: string, width: number, height: number, _time: number): void;
+
+export function update_reaction_diffusion(canvas_id: string, w: number, h: number, params_json: string): void;
 
 export function update_regex_playground(canvas_id: string, width: number, height: number, data_json: string): void;
 
+export function update_sankey(canvas_id: string, w: number, h: number, params_json: string): void;
+
+export function update_solar(canvas_id: string, w: number, h: number, params_json: string): void;
+
+export function update_spectrogram(canvas_id: string, w: number, h: number, params_json: string): void;
+
+export function update_trade_flow(canvas_id: string, w: number, h: number, params_json: string): void;
+
 export function update_treemap(canvas_id: string, width: number, height: number, data_json: string): void;
+
+export function update_tsne(canvas_id: string, w: number, h: number, params_json: string): void;
+
+export function update_vol_surface(canvas_id: string, w: number, h: number, params_json: string): void;
+
+export function update_voronoi(canvas_id: string, w: number, h: number, params_json: string): void;
+
+export function update_wave(canvas_id: string, w: number, h: number, params_json: string): void;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -196,20 +332,39 @@ export interface InitOutput {
     readonly body_new: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly create_audio_visualizer: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_backtest: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_boids: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_btc_health: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_ca_explorer: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_cellular_automata: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_climate: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_colorblind: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_correlation: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_fluids: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_fourier_viz: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_generative: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_gradient_descent: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_kmeans: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_lightning: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_lorenz: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_mandelbrot: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_nbody_simulation: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_network: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_neural_net: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_order_book: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_pendulum: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_physics: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_reaction_diffusion: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_regex_playground: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_sankey: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_solar: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_spectrogram: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_terrain_generator: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_trade_flow: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_treemap: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_tsne: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_vol_surface: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_voronoi: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_wave: (a: number, b: number, c: number, d: number) => [number, number];
     readonly main: () => void;
     readonly nbodysimulation_add_body: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
     readonly nbodysimulation_body_count: (a: number) => number;
@@ -240,18 +395,37 @@ export interface InitOutput {
     readonly terraingenerator_set_scale: (a: number, b: number) => void;
     readonly terraingenerator_set_seed: (a: number, b: number) => void;
     readonly update_backtest: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_boids: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_btc_health: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_ca_explorer: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_cellular_automata: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_climate: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_colorblind: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_correlation: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_fluids: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_fourier_viz: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_generative: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
+    readonly update_gradient_descent: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_kmeans: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_lightning: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_lorenz: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_mandelbrot: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_network: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_neural_net: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_order_book: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_pendulum: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_physics: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_reaction_diffusion: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_regex_playground: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_sankey: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_solar: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_spectrogram: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_trade_flow: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_treemap: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_tsne: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_vol_surface: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_voronoi: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_wave: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly terraingenerator_persistence: (a: number) => number;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

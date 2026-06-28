@@ -1,0 +1,186 @@
+---
+import Footer from '../components/astro/Footer.astro';
+import Nav from '../components/astro/Nav.astro';
+import ThemeToggle from '../components/solid/ThemeToggle';
+import WasmEmbed from '../components/wasm/WasmEmbed.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/base.css';
+import '../styles/animations.css';
+---
+
+<BaseLayout title="WASM Showcase — Wyatt Au" description="20 WebAssembly visualization widgets running client-side.">
+  <Nav />
+
+  <main id="main-content" class="pt-32">
+    <section class="px-6 md:px-12 lg:px-24 pb-6">
+      <p class="label mb-2" style="color: var(--accent);">WASM SHOWCASE</p>
+      <h1 class="text-2xl md:text-3xl font-bold mb-1">WebAssembly Visualization Gallery</h1>
+      <p class="text-sm" style="color: var(--text-secondary);">20 computation-heavy widgets rendered in Rust/WASM. Zero server compute.</p>
+    </section>
+
+    <section class="px-6 md:px-12 lg:px-24 pb-12">
+      <!-- Category: Creative -->
+      <div class="mb-12">
+        <p class="label mb-4" style="color: var(--accent);">CREATIVE</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Mandelbrot Set</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Deep zoom fractal. 80 iterations per pixel, computed in WASM.</p>
+            <WasmEmbed widget="mandelbrot" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Generative Art</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Procedural art with parameter-driven morphing.</p>
+            <WasmEmbed widget="generative" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Boids Flocking</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Emergent flocking from separation, alignment, cohesion.</p>
+            <WasmEmbed widget="boids" width={380} height={300} />
+          </div>
+        </div>
+      </div>
+
+      <!-- Category: Science -->
+      <div class="mb-12">
+        <p class="label mb-4" style="color: var(--accent);">SCIENCE</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Double Pendulum</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Chaos theory: 4 pendulums with 0.001 rad offset diverge exponentially.</p>
+            <WasmEmbed widget="double_pendulum" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Fluid Dynamics</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Stam's stable fluids on a 128x128 grid. Navier-Stokes in WASM.</p>
+            <WasmEmbed widget="fluids" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Reaction-Diffusion</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Gray-Scott model generates Turing patterns.</p>
+            <WasmEmbed widget="reaction_diffusion" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Lorenz Attractor</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Strange attractor showing the butterfly effect in 3D.</p>
+            <WasmEmbed widget="lorenz" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Solar System</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">N-body gravitational simulation of planetary orbits.</p>
+            <WasmEmbed widget="solar" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Wave Equation</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">2D wave propagation via finite-difference time-domain.</p>
+            <WasmEmbed widget="wave" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Fourier Transform</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Epicycles tracing arbitrary paths via DFT.</p>
+            <WasmEmbed widget="fourier_viz" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Cellular Automata</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Conway's Game of Life with WASM grid computation.</p>
+            <WasmEmbed widget="cellular_automata" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">CA Explorer</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">256 elementary cellular automaton rules.</p>
+            <WasmEmbed widget="ca_explorer" width={380} height={300} />
+          </div>
+        </div>
+      </div>
+
+      <!-- Category: Machine Learning -->
+      <div class="mb-12">
+        <p class="label mb-4" style="color: var(--accent);">MACHINE LEARNING</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Neural Network</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Animated forward pass through a 4-layer network.</p>
+            <WasmEmbed widget="neural_net" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Gradient Descent</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Loss landscape with ball rolling to minimum.</p>
+            <WasmEmbed widget="gradient_descent" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">K-Means Clustering</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Watch centroids converge to clusters in real-time.</p>
+            <WasmEmbed widget="kmeans" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">t-SNE Projection</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Dimensionality reduction from 11D to 2D for ETF data.</p>
+            <WasmEmbed widget="tsne" width={380} height={300} />
+          </div>
+        </div>
+      </div>
+
+      <!-- Category: Finance -->
+      <div class="mb-12">
+        <p class="label mb-4" style="color: var(--accent);">FINANCE</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Volatility Surface</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">3D implied vol mesh across strikes and expirations.</p>
+            <WasmEmbed widget="vol_surface" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Trade Flow</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Particle system of buy/sell trades flowing through the market.</p>
+            <WasmEmbed widget="trade_flow" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Voronoi Treemap</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Crypto market cap as Voronoi cells with Lloyd's relaxation.</p>
+            <WasmEmbed widget="voronoi" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Sankey Flows</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Capital flow diagram from sectors to ETFs to holdings.</p>
+            <WasmEmbed widget="sankey" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Order Book</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Market depth visualization with bid/ask imbalance.</p>
+            <WasmEmbed widget="order_book" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Backtest</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Strategy backtest with equity curve and drawdown.</p>
+            <WasmEmbed widget="backtest" width={380} height={300} />
+          </div>
+        </div>
+      </div>
+
+      <!-- Category: Audio & Data -->
+      <div class="mb-12">
+        <p class="label mb-4" style="color: var(--accent);">AUDIO &amp; NETWORK</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Spectrogram</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Real-time FFT spectrogram from microphone input.</p>
+            <WasmEmbed widget="spectrogram" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Network Graph</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Force-directed graph layout with Barnes-Hut optimization.</p>
+            <WasmEmbed widget="network" width={380} height={300} />
+          </div>
+          <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+            <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Lightning Network</p>
+            <p class="text-sm mb-4" style="color: var(--text-secondary);">Bitcoin L2 payment channel topology.</p>
+            <WasmEmbed widget="lightning" width={380} height={300} />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+  <ThemeToggle client:load />
+</BaseLayout>

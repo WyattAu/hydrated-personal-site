@@ -19,6 +19,7 @@ mod devtools;
 mod finance;
 mod creative;
 pub mod quant;
+pub mod showcase;
 
 use wasm_bindgen::prelude::*;
 
