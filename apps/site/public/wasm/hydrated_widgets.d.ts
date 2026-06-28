@@ -75,6 +75,8 @@ export function create_colorblind(canvas_id: string, width: number, height: numb
 
 export function create_correlation(canvas_id: string, width: number, height: number): void;
 
+export function create_double_pendulum(canvas_id: string, w: number, h: number): void;
+
 export function create_fluids(canvas_id: string, w: number, h: number): void;
 
 export function create_fourier_viz(canvas_id: string, width: number, height: number): void;
@@ -110,8 +112,6 @@ export function create_network(canvas_id: string, width: number, height: number)
 export function create_neural_net(canvas_id: string, w: number, h: number): void;
 
 export function create_order_book(canvas_id: string, width: number, height: number): void;
-
-export function create_pendulum(canvas_id: string, w: number, h: number): void;
 
 export function create_physics(canvas_id: string, width: number, height: number): void;
 
@@ -222,11 +222,11 @@ export function quant_yield_curve(maturities: Float64Array, yields: Float64Array
 
 export function update_backtest(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_boids(canvas_id: string, w: number, h: number, _params: string): void;
+export function update_boids(canvas_id: string, w: number, h: number, _t: number): void;
 
 export function update_btc_health(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_ca_explorer(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_ca_explorer(canvas_id: string, w: number, h: number, _t: number): void;
 
 export function update_cellular_automata(canvas_id: string, width: number, height: number, _time: number): void;
 
@@ -236,53 +236,53 @@ export function update_colorblind(canvas_id: string, width: number, height: numb
 
 export function update_correlation(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_fluids(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_double_pendulum(canvas_id: string, w: number, h: number, _t: number): void;
+
+export function update_fluids(canvas_id: string, w: number, h: number, _t: number): void;
 
 export function update_fourier_viz(canvas_id: string, width: number, height: number, time: number): void;
 
 export function update_generative(canvas_id: string, width: number, height: number, seed: number, speed: number, density: number, time: number): void;
 
-export function update_gradient_descent(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_gradient_descent(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_kmeans(canvas_id: string, w: number, h: number, _params: string): void;
+export function update_kmeans(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_lightning(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_lightning(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_lorenz(canvas_id: string, w: number, h: number, _params: string): void;
+export function update_lorenz(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_mandelbrot(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_mandelbrot(canvas_id: string, w: number, h: number, _t: number): void;
 
 export function update_network(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_neural_net(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_neural_net(canvas_id: string, w: number, h: number, _t: number): void;
 
 export function update_order_book(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_pendulum(canvas_id: string, w: number, h: number, params_json: string): void;
-
 export function update_physics(canvas_id: string, width: number, height: number, _time: number): void;
 
-export function update_reaction_diffusion(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_reaction_diffusion(canvas_id: string, w: number, h: number, _t: number): void;
 
 export function update_regex_playground(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_sankey(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_sankey(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_solar(canvas_id: string, w: number, h: number, _params: string): void;
+export function update_solar(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_spectrogram(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_spectrogram(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_trade_flow(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_trade_flow(canvas_id: string, w: number, h: number, _t: number): void;
 
 export function update_treemap(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_tsne(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_tsne(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_vol_surface(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_vol_surface(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_voronoi(canvas_id: string, w: number, h: number, params_json: string): void;
+export function update_voronoi(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_wave(canvas_id: string, w: number, h: number, _params: string): void;
+export function update_wave(canvas_id: string, w: number, h: number, _t: number): void;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -319,6 +319,7 @@ export interface InitOutput {
     readonly create_climate: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_colorblind: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_correlation: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly create_double_pendulum: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_fluids: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_fourier_viz: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_generative: (a: number, b: number, c: number, d: number) => [number, number];
@@ -331,7 +332,6 @@ export interface InitOutput {
     readonly create_network: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_neural_net: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_order_book: (a: number, b: number, c: number, d: number) => [number, number];
-    readonly create_pendulum: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_physics: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_reaction_diffusion: (a: number, b: number, c: number, d: number) => [number, number];
     readonly create_regex_playground: (a: number, b: number, c: number, d: number) => [number, number];
@@ -375,37 +375,37 @@ export interface InitOutput {
     readonly terraingenerator_set_scale: (a: number, b: number) => void;
     readonly terraingenerator_set_seed: (a: number, b: number) => void;
     readonly update_backtest: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_boids: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_boids: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_btc_health: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_ca_explorer: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_ca_explorer: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_cellular_automata: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_climate: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_colorblind: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_correlation: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_fluids: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_double_pendulum: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_fluids: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_fourier_viz: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_generative: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
-    readonly update_gradient_descent: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_kmeans: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_lightning: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_lorenz: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_mandelbrot: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_gradient_descent: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_kmeans: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_lightning: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_lorenz: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_mandelbrot: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_network: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_neural_net: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_neural_net: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_order_book: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_pendulum: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
     readonly update_physics: (a: number, b: number, c: number, d: number, e: number) => [number, number];
-    readonly update_reaction_diffusion: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_reaction_diffusion: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_regex_playground: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_sankey: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_solar: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_spectrogram: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_trade_flow: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_sankey: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_solar: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_spectrogram: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_trade_flow: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly update_treemap: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_tsne: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_vol_surface: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_voronoi: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
-    readonly update_wave: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+    readonly update_tsne: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_vol_surface: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_voronoi: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+    readonly update_wave: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly terraingenerator_persistence: (a: number) => number;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

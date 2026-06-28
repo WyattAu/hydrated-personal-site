@@ -29,7 +29,7 @@ pub fn create_boids(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn update_boids(canvas_id: &str, w: u32, h: u32, _params: &str) -> Result<(), JsValue> {
+pub fn update_boids(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsValue> {
     let wf = w as f64; let hf = h as f64;
     let mut birds: Vec<Bird> = (0..N_BIRDS).map(|_| Bird::new(wf, hf)).collect();
 

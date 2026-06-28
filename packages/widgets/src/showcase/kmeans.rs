@@ -14,7 +14,7 @@ pub fn create_kmeans(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn update_kmeans(canvas_id: &str, w: u32, h: u32, _params: &str) -> Result<(), JsValue> {
+pub fn update_kmeans(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsValue> {
     let wf = w as f64; let hf = h as f64;
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();

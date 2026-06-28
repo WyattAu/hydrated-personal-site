@@ -36,7 +36,7 @@ pub fn create_sankey(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn update_sankey(canvas_id: &str, w: u32, h: u32, params_json: &str) -> Result<(), JsValue> {
+pub fn update_sankey(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let canvas = document.get_element_by_id(canvas_id)

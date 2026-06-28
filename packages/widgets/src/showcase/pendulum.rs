@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
 #[wasm_bindgen]
-pub fn create_pendulum(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
+pub fn create_double_pendulum(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
@@ -15,7 +15,7 @@ pub fn create_pendulum(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn update_pendulum(canvas_id: &str, w: u32, h: u32, params_json: &str) -> Result<(), JsValue> {
+pub fn update_double_pendulum(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;

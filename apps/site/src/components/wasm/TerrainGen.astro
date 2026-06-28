@@ -46,7 +46,7 @@ const widgetId = `terrain-gen-${Math.random().toString(36).slice(2, 8)}`;
   if (!el) return;
 
   function initTerrain() {
-    var wasmPath = '/wasm-v4/hydrated_widgets.js';
+    var wasmPath = '/wasm/hydrated_widgets.js?v=j28';
     import(wasmPath)
       .then(async function (mod) {
         await mod.default();

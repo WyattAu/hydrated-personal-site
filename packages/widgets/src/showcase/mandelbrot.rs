@@ -34,6 +34,6 @@ pub fn create_mandelbrot(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue>
 }
 
 #[wasm_bindgen]
-pub fn update_mandelbrot(canvas_id: &str, w: u32, h: u32, params_json: &str) -> Result<(), JsValue> {
+pub fn update_mandelbrot(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsValue> {
     create_mandelbrot(canvas_id, w, h)
 }

@@ -16,7 +16,7 @@ pub fn create_wave(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn update_wave(canvas_id: &str, w: u32, h: u32, _params: &str) -> Result<(), JsValue> {
+pub fn update_wave(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;

@@ -1,9 +1,3 @@
-# Cloudflare Pages _headers file
-# CSP is set via <meta> tag in BaseLayout.astro because Astro's
-# Cloudflare adapter (_worker.js) intercepts all requests and
-# the _headers file's CSP is cached aggressively by Cloudflare's
-# edge. The meta tag is baked into each prerendered HTML page.
-
 /*
   Content-Security-Policy: frame-ancestors 'none'
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
@@ -12,14 +6,12 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()
 
-# API routes: CORS headers.
 /api/*
   Access-Control-Allow-Origin: *
   Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS
   Access-Control-Allow-Headers: Content-Type, Authorization
 
-# WASM and static assets: immutable cache.
-/wasm-v4/*
-  Cache-Control: public, max-age=31536000, immutable
+/wasm/*
+  Cache-Control: public, max-age=3600, must-revalidate
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable

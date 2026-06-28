@@ -475,6 +475,20 @@ export function create_correlation(canvas_id, width, height) {
  * @param {number} w
  * @param {number} h
  */
+export function create_double_pendulum(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_double_pendulum(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
 export function create_fluids(canvas_id, w, h) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
@@ -639,20 +653,6 @@ export function create_order_book(canvas_id, width, height) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
     const ret = wasm.create_order_book(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_pendulum(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_pendulum(ptr0, len0, w, h);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1092,14 +1092,12 @@ export function update_backtest(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} _params
+ * @param {number} _t
  */
-export function update_boids(canvas_id, w, h, _params) {
+export function update_boids(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(_params, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_boids(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_boids(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1126,14 +1124,12 @@ export function update_btc_health(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_ca_explorer(canvas_id, w, h, params_json) {
+export function update_ca_explorer(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_ca_explorer(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_ca_explorer(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1209,14 +1205,27 @@ export function update_correlation(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_fluids(canvas_id, w, h, params_json) {
+export function update_double_pendulum(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_fluids(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_double_pendulum(ptr0, len0, w, h, _t);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _t
+ */
+export function update_fluids(canvas_id, w, h, _t) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_fluids(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1259,14 +1268,12 @@ export function update_generative(canvas_id, width, height, seed, speed, density
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_gradient_descent(canvas_id, w, h, params_json) {
+export function update_gradient_descent(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_gradient_descent(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_gradient_descent(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1276,14 +1283,12 @@ export function update_gradient_descent(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} _params
+ * @param {number} _t
  */
-export function update_kmeans(canvas_id, w, h, _params) {
+export function update_kmeans(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(_params, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_kmeans(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_kmeans(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1293,14 +1298,12 @@ export function update_kmeans(canvas_id, w, h, _params) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_lightning(canvas_id, w, h, params_json) {
+export function update_lightning(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_lightning(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_lightning(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1310,14 +1313,12 @@ export function update_lightning(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} _params
+ * @param {number} _t
  */
-export function update_lorenz(canvas_id, w, h, _params) {
+export function update_lorenz(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(_params, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_lorenz(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_lorenz(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1327,14 +1328,12 @@ export function update_lorenz(canvas_id, w, h, _params) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_mandelbrot(canvas_id, w, h, params_json) {
+export function update_mandelbrot(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_mandelbrot(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_mandelbrot(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1361,14 +1360,12 @@ export function update_network(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_neural_net(canvas_id, w, h, params_json) {
+export function update_neural_net(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_neural_net(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_neural_net(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1393,23 +1390,6 @@ export function update_order_book(canvas_id, width, height, data_json) {
 
 /**
  * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {string} params_json
- */
-export function update_pendulum(canvas_id, w, h, params_json) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_pendulum(ptr0, len0, w, h, ptr1, len1);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
  * @param {number} width
  * @param {number} height
  * @param {number} _time
@@ -1427,14 +1407,12 @@ export function update_physics(canvas_id, width, height, _time) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_reaction_diffusion(canvas_id, w, h, params_json) {
+export function update_reaction_diffusion(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_reaction_diffusion(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_reaction_diffusion(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1461,14 +1439,12 @@ export function update_regex_playground(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_sankey(canvas_id, w, h, params_json) {
+export function update_sankey(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_sankey(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_sankey(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1478,14 +1454,12 @@ export function update_sankey(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} _params
+ * @param {number} _t
  */
-export function update_solar(canvas_id, w, h, _params) {
+export function update_solar(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(_params, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_solar(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_solar(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1495,14 +1469,12 @@ export function update_solar(canvas_id, w, h, _params) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_spectrogram(canvas_id, w, h, params_json) {
+export function update_spectrogram(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_spectrogram(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_spectrogram(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1512,14 +1484,12 @@ export function update_spectrogram(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_trade_flow(canvas_id, w, h, params_json) {
+export function update_trade_flow(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_trade_flow(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_trade_flow(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1546,14 +1516,12 @@ export function update_treemap(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_tsne(canvas_id, w, h, params_json) {
+export function update_tsne(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_tsne(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_tsne(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1563,14 +1531,12 @@ export function update_tsne(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_vol_surface(canvas_id, w, h, params_json) {
+export function update_vol_surface(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_vol_surface(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_vol_surface(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1580,14 +1546,12 @@ export function update_vol_surface(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} params_json
+ * @param {number} _t
  */
-export function update_voronoi(canvas_id, w, h, params_json) {
+export function update_voronoi(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_voronoi(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_voronoi(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1597,14 +1561,12 @@ export function update_voronoi(canvas_id, w, h, params_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {string} _params
+ * @param {number} _t
  */
-export function update_wave(canvas_id, w, h, _params) {
+export function update_wave(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(_params, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_wave(ptr0, len0, w, h, ptr1, len1);
+    const ret = wasm.update_wave(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
