@@ -154,6 +154,11 @@ export default function EtfVaR() {
   });
 
   createEffect(() => {
+    ticker();
+    loadData();
+  });
+
+  createEffect(() => {
     const v = data();
     if (v) draw();
   });

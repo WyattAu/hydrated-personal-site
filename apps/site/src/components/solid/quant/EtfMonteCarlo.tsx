@@ -183,6 +183,11 @@ export default function EtfMonteCarlo() {
   });
 
   createEffect(() => {
+    ticker();
+    loadData();
+  });
+
+  createEffect(() => {
     const v = result();
     if (v) draw();
   });
