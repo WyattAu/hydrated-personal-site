@@ -592,78 +592,106 @@ export default function WorldMap() {
                 return;
               }
               try {
-                const [countryRes, wbRes] = await Promise.all([
-                  fetch(`/api/restcountries?code=${iso}`),
-                  fetch(
-                    `/api/world-bank?country=${iso}&indicators=SP.DYN.LE00.IN,SP.POP.TOTL,NY.GDP.MKTP.CD,NY.GDP.PCAP.CD,EN.ATM.CO2E.PC,SP.URB.TOTL.IN.ZS,SL.UEM.TOTL.ZS,SH.DYN.MORT,SH.XPD.CHEX.GD.ZS,SE.ADT.LITR.ZS,SI.POV.GINI,AG.LND.ARBL.HA.PC,EG.USE.ELEC.KH.PC,IT.NET.USER.ZS,NV.IND.MANF.ZS`,
-                  ),
-                ]);
+                // Phase 1: Fast basic data (capital, region) - show immediately
+                const countryRes = await fetch(`/api/restcountries?code=${iso}`);
                 const cData = countryRes.ok ? await countryRes.json() : null;
-                const wbData = wbRes.ok ? await wbRes.json() : {};
                 if (cData) {
                   setCountryData({
                     name: cData.name?.common || name,
                     capital: Array.isArray(cData.capital) ? cData.capital[0] : cData.capital,
-                    population:
-                      typeof wbData['SP.POP.TOTL'] === 'number' ? wbData['SP.POP.TOTL'] : undefined,
-                    area: typeof cData.area === 'number' ? cData.area : undefined,
                     region: cData.region,
                     languages: cData.languages || {},
                     currencies: cData.currencies || {},
-                    gdp:
-                      typeof wbData['NY.GDP.MKTP.CD'] === 'number'
-                        ? wbData['NY.GDP.MKTP.CD']
-                        : undefined,
-                    lifeExpectancy:
-                      typeof wbData['SP.DYN.LE00.IN'] === 'number'
-                        ? wbData['SP.DYN.LE00.IN']
-                        : undefined,
-                    gdpPerCapita:
-                      typeof wbData['NY.GDP.PCAP.CD'] === 'number'
-                        ? wbData['NY.GDP.PCAP.CD']
-                        : undefined,
-                    unemployment:
-                      typeof wbData['SL.UEM.TOTL.ZS'] === 'number'
-                        ? wbData['SL.UEM.TOTL.ZS']
-                        : undefined,
-                    infantMortality:
-                      typeof wbData['SH.DYN.MORT'] === 'number' ? wbData['SH.DYN.MORT'] : undefined,
-                    healthExpenditure:
-                      typeof wbData['SH.XPD.CHEX.GD.ZS'] === 'number'
-                        ? wbData['SH.XPD.CHEX.GD.ZS']
-                        : undefined,
-                    literacyRate:
-                      typeof wbData['SE.ADT.LITR.ZS'] === 'number'
-                        ? wbData['SE.ADT.LITR.ZS']
-                        : undefined,
-                    giniIndex:
-                      typeof wbData['SI.POV.GINI'] === 'number' ? wbData['SI.POV.GINI'] : undefined,
-                    arableLand:
-                      typeof wbData['AG.LND.ARBL.HA.PC'] === 'number'
-                        ? wbData['AG.LND.ARBL.HA.PC']
-                        : undefined,
-                    electricyPerCapita:
-                      typeof wbData['EG.USE.ELEC.KH.PC'] === 'number'
-                        ? wbData['EG.USE.ELEC.KH.PC']
-                        : undefined,
-                    internetUsers:
-                      typeof wbData['IT.NET.USER.ZS'] === 'number'
-                        ? wbData['IT.NET.USER.ZS']
-                        : undefined,
-                    manufacturing:
-                      typeof wbData['NV.IND.MANF.ZS'] === 'number'
-                        ? wbData['NV.IND.MANF.ZS']
-                        : undefined,
-                    co2PerCapita:
-                      typeof wbData['EN.ATM.CO2E.PC'] === 'number'
-                        ? wbData['EN.ATM.CO2E.PC']
-                        : undefined,
-                    urbanPopulation:
-                      typeof wbData['SP.URB.TOTL.IN.ZS'] === 'number'
-                        ? wbData['SP.URB.TOTL.IN.ZS']
-                        : undefined,
                   });
+                  setCountryLoading(false);
                 }
+
+                // Phase 2: Key indicators (population, GDP, life exp) - load next
+                const wbKeyRes = await fetch(
+                  `/api/world-bank?country=${iso}&indicators=SP.POP.TOTL,NY.GDP.MKTP.CD,SP.DYN.LE00.IN,NY.GDP.PCAP.CD`,
+                );
+                const wbKey = wbKeyRes.ok ? await wbKeyRes.json() : {};
+                setCountryData((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        population:
+                          typeof wbKey['SP.POP.TOTL'] === 'number'
+                            ? wbKey['SP.POP.TOTL']
+                            : undefined,
+                        gdp:
+                          typeof wbKey['NY.GDP.MKTP.CD'] === 'number'
+                            ? wbKey['NY.GDP.MKTP.CD']
+                            : undefined,
+                        lifeExpectancy:
+                          typeof wbKey['SP.DYN.LE00.IN'] === 'number'
+                            ? wbKey['SP.DYN.LE00.IN']
+                            : undefined,
+                        gdpPerCapita:
+                          typeof wbKey['NY.GDP.PCAP.CD'] === 'number'
+                            ? wbKey['NY.GDP.PCAP.CD']
+                            : undefined,
+                      }
+                    : prev,
+                );
+
+                // Phase 3: Extended indicators - load in background
+                const wbExtRes = await fetch(
+                  `/api/world-bank?country=${iso}&indicators=SL.UEM.TOTL.ZS,SH.DYN.MORT,SH.XPD.CHEX.GD.ZS,SE.ADT.LITR.ZS,SI.POV.GINI,AG.LND.ARBL.HA.PC,EG.USE.ELEC.KH.PC,IT.NET.USER.ZS,NV.IND.MANF.ZS,EN.ATM.CO2E.PC,SP.URB.TOTL.IN.ZS`,
+                );
+                const wbExt = wbExtRes.ok ? await wbExtRes.json() : {};
+                setCountryData((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        unemployment:
+                          typeof wbExt['SL.UEM.TOTL.ZS'] === 'number'
+                            ? wbExt['SL.UEM.TOTL.ZS']
+                            : undefined,
+                        infantMortality:
+                          typeof wbExt['SH.DYN.MORT'] === 'number'
+                            ? wbExt['SH.DYN.MORT']
+                            : undefined,
+                        healthExpenditure:
+                          typeof wbExt['SH.XPD.CHEX.GD.ZS'] === 'number'
+                            ? wbExt['SH.XPD.CHEX.GD.ZS']
+                            : undefined,
+                        literacyRate:
+                          typeof wbExt['SE.ADT.LITR.ZS'] === 'number'
+                            ? wbExt['SE.ADT.LITR.ZS']
+                            : undefined,
+                        giniIndex:
+                          typeof wbExt['SI.POV.GINI'] === 'number'
+                            ? wbExt['SI.POV.GINI']
+                            : undefined,
+                        arableLand:
+                          typeof wbExt['AG.LND.ARBL.HA.PC'] === 'number'
+                            ? wbExt['AG.LND.ARBL.HA.PC']
+                            : undefined,
+                        electricyPerCapita:
+                          typeof wbExt['EG.USE.ELEC.KH.PC'] === 'number'
+                            ? wbExt['EG.USE.ELEC.KH.PC']
+                            : undefined,
+                        internetUsers:
+                          typeof wbExt['IT.NET.USER.ZS'] === 'number'
+                            ? wbExt['IT.NET.USER.ZS']
+                            : undefined,
+                        manufacturing:
+                          typeof wbExt['NV.IND.MANF.ZS'] === 'number'
+                            ? wbExt['NV.IND.MANF.ZS']
+                            : undefined,
+                        co2PerCapita:
+                          typeof wbExt['EN.ATM.CO2E.PC'] === 'number'
+                            ? wbExt['EN.ATM.CO2E.PC']
+                            : undefined,
+                        urbanPopulation:
+                          typeof wbExt['SP.URB.TOTL.IN.ZS'] === 'number'
+                            ? wbExt['SP.URB.TOTL.IN.ZS']
+                            : undefined,
+                      }
+                    : prev,
+                );
+
                 recordFetch('restcountries');
               } catch {}
               setCountryLoading(false);
