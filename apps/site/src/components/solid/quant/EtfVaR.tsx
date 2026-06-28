@@ -21,7 +21,8 @@ interface ChartResponse {
   error?: unknown;
 }
 
-export default function EtfVaR(props: { symbol: string }) {
+export default function EtfVaR() {
+  const [ticker, setTicker] = createSignal('SPY');
   const [data, setData] = createSignal<VarResult | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
@@ -33,7 +34,7 @@ export default function EtfVaR(props: { symbol: string }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/stock-chart?symbol=${props.symbol}&range=1y&interval=1d`);
+      const res = await fetch(`/api/stock-chart?symbol=${ticker()}&range=1y&interval=1d`);
       if (!res.ok) throw new Error(`API ${res.status}`);
       const json: ChartResponse = await res.json();
       if (json.error) throw new Error('chart unavailable');
@@ -45,7 +46,7 @@ export default function EtfVaR(props: { symbol: string }) {
       for (let i = 1; i < closes.length; i++) returns[i - 1] = Math.log(closes[i] / closes[i - 1]);
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js';
+        const _w = '/wasm-v2/hydrated_widgets.js';
         wasmMod = await import(_w);
         await wasmMod.default();
       }
@@ -172,7 +173,7 @@ export default function EtfVaR(props: { symbol: string }) {
           }
         >
           <span class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-            {props.symbol}
+            {ticker()}
           </span>
         </Show>
       </div>
@@ -185,8 +186,8 @@ export default function EtfVaR(props: { symbol: string }) {
       <Show when={data()} keyed>
         {(d) => (
           <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-            {props.symbol} 1d log returns | VaR(95%): {(d.var_historical * 100).toFixed(2)}% |
-            ES(95%): {(d.es_historical * 100).toFixed(2)}%
+            {ticker()} 1d log returns | VaR(95%): {(d.var_historical * 100).toFixed(2)}% | ES(95%):{' '}
+            {(d.es_historical * 100).toFixed(2)}%
           </p>
         )}
       </Show>

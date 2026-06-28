@@ -23,7 +23,8 @@ interface ChartResponse {
   error?: unknown;
 }
 
-export default function EtfMonteCarlo(props: { symbol: string }) {
+export default function EtfMonteCarlo() {
+  const [ticker, setTicker] = createSignal('SPY');
   const [result, setResult] = createSignal<MCResult | null>(null);
   const [historical, setHistorical] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
@@ -36,7 +37,7 @@ export default function EtfMonteCarlo(props: { symbol: string }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/stock-chart?symbol=${props.symbol}&range=1y&interval=1d`);
+      const res = await fetch(`/api/stock-chart?symbol=${ticker()}&range=1y&interval=1d`);
       if (!res.ok) throw new Error(`API ${res.status}`);
       const json: ChartResponse = await res.json();
       if (json.error) throw new Error('chart unavailable');
@@ -46,7 +47,7 @@ export default function EtfMonteCarlo(props: { symbol: string }) {
       setHistorical(closes);
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js';
+        const _w = '/wasm-v2/hydrated_widgets.js';
         wasmMod = await import(_w);
         await wasmMod.default();
         wasmMod.quant_seed(Math.random() * 1e18, Math.random() * 1e18);
@@ -201,7 +202,7 @@ export default function EtfMonteCarlo(props: { symbol: string }) {
           }
         >
           <span class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-            {props.symbol}
+            {ticker()}
           </span>
         </Show>
       </div>
@@ -214,8 +215,8 @@ export default function EtfMonteCarlo(props: { symbol: string }) {
       <Show when={result()} keyed>
         {(mc) => (
           <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-            {props.symbol} | 1000 GBM paths | annualized vol {(mc.volatility * 100).toFixed(1)}% |
-            drift {(mc.drift * 100).toFixed(1)}%
+            {ticker()} | 1000 GBM paths | annualized vol {(mc.volatility * 100).toFixed(1)}% | drift{' '}
+            {(mc.drift * 100).toFixed(1)}%
           </p>
         )}
       </Show>

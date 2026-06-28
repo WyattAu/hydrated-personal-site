@@ -7,6 +7,7 @@ import ThemeToggle from '../components/solid/ThemeToggle';
 import EtfDrawdownChart from '../components/solid/quant/EtfDrawdownChart';
 import EtfMonteCarlo from '../components/solid/quant/EtfMonteCarlo';
 import EtfRiskReturnScatter from '../components/solid/quant/EtfRiskReturnScatter';
+import EtfSectorRadar from '../components/solid/quant/EtfSectorRadar';
 import EtfVaR from '../components/solid/quant/EtfVaR';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -84,21 +85,30 @@ import '../styles/base.css';
         </div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
           <AppErrorBoundary client:load>
-            <EtfMonteCarlo client:load symbol="SPY" />
+            <EtfMonteCarlo client:load />
           </AppErrorBoundary>
         </div>
       </div>
 
       <!-- Row 2: Drawdown + VaR -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
           <AppErrorBoundary client:load>
-            <EtfDrawdownChart client:load symbol="SPY" />
+            <EtfDrawdownChart client:load />
           </AppErrorBoundary>
         </div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
           <AppErrorBoundary client:load>
-            <EtfVaR client:load symbol="SPY" />
+            <EtfVaR client:load />
+          </AppErrorBoundary>
+        </div>
+      </div>
+
+      <!-- Row 3: Sector Radar -->
+      <div class="grid grid-cols-1 gap-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <EtfSectorRadar client:load />
           </AppErrorBoundary>
         </div>
       </div>
