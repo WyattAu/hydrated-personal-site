@@ -38,7 +38,7 @@ export default function YieldCurveChart() {
       const yieldVals = new Float64Array(yields.map((y: YieldPoint) => y.yield));
 
       if (!wasmMod) {
-        const _w = '/wasm-v2/hydrated_widgets.js';
+        const _w = '/wasm-v3/hydrated_widgets.js';
         wasmMod = await import(_w);
         await wasmMod.default();
       }

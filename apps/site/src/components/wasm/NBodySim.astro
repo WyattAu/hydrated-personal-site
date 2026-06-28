@@ -34,7 +34,7 @@ const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
   if (!el) return;
 
   function initNBody() {
-    var wasmPath = '/wasm-v2/hydrated_widgets.js';
+    var wasmPath = '/wasm-v3/hydrated_widgets.js';
     import(wasmPath)
       .then(async function (mod) {
         await mod.default();
