@@ -1,70 +1,62 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-/// voronoi visualization widget.
-/// Renders to canvas with create_voronoi / update_voronoi pattern.
+/// Voronoi treemap animation.
 
 #[wasm_bindgen]
 pub fn create_voronoi(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or_else(|| JsValue::from_str("Canvas not found"))?;
+    let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
-    canvas.set_width(w);
-    canvas.set_height(h);
-    let ctx = canvas.get_context("2d")?
-        .ok_or_else(|| JsValue::from_str("No 2d context"))?
-        .dyn_into::<CanvasRenderingContext2d>()?;
+    canvas.set_width(w); canvas.set_height(h);
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
     ctx.set_fill_style(&"#0a0a0a".into());
     ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
-    // Placeholder animation
-    let cx = w as f64 / 2.0;
-    let cy = h as f64 / 2.0;
-    for i in 0..200 {
-        let angle = i as f64 * 0.1;
-        let r = 50.0 + (i as f64 * 0.5);
-        let x = cx + r * angle.cos();
-        let y = cy + r * angle.sin();
-        let hue = (i as f64 * 1.8) % 360.0;
-        ctx.set_fill_style(&format!("hsl({}, 80%, 60%)", hue).into());
-        ctx.begin_path();
-        ctx.arc(x, y, 2.0, 0.0, std::f64::consts::TAU).ok();
-        ctx.fill();
-    }
     Ok(())
 }
 
 #[wasm_bindgen]
-pub fn update_voronoi(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsValue> {
+pub fn update_voronoi(canvas_id: &str, w: u32, h: u32, time: f64) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or_else(|| JsValue::from_str("Canvas not found"))?;
+    let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
-    let ctx = canvas.get_context("2d")?
-        .ok_or_else(|| JsValue::from_str("No 2d context"))?
-        .dyn_into::<CanvasRenderingContext2d>()?;
-    
-    // Fade trail
-    ctx.set_fill_style(&"rgba(10,10,10,0.05)".into());
-    ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
-    
-    let cx = w as f64 / 2.0;
-    let cy = h as f64 / 2.0;
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
+    let wf = w as f64;
+    let hf = h as f64;
+    let cx = wf / 2.0;
+    let cy = hf / 2.0;
     let t = js_sys::Date::now() as f64 / 1000.0;
-    
-    // Animated particle system unique to each widget
-    for i in 0..150 {
-        let phase = i as f64 * 0.04;
-        let r = 40.0 + 60.0 * (t * 0.5 + phase).sin().abs();
-        let angle = phase + t * 0.3;
-        let x = cx + r * angle.cos() * (1.0 + 0.3 * (t + phase).sin());
-        let y = cy + r * angle.sin() * (1.0 + 0.3 * (t * 1.1 + phase).cos());
-        let hue = (phase * 57.3 + t * 30.0) % 360.0;
-        ctx.set_fill_style(&format!("hsla({}, 80%, 60%, 0.8)", hue).into());
+
+    ctx.set_fill_style(&"#0a0a0a".into());
+    ctx.fill_rect(0.0, 0.0, wf, hf);
+    // Moving Voronoi-like cells (simplified: just draw moving colored regions)
+    let sites = [
+        (wf * 0.2 + (t * 20.0).sin() * 30.0, hf * 0.3 + (t * 15.0).cos() * 20.0, "#00e5ff"),
+        (wf * 0.7 + (t * 18.0).cos() * 25.0, hf * 0.4 + (t * 22.0).sin() * 20.0, "#ff4081"),
+        (wf * 0.3 + (t * 25.0).sin() * 20.0, hf * 0.7 + (t * 17.0).cos() * 25.0, "#4caf50"),
+        (wf * 0.8 + (t * 16.0).cos() * 30.0, hf * 0.75 + (t * 19.0).sin() * 20.0, "#7c4dff"),
+        (wf * 0.5 + (t * 21.0).sin() * 15.0, hf * 0.5 + (t * 14.0).cos() * 30.0, "#ff9800"),
+    ];
+    for py in (0..h).step_by(4) {
+        for px in (0..w).step_by(4) {
+            let mut best = 0; let mut best_d = f64::MAX;
+            for (si, s) in sites.iter().enumerate() {
+                let d = (px as f64 - s.0).powi(2) + (py as f64 - s.1).powi(2);
+                if d < best_d { best_d = d; best = si; }
+            }
+            let s = &sites[best];
+            let alpha = (1.0 / (1.0 + best_d * 0.0001)).min(0.4);
+            ctx.set_fill_style(&format!("{}{}", s.2, format!("{:02x}", (alpha * 255.0) as u8)).into());
+            ctx.fill_rect(px as f64, py as f64, 4.0, 4.0);
+        }
+    }
+    // Draw site markers
+    for s in &sites {
+        ctx.set_fill_style(&s.2.into());
         ctx.begin_path();
-        ctx.arc(x, y, 1.5, 0.0, std::f64::consts::TAU).ok();
+        ctx.arc(s.0, s.1, 4.0, 0.0, std::f64::consts::TAU).ok();
         ctx.fill();
     }
     Ok(())

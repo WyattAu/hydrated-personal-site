@@ -35,7 +35,7 @@ export default function MonteCarloFan(props: { symbol?: string }) {
       setHistorical(closes);
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js?v=j28';
+        const _w = '/wasm/hydrated_widgets.js?v=j29';
         wasmMod = await import(_w);
         await wasmMod.default();
         wasmMod.quant_seed(Math.random() * 1e18, Math.random() * 1e18);

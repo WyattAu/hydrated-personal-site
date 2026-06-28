@@ -33,7 +33,7 @@ export default function VolatilityForecast(props: { symbol?: string }) {
       for (let i = 1; i < closes.length; i++) returns[i - 1] = Math.log(closes[i] / closes[i - 1]);
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js?v=j28';
+        const _w = '/wasm/hydrated_widgets.js?v=j29';
         wasmMod = await import(_w);
         await wasmMod.default();
       }

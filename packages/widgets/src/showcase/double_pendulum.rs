@@ -1,10 +1,10 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-/// t-SNE dimensionality reduction.
+/// Double pendulum chaos simulation.
 
 #[wasm_bindgen]
-pub fn create_tsne(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
+pub fn create_double_pendulum(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
@@ -17,7 +17,7 @@ pub fn create_tsne(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn update_tsne(canvas_id: &str, w: u32, h: u32, time: f64) -> Result<(), JsValue> {
+pub fn update_double_pendulum(canvas_id: &str, w: u32, h: u32, time: f64) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
@@ -29,23 +29,29 @@ pub fn update_tsne(canvas_id: &str, w: u32, h: u32, time: f64) -> Result<(), JsV
     let cy = hf / 2.0;
     let t = js_sys::Date::now() as f64 / 1000.0;
 
-    ctx.set_fill_style(&"rgba(10,10,10,0.08)".into());
+    // Fade
+    ctx.set_fill_style(&"rgba(10,10,10,0.06)".into());
     ctx.fill_rect(0.0, 0.0, wf, hf);
-    // Points converging to 3 clusters
-    let clusters = [(cx - 60.0, cy - 40.0), (cx + 60.0, cy - 40.0), (cx, cy + 50.0)];
-    let colors = ["#00e5ff", "#ff4081", "#4caf50"];
-    for i in 0..90u32 {
-        let ci = (i % 3) as usize;
-        let (tx, ty) = clusters[ci];
-        // Start position is random-ish (based on i), converges over time
-        let convergence = ((t * 0.2).sin() + 1.0) * 0.5;
-        let start_x = cx + ((i as f64 * 37.0) % 200.0 - 100.0);
-        let start_y = cy + ((i as f64 * 53.0) % 200.0 - 100.0);
-        let x = start_x + (tx - start_x) * convergence;
-        let y = start_y + (ty - start_y) * convergence;
-        ctx.set_fill_style(&format!("{}80", colors[ci]).into());
+    let scale = wf.min(hf) * 0.15;
+    let colors = ["#00e5ff", "#7c4dff", "#ff4081", "#4caf50"];
+    for i in 0..4u32 {
+        let off = i as f64 * 0.002;
+        let a1 = 1.57 + off + (t * 0.8).sin() * 0.3;
+        let a2 = 1.57 + off + (t * 1.2).cos() * 0.5;
+        let x1 = cx + a1.sin() * scale;
+        let y1 = cy + a1.cos() * scale;
+        let x2 = x1 + a2.sin() * scale;
+        let y2 = y1 + a2.cos() * scale;
+        ctx.set_stroke_style(&colors[i as usize].into());
+        ctx.set_line_width(1.5);
         ctx.begin_path();
-        ctx.arc(x, y, 3.0, 0.0, std::f64::consts::TAU).ok();
+        ctx.move_to(cx, cy);
+        ctx.line_to(x1, y1);
+        ctx.line_to(x2, y2);
+        ctx.stroke();
+        ctx.set_fill_style(&colors[i as usize].into());
+        ctx.begin_path();
+        ctx.arc(x2, y2, 4.0, 0.0, std::f64::consts::TAU).ok();
         ctx.fill();
     }
     Ok(())

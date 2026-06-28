@@ -399,8 +399,7 @@ export function create_btc_health(canvas_id, width, height) {
 }
 
 /**
- * ca_explorer visualization widget.
- * Renders to canvas with create_ca_explorer / update_ca_explorer pattern.
+ * Elementary cellular automaton explorer.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -485,6 +484,7 @@ export function create_double_pendulum(canvas_id, w, h) {
 }
 
 /**
+ * Fluid dynamics smoke simulation.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -527,8 +527,7 @@ export function create_generative(canvas_id, width, height) {
 }
 
 /**
- * gradient_descent visualization widget.
- * Renders to canvas with create_gradient_descent / update_gradient_descent pattern.
+ * Gradient descent on loss landscape.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -557,8 +556,7 @@ export function create_kmeans(canvas_id, w, h) {
 }
 
 /**
- * lightning visualization widget.
- * Renders to canvas with create_lightning / update_lightning pattern.
+ * Lightning Network topology.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -629,8 +627,7 @@ export function create_network(canvas_id, width, height) {
 }
 
 /**
- * neural_net visualization widget.
- * Renders to canvas with create_neural_net / update_neural_net pattern.
+ * Neural network forward pass visualization.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -673,6 +670,7 @@ export function create_physics(canvas_id, width, height) {
 }
 
 /**
+ * Gray-Scott Turing pattern formation.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -701,8 +699,7 @@ export function create_regex_playground(canvas_id, width, height) {
 }
 
 /**
- * sankey visualization widget.
- * Renders to canvas with create_sankey / update_sankey pattern.
+ * Sankey flow diagram.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -731,8 +728,7 @@ export function create_solar(canvas_id, w, h) {
 }
 
 /**
- * spectrogram visualization widget.
- * Renders to canvas with create_spectrogram / update_spectrogram pattern.
+ * Frequency spectrogram.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -761,8 +757,7 @@ export function create_terrain_generator(canvas_id, width, height) {
 }
 
 /**
- * trade_flow visualization widget.
- * Renders to canvas with create_trade_flow / update_trade_flow pattern.
+ * Trade flow particle system.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -791,8 +786,7 @@ export function create_treemap(canvas_id, width, height) {
 }
 
 /**
- * tsne visualization widget.
- * Renders to canvas with create_tsne / update_tsne pattern.
+ * t-SNE dimensionality reduction.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -807,8 +801,7 @@ export function create_tsne(canvas_id, w, h) {
 }
 
 /**
- * vol_surface visualization widget.
- * Renders to canvas with create_vol_surface / update_vol_surface pattern.
+ * 3D implied volatility surface.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -823,8 +816,7 @@ export function create_vol_surface(canvas_id, w, h) {
 }
 
 /**
- * voronoi visualization widget.
- * Renders to canvas with create_voronoi / update_voronoi pattern.
+ * Voronoi treemap animation.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -839,6 +831,7 @@ export function create_voronoi(canvas_id, w, h) {
 }
 
 /**
+ * 2D wave equation simulation.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -1124,12 +1117,12 @@ export function update_btc_health(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_ca_explorer(canvas_id, w, h, _t) {
+export function update_ca_explorer(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_ca_explorer(ptr0, len0, w, h, _t);
+    const ret = wasm.update_ca_explorer(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1220,12 +1213,12 @@ export function update_double_pendulum(canvas_id, w, h, _t) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_fluids(canvas_id, w, h, _t) {
+export function update_fluids(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_fluids(ptr0, len0, w, h, _t);
+    const ret = wasm.update_fluids(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1268,12 +1261,12 @@ export function update_generative(canvas_id, width, height, seed, speed, density
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_gradient_descent(canvas_id, w, h, _t) {
+export function update_gradient_descent(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_gradient_descent(ptr0, len0, w, h, _t);
+    const ret = wasm.update_gradient_descent(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1298,12 +1291,12 @@ export function update_kmeans(canvas_id, w, h, _t) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_lightning(canvas_id, w, h, _t) {
+export function update_lightning(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_lightning(ptr0, len0, w, h, _t);
+    const ret = wasm.update_lightning(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1360,12 +1353,12 @@ export function update_network(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_neural_net(canvas_id, w, h, _t) {
+export function update_neural_net(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_neural_net(ptr0, len0, w, h, _t);
+    const ret = wasm.update_neural_net(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1407,12 +1400,12 @@ export function update_physics(canvas_id, width, height, _time) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_reaction_diffusion(canvas_id, w, h, _t) {
+export function update_reaction_diffusion(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_reaction_diffusion(ptr0, len0, w, h, _t);
+    const ret = wasm.update_reaction_diffusion(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1439,12 +1432,12 @@ export function update_regex_playground(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_sankey(canvas_id, w, h, _t) {
+export function update_sankey(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_sankey(ptr0, len0, w, h, _t);
+    const ret = wasm.update_sankey(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1469,12 +1462,12 @@ export function update_solar(canvas_id, w, h, _t) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_spectrogram(canvas_id, w, h, _t) {
+export function update_spectrogram(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_spectrogram(ptr0, len0, w, h, _t);
+    const ret = wasm.update_spectrogram(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1484,12 +1477,12 @@ export function update_spectrogram(canvas_id, w, h, _t) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_trade_flow(canvas_id, w, h, _t) {
+export function update_trade_flow(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_trade_flow(ptr0, len0, w, h, _t);
+    const ret = wasm.update_trade_flow(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1516,12 +1509,12 @@ export function update_treemap(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_tsne(canvas_id, w, h, _t) {
+export function update_tsne(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_tsne(ptr0, len0, w, h, _t);
+    const ret = wasm.update_tsne(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1531,12 +1524,12 @@ export function update_tsne(canvas_id, w, h, _t) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_vol_surface(canvas_id, w, h, _t) {
+export function update_vol_surface(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_vol_surface(ptr0, len0, w, h, _t);
+    const ret = wasm.update_vol_surface(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1546,12 +1539,12 @@ export function update_vol_surface(canvas_id, w, h, _t) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_voronoi(canvas_id, w, h, _t) {
+export function update_voronoi(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_voronoi(ptr0, len0, w, h, _t);
+    const ret = wasm.update_voronoi(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1561,12 +1554,12 @@ export function update_voronoi(canvas_id, w, h, _t) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} _t
+ * @param {number} time
  */
-export function update_wave(canvas_id, w, h, _t) {
+export function update_wave(canvas_id, w, h, time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_wave(ptr0, len0, w, h, _t);
+    const ret = wasm.update_wave(ptr0, len0, w, h, time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1606,6 +1599,9 @@ function __wbg_get_imports() {
         __wbg_beginPath_c99b5be3516a2077: function(arg0) {
             arg0.beginPath();
         },
+        __wbg_bezierCurveTo_22132b66df298a0b: function(arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
+            arg0.bezierCurveTo(arg1, arg2, arg3, arg4, arg5, arg6);
+        },
         __wbg_closePath_47136fd7a8a2f043: function(arg0) {
             arg0.closePath();
         },
@@ -1613,6 +1609,9 @@ function __wbg_get_imports() {
             const ret = arg0.document;
             return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
         },
+        __wbg_ellipse_69edbc4c6b78175b: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+            arg0.ellipse(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }, arguments); },
         __wbg_error_a6fa202b58aa1cd3: function(arg0, arg1) {
             let deferred0_0;
             let deferred0_1;

@@ -44,7 +44,7 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
     var wasmModPromise = null;
     function getWasmMod() {
       if (!wasmModPromise) {
-        wasmModPromise = import('/wasm/hydrated_widgets.js?v=j28').then(async function(mod) {
+        wasmModPromise = import('/wasm/hydrated_widgets.js?v=j29').then(async function(mod) {
           await mod.default();
           return mod;
         });

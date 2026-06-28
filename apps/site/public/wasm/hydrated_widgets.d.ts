@@ -62,8 +62,7 @@ export function create_boids(canvas_id: string, w: number, h: number): void;
 export function create_btc_health(canvas_id: string, width: number, height: number): void;
 
 /**
- * ca_explorer visualization widget.
- * Renders to canvas with create_ca_explorer / update_ca_explorer pattern.
+ * Elementary cellular automaton explorer.
  */
 export function create_ca_explorer(canvas_id: string, w: number, h: number): void;
 
@@ -77,6 +76,9 @@ export function create_correlation(canvas_id: string, width: number, height: num
 
 export function create_double_pendulum(canvas_id: string, w: number, h: number): void;
 
+/**
+ * Fluid dynamics smoke simulation.
+ */
 export function create_fluids(canvas_id: string, w: number, h: number): void;
 
 export function create_fourier_viz(canvas_id: string, width: number, height: number): void;
@@ -84,16 +86,14 @@ export function create_fourier_viz(canvas_id: string, width: number, height: num
 export function create_generative(canvas_id: string, width: number, height: number): void;
 
 /**
- * gradient_descent visualization widget.
- * Renders to canvas with create_gradient_descent / update_gradient_descent pattern.
+ * Gradient descent on loss landscape.
  */
 export function create_gradient_descent(canvas_id: string, w: number, h: number): void;
 
 export function create_kmeans(canvas_id: string, w: number, h: number): void;
 
 /**
- * lightning visualization widget.
- * Renders to canvas with create_lightning / update_lightning pattern.
+ * Lightning Network topology.
  */
 export function create_lightning(canvas_id: string, w: number, h: number): void;
 
@@ -106,8 +106,7 @@ export function create_nbody_simulation(canvas_id: string, width: number, height
 export function create_network(canvas_id: string, width: number, height: number): void;
 
 /**
- * neural_net visualization widget.
- * Renders to canvas with create_neural_net / update_neural_net pattern.
+ * Neural network forward pass visualization.
  */
 export function create_neural_net(canvas_id: string, w: number, h: number): void;
 
@@ -115,52 +114,52 @@ export function create_order_book(canvas_id: string, width: number, height: numb
 
 export function create_physics(canvas_id: string, width: number, height: number): void;
 
+/**
+ * Gray-Scott Turing pattern formation.
+ */
 export function create_reaction_diffusion(canvas_id: string, w: number, h: number): void;
 
 export function create_regex_playground(canvas_id: string, width: number, height: number): void;
 
 /**
- * sankey visualization widget.
- * Renders to canvas with create_sankey / update_sankey pattern.
+ * Sankey flow diagram.
  */
 export function create_sankey(canvas_id: string, w: number, h: number): void;
 
 export function create_solar(canvas_id: string, w: number, h: number): void;
 
 /**
- * spectrogram visualization widget.
- * Renders to canvas with create_spectrogram / update_spectrogram pattern.
+ * Frequency spectrogram.
  */
 export function create_spectrogram(canvas_id: string, w: number, h: number): void;
 
 export function create_terrain_generator(canvas_id: string, width: number, height: number): void;
 
 /**
- * trade_flow visualization widget.
- * Renders to canvas with create_trade_flow / update_trade_flow pattern.
+ * Trade flow particle system.
  */
 export function create_trade_flow(canvas_id: string, w: number, h: number): void;
 
 export function create_treemap(canvas_id: string, width: number, height: number): void;
 
 /**
- * tsne visualization widget.
- * Renders to canvas with create_tsne / update_tsne pattern.
+ * t-SNE dimensionality reduction.
  */
 export function create_tsne(canvas_id: string, w: number, h: number): void;
 
 /**
- * vol_surface visualization widget.
- * Renders to canvas with create_vol_surface / update_vol_surface pattern.
+ * 3D implied volatility surface.
  */
 export function create_vol_surface(canvas_id: string, w: number, h: number): void;
 
 /**
- * voronoi visualization widget.
- * Renders to canvas with create_voronoi / update_voronoi pattern.
+ * Voronoi treemap animation.
  */
 export function create_voronoi(canvas_id: string, w: number, h: number): void;
 
+/**
+ * 2D wave equation simulation.
+ */
 export function create_wave(canvas_id: string, w: number, h: number): void;
 
 export function main(): void;
@@ -226,7 +225,7 @@ export function update_boids(canvas_id: string, w: number, h: number, _t: number
 
 export function update_btc_health(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_ca_explorer(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_ca_explorer(canvas_id: string, w: number, h: number, time: number): void;
 
 export function update_cellular_automata(canvas_id: string, width: number, height: number, _time: number): void;
 
@@ -238,17 +237,17 @@ export function update_correlation(canvas_id: string, width: number, height: num
 
 export function update_double_pendulum(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_fluids(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_fluids(canvas_id: string, w: number, h: number, time: number): void;
 
 export function update_fourier_viz(canvas_id: string, width: number, height: number, time: number): void;
 
 export function update_generative(canvas_id: string, width: number, height: number, seed: number, speed: number, density: number, time: number): void;
 
-export function update_gradient_descent(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_gradient_descent(canvas_id: string, w: number, h: number, time: number): void;
 
 export function update_kmeans(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_lightning(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_lightning(canvas_id: string, w: number, h: number, time: number): void;
 
 export function update_lorenz(canvas_id: string, w: number, h: number, _t: number): void;
 
@@ -256,33 +255,33 @@ export function update_mandelbrot(canvas_id: string, w: number, h: number, _t: n
 
 export function update_network(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_neural_net(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_neural_net(canvas_id: string, w: number, h: number, time: number): void;
 
 export function update_order_book(canvas_id: string, width: number, height: number, data_json: string): void;
 
 export function update_physics(canvas_id: string, width: number, height: number, _time: number): void;
 
-export function update_reaction_diffusion(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_reaction_diffusion(canvas_id: string, w: number, h: number, time: number): void;
 
 export function update_regex_playground(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_sankey(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_sankey(canvas_id: string, w: number, h: number, time: number): void;
 
 export function update_solar(canvas_id: string, w: number, h: number, _t: number): void;
 
-export function update_spectrogram(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_spectrogram(canvas_id: string, w: number, h: number, time: number): void;
 
-export function update_trade_flow(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_trade_flow(canvas_id: string, w: number, h: number, time: number): void;
 
 export function update_treemap(canvas_id: string, width: number, height: number, data_json: string): void;
 
-export function update_tsne(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_tsne(canvas_id: string, w: number, h: number, time: number): void;
 
-export function update_vol_surface(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_vol_surface(canvas_id: string, w: number, h: number, time: number): void;
 
-export function update_voronoi(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_voronoi(canvas_id: string, w: number, h: number, time: number): void;
 
-export function update_wave(canvas_id: string, w: number, h: number, _t: number): void;
+export function update_wave(canvas_id: string, w: number, h: number, time: number): void;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 

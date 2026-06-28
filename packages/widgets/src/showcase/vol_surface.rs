@@ -1,71 +1,71 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-/// vol_surface visualization widget.
-/// Renders to canvas with create_vol_surface / update_vol_surface pattern.
+/// 3D implied volatility surface.
 
 #[wasm_bindgen]
 pub fn create_vol_surface(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or_else(|| JsValue::from_str("Canvas not found"))?;
+    let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
-    canvas.set_width(w);
-    canvas.set_height(h);
-    let ctx = canvas.get_context("2d")?
-        .ok_or_else(|| JsValue::from_str("No 2d context"))?
-        .dyn_into::<CanvasRenderingContext2d>()?;
+    canvas.set_width(w); canvas.set_height(h);
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
     ctx.set_fill_style(&"#0a0a0a".into());
     ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
-    // Placeholder animation
-    let cx = w as f64 / 2.0;
-    let cy = h as f64 / 2.0;
-    for i in 0..200 {
-        let angle = i as f64 * 0.1;
-        let r = 50.0 + (i as f64 * 0.5);
-        let x = cx + r * angle.cos();
-        let y = cy + r * angle.sin();
-        let hue = (i as f64 * 1.8) % 360.0;
-        ctx.set_fill_style(&format!("hsl({}, 80%, 60%)", hue).into());
-        ctx.begin_path();
-        ctx.arc(x, y, 2.0, 0.0, std::f64::consts::TAU).ok();
-        ctx.fill();
-    }
     Ok(())
 }
 
 #[wasm_bindgen]
-pub fn update_vol_surface(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsValue> {
+pub fn update_vol_surface(canvas_id: &str, w: u32, h: u32, time: f64) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or_else(|| JsValue::from_str("Canvas not found"))?;
+    let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
-    let ctx = canvas.get_context("2d")?
-        .ok_or_else(|| JsValue::from_str("No 2d context"))?
-        .dyn_into::<CanvasRenderingContext2d>()?;
-    
-    // Fade trail
-    ctx.set_fill_style(&"rgba(10,10,10,0.05)".into());
-    ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
-    
-    let cx = w as f64 / 2.0;
-    let cy = h as f64 / 2.0;
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
+    let wf = w as f64;
+    let hf = h as f64;
+    let cx = wf / 2.0;
+    let cy = hf / 2.0;
     let t = js_sys::Date::now() as f64 / 1000.0;
-    
-    // Animated particle system unique to each widget
-    for i in 0..150 {
-        let phase = i as f64 * 0.04;
-        let r = 40.0 + 60.0 * (t * 0.5 + phase).sin().abs();
-        let angle = phase + t * 0.3;
-        let x = cx + r * angle.cos() * (1.0 + 0.3 * (t + phase).sin());
-        let y = cy + r * angle.sin() * (1.0 + 0.3 * (t * 1.1 + phase).cos());
-        let hue = (phase * 57.3 + t * 30.0) % 360.0;
-        ctx.set_fill_style(&format!("hsla({}, 80%, 60%, 0.8)", hue).into());
+
+    ctx.set_fill_style(&"rgba(10,10,10,0.1)".into());
+    ctx.fill_rect(0.0, 0.0, wf, hf);
+    // 3D mesh wireframe - volatility smile shape
+    let angle = t * 0.2;
+    let grid = 12;
+    let points: Vec<(f64, f64)> = (0..grid).flat_map(|i| {
+        (0..grid).map(move |j| {
+            let x = (i as f64 / (grid - 1) as f64 - 0.5) * 2.0;
+            let z = (j as f64 / (grid - 1) as f64 - 0.5) * 2.0;
+            // Smile shape: higher at edges
+            let y_val = (x * x + z * z) * 0.3 + 0.2;
+            // Project to 2D with rotation
+            let cos_a = angle.cos();
+            let sin_a = angle.sin();
+            let px = cx + (x * cos_a - z * sin_a) * wf * 0.18;
+            let py = cy + y_val * hf * 0.15 - z * hf * 0.08;
+            (px, py)
+        })
+    }).collect();
+    // Draw grid lines
+    ctx.set_stroke_style(&"rgba(0, 229, 255, 0.3)".into());
+    ctx.set_line_width(0.8);
+    for i in 0..grid {
         ctx.begin_path();
-        ctx.arc(x, y, 1.5, 0.0, std::f64::consts::TAU).ok();
-        ctx.fill();
+        for j in 0..grid {
+            let (px, py) = points[i * grid + j];
+            if j == 0 { ctx.move_to(px, py); } else { ctx.line_to(px, py); }
+        }
+        ctx.stroke();
+    }
+    for j in 0..grid {
+        ctx.begin_path();
+        for i in 0..grid {
+            let (px, py) = points[i * grid + j];
+            if i == 0 { ctx.move_to(px, py); } else { ctx.line_to(px, py); }
+        }
+        ctx.stroke();
     }
     Ok(())
 }

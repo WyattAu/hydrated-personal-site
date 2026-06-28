@@ -31,7 +31,7 @@ export default function EtfDrawdownChart() {
       if (closes.length < 30) throw new Error('insufficient');
 
       if (!sharedWasm) {
-        const _wasmUrl = '/wasm/hydrated_widgets.js?v=j28';
+        const _wasmUrl = '/wasm/hydrated_widgets.js?v=j29';
         sharedWasm = await import(_wasmUrl);
         await sharedWasm.default();
       }

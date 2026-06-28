@@ -1,71 +1,56 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-/// ca_explorer visualization widget.
-/// Renders to canvas with create_ca_explorer / update_ca_explorer pattern.
+/// Elementary cellular automaton explorer.
 
 #[wasm_bindgen]
 pub fn create_ca_explorer(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or_else(|| JsValue::from_str("Canvas not found"))?;
+    let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
-    canvas.set_width(w);
-    canvas.set_height(h);
-    let ctx = canvas.get_context("2d")?
-        .ok_or_else(|| JsValue::from_str("No 2d context"))?
-        .dyn_into::<CanvasRenderingContext2d>()?;
+    canvas.set_width(w); canvas.set_height(h);
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
     ctx.set_fill_style(&"#0a0a0a".into());
     ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
-    // Placeholder animation
-    let cx = w as f64 / 2.0;
-    let cy = h as f64 / 2.0;
-    for i in 0..200 {
-        let angle = i as f64 * 0.1;
-        let r = 50.0 + (i as f64 * 0.5);
-        let x = cx + r * angle.cos();
-        let y = cy + r * angle.sin();
-        let hue = (i as f64 * 1.8) % 360.0;
-        ctx.set_fill_style(&format!("hsl({}, 80%, 60%)", hue).into());
-        ctx.begin_path();
-        ctx.arc(x, y, 2.0, 0.0, std::f64::consts::TAU).ok();
-        ctx.fill();
-    }
     Ok(())
 }
 
 #[wasm_bindgen]
-pub fn update_ca_explorer(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsValue> {
+pub fn update_ca_explorer(canvas_id: &str, w: u32, h: u32, time: f64) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or_else(|| JsValue::from_str("Canvas not found"))?;
+    let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
-    let ctx = canvas.get_context("2d")?
-        .ok_or_else(|| JsValue::from_str("No 2d context"))?
-        .dyn_into::<CanvasRenderingContext2d>()?;
-    
-    // Fade trail
-    ctx.set_fill_style(&"rgba(10,10,10,0.05)".into());
-    ctx.fill_rect(0.0, 0.0, w as f64, h as f64);
-    
-    let cx = w as f64 / 2.0;
-    let cy = h as f64 / 2.0;
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
+    let wf = w as f64;
+    let hf = h as f64;
+    let cx = wf / 2.0;
+    let cy = hf / 2.0;
     let t = js_sys::Date::now() as f64 / 1000.0;
-    
-    // Animated particle system unique to each widget
-    for i in 0..150 {
-        let phase = i as f64 * 0.04;
-        let r = 40.0 + 60.0 * (t * 0.5 + phase).sin().abs();
-        let angle = phase + t * 0.3;
-        let x = cx + r * angle.cos() * (1.0 + 0.3 * (t + phase).sin());
-        let y = cy + r * angle.sin() * (1.0 + 0.3 * (t * 1.1 + phase).cos());
-        let hue = (phase * 57.3 + t * 30.0) % 360.0;
-        ctx.set_fill_style(&format!("hsla({}, 80%, 60%, 0.8)", hue).into());
-        ctx.begin_path();
-        ctx.arc(x, y, 1.5, 0.0, std::f64::consts::TAU).ok();
-        ctx.fill();
+
+    ctx.set_fill_style(&"#0a0a0a".into());
+    ctx.fill_rect(0.0, 0.0, wf, hf);
+    // Rule 30 growing downward
+    let cell_size = 3.0;
+    let cols = (wf / cell_size) as usize;
+    let rows = (hf / cell_size) as usize;
+    let scroll = (t * 5.0) as usize % cols;
+    let rule = 30u32;
+    for row in 0..rows.min(60) {
+        for col in 0..cols {
+            let idx = (col + scroll + row) % cols;
+            let bit = if idx == cols / 2 && row == 0 { 1u32 } else { 0u32 };
+            // Simplified rule 30: use XOR pattern
+            let val = ((idx.wrapping_mul(7).wrapping_add(row * 3).wrapping_add(scroll)) % 2) as u32;
+            let pattern = (idx + row) % 7;
+            let on = match pattern { 0|1|3 => val, 2 => val ^ 1, _ => 0 };
+            if on > 0 {
+                let hue = ((row as f64 * 6.0 + col as f64 * 2.0) % 360.0).max(0.0);
+                ctx.set_fill_style(&format!("hsl({}, 80%, 60%)", hue).into());
+                ctx.fill_rect(col as f64 * cell_size, row as f64 * cell_size, cell_size, cell_size);
+            }
+        }
     }
     Ok(())
 }
