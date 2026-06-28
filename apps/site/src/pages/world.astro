@@ -19,6 +19,17 @@ import RiskMetrics from '../components/solid/quant/RiskMetrics';
 import RollingCorrelationHeatmap from '../components/solid/quant/RollingCorrelationHeatmap';
 import VolatilityForecast from '../components/solid/quant/VolatilityForecast';
 import YieldCurveChart from '../components/solid/quant/YieldCurveChart';
+import BetaMatrix from '../components/solid/world/BetaMatrix';
+import CryptoDominancePie from '../components/solid/world/CryptoDominancePie';
+import CurrencyMatrix from '../components/solid/world/CurrencyMatrix';
+import EarthquakeHistogram from '../components/solid/world/EarthquakeHistogram';
+import FredSparklines from '../components/solid/world/FredSparklines';
+import GlobalStressGauge from '../components/solid/world/GlobalStressGauge';
+import MultiDrawdown from '../components/solid/world/MultiDrawdown';
+import RealizedVolRanking from '../components/solid/world/RealizedVolRanking';
+import RiskReturnBubble from '../components/solid/world/RiskReturnBubble';
+import SolarWindPanel from '../components/solid/world/SolarWindPanel';
+import WeatherStrip from '../components/solid/world/WeatherStrip';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
@@ -167,9 +178,81 @@ import '../styles/base.css';
       </div>
     </section>
 
-    <!-- Stale Indicator -->
-    <section class="px-6 md:px-12 lg:px-24 py-4 pb-12">
-      <StaleIndicator client:load />
+    <!-- Global Monitor -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">GLOBAL MONITOR</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-1">Real-Time World Dashboard</h2>
+      <p class="mb-6 text-sm" style="color: var(--text-secondary);">Geophysical, macroeconomic, and market signals aggregated into a single view.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <GlobalStressGauge client:load />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border col-span-1 md:col-span-2" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <FredSparklines client:load />
+          </AppErrorBoundary>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <EarthquakeHistogram client:load />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <SolarWindPanel client:load />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <WeatherStrip client:load />
+          </AppErrorBoundary>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <RealizedVolRanking client:load />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <RiskReturnBubble client:load />
+          </AppErrorBoundary>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <CurrencyMatrix client:load />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <CryptoDominancePie client:load />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <BetaMatrix client:load />
+          </AppErrorBoundary>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <MultiDrawdown client:load />
+          </AppErrorBoundary>
+        </div>
+      </div>
     </section>
   </main>
 

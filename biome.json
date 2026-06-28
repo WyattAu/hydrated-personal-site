@@ -116,6 +116,25 @@
       }
     },
     {
+      "include": ["apps/site/src/components/solid/world/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "useJsxKeyInIterable": "off",
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          },
+          "style": {
+            "noNonNullAssertion": "off"
+          },
+          "suspicious": {
+            "noAssignInExpressions": "off",
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
       "include": [
         "apps/site/src/components/solid/WorldMap.tsx",
         "apps/site/src/components/solid/quant/MonteCarloFan.tsx"
