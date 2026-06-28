@@ -4,6 +4,10 @@ import Nav from '../components/astro/Nav.astro';
 import AppErrorBoundary from '../components/solid/ErrorBoundary';
 import EtfApp from '../components/solid/EtfApp';
 import ThemeToggle from '../components/solid/ThemeToggle';
+import EtfDrawdownChart from '../components/solid/quant/EtfDrawdownChart';
+import EtfMonteCarlo from '../components/solid/quant/EtfMonteCarlo';
+import EtfRiskReturnScatter from '../components/solid/quant/EtfRiskReturnScatter';
+import EtfVaR from '../components/solid/quant/EtfVaR';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
@@ -61,6 +65,41 @@ import '../styles/base.css';
               Computed client-side from 1Y daily returns using WASM-accelerated linear algebra.
             </p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ETF Quant Analytics -->
+    <section class="py-12 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">QUANT ANALYTICS</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-1">ETF Risk & Performance Engine</h2>
+      <p class="mb-6 text-sm" style="color: var(--text-secondary);">All computations run in Rust/WASM on your CPU. Data from Yahoo Finance.</p>
+
+      <!-- Row 1: Risk-Return Scatter + Monte Carlo -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <EtfRiskReturnScatter client:load />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <EtfMonteCarlo client:load symbol="SPY" />
+          </AppErrorBoundary>
+        </div>
+      </div>
+
+      <!-- Row 2: Drawdown + VaR -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <EtfDrawdownChart client:load symbol="SPY" />
+          </AppErrorBoundary>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <AppErrorBoundary client:load>
+            <EtfVaR client:load symbol="SPY" />
+          </AppErrorBoundary>
         </div>
       </div>
     </section>
