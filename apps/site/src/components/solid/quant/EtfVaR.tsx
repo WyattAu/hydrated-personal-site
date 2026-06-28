@@ -28,7 +28,6 @@ export default function EtfVaR() {
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
   let canvasRef: HTMLCanvasElement | undefined;
-  // biome-ignore lint/suspicious/noExplicitAny: WASM dynamic import returns untyped module
   let wasmMod: any = null;
 
   async function loadData() {

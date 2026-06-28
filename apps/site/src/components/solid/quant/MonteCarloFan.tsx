@@ -20,7 +20,6 @@ export default function MonteCarloFan(props: { symbol?: string }) {
   const [horizon, setHorizon] = createSignal(90);
   const [error, setError] = createSignal<string | null>(null);
   let canvasRef: HTMLCanvasElement | undefined;
-  // biome-ignore lint/suspicious/noExplicitAny: WASM dynamic import returns untyped module
   let wasmMod: any = null;
 
   async function loadData() {
@@ -195,7 +194,6 @@ export default function MonteCarloFan(props: { symbol?: string }) {
           <div class="flex gap-1">
             {[30, 90, 180, 365].map((h) => (
               <button
-                // biome-ignore lint/correctness/useJsxKeyInIterable: static array
                 data-key={h}
                 type="button"
                 class="font-mono text-[9px] px-2 py-0.5 border transition-colors"

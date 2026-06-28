@@ -17,7 +17,6 @@ export default function VolatilityForecast(props: { symbol?: string }) {
   const [data, setData] = createSignal<GarchResult | null>(null);
   const [loading, setLoading] = createSignal(true);
   let canvasRef: HTMLCanvasElement | undefined;
-  // biome-ignore lint/suspicious/noExplicitAny: WASM dynamic import returns untyped module
   let wasmMod: any = null;
 
   async function loadData() {

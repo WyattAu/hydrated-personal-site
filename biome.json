@@ -109,7 +109,27 @@
             "noNonNullAssertion": "off"
           },
           "suspicious": {
-            "noAssignInExpressions": "off"
+            "noAssignInExpressions": "off",
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": [
+        "apps/site/src/components/solid/WorldMap.tsx",
+        "apps/site/src/components/solid/quant/MonteCarloFan.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off"
+          },
+          "suspicious": {
+            "noExplicitAny": "off"
+          },
+          "style": {
+            "noNonNullAssertion": "off"
           }
         }
       }

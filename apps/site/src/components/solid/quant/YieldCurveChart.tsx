@@ -22,7 +22,6 @@ export default function YieldCurveChart() {
   const [raw, setRaw] = createSignal<YieldPoint[]>([]);
   const [loading, setLoading] = createSignal(true);
   let canvasRef: HTMLCanvasElement | undefined;
-  // biome-ignore lint/suspicious/noExplicitAny: WASM dynamic import returns untyped module
   let wasmMod: any = null;
 
   async function loadData() {

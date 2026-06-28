@@ -17,7 +17,6 @@ export default function GreeksDashboard() {
   const [loading, setLoading] = createSignal(true);
   const [error, _setError] = createSignal<string | null>(null);
   let canvasRef: HTMLCanvasElement | undefined;
-  // biome-ignore lint/suspicious/noExplicitAny: WASM dynamic import returns untyped module
   let wasmMod: any = null;
 
   interface Opt {

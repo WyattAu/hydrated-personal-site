@@ -12,7 +12,6 @@ interface DDResult {
   pain_index: number;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: WASM dynamic import
 let sharedWasm: any = null;
 
 export default function EtfDrawdownChart() {

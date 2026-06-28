@@ -22,7 +22,6 @@ export default function EtfConcentrationGauge(props: { holdings: Holding[] }) {
   const [result, setResult] = createSignal<ConcentrationResult | null>(null);
   const [error, setError] = createSignal<string | null>(null);
   let canvasRef: HTMLCanvasElement | undefined;
-  // biome-ignore lint/suspicious/noExplicitAny: WASM dynamic import returns untyped module
   let wasmMod: any = null;
 
   async function compute() {
