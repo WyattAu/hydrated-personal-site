@@ -168,8 +168,27 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
                       fetch(endpoint).then(function(r) { return r.json(); }).then(function(d) {
                         if (d && d.error) return; // skip error responses
                         var dfn = mod['update_' + widget];
-                        if (dfn) dfn(canvas.id, rw, rh, JSON.stringify(d));
-                      }).catch(function() {});
+                        if (dfn) {
+                        // Normalize string numbers to JS numbers for WASM compatibility
+                        if (Array.isArray(d)) {
+                          d = d.map(function(item) {
+                            var out = {};
+                            for (var key in item) {
+                              var val = item[key];
+                              if (typeof val === 'string' && key !== 'symbol' && key !== 'name' && key !== 'instrument' && key !== 'ticker' && key !== 'expiry' && key !== 'type') {
+                                var num = parseFloat(val);
+                                out[key] = isNaN(num) ? val : num;
+                              } else {
+                                out[key] = val;
+                              }
+                            }
+                            return out;
+                          });
+                        }
+                        try { dfn(canvas.id, rw, rh, JSON.stringify(d)); }
+                        catch(e) { console.error('WASM update_' + widget + ' error:', e.message); }
+                      }
+                      }).catch(function(err) { console.error('WASM data fetch failed for ' + widget + ':', err); });
                     }
                     fetchData();
                     if (interval > 0) setInterval(fetchData, interval);
