@@ -8,6 +8,7 @@ import PriceChart from '../components/solid/PriceChart';
 import ScatterPlots from '../components/solid/ScatterPlots';
 import StaleIndicator from '../components/solid/StaleIndicator';
 import ThemeToggle from '../components/solid/ThemeToggle';
+import TreemapWidget from '../components/solid/TreemapWidget';
 import WorldMap from '../components/solid/WorldMap';
 import CorrelationNetwork from '../components/solid/quant/CorrelationNetwork';
 import EfficientFrontier from '../components/solid/quant/EfficientFrontier';
@@ -81,7 +82,9 @@ import '../styles/base.css';
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Market Treemap</p>
           <p class="text-sm mb-4" style="color: var(--text-secondary);">Crypto asset treemap. Cell size scales with trading volume.</p>
-          <WasmEmbed widget="treemap" width={380} height={300} dataEndpoint="/api/crypto-ticker" dataInterval={30000} />
+          <AppErrorBoundary client:load>
+            <TreemapWidget client:load />
+          </AppErrorBoundary>
         </div>
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">BTC Health</p>
