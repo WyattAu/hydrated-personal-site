@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 const H = 240;
@@ -38,7 +39,7 @@ export default function WeatherStrip() {
     try {
       const settled = await Promise.allSettled(
         CITIES.map(async (c) => {
-          const res = await fetch(`/api/weather?lat=${c.lat}&lon=${c.lon}`);
+          const res = await fetch(`${apiBase()}/api/weather?lat=${c.lat}&lon=${c.lon}`);
           if (!res.ok) throw new Error(c.name);
           const json = await res.json();
           const current = Number(json?.current?.temperature_2m) || 0;

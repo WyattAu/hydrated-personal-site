@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 const H = 360;
@@ -52,7 +53,7 @@ export default function FredSparklines() {
     try {
       // FRED doesn't send CORS headers, so direct browser fetch is blocked.
       // Proxy through our API which fetches server-side.
-      const res = await fetch('/api/fred-sparklines');
+      const res = await fetch(`${apiBase()}/api/fred-sparklines`);
       if (!res.ok) throw new Error('API');
       const data = await res.json();
       if (data.error) throw new Error(data.error);

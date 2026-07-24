@@ -1,5 +1,6 @@
 import autoAnimate from '@formkit/auto-animate';
 import { For, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../lib/api-base';
 
 interface GuestbookEntry {
   id: number;
@@ -16,7 +17,7 @@ export default function GuestbookList() {
 
   async function fetchEntries() {
     try {
-      const res = await fetch('/api/guestbook');
+      const res = await fetch(`${apiBase()}/api/guestbook`);
       if (!res.ok) throw new Error('Failed to load');
       const data = await res.json();
       setEntries(data.entries);

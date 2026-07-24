@@ -399,7 +399,6 @@ export function create_btc_health(canvas_id, width, height) {
 }
 
 /**
- * Elementary cellular automaton explorer.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -484,7 +483,6 @@ export function create_double_pendulum(canvas_id, w, h) {
 }
 
 /**
- * Fluid dynamics smoke simulation.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -499,6 +497,7 @@ export function create_fluids(canvas_id, w, h) {
 }
 
 /**
+ * wave_type: 0=sine, 1=square, 2=triangle, 3=sawtooth, 4=pulse
  * @param {string} canvas_id
  * @param {number} width
  * @param {number} height
@@ -527,7 +526,6 @@ export function create_generative(canvas_id, width, height) {
 }
 
 /**
- * Gradient descent on loss landscape.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -585,6 +583,10 @@ export function create_lorenz(canvas_id, w, h) {
 }
 
 /**
+ * Renders the Mandelbrot set at a given center and zoom level.
+ * center_x/center_y: complex-plane coordinates of the viewport center
+ * scale: half-width of the visible region in complex plane (smaller = zoomed in)
+ * max_iter: iteration cap (higher = more detail when zoomed in)
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -627,7 +629,6 @@ export function create_network(canvas_id, width, height) {
 }
 
 /**
- * Neural network forward pass visualization.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -670,7 +671,20 @@ export function create_physics(canvas_id, width, height) {
 }
 
 /**
- * Gray-Scott Turing pattern formation.
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_protein_folding(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_protein_folding(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -786,7 +800,6 @@ export function create_treemap(canvas_id, width, height) {
 }
 
 /**
- * t-SNE dimensionality reduction.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -801,7 +814,9 @@ export function create_tsne(canvas_id, w, h) {
 }
 
 /**
- * 3D implied volatility surface.
+ * 3D Implied Volatility Surface — rotating wireframe with labeled axes.
+ * Shows the classic vol smile/skew shape: high IV at deep ITM/OTM,
+ * lower at ATM. Term structure decreases with expiry for equity indices.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -831,7 +846,6 @@ export function create_voronoi(canvas_id, w, h) {
 }
 
 /**
- * 2D wave equation simulation.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
@@ -847,6 +861,88 @@ export function create_wave(canvas_id, w, h) {
 
 export function main() {
     wasm.main();
+}
+
+/**
+ * Black-Litterman portfolio optimization.
+ * Combines market equilibrium prior with investor views.
+ * @param {Float64Array} returns
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @param {Float64Array} views
+ * @param {Float64Array} picking
+ * @param {number} n_views
+ * @param {number} risk_free
+ * @param {number} tau
+ * @returns {string}
+ */
+export function quant_black_litterman(returns, n_assets, n_periods, views, picking, n_views, risk_free, tau) {
+    let deferred4_0;
+    let deferred4_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(views, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passArrayF64ToWasm0(picking, wasm.__wbindgen_malloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_black_litterman(ptr0, len0, n_assets, n_periods, ptr1, len1, ptr2, len2, n_views, risk_free, tau);
+        deferred4_0 = ret[0];
+        deferred4_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
+    }
+}
+
+/**
+ * Engle-Granger cointegration test for two price series.
+ * Returns JSON: { hedge_ratio, intercept, adf_statistic, half_life, is_cointegrated, z_score }
+ * @param {Float64Array} y
+ * @param {Float64Array} x
+ * @returns {string}
+ */
+export function quant_cointegration(y, x) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_cointegration(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Component VaR decomposition.
+ * @param {Float64Array} returns
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @param {Float64Array} weights
+ * @param {number} alpha
+ * @returns {string}
+ */
+export function quant_component_var(returns, n_assets, n_periods, weights, alpha) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(weights, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_component_var(ptr0, len0, n_assets, n_periods, ptr1, len1, alpha);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
 }
 
 /**
@@ -915,6 +1011,39 @@ export function quant_drawdown(prices, periods_per_year) {
 }
 
 /**
+ * Efficient frontier computation.
+ * Returns JSON: {
+ *   random: [{ret, risk, sharpe}, ...],
+ *   frontier: [{ret, risk, sharpe}, ...],
+ *   assets: [{label, ret, risk}, ...],
+ *   tangency: {ret, risk, sharpe},
+ *   min_variance: {ret, risk}
+ * }
+ * @param {Float64Array} returns
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @param {number} risk_free
+ * @param {number} n_random
+ * @param {number} n_frontier
+ * @param {number} periods_per_year
+ * @returns {string}
+ */
+export function quant_efficient_frontier(returns, n_assets, n_periods, risk_free, n_random, n_frontier, periods_per_year) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_efficient_frontier(ptr0, len0, n_assets, n_periods, risk_free, n_random, n_frontier, periods_per_year);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
  * Factor exposure regression (OLS).
  * Returns JSON: { alpha, betas, r_squared, adj_r_squared, f_statistic, t_stats }
  * @param {Float64Array} y
@@ -937,6 +1066,59 @@ export function quant_factor_regression(y, x, n_factors, n_obs) {
         return getStringFromWasm0(ret[0], ret[1]);
     } finally {
         wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Forward rate curve from Nelson-Siegel parameters.
+ * Derives instantaneous forward rates: f(τ) = d/dτ [τ · y(τ)]
+ * @param {Float64Array} maturities
+ * @param {Float64Array} yields
+ * @returns {string}
+ */
+export function quant_forward_rates(maturities, yields) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(maturities, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(yields, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_forward_rates(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Full weighted ETF holdings overlap analysis.
+ * @param {string} tickers_a
+ * @param {Float64Array} weights_a
+ * @param {string} tickers_b
+ * @param {Float64Array} weights_b
+ * @returns {string}
+ */
+export function quant_full_overlap(tickers_a, weights_a, tickers_b, weights_b) {
+    let deferred5_0;
+    let deferred5_1;
+    try {
+        const ptr0 = passStringToWasm0(tickers_a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(weights_a, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(tickers_b, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ptr3 = passArrayF64ToWasm0(weights_b, wasm.__wbindgen_malloc);
+        const len3 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_full_overlap(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+        deferred5_0 = ret[0];
+        deferred5_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred5_0, deferred5_1, 1);
     }
 }
 
@@ -988,6 +1170,116 @@ export function quant_greeks(spot_min, spot_max, num_points, strike, time_to_exp
 }
 
 /**
+ * Holdings overlap analysis (Jaccard index).
+ * @param {string} a
+ * @param {string} b
+ * @returns {string}
+ */
+export function quant_holdings_overlap(a, b) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(b, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_holdings_overlap(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Hierarchical Risk Parity allocation.
+ * @param {Float64Array} returns
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @returns {string}
+ */
+export function quant_hrp(returns, n_assets, n_periods) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_hrp(ptr0, len0, n_assets, n_periods);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Black-Scholes implied volatility solver (Newton-Raphson).
+ * @param {number} market_price
+ * @param {number} spot
+ * @param {number} strike
+ * @param {number} t
+ * @param {number} r
+ * @param {boolean} is_call
+ * @returns {number}
+ */
+export function quant_implied_vol(market_price, spot, strike, t, r, is_call) {
+    const ret = wasm.quant_implied_vol(market_price, spot, strike, t, r, is_call);
+    return ret;
+}
+
+/**
+ * Kelly criterion analysis from returns.
+ * @param {Float64Array} returns
+ * @returns {string}
+ */
+export function quant_kelly(returns) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_kelly(ptr0, len0);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Liquidity analysis from OHLCV data.
+ * Returns JSON: { amihud, cs_spread, roll_spread, kyle_lambda, avg_dollar_volume }
+ * @param {Float64Array} highs
+ * @param {Float64Array} lows
+ * @param {Float64Array} closes
+ * @param {Float64Array} volumes
+ * @returns {string}
+ */
+export function quant_liquidity(highs, lows, closes, volumes) {
+    let deferred5_0;
+    let deferred5_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(highs, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(lows, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passArrayF64ToWasm0(closes, wasm.__wbindgen_malloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ptr3 = passArrayF64ToWasm0(volumes, wasm.__wbindgen_malloc);
+        const len3 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_liquidity(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+        deferred5_0 = ret[0];
+        deferred5_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred5_0, deferred5_1, 1);
+    }
+}
+
+/**
  * Monte Carlo GBM simulation from historical close prices.
  * Returns JSON: { drift, volatility, s0, p5, p25, p50, p75, p95 }
  * @param {Float64Array} closes
@@ -1012,12 +1304,194 @@ export function quant_montecarlo(closes, periods_per_year, horizon_days, num_pat
 }
 
 /**
+ * Pairs trading signal from two cointegrated price series.
+ * @param {Float64Array} y
+ * @param {Float64Array} x
+ * @returns {string}
+ */
+export function quant_pairs_signal(y, x) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_pairs_signal(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Realized volatility decomposition (bipower variation).
+ * Returns JSON: { realized_var, bipower_var, continuous_var, jump_var, jump_ratio, annualized_vol, jump_days }
+ * @param {Float64Array} returns
+ * @returns {string}
+ */
+export function quant_realized_vol(returns) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_realized_vol(ptr0, len0);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Market regime detection via 2-state Gaussian HMM.
+ * Returns JSON: { states_tail, transition, means, variances, probs_tail, current_regime, regime_label }
+ * @param {Float64Array} returns
+ * @returns {string}
+ */
+export function quant_regime(returns) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_regime(ptr0, len0);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Risk-adjusted return ratios (Sharpe, Sortino, Calmar, Treynor).
+ * @param {Float64Array} closes
+ * @param {number} risk_free
+ * @param {number} periods_per_year
+ * @returns {string}
+ */
+export function quant_risk_ratios(closes, risk_free, periods_per_year) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(closes, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_risk_ratios(ptr0, len0, risk_free, periods_per_year);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Rolling multi-factor regression time series.
+ * @param {Float64Array} y
+ * @param {Float64Array} x
+ * @param {number} n_factors
+ * @param {number} window
+ * @param {number} step
+ * @returns {string}
+ */
+export function quant_rolling_factor(y, x, n_factors, window, step) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_rolling_factor(ptr0, len0, ptr1, len1, n_factors, window, step);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
  * Seed the WASM PRNG from JS (use crypto.getRandomValues for entropy).
  * @param {number} s0
  * @param {number} s1
  */
 export function quant_seed(s0, s1) {
     wasm.quant_seed(s0, s1);
+}
+
+/**
+ * Historical stress test on a portfolio.
+ * @param {string} symbols_json
+ * @param {Float64Array} weights
+ * @returns {string}
+ */
+export function quant_stress_test(symbols_json, weights) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(symbols_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(weights, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_stress_test(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Tail dependence (copula) analysis for two return series.
+ * Returns JSON: { lower, upper, kendall_tau, spearman_rho }
+ * @param {Float64Array} x
+ * @param {Float64Array} y
+ * @returns {string}
+ */
+export function quant_tail_dependence(x, y) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_tail_dependence(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * N×N tail dependence matrix (lower tail, 5% level).
+ * @param {Float64Array} returns
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @returns {string}
+ */
+export function quant_tail_matrix(returns, n_assets, n_periods) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_tail_matrix(ptr0, len0, n_assets, n_periods);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
 }
 
 /**
@@ -1061,6 +1535,24 @@ export function quant_yield_curve(maturities, yields) {
         return getStringFromWasm0(ret[0], ret[1]);
     } finally {
         wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} center_x
+ * @param {number} center_y
+ * @param {number} scale
+ * @param {number} max_iter
+ */
+export function render_mandelbrot(canvas_id, w, h, center_x, center_y, scale, max_iter) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.render_mandelbrot(ptr0, len0, w, h, center_x, center_y, scale, max_iter);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
     }
 }
 
@@ -1117,12 +1609,12 @@ export function update_btc_health(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} time
+ * @param {number} _t
  */
-export function update_ca_explorer(canvas_id, w, h, time) {
+export function update_ca_explorer(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_ca_explorer(ptr0, len0, w, h, time);
+    const ret = wasm.update_ca_explorer(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1243,15 +1735,32 @@ export function update_fourier_viz(canvas_id, width, height, time) {
  * @param {string} canvas_id
  * @param {number} width
  * @param {number} height
- * @param {number} seed
- * @param {number} speed
- * @param {number} density
  * @param {number} time
+ * @param {number} harmonics
+ * @param {number} wave_type
  */
-export function update_generative(canvas_id, width, height, seed, speed, density, time) {
+export function update_fourier_viz_full(canvas_id, width, height, time, harmonics, wave_type) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_generative(ptr0, len0, width, height, seed, speed, density, time);
+    const ret = wasm.update_fourier_viz_full(ptr0, len0, width, height, time, harmonics, wave_type);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ * @param {number} _seed
+ * @param {number} _speed
+ * @param {number} _density
+ * @param {number} _time
+ */
+export function update_generative(canvas_id, width, height, _seed, _speed, _density, _time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_generative(ptr0, len0, width, height, _seed, _speed, _density, _time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1261,12 +1770,12 @@ export function update_generative(canvas_id, width, height, seed, speed, density
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} time
+ * @param {number} _time
  */
-export function update_gradient_descent(canvas_id, w, h, time) {
+export function update_gradient_descent(canvas_id, w, h, _time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_gradient_descent(ptr0, len0, w, h, time);
+    const ret = wasm.update_gradient_descent(ptr0, len0, w, h, _time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1353,12 +1862,12 @@ export function update_network(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} time
+ * @param {number} _time
  */
-export function update_neural_net(canvas_id, w, h, time) {
+export function update_neural_net(canvas_id, w, h, _time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_neural_net(ptr0, len0, w, h, time);
+    const ret = wasm.update_neural_net(ptr0, len0, w, h, _time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1400,12 +1909,27 @@ export function update_physics(canvas_id, width, height, _time) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} time
+ * @param {number} _t
  */
-export function update_reaction_diffusion(canvas_id, w, h, time) {
+export function update_protein_folding(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_reaction_diffusion(ptr0, len0, w, h, time);
+    const ret = wasm.update_protein_folding(ptr0, len0, w, h, _t);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _time
+ */
+export function update_reaction_diffusion(canvas_id, w, h, _time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_reaction_diffusion(ptr0, len0, w, h, _time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1509,12 +2033,12 @@ export function update_treemap(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} time
+ * @param {number} _time
  */
-export function update_tsne(canvas_id, w, h, time) {
+export function update_tsne(canvas_id, w, h, _time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_tsne(ptr0, len0, w, h, time);
+    const ret = wasm.update_tsne(ptr0, len0, w, h, _time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1524,12 +2048,12 @@ export function update_tsne(canvas_id, w, h, time) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} time
+ * @param {number} _t
  */
-export function update_vol_surface(canvas_id, w, h, time) {
+export function update_vol_surface(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_vol_surface(ptr0, len0, w, h, time);
+    const ret = wasm.update_vol_surface(ptr0, len0, w, h, _t);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1743,6 +2267,9 @@ function __wbg_get_imports() {
         },
         __wbg_set_font_e2bce6175ef42bc3: function(arg0, arg1, arg2) {
             arg0.font = getStringFromWasm0(arg1, arg2);
+        },
+        __wbg_set_globalAlpha_60fedcc06aa9a61c: function(arg0, arg1) {
+            arg0.globalAlpha = arg1;
         },
         __wbg_set_height_ad5056ea051acd78: function(arg0, arg1) {
             arg0.height = arg1 >>> 0;

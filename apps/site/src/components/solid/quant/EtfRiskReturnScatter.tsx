@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface EtfEntry {
@@ -70,7 +71,7 @@ export default function EtfRiskReturnScatter() {
 
   async function fetchOne(ticker: string): Promise<ScatterPoint | null> {
     try {
-      const res = await fetch(`/api/stock-chart?symbol=${ticker}&range=1y&interval=1d`);
+      const res = await fetch(`${apiBase()}/api/stock-chart?symbol=${ticker}&range=1y&interval=1d`);
       if (!res.ok) return null;
       const json: ChartResponse = await res.json();
       if (json.error) return null;

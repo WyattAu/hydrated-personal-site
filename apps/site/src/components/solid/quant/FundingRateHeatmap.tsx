@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 export default function FundingRateHeatmap() {
@@ -9,7 +10,7 @@ export default function FundingRateHeatmap() {
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch('/api/funding-rates');
+      const res = await fetch(`${apiBase()}/api/funding-rates`);
       if (!res.ok) throw new Error('API');
       const d = await res.json();
       if (Array.isArray(d)) setData(d.slice(0, 30));

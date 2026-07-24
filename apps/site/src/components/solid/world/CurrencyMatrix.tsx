@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 const H = 340;
@@ -18,7 +19,7 @@ export default function CurrencyMatrix() {
     setLoading(true);
     setErr(null);
     try {
-      const res = await fetch('/api/exchange-rates');
+      const res = await fetch(`${apiBase()}/api/exchange-rates`);
       if (!res.ok) throw new Error('API');
       const raw = await res.json();
       const body = raw.data || raw;

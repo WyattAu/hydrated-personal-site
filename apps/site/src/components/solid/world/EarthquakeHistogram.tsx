@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 const H = 220;
@@ -23,7 +24,7 @@ export default function EarthquakeHistogram() {
     setLoading(true);
     setErr(null);
     try {
-      const res = await fetch('/api/earthquakes');
+      const res = await fetch(`${apiBase()}/api/earthquakes`);
       if (!res.ok) throw new Error('API');
       const raw = await res.json();
       const features: Array<{ properties: { mag: number | null } }> =

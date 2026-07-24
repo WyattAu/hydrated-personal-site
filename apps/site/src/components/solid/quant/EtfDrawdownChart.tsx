@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { activeTicker } from '../../../lib/etf-store';
 import { getThemeColors } from '../../../lib/theme-colors';
 
@@ -22,7 +23,9 @@ export default function EtfDrawdownChart() {
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/stock-chart?symbol=${activeTicker()}&range=1y&interval=1d`);
+      const res = await fetch(
+        `${apiBase()}/api/stock-chart?symbol=${activeTicker()}&range=1y&interval=1d`,
+      );
       if (!res.ok) throw new Error('API');
       const json = await res.json();
       const quote = json?.chart?.result?.[0]?.indicators?.quote?.[0];

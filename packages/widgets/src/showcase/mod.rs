@@ -17,3 +17,4 @@ pub mod voronoi;
 pub mod sankey;
 pub mod lightning;
 pub mod spectrogram;
+pub mod protein_folding;

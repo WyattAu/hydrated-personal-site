@@ -1,0 +1,182 @@
+---
+import Footer from '../components/astro/Footer.astro';
+import Nav from '../components/astro/Nav.astro';
+import AppErrorBoundary from '../components/solid/ErrorBoundary';
+import ThemeToggle from '../components/solid/ThemeToggle';
+import SeoAuditReport from '../components/solid/seo/SeoAuditReport';
+import SeoPageList from '../components/solid/seo/SeoPageList';
+import SeoRecommendations from '../components/solid/seo/SeoRecommendations';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/base.css';
+---
+
+<BaseLayout
+  title="SEO Audit — Wyatt Au"
+  description="Comprehensive SEO audit, site health analysis, domain authority metrics, performance scoring, and actionable recommendations powered by crawlkit crawler."
+>
+  <Nav />
+
+  <main id="main-content" class="pt-32">
+    <section class="px-6 md:px-12 lg:px-24 pb-6">
+      <p class="label mb-2" style="color: var(--accent);">SEO & PERFORMANCE</p>
+      <h1 class="text-2xl md:text-3xl font-bold mb-1">Site Health Dashboard</h1>
+      <p class="text-sm" style="color: var(--text-secondary);">Comprehensive audit powered by crawlkit. Measures SEO, security, accessibility, performance, and content quality across all pages.</p>
+    </section>
+
+    <!-- Section 1: Overall Audit Score -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <AppErrorBoundary client:load>
+        <SeoAuditReport client:load />
+      </AppErrorBoundary>
+    </section>
+
+    <!-- Section 2: Domain Authority & Key Metrics -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">DOMAIN METRICS</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Estimated DA / DR & Performance</h2>
+      <p class="mb-6 text-sm" style="color: var(--text-secondary);">Domain Authority (DA) and Domain Rating (DR) are proprietary metrics from Moz and Ahrefs respectively. These are estimated based on crawlable signals.</p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div class="p-4 border text-center" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-3xl font-bold" style="color: var(--accent);">15-25</p>
+          <p class="font-mono text-[10px] uppercase tracking-wider mt-1" style="color: var(--text-secondary);">Est. Domain Authority</p>
+          <p class="font-mono text-[9px] mt-1" style="color: var(--text-secondary);">New personal site, limited backlinks</p>
+        </div>
+        <div class="p-4 border text-center" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-3xl font-bold" style="color: var(--accent);">5-15</p>
+          <p class="font-mono text-[10px] uppercase tracking-wider mt-1" style="color: var(--text-secondary);">Est. Domain Rating</p>
+          <p class="font-mono text-[9px] mt-1" style="color: var(--text-secondary);">Low link equity from referring domains</p>
+        </div>
+        <div class="p-4 border text-center" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-3xl font-bold" style="color: #4caf50;">100</p>
+          <p class="font-mono text-[10px] uppercase tracking-wider mt-1" style="color: var(--text-secondary);">Security Score</p>
+          <p class="font-mono text-[9px] mt-1" style="color: var(--text-secondary);">CSP, HSTS, X-Frame-Options</p>
+        </div>
+        <div class="p-4 border text-center" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-3xl font-bold" style="color: #ff4081;">8/8</p>
+          <p class="font-mono text-[10px] uppercase tracking-wider mt-1" style="color: var(--text-secondary);">Social Metadata</p>
+          <p class="font-mono text-[9px] mt-1" style="color: var(--text-secondary);">OG + Twitter Cards complete</p>
+        </div>
+      </div>
+
+      <!-- Key Performance Metrics -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-3" style="color: var(--accent);">Technical Health</p>
+          <div class="space-y-2 text-xs font-mono" style="color: var(--text-secondary);">
+            <div class="flex justify-between"><span>HTTPS</span><span style="color: #4caf50;">Active</span></div>
+            <div class="flex justify-between"><span>HSTS</span><span style="color: #4caf50;">max-age=31536000</span></div>
+            <div class="flex justify-between"><span>CSP</span><span style="color: #4caf50;">Configured</span></div>
+            <div class="flex justify-between"><span>X-Frame-Options</span><span style="color: #4caf50;">DENY</span></div>
+            <div class="flex justify-between"><span>COEP / COOP / CORP</span><span style="color: #ff9800;">Missing</span></div>
+            <div class="flex justify-between"><span>robots.txt</span><span style="color: #ff9800;">Content-Signals only</span></div>
+            <div class="flex justify-between"><span>Sitemap</span><span style="color: #4caf50;">/sitemap.xml</span></div>
+            <div class="flex justify-between"><span>Structured Data</span><span style="color: #4caf50;">JSON-LD (Person, WebSite, WebPage)</span></div>
+          </div>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-3" style="color: var(--accent);">Content Quality</p>
+          <div class="space-y-2 text-xs font-mono" style="color: var(--text-secondary);">
+            <div class="flex justify-between"><span>Readability (Flesch)</span><span style="color: #ff9800;">0.0/100 (very difficult)</span></div>
+            <div class="flex justify-between"><span>Grade Level</span><span style="color: var(--text-secondary);">19.7 (postgraduate)</span></div>
+            <div class="flex justify-between"><span>Avg Words/Sentence</span><span style="color: #ff9800;">358.5</span></div>
+            <div class="flex justify-between"><span>Internal Links</span><span style="color: #4caf50;">23</span></div>
+            <div class="flex justify-between"><span>External Links</span><span style="color: var(--text-secondary);">18</span></div>
+            <div class="flex justify-between"><span>Missing H1</span><span style="color: #ff4081;">All pages</span></div>
+            <div class="flex justify-between"><span>Missing Alt Text</span><span style="color: #ff4081;">2 images</span></div>
+            <div class="flex justify-between"><span>Missing <code>lang</code></span><span style="color: #ff4081;">Yes</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Crawl Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="p-3 border text-center" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xl font-bold" style="color: var(--accent);">10</p>
+          <p class="font-mono text-[9px] mt-1" style="color: var(--text-secondary);">Pages Crawled</p>
+        </div>
+        <div class="p-3 border text-center" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xl font-bold" style="color: #ff4081;">6</p>
+          <p class="font-mono text-[9px] mt-1" style="color: var(--text-secondary);">Critical Errors</p>
+        </div>
+        <div class="p-3 border text-center" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xl font-bold" style="color: #ff9800;">45</p>
+          <p class="font-mono text-[9px] mt-1" style="color: var(--text-secondary);">Warnings</p>
+        </div>
+        <div class="p-3 border text-center" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xl font-bold" style="color: var(--text-secondary);">274</p>
+          <p class="font-mono text-[9px] mt-1" style="color: var(--text-secondary);">Info Findings</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Page Analysis -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <AppErrorBoundary client:load>
+        <SeoPageList client:load />
+      </AppErrorBoundary>
+    </section>
+
+    <!-- Section 4: Recommendations -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <AppErrorBoundary client:load>
+        <SeoRecommendations client:load />
+      </AppErrorBoundary>
+    </section>
+
+    <!-- Section 5: DA/DR Analysis -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">DOMAIN AUTHORITY</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">What Affects DA / DR</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-3" style="color: var(--accent);">Positive Factors (Present)</p>
+          <div class="space-y-1.5 text-xs font-mono" style="color: var(--text-secondary);">
+            <div class="flex items-start gap-2"><span style="color: #4caf50;">+</span> HTTPS with HSTS preload</div>
+            <div class="flex items-start gap-2"><span style="color: #4caf50;">+</span> Content-Security-Policy configured</div>
+            <div class="flex items-start gap-2"><span style="color: #4caf50;">+</span> JSON-LD structured data (Person, WebSite, WebPage)</div>
+            <div class="flex items-start gap-2"><span style="color: #4caf50;">+</span> Open Graph + Twitter Cards (8/8)</div>
+            <div class="flex items-start gap-2"><span style="color: #4caf50;">+</span> Cloudflare CDN + edge caching</div>
+            <div class="flex items-start gap-2"><span style="color: #4caf50;">+</span> Fast server response (under 200ms avg)</div>
+            <div class="flex items-start gap-2"><span style="color: #4caf50;">+</span> Unique WASM-powered quant tools (differentiator)</div>
+            <div class="flex items-start gap-2"><span style="color: #4caf50;">+</span> Open-source projects on GitHub</div>
+            <div class="flex items-start gap-2"><span style="color: #4caf50;">+</span> Sitemap + robots.txt</div>
+          </div>
+        </div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-3" style="color: var(--accent);">Missing Factors (Needed)</p>
+          <div class="space-y-1.5 text-xs font-mono" style="color: var(--text-secondary);">
+            <div class="flex items-start gap-2"><span style="color: #ff4081;">-</span> Fewer than 10 referring domains (needs backlinks)</div>
+            <div class="flex items-start gap-2"><span style="color: #ff4081;">-</span> No blog/content marketing (no regular publishing)</div>
+            <div class="flex items-start gap-2"><span style="color: #ff4081;">-</span> No external citations or mentions</div>
+            <div class="flex items-start gap-2"><span style="color: #ff4081;">-</span> Domain age less than 1 year</div>
+            <div class="flex items-start gap-2"><span style="color: #ff4081;">-</span> No social media presence driving traffic</div>
+            <div class="flex items-start gap-2"><span style="color: #ff4081;">-</span> No Google Search Console data (no indexing data)</div>
+            <div class="flex items-start gap-2"><span style="color: #ff4081;">-</span> No guest posts or cross-site mentions</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 p-4 border" style="border-color: var(--border); background: var(--bg-secondary);">
+        <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Recommended Actions to Improve DA/DR</p>
+        <div class="space-y-1.5 text-xs font-mono" style="color: var(--text-secondary);">
+          <div>1. <strong>Add <code>lang="en"</code> to <code>&lt;html&gt;</code></strong> — accessibility fix, instant improvement</div>
+          <div>2. <strong>Add H1 tag to every page</strong> — all pages are missing H1, critical for SEO</div>
+          <div>3. <strong>Expand meta descriptions</strong> — homepage is 102 chars (min: 120)</div>
+          <div>4. <strong>Add alt text to all images</strong> — 2 images missing, accessibility error</div>
+          <div>5. <strong>Add COEP/COOP/CORP headers</strong> — improves security score</div>
+          <div>6. <strong>Improve readability</strong> — current grade level 19.7 (postgraduate), target: 8-10</div>
+          <div>7. <strong>Publish regular content</strong> — blog posts, project writeups, technical articles</div>
+          <div>8. <strong>Get backlinks</strong> — submit to directories, guest post, link from GitHub repos</div>
+          <div>9. <strong>Register Google Search Console</strong> — monitor indexing and search performance</div>
+          <div>10. <strong>Add speakable schema</strong> — enables voice search results</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+  <ThemeToggle client:load />
+</BaseLayout>

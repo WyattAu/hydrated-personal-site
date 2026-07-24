@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 const H = 280;
@@ -30,7 +31,7 @@ export default function CryptoDominancePie() {
     setLoading(true);
     setErr(null);
     try {
-      const res = await fetch('/api/crypto-ticker');
+      const res = await fetch(`${apiBase()}/api/crypto-ticker`);
       if (!res.ok) throw new Error('API');
       const raw = await res.json();
       const items: Array<{

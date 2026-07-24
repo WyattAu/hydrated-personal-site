@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../lib/api-base';
 import { getThemeColors } from '../../lib/theme-colors';
 
 interface TickerItem {
@@ -17,7 +18,7 @@ export default function TreemapWidget() {
 
   async function loadData() {
     try {
-      const res = await fetch('/api/crypto-ticker');
+      const res = await fetch(`${apiBase()}/api/crypto-ticker`);
       if (!res.ok) return;
       const d = await res.json();
       const items = Array.isArray(d) ? d : d.data || [];

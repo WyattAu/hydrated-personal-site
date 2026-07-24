@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 const H = 260;
@@ -33,10 +34,10 @@ export default function GlobalStressGauge() {
     setErr(null);
     try {
       const [eqRes, kpRes, fgRes, vixRes] = await Promise.all([
-        fetch('/api/earthquakes'),
-        fetch('/api/kp-index'),
-        fetch('/api/fear-greed'),
-        fetch('/api/stock-quote?symbols=%5EVIX'),
+        fetch(`${apiBase()}/api/earthquakes`),
+        fetch(`${apiBase()}/api/kp-index`),
+        fetch(`${apiBase()}/api/fear-greed`),
+        fetch(`${apiBase()}/api/stock-quote?symbols=%5EVIX`),
       ]);
 
       let quakeCount = 0;

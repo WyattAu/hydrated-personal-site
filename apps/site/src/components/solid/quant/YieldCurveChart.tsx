@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface YieldResult {
@@ -27,7 +28,7 @@ export default function YieldCurveChart() {
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch('/api/treasury-yields');
+      const res = await fetch(`${apiBase()}/api/treasury-yields`);
       if (!res.ok) throw new Error('API');
       const yields = await res.json();
       if (!Array.isArray(yields) || yields.length < 3) throw new Error('insufficient');

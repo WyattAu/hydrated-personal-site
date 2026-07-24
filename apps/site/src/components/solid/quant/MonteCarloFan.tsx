@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface MCResult {
@@ -26,7 +27,9 @@ export default function MonteCarloFan(props: { symbol?: string }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/binance-klines?symbol=${symbol()}&interval=1d&limit=365`);
+      const res = await fetch(
+        `${apiBase()}/api/binance-klines?symbol=${symbol()}&interval=1d&limit=365`,
+      );
       if (!res.ok) throw new Error(`API ${res.status}`);
       const klines = await res.json();
       const closes = klines.map((k: (string | number)[]) => Number.parseFloat(k[4] as string));

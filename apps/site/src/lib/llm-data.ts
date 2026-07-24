@@ -1,5 +1,6 @@
 import { createSignal, onMount } from 'solid-js';
 import { recordFetch } from '../components/solid/StaleIndicator';
+import { apiBase } from './api-base';
 import type { LLMBenchmarkModel } from './types';
 
 let fetched = false;
@@ -201,7 +202,7 @@ export function useLlmData() {
     fetched = true;
     onMount(async () => {
       try {
-        const res = await fetch('/api/llm-benchmarks');
+        const res = await fetch(`${apiBase()}/api/llm-benchmarks`);
         if (!res.ok) throw new Error(`API returned ${res.status}`);
         const raw = await res.json();
         if (raw?.error) throw new Error(raw.error);

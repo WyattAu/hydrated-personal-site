@@ -99,7 +99,7 @@ fn matvec(mat: &[f64], vec: &[f64], n: usize) -> Vec<f64> {
 }
 
 /// Gauss-Jordan matrix inverse for small NxN matrices.
-fn matrix_inverse(mat: &[f64], n: usize) -> Option<Vec<f64>> {
+pub fn matrix_inverse(mat: &[f64], n: usize) -> Option<Vec<f64>> {
     let mut aug = vec![0.0; n * 2 * n];
     for i in 0..n {
         for j in 0..n {

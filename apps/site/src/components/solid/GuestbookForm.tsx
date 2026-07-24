@@ -1,5 +1,6 @@
 import { createSignal } from 'solid-js';
 import { toast } from 'solid-sonner';
+import { apiBase } from '../../lib/api-base';
 
 export default function GuestbookForm() {
   const [name, setName] = createSignal('');
@@ -31,7 +32,7 @@ export default function GuestbookForm() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/guestbook', {
+      const res = await fetch(`${apiBase()}/api/guestbook`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

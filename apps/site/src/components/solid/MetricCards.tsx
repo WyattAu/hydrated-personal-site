@@ -1,4 +1,5 @@
 import { For, createSignal, onCleanup, onMount } from 'solid-js';
+import { apiBase } from '../../lib/api-base';
 import { recordFetch } from './StaleIndicator';
 
 // ─── Data Hooks ─────────────────────────────────────────────────────
@@ -10,7 +11,7 @@ function useCryptoTicker() {
   onMount(async () => {
     async function fetch_() {
       try {
-        const res = await fetch('/api/crypto-ticker');
+        const res = await fetch(`${apiBase()}/api/crypto-ticker`);
         if (!res.ok) return;
         const raw = await res.json();
         const items = Array.isArray(raw) ? raw : raw.data || [];
@@ -41,7 +42,7 @@ function useStockQuote(symbols: string) {
   onMount(async () => {
     async function fetch_() {
       try {
-        const res = await fetch(`/api/stock-quote?symbols=${symbols}`);
+        const res = await fetch(`${apiBase()}/api/stock-quote?symbols=${symbols}`);
         if (!res.ok) return;
         const raw = await res.json();
         const items = Array.isArray(raw) ? raw : raw.data || [];
@@ -81,7 +82,7 @@ function useMempool() {
   onMount(async () => {
     async function fetch_() {
       try {
-        const res = await fetch('/api/mempool');
+        const res = await fetch(`${apiBase()}/api/mempool`);
         if (!res.ok) return;
         const raw = await res.json();
         if (raw.fees)
@@ -109,7 +110,7 @@ function useBinanceFutures() {
   } | null>(null);
   onMount(async () => {
     try {
-      const res = await fetch('/api/binance-futures');
+      const res = await fetch(`${apiBase()}/api/binance-futures`);
       if (!res.ok) return;
       const _resp = await res.json();
       const items = Array.isArray(_resp) ? _resp : _resp.data || [];
@@ -133,7 +134,7 @@ function useFearGreed() {
   const [data, setData] = createSignal<{ value: string; classification: string } | null>(null);
   onMount(async () => {
     try {
-      const res = await fetch('/api/fear-greed');
+      const res = await fetch(`${apiBase()}/api/fear-greed`);
       if (!res.ok) return;
       const _resp = await res.json();
       // fear-greed returns { name, data: [{ value, value_classification }] }
@@ -151,7 +152,7 @@ function useKpIndex() {
   const [data, setData] = createSignal<string>('N/A');
   onMount(async () => {
     try {
-      const res = await fetch('/api/kp-index');
+      const res = await fetch(`${apiBase()}/api/kp-index`);
       if (!res.ok) return;
       const _resp = await res.json();
       const raw = _resp.data || _resp;
@@ -170,7 +171,7 @@ function useEarthquakes() {
   const [count, setCount] = createSignal(0);
   onMount(async () => {
     try {
-      const res = await fetch('/api/earthquakes');
+      const res = await fetch(`${apiBase()}/api/earthquakes`);
       if (!res.ok) return;
       const _resp = await res.json();
       const raw = _resp.data || _resp;
@@ -185,7 +186,7 @@ function useExchangeRates() {
   const [rates, setRates] = createSignal<Record<string, number>>({});
   onMount(async () => {
     try {
-      const res = await fetch('/api/exchange-rates');
+      const res = await fetch(`${apiBase()}/api/exchange-rates`);
       if (!res.ok) return;
       const _resp = await res.json();
       const raw = _resp.data || _resp;

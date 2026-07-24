@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface GarchResult {
@@ -22,7 +23,9 @@ export default function VolatilityForecast(props: { symbol?: string }) {
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/binance-klines?symbol=${symbol()}&interval=1d&limit=365`);
+      const res = await fetch(
+        `${apiBase()}/api/binance-klines?symbol=${symbol()}&interval=1d&limit=365`,
+      );
       if (!res.ok) return;
       const klines = await res.json();
       const closes: number[] = klines.map((k: (string | number)[]) =>

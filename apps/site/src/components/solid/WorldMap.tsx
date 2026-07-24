@@ -1,4 +1,5 @@
 import { createSignal, onCleanup, onMount } from 'solid-js';
+import { apiBase } from '../../lib/api-base';
 import type { EarthquakeFeature } from '../../lib/types';
 import { recordFetch } from './StaleIndicator';
 
@@ -593,7 +594,7 @@ export default function WorldMap() {
               }
               try {
                 // Phase 1: Fast basic data (capital, region) - show immediately
-                const countryRes = await fetch(`/api/restcountries?code=${iso}`);
+                const countryRes = await fetch(`${apiBase()}/api/restcountries?code=${iso}`);
                 const cData = countryRes.ok ? await countryRes.json() : null;
                 if (cData) {
                   setCountryData({
@@ -779,7 +780,7 @@ export default function WorldMap() {
 
       // Fetch fresh data
       try {
-        const res = await fetch('/api/earthquakes');
+        const res = await fetch(`${apiBase()}/api/earthquakes`);
         if (!res.ok) throw new Error('Failed to fetch earthquakes');
         const data = await res.json();
 

@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface GreeksResult {
@@ -35,7 +36,7 @@ export default function GreeksDashboard() {
 
   async function loadOptions() {
     try {
-      const res = await fetch('/api/deribit-options?currency=BTC');
+      const res = await fetch(`${apiBase()}/api/deribit-options?currency=BTC`);
       if (!res.ok) throw new Error('API failed');
       const data = await res.json();
       if (Array.isArray(data)) {

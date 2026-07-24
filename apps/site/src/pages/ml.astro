@@ -1,0 +1,124 @@
+---
+import Footer from '../components/astro/Footer.astro';
+import Nav from '../components/astro/Nav.astro';
+import AppErrorBoundary from '../components/solid/ErrorBoundary';
+import ScatterPlots from '../components/solid/ScatterPlots';
+import ThemeToggle from '../components/solid/ThemeToggle';
+import ArxivPapers from '../components/solid/ml/ArxivPapers';
+import GpuSuggestion from '../components/solid/ml/GpuSuggestion';
+import InferenceSimulator from '../components/solid/ml/InferenceSimulator';
+import LlmBenchmarkTable from '../components/solid/ml/LlmBenchmarkTable';
+import ModelRadarChart from '../components/solid/ml/ModelRadarChart';
+import WasmEmbed from '../components/wasm/WasmEmbed.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/base.css';
+import '../styles/animations.css';
+---
+
+<BaseLayout
+  title="ML Intelligence — Wyatt Au"
+  description="LLM benchmark leaderboards, model comparison radar charts, ArXiv paper feeds, GPU requirement calculator, and inference throughput simulator for AI and machine learning engineers."
+>
+  <Nav />
+
+  <main id="main-content" class="pt-32">
+
+    <!-- Header -->
+    <section class="px-6 md:px-12 lg:px-24 pb-6">
+      <p class="label mb-2" style="color: var(--accent);">ML INTELLIGENCE</p>
+      <h1 class="text-2xl md:text-3xl font-bold mb-1">AI/ML Dashboard</h1>
+      <p class="text-sm" style="color: var(--text-secondary);">LLM benchmarks, latest research papers, and model performance analytics.</p>
+    </section>
+
+    <!-- Section 1: Benchmark Visualizations -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">MODEL ANALYTICS</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Benchmark Visualizations</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">Compare language models on intelligence, speed, and cost dimensions.</p>
+      <AppErrorBoundary client:load>
+        <ScatterPlots client:load />
+      </AppErrorBoundary>
+    </section>
+
+    <!-- Section 2: Model Comparison Radar -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">MODEL COMPARISON</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Multi-Benchmark Radar</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">Compare top models across all benchmark dimensions simultaneously.</p>
+      <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+        <AppErrorBoundary client:load><ModelRadarChart client:load /></AppErrorBoundary>
+      </div>
+    </section>
+
+    <!-- Section 3: Inference Simulator -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">INFERENCE</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Throughput Simulator</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">Estimate theoretical inference throughput from model parameters, quantization, and hardware bandwidth.</p>
+      <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+        <AppErrorBoundary client:load><InferenceSimulator client:load /></AppErrorBoundary>
+      </div>
+    </section>
+
+    <!-- Section 3.5: GPU Selector -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">HARDWARE</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">GPU Requirement Calculator</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">Input model parameters, quantization, and serving engine to find compatible GPUs with estimated throughput.</p>
+      <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+        <AppErrorBoundary client:load><GpuSuggestion client:load /></AppErrorBoundary>
+      </div>
+    </section>
+
+    <!-- Section 4: Leaderboard Table -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">LEADERBOARD</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">LLM Benchmark Table</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">Sortable comparison across MMLU, HumanEval, GSM8K, HellaSwag, ARC, and TruthfulQA benchmarks.</p>
+      <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+        <AppErrorBoundary client:load>
+          <LlmBenchmarkTable client:load />
+        </AppErrorBoundary>
+      </div>
+    </section>
+
+    <!-- Section 3: ArXiv Papers -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">RESEARCH</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Latest ArXiv Papers</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">Newest submissions in AI, Machine Learning, and Computation & Language. Updated hourly.</p>
+      <AppErrorBoundary client:load>
+        <ArxivPapers client:load />
+      </AppErrorBoundary>
+    </section>
+
+    <!-- Section: WASM ML Visualizations -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">WASM VISUALIZATIONS</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Interactive ML Demos</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">Neural network training, dimensionality reduction, and optimization — all computed client-side in Rust/WASM.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Neural Network Training</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Real 2-4-1 MLP learning XOR via backpropagation. Sigmoid activations, MSE loss, weight updates visualized as line thickness.</p>
+          <WasmEmbed widget="neural_net" width={380} height={300} />
+        </div>
+        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">t-SNE Clustering</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Real t-SNE on 90 points in 6D space. PCA initialization, Student-t kernel, KL divergence gradient descent. Watch clusters converge.</p>
+          <WasmEmbed widget="tsne" width={380} height={300} />
+        </div>
+        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Gradient Descent</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Adam optimizer on the Rosenbrock function. Numerical gradients, bias-corrected momentum. Contour map with trajectory.</p>
+          <WasmEmbed widget="gradient_descent" width={380} height={300} />
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+  <ThemeToggle client:load />
+</BaseLayout>

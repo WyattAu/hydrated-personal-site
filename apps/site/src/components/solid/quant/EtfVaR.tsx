@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../../lib/api-base';
 import { activeTicker } from '../../../lib/etf-store';
 import { getThemeColors } from '../../../lib/theme-colors';
 
@@ -34,7 +35,9 @@ export default function EtfVaR() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/stock-chart?symbol=${activeTicker()}&range=1y&interval=1d`);
+      const res = await fetch(
+        `${apiBase()}/api/stock-chart?symbol=${activeTicker()}&range=1y&interval=1d`,
+      );
       if (!res.ok) throw new Error(`API ${res.status}`);
       const json: ChartResponse = await res.json();
       if (json.error) throw new Error('chart unavailable');

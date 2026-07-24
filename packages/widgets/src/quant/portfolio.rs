@@ -26,21 +26,22 @@ pub fn random_portfolios(
     risk_free: f64,
     periods_per_year: u32,
 ) -> Vec<PortfolioPoint> {
+    let ppy = periods_per_year as f64;
     let mean_vec: Vec<f64> = (0..n_assets)
         .map(|i| {
             let row: Vec<f64> = (0..n_periods).map(|t| returns[i * n_periods + t]).collect();
-            montecarlo::mean(&row) * periods_per_year as f64
+            montecarlo::mean(&row) * ppy
         })
         .collect();
 
-    let cov = stats::covariance_matrix(returns, n_assets, n_periods);
-
-    let rfp = risk_free / periods_per_year as f64;
+    // Annualize the covariance matrix: daily cov * periods_per_year
+    let cov_daily = stats::covariance_matrix(returns, n_assets, n_periods);
+    let cov: Vec<f64> = cov_daily.iter().map(|&x| x * ppy).collect();
 
     let mut points = Vec::with_capacity(n_portfolios);
     for _ in 0..n_portfolios {
         let weights = random_weights(n_assets);
-        let (ret, risk, sharpe) = stats::evaluate_portfolio(&weights, &mean_vec, &cov, rfp * periods_per_year as f64, n_assets);
+        let (ret, risk, sharpe) = stats::evaluate_portfolio(&weights, &mean_vec, &cov, risk_free, n_assets);
         points.push(PortfolioPoint { ret, risk, sharpe, weights });
     }
     points
@@ -56,14 +57,17 @@ pub fn efficient_frontier(
     num_points: usize,
     periods_per_year: u32,
 ) -> Vec<PortfolioPoint> {
+    let ppy = periods_per_year as f64;
     let mean_vec: Vec<f64> = (0..n_assets)
         .map(|i| {
             let row: Vec<f64> = (0..n_periods).map(|t| returns[i * n_periods + t]).collect();
-            montecarlo::mean(&row) * periods_per_year as f64
+            montecarlo::mean(&row) * ppy
         })
         .collect();
 
-    let cov = stats::covariance_matrix(returns, n_assets, n_periods);
+    // Annualize the covariance matrix: daily cov * periods_per_year
+    let cov_daily = stats::covariance_matrix(returns, n_assets, n_periods);
+    let cov: Vec<f64> = cov_daily.iter().map(|&x| x * ppy).collect();
 
     // Tangency portfolio
     let tan_w = stats::tangency_portfolio(&cov, &mean_vec, risk_free, n_assets);

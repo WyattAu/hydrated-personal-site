@@ -1,4 +1,5 @@
 import { For, createSignal, onMount } from 'solid-js';
+import { apiBase } from '../../lib/api-base';
 import { useLlmData } from '../../lib/llm-data';
 import type { GitHubRepo, HNStory } from '../../lib/types';
 import { recordFetch } from './StaleIndicator';
@@ -10,7 +11,7 @@ function useGithubTrending() {
   const [loading, setLoading] = createSignal(true);
   onMount(async () => {
     try {
-      const res = await fetch('/api/github-trending');
+      const res = await fetch(`${apiBase()}/api/github-trending`);
       if (res.ok) {
         const raw = await res.json();
         setRepos((raw?.items ?? (Array.isArray(raw) ? raw : [])).slice(0, 15));
@@ -27,7 +28,7 @@ function useHackerNews() {
   const [loading, setLoading] = createSignal(true);
   onMount(async () => {
     try {
-      const res = await fetch('/api/hacker-news');
+      const res = await fetch(`${apiBase()}/api/hacker-news`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {
@@ -46,7 +47,7 @@ function useExchangeRates() {
   const [loading, setLoading] = createSignal(true);
   onMount(async () => {
     try {
-      const res = await fetch('/api/exchange-rates');
+      const res = await fetch(`${apiBase()}/api/exchange-rates`);
       if (res.ok) {
         const data = await res.json();
         setRates(data.rates || {});
@@ -63,7 +64,7 @@ function useCryptoTicker() {
   const [loading, setLoading] = createSignal(true);
   onMount(async () => {
     try {
-      const res = await fetch('/api/crypto-ticker');
+      const res = await fetch(`${apiBase()}/api/crypto-ticker`);
       if (res.ok) {
         const data = await res.json();
         const items: Array<{ symbol: string; lastPrice?: string; price?: number }> = Array.isArray(

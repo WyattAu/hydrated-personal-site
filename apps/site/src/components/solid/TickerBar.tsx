@@ -1,4 +1,5 @@
 import { For, Show, createSignal, onCleanup, onMount } from 'solid-js';
+import { apiBase } from '../../lib/api-base';
 import { formatPrice } from '../../lib/utils';
 
 interface TickerItem {
@@ -20,7 +21,7 @@ export default function TickerBar() {
       abortController?.abort();
       abortController = new AbortController();
 
-      const res = await fetch('/api/crypto-ticker', {
+      const res = await fetch(`${apiBase()}/api/crypto-ticker`, {
         signal: abortController.signal,
         cache: 'no-cache',
       });
