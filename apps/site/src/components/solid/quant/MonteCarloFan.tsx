@@ -1,6 +1,8 @@
 import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
+import { activeAsset } from '../../../lib/asset-store';
+import { onAssetChanged } from '../../../lib/asset-events';
 
 interface MCResult {
   drift: number;
@@ -14,7 +16,7 @@ interface MCResult {
 }
 
 export default function MonteCarloFan(props: { symbol?: string }) {
-  const symbol = () => props.symbol || 'BTCUSDT';
+  const symbol = () => activeAsset();
   const [result, setResult] = createSignal<MCResult | null>(null);
   const [historical, setHistorical] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
@@ -28,23 +30,24 @@ export default function MonteCarloFan(props: { symbol?: string }) {
     setError(null);
     try {
       const res = await fetch(
-        `${apiBase()}/api/binance-klines?symbol=${symbol()}&interval=1d&limit=365`,
+        `${apiBase()}/api/stock-chart?symbol=${encodeURIComponent(symbol())}&range=1y&interval=1d`,
       );
       if (!res.ok) throw new Error(`API ${res.status}`);
-      const klines = await res.json();
-      const closes = klines.map((k: (string | number)[]) => Number.parseFloat(k[4] as string));
+      const json = await res.json();
+      const quote = json?.chart?.result?.[0]?.indicators?.quote?.[0];
+      const closes: number[] = (quote?.close ?? []).filter((c: number | null): c is number => c != null);
       if (closes.length < 30) throw new Error('insufficient data');
       setHistorical(closes);
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js?v=j30';
+        const _w = '/wasm/hydrated_widgets.js?v=j35';
         wasmMod = await import(_w);
         await wasmMod.default();
         wasmMod.quant_seed(Math.random() * 1e18, Math.random() * 1e18);
       }
 
-      const json = wasmMod.quant_montecarlo(new Float64Array(closes), 252, horizon(), 1000);
-      setResult(JSON.parse(json));
+      const mcJson = wasmMod.quant_montecarlo(new Float64Array(closes), 252, horizon(), 1000);
+      setResult(JSON.parse(mcJson));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load');
     } finally {
@@ -174,6 +177,8 @@ export default function MonteCarloFan(props: { symbol?: string }) {
     const interval = setInterval(loadData, 120000);
     onCleanup(() => clearInterval(interval));
   });
+
+  onAssetChanged(() => loadData());
 
   createEffect(() => {
     const v = result();

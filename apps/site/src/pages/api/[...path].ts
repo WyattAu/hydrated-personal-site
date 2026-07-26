@@ -17,6 +17,17 @@ import {
   fetchTreasuryYields,
 } from '../../lib/upstream';
 
+const allowedOrigins = [
+  'https://wyattau.com',
+  'https://www.wyattau.com',
+  'https://yourusername.github.io',
+];
+
+function getAccessControlOrigin(request: Request): string {
+  const origin = request.headers.get('origin');
+  return allowedOrigins.includes(origin || '') ? origin || '*' : '*';
+}
+
 const cache = new Map<string, { data: unknown; expiry: number }>();
 const inflight = new Map<string, Promise<unknown>>();
 
@@ -96,11 +107,12 @@ function rlchk(ip: string, limit: number, windowMs: number): boolean {
   return true;
 }
 
-export const OPTIONS: APIRoute = () => {
+export const OPTIONS: APIRoute = ({ request }) => {
+  const allowedOrigin = getAccessControlOrigin(request);
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': allowedOrigin,
       'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       'Access-Control-Max-Age': '86400',
@@ -118,10 +130,12 @@ interface KVLike {
 }
 
 export const GET: APIRoute = async (ctx) => {
+  const startTime = Date.now();
   const { url } = ctx;
   const kv = (ctx.locals as { runtime?: { env?: Record<string, unknown> } } | undefined)?.runtime
     ?.env?.GUESTBOOK as KVLike | undefined;
   const path = url.pathname.replace(/^\/api\//, '');
+  const origin = getAccessControlOrigin(ctx.request);
 
   if (path === 'health')
     return new Response(JSON.stringify({ status: 'ok', timestamp: Date.now() }), {
@@ -566,31 +580,52 @@ export const GET: APIRoute = async (ctx) => {
 
   if (path === 'metrics') return J({ status: 'ok', timestamp: Date.now() });
   if (path === 'guestbook') {
-    const c = getCached('gb');
+    const limit = Math.min(Number.parseInt(url.searchParams.get('limit') || '20'), 50);
+    const offset = Number.parseInt(url.searchParams.get('offset') || '0');
+    const cacheKey = `gb_${limit}_${offset}`;
+    const c = getCached(cacheKey);
     if (c) return J(c);
     // When Cloudflare KV binding is configured, read real entries.
-    // Falls back to sample data for local dev / pre-KV setup.
     if (kv) {
       try {
-        const list = await kv.list({ limit: 50 });
+        const list = await kv.list({ limit: 200 });
         const entries = await Promise.all(
           list.keys.map(async (key: { name: string }) => {
             const val = await kv.get(key.name, 'json');
             return val;
           }),
         );
-        const valid = entries.filter(Boolean);
-        setCache('gb', { entries: valid }, 30000);
-        return J({ entries: valid });
+        const valid = entries.filter(Boolean).sort((a: any, b: any) => {
+          const da = new Date(a.created_at || 0).getTime();
+          const db = new Date(b.created_at || 0).getTime();
+          return db - da;
+        });
+        const total = valid.length;
+        const paged = valid.slice(offset, offset + limit);
+        const result = { entries: paged, total, has_more: offset + limit < total };
+        setCache(cacheKey, result, 5000); // 5 second cache
+        return J(result);
       } catch {
         // KV read failed; fall through to sample data.
       }
     }
     return J({
       entries: [
-        { id: '1', name: 'Visitor', message: 'Great site!', created: Date.now() - 86400000 },
-        { id: '2', name: 'Dev', message: 'Love the WASM widgets.', created: Date.now() - 3600000 },
+        {
+          id: '1',
+          name: 'Visitor',
+          message: 'Great site!',
+          created_at: new Date(Date.now() - 86400000).toISOString(),
+        },
+        {
+          id: '2',
+          name: 'Dev',
+          message: 'Love the WASM widgets.',
+          created_at: new Date(Date.now() - 3600000).toISOString(),
+        },
       ],
+      total: 2,
+      has_more: false,
     });
   }
 
@@ -634,10 +669,12 @@ export const GET: APIRoute = async (ctx) => {
     return J(getCached('funding') || { error: 'unavailable' });
   }
 
-  return E('Not found', 404);
+  auditLog('GET', path, 404, Date.now() - startTime);
+  return E('Not found', 404, origin);
 };
 
 export const POST: APIRoute = async ({ request }) => {
+  const startTime = Date.now();
   const path = request.url.replace(/^.*\/api\//, '');
   if (path === 'guestbook') {
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
@@ -659,10 +696,25 @@ export const POST: APIRoute = async ({ request }) => {
     };
     return J({ success: true, entry }, 201);
   }
+  auditLog('POST', path, 404, Date.now() - startTime);
   return E('Not found', 404);
 };
 
-function J(data: unknown, status = 200): Response {
+function auditLog(method: string, path: string, status: number, durationMs: number) {
+  if (typeof console !== 'undefined') {
+    console.log(
+      JSON.stringify({
+        ts: new Date().toISOString(),
+        method,
+        path,
+        status,
+        duration: `${durationMs}ms`,
+      }),
+    );
+  }
+}
+
+function J(data: unknown, status = 200, origin?: string | null): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
@@ -670,13 +722,13 @@ function J(data: unknown, status = 200): Response {
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': origin || '*',
       'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });
 }
 
-function E(message: string, status = 400): Response {
-  return J({ error: message }, status);
+function E(message: string, status = 400, origin?: string | null): Response {
+  return J({ error: message }, status, origin);
 }

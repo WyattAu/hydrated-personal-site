@@ -1,6 +1,7 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { activeAsset } from '../../../lib/asset-store';
+import { onAssetChanged } from '../../../lib/asset-events';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 const BINS = 25;
@@ -175,10 +176,7 @@ export default function VolumeProfile() {
 
   onMount(() => loadData());
 
-  createEffect(() => {
-    activeAsset();
-    loadData();
-  });
+  onAssetChanged(() => loadData());
 
   createEffect(() => {
     profile();

@@ -1,5 +1,7 @@
 import { createEffect, createSignal, onMount } from 'solid-js';
 import { getThemeColors } from '../../../lib/theme-colors';
+import { activeAsset } from '../../../lib/asset-store';
+import { onAssetChanged } from '../../../lib/asset-events';
 
 interface Leg {
   type: 'call' | 'put';
@@ -124,6 +126,8 @@ export default function OptionsPayoff() {
   onMount(() => {
     setTimeout(draw, 10);
   });
+
+  onAssetChanged(() => {});
 
   createEffect(() => {
     legs();

@@ -1,6 +1,7 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { activeAsset } from '../../../lib/asset-store';
+import { onAssetChanged } from '../../../lib/asset-events';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 const FIB_LEVELS: { ratio: number; label: string; golden?: boolean }[] = [
@@ -159,10 +160,7 @@ export default function FibonacciLevels() {
 
   onMount(() => loadData());
 
-  createEffect(() => {
-    activeAsset();
-    loadData();
-  });
+  onAssetChanged(() => loadData());
 
   createEffect(() => {
     state();

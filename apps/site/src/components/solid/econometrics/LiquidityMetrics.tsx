@@ -1,6 +1,7 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { activeAsset } from '../../../lib/asset-store';
+import { onAssetChanged } from '../../../lib/asset-events';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface LiquidityResult {
@@ -70,10 +71,7 @@ export default function LiquidityMetrics() {
 
   onMount(() => loadData());
 
-  createEffect(() => {
-    activeAsset();
-    loadData();
-  });
+  onAssetChanged(() => loadData());
 
   function fmtAmihud(v: number): string {
     if (v === 0 || !Number.isFinite(v)) return 'N/A';

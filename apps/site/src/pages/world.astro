@@ -5,32 +5,71 @@ import DataPanels from '../components/solid/DataPanels';
 import AppErrorBoundary from '../components/solid/ErrorBoundary';
 import MetricCards from '../components/solid/MetricCards';
 import PriceChart from '../components/solid/PriceChart';
-import ScatterPlots from '../components/solid/ScatterPlots';
-import StaleIndicator from '../components/solid/StaleIndicator';
 import ThemeToggle from '../components/solid/ThemeToggle';
 import TreemapWidget from '../components/solid/TreemapWidget';
 import WorldMap from '../components/solid/WorldMap';
-import CorrelationNetwork from '../components/solid/quant/CorrelationNetwork';
-import EfficientFrontier from '../components/solid/quant/EfficientFrontier';
-import FundingRateHeatmap from '../components/solid/quant/FundingRateHeatmap';
-import GreeksDashboard from '../components/solid/quant/GreeksDashboard';
+
+// Single-asset quant (driven by AssetSelector)
 import MonteCarloFan from '../components/solid/quant/MonteCarloFan';
-import OptionsPayoff from '../components/solid/quant/OptionsPayoff';
-import RiskMetrics from '../components/solid/quant/RiskMetrics';
-import RollingCorrelationHeatmap from '../components/solid/quant/RollingCorrelationHeatmap';
 import VolatilityForecast from '../components/solid/quant/VolatilityForecast';
-import YieldCurveChart from '../components/solid/quant/YieldCurveChart';
+import RiskMetrics from '../components/solid/quant/RiskMetrics';
+import GreeksDashboard from '../components/solid/quant/GreeksDashboard';
+import OptionsPayoff from '../components/solid/quant/OptionsPayoff';
+
+// Econometrics: single-asset
+import LiquidityMetrics from '../components/solid/econometrics/LiquidityMetrics';
+import RegimeDetector from '../components/solid/econometrics/RegimeDetector';
+import RealizedVolDecomposition from '../components/solid/econometrics/RealizedVolDecomposition';
+import RollingFactorExposure from '../components/solid/econometrics/RollingFactorExposure';
+import KellyCalculator from '../components/solid/econometrics/KellyCalculator';
+import CommodityTermStructure from '../components/solid/econometrics/CommodityTermStructure';
+import IvSolver from '../components/solid/econometrics/IvSolver';
+import RiskRatios from '../components/solid/econometrics/RiskRatios';
+import WeekRange52 from '../components/solid/econometrics/WeekRange52';
+import VwapTracker from '../components/solid/econometrics/VwapTracker';
+import VolumeProfile from '../components/solid/econometrics/VolumeProfile';
+import FibonacciLevels from '../components/solid/econometrics/FibonacciLevels';
+
+// Cross-asset (driven by TickerManager)
+import EfficientFrontier from '../components/solid/quant/EfficientFrontier';
+import CorrelationNetwork from '../components/solid/quant/CorrelationNetwork';
+import RollingCorrelationHeatmap from '../components/solid/quant/RollingCorrelationHeatmap';
 import BetaMatrix from '../components/solid/world/BetaMatrix';
-import CryptoDominancePie from '../components/solid/world/CryptoDominancePie';
-import CurrencyMatrix from '../components/solid/world/CurrencyMatrix';
-import EarthquakeHistogram from '../components/solid/world/EarthquakeHistogram';
-import FredSparklines from '../components/solid/world/FredSparklines';
-import GlobalStressGauge from '../components/solid/world/GlobalStressGauge';
-import MultiDrawdown from '../components/solid/world/MultiDrawdown';
 import RealizedVolRanking from '../components/solid/world/RealizedVolRanking';
 import RiskReturnBubble from '../components/solid/world/RiskReturnBubble';
+import MultiDrawdown from '../components/solid/world/MultiDrawdown';
+import MomentumScanner from '../components/solid/econometrics/MomentumScanner';
+import HrpAllocation from '../components/solid/econometrics/HrpAllocation';
+import ComponentVaR from '../components/solid/econometrics/ComponentVaR';
+import BlackLitterman from '../components/solid/econometrics/BlackLitterman';
+import SectorRotation from '../components/solid/econometrics/SectorRotation';
+import StressTestPanel from '../components/solid/econometrics/StressTestPanel';
+
+// Econometrics: cross-asset
+import CointegrationScanner from '../components/solid/econometrics/CointegrationScanner';
+import PairsTradingSignal from '../components/solid/econometrics/PairsTradingSignal';
+import CopulaMatrix from '../components/solid/econometrics/CopulaMatrix';
+import TailDependenceMatrix from '../components/solid/econometrics/TailDependenceMatrix';
+
+// Macro & rates
+import YieldCurveChart from '../components/solid/quant/YieldCurveChart';
+import ForwardRateCurve from '../components/solid/econometrics/ForwardRateCurve';
+import FundingRateHeatmap from '../components/solid/quant/FundingRateHeatmap';
+
+// Global signals
+import GlobalStressGauge from '../components/solid/world/GlobalStressGauge';
+import FredSparklines from '../components/solid/world/FredSparklines';
+import EarthquakeHistogram from '../components/solid/world/EarthquakeHistogram';
 import SolarWindPanel from '../components/solid/world/SolarWindPanel';
 import WeatherStrip from '../components/solid/world/WeatherStrip';
+import CurrencyMatrix from '../components/solid/world/CurrencyMatrix';
+
+// Crypto
+import CryptoDominancePie from '../components/solid/world/CryptoDominancePie';
+
+// UI
+import AssetSelector from '../components/solid/world/AssetSelector';
+import TickerManager from '../components/solid/world/TickerManager';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
@@ -38,227 +77,134 @@ import '../styles/base.css';
 
 <BaseLayout
   title="World Monitor — Wyatt Au"
-  description="Real-time world intelligence monitor: earthquakes, crypto prices, market data, LLM benchmarks, and trending tech."
+  description="Multi-asset intelligence dashboard: stocks, ETFs, forex, commodities, crypto. All quantitative analysis runs client-side in Rust/WASM."
 >
   <Nav />
 
   <main id="main-content" class="pt-32">
+
+    <!-- ====== SECTION 1: MARKET OVERVIEW ====== -->
     <section class="px-6 md:px-12 lg:px-24 pb-6">
       <p class="label mb-2" style="color: var(--accent);">WORLD MONITOR</p>
       <h1 class="text-2xl md:text-3xl font-bold mb-1">Intelligence Dashboard</h1>
-      <p class="text-sm" style="color: var(--text-secondary);">Live data feeds, market metrics, and global monitoring.</p>
+      <p class="text-sm" style="color: var(--text-secondary);">Multi-asset market data, client-side quantitative analysis, and global signals.</p>
     </section>
 
-    <!-- Map -->
     <section class="w-full border-y" style="border-color: var(--border); height: 50vh; min-height: 360px;">
-      <AppErrorBoundary client:load>
-        <WorldMap client:load />
-      </AppErrorBoundary>
+      <AppErrorBoundary client:load><WorldMap client:load /></AppErrorBoundary>
     </section>
 
-    <!-- Metric Cards -->
-    <section class="px-6 md:px-12 lg:px-24 py-6">
+    <section class="px-6 md:px-12 lg:px-24 py-4">
       <MetricCards client:load />
     </section>
 
-    <!-- Price Chart -->
     <section class="px-6 md:px-12 lg:px-24 py-4">
-      <AppErrorBoundary client:load>
-        <PriceChart client:load symbol="^GSPC" title="MARKET OVERVIEW" />
-      </AppErrorBoundary>
+      <AppErrorBoundary client:load><PriceChart client:load symbol="^GSPC" title="MARKET OVERVIEW" /></AppErrorBoundary>
     </section>
 
-    <!-- WASM Finance Widgets -->
-    <section class="py-12 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
-      <p class="label mb-6" style="color: var(--accent);">WASM ANALYTICS</p>
-      <h2 class="text-xl md:text-2xl font-bold mb-4">Interactive Market Tools</h2>
-      <p class="mb-8 text-sm" style="color: var(--text-secondary);">Client-side analytics powered by WebAssembly.</p>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
-          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Order Book</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Bitcoin mempool fee structure visualised as a depth chart.</p>
-          <WasmEmbed widget="order_book" width={380} height={300} dataEndpoint="/api/mempool" dataInterval={60000} />
-        </div>
-        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
-          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Market Treemap</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Crypto asset treemap. Cell size scales with trading volume.</p>
-          <AppErrorBoundary client:load>
-            <TreemapWidget client:load />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
-          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">BTC Health</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Mempool count and recommended fees from mempool.space.</p>
-          <WasmEmbed widget="btc_health" width={380} height={300} dataEndpoint="/api/mempool" dataInterval={60000} />
-        </div>
-      </div>
-    </section>
-
-    <!-- Data Panels Grid -->
-    <section class="px-6 md:px-12 lg:px-24 py-4">
-      <DataPanels client:load />
-    </section>
-
-    <!-- Scatter Plots -->
-    <section class="px-6 md:px-12 lg:px-24 py-4">
-      <ScatterPlots client:load />
-    </section>
-
-    <!-- Quant Dashboard -->
+    <!-- ====== SECTION 2: SINGLE-ASSET QUANT ====== -->
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
-      <p class="label mb-2" style="color: var(--accent);">QUANT ANALYTICS</p>
-      <h2 class="text-xl md:text-2xl font-bold mb-1">Client-Side Quantitative Engine</h2>
-      <p class="mb-6 text-sm" style="color: var(--text-secondary);">All computations run in Rust/WASM on your CPU. Zero server-side math.</p>
-
-      <!-- Row 1: Monte Carlo + GARCH -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <MonteCarloFan client:load symbol="BTCUSDT" />
-          </AppErrorBoundary>
+      <div class="flex items-start justify-between mb-4 flex-wrap gap-4">
+        <div>
+          <p class="label" style="color: var(--accent);">QUANT ANALYTICS</p>
+          <h2 class="text-xl md:text-2xl font-bold">Single-Asset Analysis</h2>
+          <p class="text-sm" style="color: var(--text-secondary);">Select an asset. All charts below update instantly. Computations run in Rust/WASM.</p>
         </div>
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <VolatilityForecast client:load symbol="BTCUSDT" />
-          </AppErrorBoundary>
-        </div>
+        <AssetSelector client:load />
       </div>
-
-      <!-- Row 2: Efficient Frontier + Greeks -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <EfficientFrontier client:load />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <GreeksDashboard client:load />
-          </AppErrorBoundary>
-        </div>
-      </div>
-
-      <!-- Row 3: VaR + Options Payoff -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <RiskMetrics client:load symbol="BTCUSDT" />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <OptionsPayoff client:load />
-          </AppErrorBoundary>
-        </div>
-      </div>
-
-      <!-- Row 4: Correlation Network + Yield Curve -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <CorrelationNetwork client:load />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <YieldCurveChart client:load />
-          </AppErrorBoundary>
-        </div>
-      </div>
-
-      <!-- Row 5: Rolling Correlation + Funding Rates -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <RollingCorrelationHeatmap client:load />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <FundingRateHeatmap client:load />
-          </AppErrorBoundary>
-        </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><MonteCarloFan client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><VolatilityForecast client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RiskMetrics client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><GreeksDashboard client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><LiquidityMetrics client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RegimeDetector client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RealizedVolDecomposition client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RollingFactorExposure client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><KellyCalculator client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><CommodityTermStructure client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RiskRatios client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><IvSolver client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><WeekRange52 client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><VwapTracker client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><VolumeProfile client:load /></AppErrorBoundary></div>
+        <div class="p-4 border lg:col-span-2" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><FibonacciLevels client:load /></AppErrorBoundary></div>
+        <div class="p-4 border lg:col-span-2" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><OptionsPayoff client:load /></AppErrorBoundary></div>
       </div>
     </section>
 
-    <!-- Global Monitor -->
+    <!-- ====== SECTION 3: CROSS-ASSET INTELLIGENCE ====== -->
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
-      <p class="label mb-2" style="color: var(--accent);">GLOBAL MONITOR</p>
-      <h2 class="text-xl md:text-2xl font-bold mb-1">Real-Time World Dashboard</h2>
-      <p class="mb-6 text-sm" style="color: var(--text-secondary);">Geophysical, macroeconomic, and market signals aggregated into a single view.</p>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <GlobalStressGauge client:load />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-4 border col-span-1 md:col-span-2" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <FredSparklines client:load />
-          </AppErrorBoundary>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <EarthquakeHistogram client:load />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <SolarWindPanel client:load />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <WeatherStrip client:load />
-          </AppErrorBoundary>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <RealizedVolRanking client:load />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <RiskReturnBubble client:load />
-          </AppErrorBoundary>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <CurrencyMatrix client:load />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <CryptoDominancePie client:load />
-          </AppErrorBoundary>
-        </div>
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <BetaMatrix client:load />
-          </AppErrorBoundary>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 gap-6">
-        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
-          <AppErrorBoundary client:load>
-            <MultiDrawdown client:load />
-          </AppErrorBoundary>
-        </div>
+      <p class="label" style="color: var(--accent);">PORTFOLIO ANALYTICS</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-3">Cross-Asset Intelligence</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">Add or remove tickers below. All cross-asset widgets update instantly.</p>
+      <div class="mb-6"><AppErrorBoundary client:load><TickerManager client:load /></AppErrorBoundary></div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><EfficientFrontier client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RollingCorrelationHeatmap client:load /></AppErrorBoundary></div>
+        <div class="p-4 border lg:col-span-2" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><CorrelationNetwork client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><BetaMatrix client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RealizedVolRanking client:load /></AppErrorBoundary></div>
+        <div class="p-4 border lg:col-span-2" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RiskReturnBubble client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><HrpAllocation client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><ComponentVaR client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><SectorRotation client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><StressTestPanel client:load /></AppErrorBoundary></div>
+        <div class="p-4 border lg:col-span-2" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><MomentumScanner client:load /></AppErrorBoundary></div>
+        <div class="p-4 border lg:col-span-2" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><BlackLitterman client:load /></AppErrorBoundary></div>
+        <div class="p-4 border lg:col-span-2" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><MultiDrawdown client:load /></AppErrorBoundary></div>
       </div>
     </section>
+
+    <!-- ====== SECTION 4: ECONOMETRICS ====== -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label" style="color: var(--accent);">ECONOMETRICS</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Advanced Cross-Asset Analytics</h2>
+      <div class="grid grid-cols-1 gap-4">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><CointegrationScanner client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><PairsTradingSignal client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><CopulaMatrix client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><TailDependenceMatrix client:load /></AppErrorBoundary></div>
+      </div>
+    </section>
+
+    <!-- ====== SECTION 5: MACRO & RATES ====== -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label" style="color: var(--accent);">MACROECONOMIC</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Rates & Economic Indicators</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><YieldCurveChart client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><ForwardRateCurve client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><GlobalStressGauge client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><CurrencyMatrix client:load /></AppErrorBoundary></div>
+        <div class="p-4 border lg:col-span-2" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><FredSparklines client:load /></AppErrorBoundary></div>
+      </div>
+    </section>
+
+    <!-- ====== SECTION 6: GLOBAL SIGNALS ====== -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label" style="color: var(--accent);">GEOPHYSICAL</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Global Signals</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><EarthquakeHistogram client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><SolarWindPanel client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><WeatherStrip client:load /></AppErrorBoundary></div>
+      </div>
+    </section>
+
+    <!-- ====== SECTION 7: CRYPTO MARKETS ====== -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label" style="color: var(--accent);">CRYPTO MARKETS</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Digital Asset Monitor</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><CryptoDominancePie client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><FundingRateHeatmap client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><TreemapWidget client:load /></AppErrorBoundary></div>
+      </div>
+      <div class="mt-4"><AppErrorBoundary client:load><DataPanels client:load /></AppErrorBoundary></div>
+    </section>
+
   </main>
-
   <Footer />
   <ThemeToggle client:load />
 </BaseLayout>

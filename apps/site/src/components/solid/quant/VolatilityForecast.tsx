@@ -1,6 +1,8 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
+import { activeAsset } from '../../../lib/asset-store';
+import { onAssetChanged } from '../../../lib/asset-events';
 
 interface GarchResult {
   omega: number;
@@ -14,9 +16,10 @@ interface GarchResult {
 }
 
 export default function VolatilityForecast(props: { symbol?: string }) {
-  const symbol = () => props.symbol || 'BTCUSDT';
+  const symbol = () => activeAsset();
   const [data, setData] = createSignal<GarchResult | null>(null);
   const [loading, setLoading] = createSignal(true);
+  const [forecastHorizon, setForecastHorizon] = createSignal(30);
   let canvasRef: HTMLCanvasElement | undefined;
   let wasmMod: any = null;
 
@@ -24,23 +27,22 @@ export default function VolatilityForecast(props: { symbol?: string }) {
     setLoading(true);
     try {
       const res = await fetch(
-        `${apiBase()}/api/binance-klines?symbol=${symbol()}&interval=1d&limit=365`,
+        `${apiBase()}/api/stock-chart?symbol=${encodeURIComponent(symbol())}&range=1y&interval=1d`,
       );
       if (!res.ok) return;
-      const klines = await res.json();
-      const closes: number[] = klines.map((k: (string | number)[]) =>
-        Number.parseFloat(k[4] as string),
-      );
+      const json = await res.json();
+      const quote = json?.chart?.result?.[0]?.indicators?.quote?.[0];
+      const closes: number[] = (quote?.close ?? []).filter((c: number | null): c is number => c != null);
       const returns = new Float64Array(closes.length - 1);
       for (let i = 1; i < closes.length; i++) returns[i - 1] = Math.log(closes[i] / closes[i - 1]);
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js?v=j30';
+        const _w = '/wasm/hydrated_widgets.js?v=j35';
         wasmMod = await import(_w);
         await wasmMod.default();
       }
-      const json = wasmMod.quant_garch(returns, 30);
-      setData(JSON.parse(json));
+      const garchJson = wasmMod.quant_garch(returns, forecastHorizon());
+      setData(JSON.parse(garchJson));
     } catch {
       /* skip */
     } finally {
@@ -155,6 +157,9 @@ export default function VolatilityForecast(props: { symbol?: string }) {
   onMount(() => {
     loadData();
   });
+
+  onAssetChanged(() => loadData());
+
   const d = data();
 
   createEffect(() => {
@@ -164,9 +169,27 @@ export default function VolatilityForecast(props: { symbol?: string }) {
 
   return (
     <div>
-      <p class="label mb-3" style={{ color: 'var(--accent)' }}>
-        GARCH(1,1) VOLATILITY FORECAST
-      </p>
+      <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <p class="label" style={{ color: 'var(--accent)' }}>
+          GARCH(1,1) VOLATILITY FORECAST
+        </p>
+        <div class="flex gap-1">
+          {[7, 30, 90].map((h) => (
+            <button
+              type="button"
+              class="font-mono text-[9px] px-2 py-0.5 border transition-colors"
+              style={{
+                'border-color': forecastHorizon() === h ? 'var(--accent)' : 'var(--border)',
+                color: forecastHorizon() === h ? 'var(--accent)' : 'var(--text-secondary)',
+                background: forecastHorizon() === h ? 'var(--bg-secondary)' : 'transparent',
+              }}
+              onClick={() => { setForecastHorizon(h); loadData(); }}
+            >
+              {h}D
+            </button>
+          ))}
+        </div>
+      </div>
       <Show when={loading()}>
         <p class="font-mono text-xs p-4" style={{ color: 'var(--text-secondary)' }}>
           Computing...

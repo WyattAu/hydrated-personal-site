@@ -1,6 +1,7 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { activeAsset } from '../../../lib/asset-store';
+import { onAssetChanged } from '../../../lib/asset-events';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 async function fetchLastClose(symbol: string): Promise<number | null> {
@@ -130,10 +131,7 @@ export default function CommodityTermStructure() {
 
   onMount(() => loadData());
 
-  createEffect(() => {
-    activeAsset();
-    loadData();
-  });
+  onAssetChanged(() => loadData());
 
   createEffect(() => {
     prices();

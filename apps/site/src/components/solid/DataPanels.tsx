@@ -17,7 +17,9 @@ function useGithubTrending() {
         setRepos((raw?.items ?? (Array.isArray(raw) ? raw : [])).slice(0, 15));
         recordFetch('github-trending');
       }
-    } catch {}
+    } catch (e) {
+      console.error('[DataPanels:useGithubTrending]', e);
+    }
     setLoading(false);
   });
   return { repos, loading };
@@ -36,7 +38,9 @@ function useHackerNews() {
           recordFetch('hacker-news');
         }
       }
-    } catch {}
+    } catch (e) {
+      console.error('[DataPanels:useHackerNews]', e);
+    }
     setLoading(false);
   });
   return { stories, loading };
@@ -53,7 +57,9 @@ function useExchangeRates() {
         setRates(data.rates || {});
         recordFetch('exchange-rates');
       }
-    } catch {}
+    } catch (e) {
+      console.error('[DataPanels:useExchangeRates]', e);
+    }
     setLoading(false);
   });
   return { rates, loading };
@@ -83,7 +89,9 @@ function useCryptoTicker() {
         setPrices(p);
         recordFetch('crypto-ticker');
       }
-    } catch {}
+    } catch (e) {
+      console.error('[DataPanels:useCryptoTicker]', e);
+    }
     setLoading(false);
   });
   return { prices, loading };

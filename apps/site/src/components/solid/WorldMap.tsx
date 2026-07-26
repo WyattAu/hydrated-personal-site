@@ -298,7 +298,8 @@ function loadCachedEarthquakes(): EarthquakeFeature[] {
     const { features, timestamp } = JSON.parse(raw);
     if (Date.now() - timestamp > EQ_CACHE_TTL_MS) return [];
     return features;
-  } catch {
+  } catch (e) {
+    console.error('[WorldMap:loadCachedEarthquakes]', e);
     return [];
   }
 }
@@ -306,7 +307,9 @@ function loadCachedEarthquakes(): EarthquakeFeature[] {
 function storeCachedEarthquakes(features: EarthquakeFeature[]): void {
   try {
     localStorage.setItem(EQ_CACHE_KEY, JSON.stringify({ features, timestamp: Date.now() }));
-  } catch {}
+  } catch (e) {
+    console.error('[WorldMap:storeCachedEarthquakes]', e);
+  }
 }
 
 export default function WorldMap() {
@@ -694,7 +697,9 @@ export default function WorldMap() {
                 );
 
                 recordFetch('restcountries');
-              } catch {}
+              } catch (e) {
+                console.error('[WorldMap:countryDataFetch]', e);
+              }
               setCountryLoading(false);
             });
             // Highlight on hover
@@ -793,8 +798,8 @@ export default function WorldMap() {
           setLoading(false);
           recordFetch('earthquakes');
         }
-      } catch {
-        // Cache fallback already displayed
+      } catch (e) {
+        console.error('[WorldMap:earthquakeFetch]', e);
       }
 
       // Country click handled by GeoJSON layer

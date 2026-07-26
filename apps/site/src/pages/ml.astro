@@ -70,6 +70,36 @@ import '../styles/animations.css';
       </div>
     </section>
 
+    <!-- Neural Network Training -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">NEURAL NETWORKS</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Interactive Neural Network</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">Watch a neural network learn in real-time. Forward pass, backpropagation, and gradient flow visualized across layers.</p>
+      <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+        <WasmEmbed widget="neural_net" width={380} height={300} />
+      </div>
+    </section>
+
+    <!-- t-SNE Clustering -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">DIMENSIONALITY REDUCTION</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">t-SNE Visualization</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">High-dimensional data projected to 2D in real-time. The t-SNE algorithm clusters similar data points in WASM.</p>
+      <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+        <WasmEmbed widget="tsne" width={380} height={300} />
+      </div>
+    </section>
+
+    <!-- Gradient Descent -->
+    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
+      <p class="label mb-2" style="color: var(--accent);">OPTIMIZATION</p>
+      <h2 class="text-xl md:text-2xl font-bold mb-4">Gradient Descent Visualization</h2>
+      <p class="mb-4 text-sm" style="color: var(--text-secondary);">3D loss landscape with optimizer trajectory. Watch the gradient descent ball navigate valleys and saddle points.</p>
+      <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
+        <WasmEmbed widget="gradient_descent" width={380} height={300} />
+      </div>
+    </section>
+
     <!-- Section 4: Leaderboard Table -->
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
       <p class="label mb-2" style="color: var(--accent);">LEADERBOARD</p>
@@ -92,30 +122,7 @@ import '../styles/animations.css';
       </AppErrorBoundary>
     </section>
 
-    <!-- Section: WASM ML Visualizations -->
-    <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
-      <p class="label mb-2" style="color: var(--accent);">WASM VISUALIZATIONS</p>
-      <h2 class="text-xl md:text-2xl font-bold mb-4">Interactive ML Demos</h2>
-      <p class="mb-4 text-sm" style="color: var(--text-secondary);">Neural network training, dimensionality reduction, and optimization — all computed client-side in Rust/WASM.</p>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
-          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Neural Network Training</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Real 2-4-1 MLP learning XOR via backpropagation. Sigmoid activations, MSE loss, weight updates visualized as line thickness.</p>
-          <WasmEmbed widget="neural_net" width={380} height={300} />
-        </div>
-        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
-          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">t-SNE Clustering</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Real t-SNE on 90 points in 6D space. PCA initialization, Student-t kernel, KL divergence gradient descent. Watch clusters converge.</p>
-          <WasmEmbed widget="tsne" width={380} height={300} />
-        </div>
-        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
-          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Gradient Descent</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Adam optimizer on the Rosenbrock function. Numerical gradients, bias-corrected momentum. Contour map with trajectory.</p>
-          <WasmEmbed widget="gradient_descent" width={380} height={300} />
-        </div>
-      </div>
-    </section>
 
   </main>
 

@@ -26,7 +26,9 @@ function useCryptoTicker() {
         }
         setData(map);
         recordFetch('crypto-ticker');
-      } catch {}
+      } catch (e) {
+        console.error('[MetricCards:useCryptoTicker]', e);
+      }
     }
     fetch_();
     const id = setInterval(fetch_, 15_000);
@@ -66,7 +68,9 @@ function useStockQuote(symbols: string) {
         }
         setData(map);
         recordFetch('stock-quote');
-      } catch {}
+      } catch (e) {
+        console.error('[MetricCards:useStockQuote]', e);
+      }
     }
     fetch_();
     const id = setInterval(fetch_, 60_000);
@@ -92,7 +96,9 @@ function useMempool() {
             hour: raw.fees.hourFee,
           });
         recordFetch('mempool');
-      } catch {}
+      } catch (e) {
+        console.error('[MetricCards:useMempool]', e);
+      }
     }
     fetch_();
     const id = setInterval(fetch_, 60_000);
@@ -125,7 +131,9 @@ function useBinanceFutures() {
         });
         recordFetch('binance-futures');
       }
-    } catch {}
+    } catch (e) {
+      console.error('[MetricCards:useBinanceFutures]', e);
+    }
   });
   return data;
 }
@@ -143,7 +151,9 @@ function useFearGreed() {
         setData({ value: fgData.value, classification: fgData.value_classification });
         recordFetch('fear-greed');
       }
-    } catch {}
+    } catch (e) {
+      console.error('[MetricCards:useFearGreed]', e);
+    }
   });
   return data;
 }
@@ -162,7 +172,9 @@ function useKpIndex() {
         setData(String(kpVal));
         recordFetch('kp-index');
       }
-    } catch {}
+    } catch (e) {
+      console.error('[MetricCards:useKpIndex]', e);
+    }
   });
   return data;
 }
@@ -177,7 +189,9 @@ function useEarthquakes() {
       const raw = _resp.data || _resp;
       setCount((raw.features || []).length);
       recordFetch('earthquakes');
-    } catch {}
+    } catch (e) {
+      console.error('[MetricCards:useEarthquakes]', e);
+    }
   });
   return count;
 }
@@ -192,7 +206,9 @@ function useExchangeRates() {
       const raw = _resp.data || _resp;
       setRates(raw.rates || {});
       recordFetch('exchange-rates');
-    } catch {}
+    } catch (e) {
+      console.error('[MetricCards:useExchangeRates]', e);
+    }
   });
   return rates;
 }

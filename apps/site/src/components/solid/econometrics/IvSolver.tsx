@@ -1,6 +1,7 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { activeAsset } from '../../../lib/asset-store';
+import { onAssetChanged } from '../../../lib/asset-events';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 // Standard normal CDF (Abramowitz & Stegun approximation).
@@ -101,10 +102,7 @@ export default function IvSolver() {
 
   onMount(() => loadSpot());
 
-  createEffect(() => {
-    activeAsset();
-    loadSpot();
-  });
+  onAssetChanged(() => loadSpot());
 
   const inputCls = 'font-mono text-xs px-2 py-1 border w-full';
   const inputStyle = {
