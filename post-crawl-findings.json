@@ -1,0 +1,138 @@
+[
+  {
+    "code": "SITEMAP006",
+    "description": "Page has canonical \"https://wyattau.com/\" but was crawled.",
+    "page_url": "https://wyattau.com/#main-content",
+    "recommendation": "Remove non-canonical pages from the sitemap.",
+    "severity": "warning",
+    "title": "Non-canonical page may be in sitemap"
+  },
+  {
+    "code": "CANON005",
+    "description": "Canonical \"https://wyattau.com/docs/\" is not linked from any crawled page.",
+    "page_url": "https://wyattau.com/docs",
+    "recommendation": "Add internal links to the canonical URL.",
+    "severity": "warning",
+    "title": "Canonical URL has no incoming links"
+  },
+  {
+    "code": "SITEMAP006",
+    "description": "Page has canonical \"https://wyattau.com/docs/\" but was crawled.",
+    "page_url": "https://wyattau.com/docs",
+    "recommendation": "Remove non-canonical pages from the sitemap.",
+    "severity": "warning",
+    "title": "Non-canonical page may be in sitemap"
+  },
+  {
+    "code": "CANON005",
+    "description": "Canonical \"https://wyattau.com/dossier/\" is not linked from any crawled page.",
+    "page_url": "https://wyattau.com/dossier",
+    "recommendation": "Add internal links to the canonical URL.",
+    "severity": "warning",
+    "title": "Canonical URL has no incoming links"
+  },
+  {
+    "code": "SITEMAP006",
+    "description": "Page has canonical \"https://wyattau.com/dossier/\" but was crawled.",
+    "page_url": "https://wyattau.com/dossier",
+    "recommendation": "Remove non-canonical pages from the sitemap.",
+    "severity": "warning",
+    "title": "Non-canonical page may be in sitemap"
+  },
+  {
+    "code": "CANON005",
+    "description": "Canonical \"https://wyattau.com/etf/\" is not linked from any crawled page.",
+    "page_url": "https://wyattau.com/etf",
+    "recommendation": "Add internal links to the canonical URL.",
+    "severity": "warning",
+    "title": "Canonical URL has no incoming links"
+  },
+  {
+    "code": "SITEMAP006",
+    "description": "Page has canonical \"https://wyattau.com/etf/\" but was crawled.",
+    "page_url": "https://wyattau.com/etf",
+    "recommendation": "Remove non-canonical pages from the sitemap.",
+    "severity": "warning",
+    "title": "Non-canonical page may be in sitemap"
+  },
+  {
+    "code": "CANON005",
+    "description": "Canonical \"https://wyattau.com/guestbook/\" is not linked from any crawled page.",
+    "page_url": "https://wyattau.com/guestbook",
+    "recommendation": "Add internal links to the canonical URL.",
+    "severity": "warning",
+    "title": "Canonical URL has no incoming links"
+  },
+  {
+    "code": "SITEMAP006",
+    "description": "Page has canonical \"https://wyattau.com/guestbook/\" but was crawled.",
+    "page_url": "https://wyattau.com/guestbook",
+    "recommendation": "Remove non-canonical pages from the sitemap.",
+    "severity": "warning",
+    "title": "Non-canonical page may be in sitemap"
+  },
+  {
+    "code": "CANON005",
+    "description": "Canonical \"https://wyattau.com/projects/\" is not linked from any crawled page.",
+    "page_url": "https://wyattau.com/projects",
+    "recommendation": "Add internal links to the canonical URL.",
+    "severity": "warning",
+    "title": "Canonical URL has no incoming links"
+  },
+  {
+    "code": "SITEMAP006",
+    "description": "Page has canonical \"https://wyattau.com/projects/\" but was crawled.",
+    "page_url": "https://wyattau.com/projects",
+    "recommendation": "Remove non-canonical pages from the sitemap.",
+    "severity": "warning",
+    "title": "Non-canonical page may be in sitemap"
+  },
+  {
+    "code": "CANON005",
+    "description": "Canonical \"https://wyattau.com/showcase/\" is not linked from any crawled page.",
+    "page_url": "https://wyattau.com/showcase",
+    "recommendation": "Add internal links to the canonical URL.",
+    "severity": "warning",
+    "title": "Canonical URL has no incoming links"
+  },
+  {
+    "code": "SITEMAP006",
+    "description": "Page has canonical \"https://wyattau.com/showcase/\" but was crawled.",
+    "page_url": "https://wyattau.com/showcase",
+    "recommendation": "Remove non-canonical pages from the sitemap.",
+    "severity": "warning",
+    "title": "Non-canonical page may be in sitemap"
+  },
+  {
+    "code": "CANON005",
+    "description": "Canonical \"https://wyattau.com/uses/\" is not linked from any crawled page.",
+    "page_url": "https://wyattau.com/uses",
+    "recommendation": "Add internal links to the canonical URL.",
+    "severity": "warning",
+    "title": "Canonical URL has no incoming links"
+  },
+  {
+    "code": "SITEMAP006",
+    "description": "Page has canonical \"https://wyattau.com/uses/\" but was crawled.",
+    "page_url": "https://wyattau.com/uses",
+    "recommendation": "Remove non-canonical pages from the sitemap.",
+    "severity": "warning",
+    "title": "Non-canonical page may be in sitemap"
+  },
+  {
+    "code": "CANON005",
+    "description": "Canonical \"https://wyattau.com/world/\" is not linked from any crawled page.",
+    "page_url": "https://wyattau.com/world",
+    "recommendation": "Add internal links to the canonical URL.",
+    "severity": "warning",
+    "title": "Canonical URL has no incoming links"
+  },
+  {
+    "code": "SITEMAP006",
+    "description": "Page has canonical \"https://wyattau.com/world/\" but was crawled.",
+    "page_url": "https://wyattau.com/world",
+    "recommendation": "Remove non-canonical pages from the sitemap.",
+    "severity": "warning",
+    "title": "Non-canonical page may be in sitemap"
+  }
+]
