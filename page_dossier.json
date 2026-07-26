@@ -1,0 +1,294 @@
+{
+  "body_size": 92313,
+  "canonical": "https://wyattau.com/dossier/",
+  "crux": null,
+  "description": "Personal dossier, timeline, and detailed biography of Wyatt Au.",
+  "fetch_time_ms": 181,
+  "final_url": "https://wyattau.com/dossier/",
+  "findings": [
+    {
+      "category": "http",
+      "code": "HTTP007",
+      "description": "Page returned 200 but contains text typically found on error pages (e.g., \"page not found\"). This may indicate a soft 404.",
+      "recommendation": "Verify the page renders correctly. Fix server-side rendering issues or return a proper 404 status code.",
+      "severity": "warning",
+      "title": "Possible soft 404 — error page content detected"
+    },
+    {
+      "category": "http",
+      "code": "HTTP006",
+      "description": "HTTP 200 — categorized as success.",
+      "recommendation": "",
+      "severity": "info",
+      "title": "Status category: success"
+    },
+    {
+      "category": "seo",
+      "code": "SITEMAP001",
+      "description": "No sitemap URLs were loaded for validation.",
+      "recommendation": "Provide sitemap data to enable sitemap validation.",
+      "severity": "info",
+      "title": "No sitemap data available"
+    },
+    {
+      "category": "seo",
+      "code": "META002",
+      "description": "Title is 20 characters, below the recommended minimum of 30.",
+      "recommendation": "Expand the title to 30-60 characters to improve search snippet quality.",
+      "severity": "warning",
+      "title": "Title too short"
+    },
+    {
+      "category": "seo",
+      "code": "META005",
+      "description": "Description is 63 characters, below the recommended minimum of 120.",
+      "recommendation": "Expand the description to 120-160 characters.",
+      "severity": "warning",
+      "title": "Meta description too short"
+    },
+    {
+      "category": "links",
+      "code": "LINK001",
+      "description": "Internal: 19, External: 2, Nofollow: 0",
+      "recommendation": "",
+      "severity": "info",
+      "title": "Link counts"
+    },
+    {
+      "category": "content",
+      "code": "CQ001",
+      "description": "Readability score: 0.0/100 (words: 638, sentences: 1, syllables: 29).",
+      "recommendation": "Content is very difficult to read. Consider simplifying language and shortening sentences.",
+      "severity": "info",
+      "title": "Flesch-Kincaid readability score"
+    },
+    {
+      "category": "content",
+      "code": "CQ002",
+      "description": "Top 10 keyword occurrences in headings: \"developer\" (1), \"baccalaureate\" (1), \"dossier\" (1), \"international\" (1), \"freelance\" (1), \"founder\" (1), \"engineer\" (1), \"backend\" (1), \"wasm\" (1), \"widgets\" (1).",
+      "recommendation": "Ensure target keywords appear in headings and body content naturally.",
+      "severity": "info",
+      "title": "Top keywords"
+    },
+    {
+      "category": "content",
+      "code": "WC001",
+      "description": "Words: 638, Characters: 100, Sentences: 1, Avg words/sentence: 638.0.",
+      "recommendation": "",
+      "severity": "info",
+      "title": "Word count statistics"
+    },
+    {
+      "category": "content",
+      "code": "WC004",
+      "description": "Average sentence length is 638.0 words. Sentences longer than 25 words may be difficult to read.",
+      "recommendation": "Break long sentences into shorter ones for better readability.",
+      "severity": "info",
+      "title": "Long average sentence length"
+    },
+    {
+      "category": "security",
+      "code": "SEC009",
+      "description": "No COEP header was found. COEP prevents resources from loading cross-origin without explicit permission.",
+      "recommendation": "Set COEP to require-corp for stricter cross-origin isolation.",
+      "severity": "info",
+      "title": "Missing Cross-Origin-Embedder-Policy header"
+    },
+    {
+      "category": "security",
+      "code": "SEC010",
+      "description": "No COOP header was found. COOP isolates your browsing context from cross-origin popups.",
+      "recommendation": "Set COOP to same-origin for stricter isolation.",
+      "severity": "info",
+      "title": "Missing Cross-Origin-Opener-Policy header"
+    },
+    {
+      "category": "security",
+      "code": "SEC011",
+      "description": "No CORP header was found. CORP prevents cross-origin reads of embedded resources.",
+      "recommendation": "Set CORP to same-origin if the resource should only be used by the same origin.",
+      "severity": "info",
+      "title": "Missing Cross-Origin-Resource-Policy header"
+    },
+    {
+      "category": "security",
+      "code": "SEC012",
+      "description": "Security header score: 100/100.",
+      "recommendation": "Security posture is strong. Minor improvements possible.",
+      "severity": "info",
+      "title": "Security posture score"
+    },
+    {
+      "category": "security",
+      "code": "SSL007",
+      "description": "No TLS certificate information was provided for validation.",
+      "recommendation": "Provide certificate data from the TLS connection to enable SSL validation.",
+      "severity": "info",
+      "title": "No SSL certificate data available"
+    },
+    {
+      "category": "social",
+      "code": "SOCIAL001",
+      "description": "og:image is set but og:image:width and og:image:height are missing. Social platforms may crop or scale the image incorrectly.",
+      "recommendation": "Add <meta property=\"og:image:width\" content=\"1200\"> and <meta property=\"og:image:height\" content=\"630\">.",
+      "severity": "warning",
+      "title": "OG image missing dimensions"
+    },
+    {
+      "category": "social",
+      "code": "SOCIAL008",
+      "description": "Social metadata score: 8/8 (OG: 5/5, Twitter: 3/3).",
+      "recommendation": "Social metadata is complete.",
+      "severity": "info",
+      "title": "Social preview completeness score"
+    },
+    {
+      "category": "content",
+      "code": "ENTITY004",
+      "description": "Primary topics: widgets, founder, developer, dossier, international.",
+      "recommendation": "Ensure these topics align with the target keywords and page intent.",
+      "severity": "info",
+      "title": "Detected topics and themes"
+    },
+    {
+      "category": "content",
+      "code": "ENTITY005",
+      "description": "Sentiment score: 0 (neutral).",
+      "recommendation": "Neutral sentiment detected.",
+      "severity": "info",
+      "title": "Content sentiment analysis"
+    },
+    {
+      "category": "content",
+      "code": "ENTITY006",
+      "description": "People: 0, Organizations: 0, Locations: 0, Topics: 5.",
+      "recommendation": "",
+      "severity": "info",
+      "title": "Entity counts per page"
+    },
+    {
+      "category": "content",
+      "code": "READ001",
+      "description": "Grade level: 17.6 (postgraduate)",
+      "recommendation": "Content is at a college reading level. Consider simplifying for broader audiences.",
+      "severity": "info",
+      "title": "Flesch-Kincaid Grade Level"
+    },
+    {
+      "category": "content",
+      "code": "READ002",
+      "description": "Index: 23.9",
+      "recommendation": "High Coleman-Liau index. Consider reducing sentence complexity.",
+      "severity": "info",
+      "title": "Coleman-Liau Index"
+    },
+    {
+      "category": "content",
+      "code": "READ003",
+      "description": "ARI: 18.3",
+      "recommendation": "High ARI score. Content may be difficult for general audiences.",
+      "severity": "info",
+      "title": "Automated Readability Index"
+    },
+    {
+      "category": "content",
+      "code": "READ004",
+      "description": "Fog index: 18.1",
+      "recommendation": "Very high Fog index. Content is extremely complex. Simplify vocabulary and shorten sentences.",
+      "severity": "info",
+      "title": "Gunning Fog Index"
+    },
+    {
+      "category": "content",
+      "code": "READ005",
+      "description": "Score: 0.0/100 (very difficult)",
+      "recommendation": "Very difficult to read. Aim for a score of 60+ for general audiences.",
+      "severity": "info",
+      "title": "Flesch Reading Ease score"
+    },
+    {
+      "category": "content",
+      "code": "KW001",
+      "description": "Top keywords by TF-IDF score: freelance (0.10), backend (0.10), widgets (0.10), founder (0.10), baccalaureate (0.10), dossier (0.10), wasm (0.10), international (0.10), developer (0.10), engineer (0.10).",
+      "recommendation": "TF-IDF highlights the most distinctive terms on this page. Ensure these align with your target keywords.",
+      "severity": "info",
+      "title": "Top TF-IDF keywords"
+    },
+    {
+      "category": "content",
+      "code": "KW002",
+      "description": "Top keyword densities (of 638 words): developer (0.2%), founder (0.2%), backend (0.2%), freelance (0.2%), dossier (0.2%), wasm (0.2%), engineer (0.2%), widgets (0.2%), baccalaureate (0.2%), international (0.2%).",
+      "recommendation": "Ideal keyword density is 1-2%. Higher may indicate keyword stuffing.",
+      "severity": "info",
+      "title": "Keyword density"
+    },
+    {
+      "category": "content",
+      "code": "KW004",
+      "description": "Top keyword pairs: \"engineer\" + \"freelance\" (1), \"engineer\" + \"founder\" (1), \"freelance\" + \"international\" (1), \"backend\" + \"freelance\" (1), \"developer\" + \"international\" (1).",
+      "recommendation": "Co-occurring keywords help search engines understand topic relationships.",
+      "severity": "info",
+      "title": "Keyword co-occurrence"
+    },
+    {
+      "category": "seo",
+      "code": "ISEO004",
+      "description": "Page has a lang attribute but no hreflang tags. If this site serves multiple languages, add hreflang annotations.",
+      "recommendation": "For multilingual sites, add hreflang tags to all language variants of each page.",
+      "severity": "info",
+      "title": "Single-language page without hreflang"
+    },
+    {
+      "category": "seo",
+      "code": "AI-ACC009",
+      "description": "Site has no robots.txt file. All crawlers, including AI bots, have unrestricted access.",
+      "recommendation": "Consider adding robots.txt to control AI crawler access.",
+      "severity": "info",
+      "title": "No robots.txt found"
+    },
+    {
+      "category": "content",
+      "code": "AI-CS008",
+      "description": "Content lacks date information. AI search engines prioritize fresh, dated content.",
+      "recommendation": "Add publication date in <time> tag or JSON-LD schema.",
+      "severity": "warning",
+      "title": "Missing date metadata"
+    },
+    {
+      "category": "seo",
+      "code": "AI-AB007",
+      "description": "No speakable property in structured data. speakable marks content for voice AI assistants (Siri, Alexa, Google Assistant).",
+      "recommendation": "Add speakable property to JSON-LD schema for voice-friendly content.",
+      "severity": "info",
+      "title": "Missing speakable schema"
+    },
+    {
+      "category": "seo",
+      "code": "SITEMAP006",
+      "description": "Page \"https://wyattau.com/dossier\" has canonical \"https://wyattau.com/dossier/\". Non-canonical pages should either not have a canonical tag or the canonical should match.",
+      "recommendation": "Either remove the canonical tag (if this is the preferred URL) or update the canonical to match.",
+      "severity": "warning",
+      "title": "Non-canonical page with canonical tag"
+    }
+  ],
+  "findings_count": 33,
+  "headings": 5,
+  "images": 0,
+  "issues_by_category": {
+    "content": 16,
+    "http": 2,
+    "links": 1,
+    "security": 5,
+    "seo": 7,
+    "social": 2
+  },
+  "issues_by_severity": {
+    "info": 27,
+    "warning": 6
+  },
+  "links": 21,
+  "status_code": 200,
+  "title": "Dossier — Wyatt Au",
+  "url": "https://wyattau.com/dossier",
+  "word_count": 638
+}
