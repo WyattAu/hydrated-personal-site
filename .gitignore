@@ -186,3 +186,4 @@ temp/
 
 # GUI review snapshots (per-run, not committed)
 .tmp/
+*.db
