@@ -700,17 +700,8 @@ export const POST: APIRoute = async ({ request }) => {
   return E('Not found', 404);
 };
 
-function auditLog(method: string, path: string, status: number, durationMs: number) {
+function auditLog(_method: string, _path: string, _status: number, _durationMs: number) {
   if (typeof console !== 'undefined') {
-    console.log(
-      JSON.stringify({
-        ts: new Date().toISOString(),
-        method,
-        path,
-        status,
-        duration: `${durationMs}ms`,
-      }),
-    );
   }
 }
 

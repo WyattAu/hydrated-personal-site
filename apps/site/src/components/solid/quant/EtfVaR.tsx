@@ -1,7 +1,8 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { activeTicker } from '../../../lib/etf-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { drawGrid, getChartTheme, setupCanvas } from '../../../lib/chart-utils';
+import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface VarResult {
   var_historical: number;
@@ -49,7 +50,7 @@ export default function EtfVaR() {
       for (let i = 1; i < closes.length; i++) returns[i - 1] = Math.log(closes[i] / closes[i - 1]);
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js?v=j30';
+        const _w = `/wasm/hydrated_widgets.js?v=${WASM_VERSION}`;
         wasmMod = await import(_w);
         await wasmMod.default();
       }
@@ -65,22 +66,15 @@ export default function EtfVaR() {
   function draw() {
     const canvas = canvasRef;
     if (!canvas || !data()) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 260 * dpr;
-    ctx.scale(dpr, dpr);
     const w = rect.width;
     const h = 260;
-    const colors = getThemeColors();
+    const theme = getChartTheme();
+    const ctx = setupCanvas(canvas, w, h, theme);
     const pad = { l: 50, r: 16, t: 16, b: 28 };
     const cW = w - pad.l - pad.r;
     const cH = h - pad.t - pad.b;
 
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
     const d = data()!;
     const edges = d.histogram_edges;
     const counts = d.histogram_counts;
@@ -95,15 +89,7 @@ export default function EtfVaR() {
     const toX = (v: number) => pad.l + ((v - minRet) / range) * cW;
     const toH = (c: number) => (c / maxCount) * cH;
 
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.06)';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-    }
+    drawGrid(ctx, w, h, theme, { top: pad.t, right: pad.r, bottom: pad.b, left: pad.l });
 
     // Histogram bars (tail beyond VaR highlighted)
     counts.forEach((c, i) => {
@@ -111,20 +97,20 @@ export default function EtfVaR() {
       const barH = toH(c);
       const isTail = edges[i] <= d.var_historical;
       ctx.fillStyle = isTail
-        ? `${colors.accentWarm || '#f0883e'}80`
-        : `${colors.accent || '#00e5ff'}40`;
+        ? `${theme.negative}80`
+        : `${theme.primary}40`;
       ctx.fillRect(x + 1, pad.t + cH - barH, barW - 2, barH);
     });
 
     // VaR line
     const varX = toX(d.var_historical);
-    ctx.strokeStyle = colors.accentWarm || '#f0883e';
+    ctx.strokeStyle = theme.negative;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(varX, pad.t);
     ctx.lineTo(varX, pad.t + cH);
     ctx.stroke();
-    ctx.fillStyle = colors.accentWarm || '#f0883e';
+    ctx.fillStyle = theme.negative;
     ctx.font = 'bold 9px "JetBrains Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`VaR(95%) ${(d.var_historical * 100).toFixed(2)}%`, varX + 4, pad.t + 12);
@@ -142,8 +128,7 @@ export default function EtfVaR() {
     ctx.fillStyle = '#ff4081';
     ctx.fillText(`ES(95%) ${(d.es_historical * 100).toFixed(2)}%`, esX + 4, pad.t + 26);
 
-    // X axis
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
+    ctx.fillStyle = theme.textMuted;
     ctx.font = '9px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     for (let i = 0; i <= 5; i++) {

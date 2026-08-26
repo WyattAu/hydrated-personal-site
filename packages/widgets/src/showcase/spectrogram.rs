@@ -17,7 +17,7 @@ pub fn create_spectrogram(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue
 }
 
 #[wasm_bindgen]
-pub fn update_spectrogram(canvas_id: &str, w: u32, h: u32, time: f64) -> Result<(), JsValue> {
+pub fn update_spectrogram(canvas_id: &str, w: u32, h: u32, _time: f64) -> Result<(), JsValue> {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
@@ -25,8 +25,8 @@ pub fn update_spectrogram(canvas_id: &str, w: u32, h: u32, time: f64) -> Result<
     let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
     let wf = w as f64;
     let hf = h as f64;
-    let cx = wf / 2.0;
-    let cy = hf / 2.0;
+    let _cx = wf / 2.0;
+    let _cy = hf / 2.0;
     let t = js_sys::Date::now() as f64 / 1000.0;
 
     ctx.set_fill_style(&"#0a0a0a".into());

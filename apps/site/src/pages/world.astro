@@ -9,60 +9,60 @@ import ThemeToggle from '../components/solid/ThemeToggle';
 import TreemapWidget from '../components/solid/TreemapWidget';
 import WorldMap from '../components/solid/WorldMap';
 
+import GreeksDashboard from '../components/solid/quant/GreeksDashboard';
 // Single-asset quant (driven by AssetSelector)
 import MonteCarloFan from '../components/solid/quant/MonteCarloFan';
-import VolatilityForecast from '../components/solid/quant/VolatilityForecast';
-import RiskMetrics from '../components/solid/quant/RiskMetrics';
-import GreeksDashboard from '../components/solid/quant/GreeksDashboard';
 import OptionsPayoff from '../components/solid/quant/OptionsPayoff';
+import RiskMetrics from '../components/solid/quant/RiskMetrics';
+import VolatilityForecast from '../components/solid/quant/VolatilityForecast';
 
+import CommodityTermStructure from '../components/solid/econometrics/CommodityTermStructure';
+import FibonacciLevels from '../components/solid/econometrics/FibonacciLevels';
+import IvSolver from '../components/solid/econometrics/IvSolver';
+import KellyCalculator from '../components/solid/econometrics/KellyCalculator';
 // Econometrics: single-asset
 import LiquidityMetrics from '../components/solid/econometrics/LiquidityMetrics';
-import RegimeDetector from '../components/solid/econometrics/RegimeDetector';
 import RealizedVolDecomposition from '../components/solid/econometrics/RealizedVolDecomposition';
-import RollingFactorExposure from '../components/solid/econometrics/RollingFactorExposure';
-import KellyCalculator from '../components/solid/econometrics/KellyCalculator';
-import CommodityTermStructure from '../components/solid/econometrics/CommodityTermStructure';
-import IvSolver from '../components/solid/econometrics/IvSolver';
+import RegimeDetector from '../components/solid/econometrics/RegimeDetector';
 import RiskRatios from '../components/solid/econometrics/RiskRatios';
-import WeekRange52 from '../components/solid/econometrics/WeekRange52';
-import VwapTracker from '../components/solid/econometrics/VwapTracker';
+import RollingFactorExposure from '../components/solid/econometrics/RollingFactorExposure';
 import VolumeProfile from '../components/solid/econometrics/VolumeProfile';
-import FibonacciLevels from '../components/solid/econometrics/FibonacciLevels';
+import VwapTracker from '../components/solid/econometrics/VwapTracker';
+import WeekRange52 from '../components/solid/econometrics/WeekRange52';
 
-// Cross-asset (driven by TickerManager)
-import EfficientFrontier from '../components/solid/quant/EfficientFrontier';
-import CorrelationNetwork from '../components/solid/quant/CorrelationNetwork';
-import RollingCorrelationHeatmap from '../components/solid/quant/RollingCorrelationHeatmap';
-import BetaMatrix from '../components/solid/world/BetaMatrix';
-import RealizedVolRanking from '../components/solid/world/RealizedVolRanking';
-import RiskReturnBubble from '../components/solid/world/RiskReturnBubble';
-import MultiDrawdown from '../components/solid/world/MultiDrawdown';
-import MomentumScanner from '../components/solid/econometrics/MomentumScanner';
-import HrpAllocation from '../components/solid/econometrics/HrpAllocation';
-import ComponentVaR from '../components/solid/econometrics/ComponentVaR';
 import BlackLitterman from '../components/solid/econometrics/BlackLitterman';
+import ComponentVaR from '../components/solid/econometrics/ComponentVaR';
+import HrpAllocation from '../components/solid/econometrics/HrpAllocation';
+import MomentumScanner from '../components/solid/econometrics/MomentumScanner';
 import SectorRotation from '../components/solid/econometrics/SectorRotation';
 import StressTestPanel from '../components/solid/econometrics/StressTestPanel';
+import CorrelationNetwork from '../components/solid/quant/CorrelationNetwork';
+// Cross-asset (driven by TickerManager)
+import EfficientFrontier from '../components/solid/quant/EfficientFrontier';
+import RollingCorrelationHeatmap from '../components/solid/quant/RollingCorrelationHeatmap';
+import BetaMatrix from '../components/solid/world/BetaMatrix';
+import MultiDrawdown from '../components/solid/world/MultiDrawdown';
+import RealizedVolRanking from '../components/solid/world/RealizedVolRanking';
+import RiskReturnBubble from '../components/solid/world/RiskReturnBubble';
 
 // Econometrics: cross-asset
 import CointegrationScanner from '../components/solid/econometrics/CointegrationScanner';
-import PairsTradingSignal from '../components/solid/econometrics/PairsTradingSignal';
 import CopulaMatrix from '../components/solid/econometrics/CopulaMatrix';
+import PairsTradingSignal from '../components/solid/econometrics/PairsTradingSignal';
 import TailDependenceMatrix from '../components/solid/econometrics/TailDependenceMatrix';
 
-// Macro & rates
-import YieldCurveChart from '../components/solid/quant/YieldCurveChart';
 import ForwardRateCurve from '../components/solid/econometrics/ForwardRateCurve';
 import FundingRateHeatmap from '../components/solid/quant/FundingRateHeatmap';
+// Macro & rates
+import YieldCurveChart from '../components/solid/quant/YieldCurveChart';
 
+import CurrencyMatrix from '../components/solid/world/CurrencyMatrix';
+import EarthquakeHistogram from '../components/solid/world/EarthquakeHistogram';
+import FredSparklines from '../components/solid/world/FredSparklines';
 // Global signals
 import GlobalStressGauge from '../components/solid/world/GlobalStressGauge';
-import FredSparklines from '../components/solid/world/FredSparklines';
-import EarthquakeHistogram from '../components/solid/world/EarthquakeHistogram';
 import SolarWindPanel from '../components/solid/world/SolarWindPanel';
 import WeatherStrip from '../components/solid/world/WeatherStrip';
-import CurrencyMatrix from '../components/solid/world/CurrencyMatrix';
 
 // Crypto
 import CryptoDominancePie from '../components/solid/world/CryptoDominancePie';

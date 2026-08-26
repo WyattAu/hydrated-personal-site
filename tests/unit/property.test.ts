@@ -283,3 +283,93 @@ describe('Property-Based: Security headers present on all responses', () => {
     expect(res.headers.get('Permissions-Policy')).toContain('camera=');
   });
 });
+
+// --- Property: sanitize() ---
+
+import { sanitize } from '../../worker/src/security';
+
+describe('Property-Based: sanitize()', () => {
+  it('idempotent: sanitize(sanitize(x)) === sanitize(x)', () => {
+    fc.assert(
+      fc.property(fc.string(), (s) => {
+        const once = sanitize(s);
+        const twice = sanitize(once);
+        expect(once).toBe(twice);
+      }),
+      { numRuns: 200 },
+    );
+  });
+
+  it('strips angle brackets', () => {
+    fc.assert(
+      fc.property(fc.string(), (s) => {
+        const result = sanitize(s);
+        expect(result).not.toContain('<');
+        expect(result).not.toContain('>');
+      }),
+      { numRuns: 200 },
+    );
+  });
+});
+
+// --- Property: checkRateLimit ---
+
+import { checkRateLimit } from '../../worker/src/rate-limiter';
+
+describe('Property-Based: checkRateLimit', () => {
+  it('never exceeds the specified limit', () => {
+    fc.assert(
+      fc.property(
+        fc.integer({ min: 1, max: 100 }),
+        fc.integer({ min: 1000, max: 60000 }),
+        (limit, windowMs) => {
+          const ip = `test-${limit}-${windowMs}`;
+          let allowed = 0;
+          for (let i = 0; i < limit + 10; i++) {
+            if (checkRateLimit(ip, limit, windowMs)) {
+              allowed++;
+            }
+          }
+          expect(allowed).toBeLessThanOrEqual(limit);
+        },
+      ),
+      { numRuns: 50 },
+    );
+  });
+});
+
+// --- Property: json() response ---
+
+import { json } from '../../worker/src/security';
+
+describe('Property-Based: json() response', () => {
+  it('always returns Content-Type application/json', () => {
+    fc.assert(
+      fc.property(fc.jsonValue(), (data) => {
+        const res = json(data);
+        expect(res.headers.get('Content-Type')).toBe('application/json');
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  it('all security headers present on every json() response', () => {
+    const requiredHeaders = [
+      'Strict-Transport-Security',
+      'X-Content-Type-Options',
+      'X-Frame-Options',
+      'Content-Security-Policy',
+      'Referrer-Policy',
+      'Permissions-Policy',
+    ];
+    fc.assert(
+      fc.property(fc.jsonValue(), (data) => {
+        const res = json(data);
+        for (const header of requiredHeaders) {
+          expect(res.headers.get(header)).toBeTruthy();
+        }
+      }),
+      { numRuns: 100 },
+    );
+  });
+});

@@ -19,3 +19,4 @@ pub mod pairs;
 pub mod stress;
 pub mod risk_decomp;
 pub mod hrp;
+pub mod simd_utils;

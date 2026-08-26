@@ -1,5 +1,5 @@
 import { For, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
-import { getThemeColors } from '../../lib/theme-colors';
+import { drawGrid, getChartTheme, setupCanvas } from '../../lib/chart-utils';
 import { formatPrice } from '../../lib/utils';
 import { recordFetch } from './StaleIndicator';
 
@@ -216,16 +216,12 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
     const allSeries = seriesData();
     if (allSeries.size === 0) return;
 
-    const dpr = window.devicePixelRatio || 1;
     const w = container.clientWidth;
     const h = 320;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
     canvas.style.width = `${w}px`;
     canvas.style.height = `${h}px`;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.scale(dpr, dpr);
+    const theme = getChartTheme();
+    const ctx = setupCanvas(canvas, w, h, theme);
 
     const padLeft = 70;
     const padRight = 16;
@@ -233,11 +229,6 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
     const padBottom = 32;
     const chartW = w - padLeft - padRight;
     const chartH = h - padTop - padBottom;
-
-    const colors = getThemeColors();
-    const bgColor = colors.bgCard || '#0c0c0c';
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, w, h);
 
     // Determine global min/max across all series
     let globalMin = Number.POSITIVE_INFINITY;
@@ -274,20 +265,14 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
     const toX = (i: number) => padLeft + (i / (maxLen - 1)) * chartW;
     const toY = (v: number) => padTop + (1 - (v - yMin) / yRange) * chartH;
 
-    // Grid lines
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 1;
+    drawGrid(ctx, w, h, theme, { top: padTop, right: padRight, bottom: padBottom, left: padLeft });
     const gridLines = 6;
+    ctx.fillStyle = theme.textMuted;
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.textAlign = 'right';
     for (let i = 0; i <= gridLines; i++) {
       const val = yMin + (yRange * i) / gridLines;
       const y = toY(val);
-      ctx.beginPath();
-      ctx.moveTo(padLeft, y);
-      ctx.lineTo(w - padRight, y);
-      ctx.stroke();
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.textAlign = 'right';
       const label =
         viewMode() === 'pct'
           ? `${val >= 0 ? '+' : ''}${val.toFixed(1)}%`
@@ -295,8 +280,7 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
       ctx.fillText(label, padLeft - 8, y + 3);
     }
 
-    // X-axis labels
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
+    ctx.fillStyle = theme.textMuted;
     ctx.font = '10px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     const labelStep = Math.max(1, Math.floor(maxLen / 6));
@@ -361,7 +345,7 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
     const ch = crosshair();
     if (ch) {
       ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
+      ctx.strokeStyle = theme.textMuted;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(ch.x, padTop);

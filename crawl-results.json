@@ -1,10 +1,10 @@
 {
-  "crawl_id": "993adf06-642c-4d0f-afcf-869ce6d8dd8f",
-  "max_pages": 3,
-  "pages_crawled": 13,
-  "pages_stored": 13,
+  "crawl_id": "c90a6494-2e20-43eb-bb09-89d71d884b07",
+  "max_pages": 100,
+  "pages_crawled": 20,
+  "pages_stored": 20,
   "seed": null,
   "status": "completed",
   "target_url": "https://wyattau.com",
-  "total_issues": 557
+  "total_issues": 728
 }

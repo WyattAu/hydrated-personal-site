@@ -240,6 +240,7 @@ fn try_reptation(s: &mut FoldingState, rng: &mut u64) {
 }
 
 #[wasm_bindgen]
+#[allow(dropping_references)]
 pub fn create_protein_folding(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
     init_chain();
     update_protein_folding(canvas_id, w, h, 0.0)

@@ -1,8 +1,8 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-/// Solar system with Kepler-compliant relative orbital periods.
-/// Orbital speeds follow Kepler's 3rd law: T ∝ a^(3/2).
+// Solar system with Kepler-compliant relative orbital periods.
+// Orbital speeds follow Kepler's 3rd law: T is proportional to a^(3/2).
 
 thread_local! {
     static TRAILS: std::cell::RefCell<Vec<Vec<(f64, f64)>>> = std::cell::RefCell::new(Vec::new());

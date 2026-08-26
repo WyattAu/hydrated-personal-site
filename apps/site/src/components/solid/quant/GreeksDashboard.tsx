@@ -1,8 +1,9 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
-import { activeAsset } from '../../../lib/asset-store';
 import { onAssetChanged } from '../../../lib/asset-events';
+import { activeAsset } from '../../../lib/asset-store';
+import { getThemeColors } from '../../../lib/theme-colors';
+import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface GreeksResult {
   spot: number[];
@@ -49,7 +50,9 @@ export default function GreeksDashboard() {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            const calls = data.filter((o: Opt) => o.type === 'call' && o.iv && o.iv > 0).slice(0, 20);
+            const calls = data
+              .filter((o: Opt) => o.type === 'call' && o.iv && o.iv > 0)
+              .slice(0, 20);
             if (calls.length > 0) {
               setOptions(calls);
               if (!selected()) setSelected(calls[0].instrument);
@@ -63,20 +66,60 @@ export default function GreeksDashboard() {
       // For all assets (or if Deribit fails): fetch spot price and create synthetic options
       let spot = 1000;
       try {
-        const spotRes = await fetch(`${apiBase()}/api/stock-chart?symbol=${encodeURIComponent(asset)}&range=1d&interval=1d`);
+        const spotRes = await fetch(
+          `${apiBase()}/api/stock-chart?symbol=${encodeURIComponent(asset)}&range=1d&interval=1d`,
+        );
         if (spotRes.ok) {
           const spotJson = await spotRes.json();
-          spot = spotJson?.chart?.result?.[0]?.meta?.regularMarketPrice || spotJson?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.slice(-1)[0] || 1000;
+          spot =
+            spotJson?.chart?.result?.[0]?.meta?.regularMarketPrice ||
+            spotJson?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.slice(-1)[0] ||
+            1000;
         }
       } catch {}
 
-      const strike = spot >= 1000 ? Math.round(spot / 50) * 50 : spot >= 100 ? Math.round(spot / 5) * 5 : Math.round(spot);
+      const strike =
+        spot >= 1000
+          ? Math.round(spot / 50) * 50
+          : spot >= 100
+            ? Math.round(spot / 5) * 5
+            : Math.round(spot);
       const ivEst = 30 + Math.random() * 10; // approximate IV
 
       setOptions([
-        { instrument: `${asset}-SYNTH-ATM-C`, strike, iv: ivEst, type: 'call', expiry: '2926', mark_price: 0, volume: 0, open_interest: 0, underlying_price: spot },
-        { instrument: `${asset}-SYNTH-OTM-C`, strike: Math.round(strike * 1.1), iv: ivEst + 5, type: 'call', expiry: '2926', mark_price: 0, volume: 0, open_interest: 0, underlying_price: spot },
-        { instrument: `${asset}-SYNTH-ITM-C`, strike: Math.round(strike * 0.9), iv: ivEst + 3, type: 'call', expiry: '2926', mark_price: 0, volume: 0, open_interest: 0, underlying_price: spot },
+        {
+          instrument: `${asset}-SYNTH-ATM-C`,
+          strike,
+          iv: ivEst,
+          type: 'call',
+          expiry: '2926',
+          mark_price: 0,
+          volume: 0,
+          open_interest: 0,
+          underlying_price: spot,
+        },
+        {
+          instrument: `${asset}-SYNTH-OTM-C`,
+          strike: Math.round(strike * 1.1),
+          iv: ivEst + 5,
+          type: 'call',
+          expiry: '2926',
+          mark_price: 0,
+          volume: 0,
+          open_interest: 0,
+          underlying_price: spot,
+        },
+        {
+          instrument: `${asset}-SYNTH-ITM-C`,
+          strike: Math.round(strike * 0.9),
+          iv: ivEst + 3,
+          type: 'call',
+          expiry: '2926',
+          mark_price: 0,
+          volume: 0,
+          open_interest: 0,
+          underlying_price: spot,
+        },
       ]);
       if (!selected()) setSelected(`${asset}-SYNTH-ATM-C`);
     } catch {
@@ -95,7 +138,7 @@ export default function GreeksDashboard() {
     if (!opt || !opt.iv) return;
 
     if (!wasmMod) {
-      const _w = '/wasm/hydrated_widgets.js?v=j30';
+      const _w = `/wasm/hydrated_widgets.js?v=${WASM_VERSION}`;
       wasmMod = await import(_w);
       await wasmMod.default();
     }

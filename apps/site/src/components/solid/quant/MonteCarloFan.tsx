@@ -1,8 +1,9 @@
 import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
-import { activeAsset } from '../../../lib/asset-store';
 import { onAssetChanged } from '../../../lib/asset-events';
+import { activeAsset } from '../../../lib/asset-store';
+import { drawGrid, getChartTheme, setupCanvas } from '../../../lib/chart-utils';
+import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface MCResult {
   drift: number;
@@ -35,12 +36,14 @@ export default function MonteCarloFan(props: { symbol?: string }) {
       if (!res.ok) throw new Error(`API ${res.status}`);
       const json = await res.json();
       const quote = json?.chart?.result?.[0]?.indicators?.quote?.[0];
-      const closes: number[] = (quote?.close ?? []).filter((c: number | null): c is number => c != null);
+      const closes: number[] = (quote?.close ?? []).filter(
+        (c: number | null): c is number => c != null,
+      );
       if (closes.length < 30) throw new Error('insufficient data');
       setHistorical(closes);
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js?v=j35';
+        const _w = `/wasm/hydrated_widgets.js?${WASM_VERSION}`;
         wasmMod = await import(_w);
         await wasmMod.default();
         wasmMod.quant_seed(Math.random() * 1e18, Math.random() * 1e18);
@@ -58,20 +61,11 @@ export default function MonteCarloFan(props: { symbol?: string }) {
   function draw() {
     const canvas = canvasRef;
     if (!canvas || !result()) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 320 * dpr;
-    ctx.scale(dpr, dpr);
-
     const w = rect.width;
     const h = 320;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
+    const theme = getChartTheme();
+    const ctx = setupCanvas(canvas, w, h, theme);
 
     const r = result()!;
     const hist = historical();
@@ -93,24 +87,17 @@ export default function MonteCarloFan(props: { symbol?: string }) {
     const toY = (v: number) =>
       padTop + (1 - (v - minVal + padding) / (range + 2 * padding)) * chartH;
 
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 1;
+    drawGrid(ctx, w, h, theme, { top: padTop, right: padRight, bottom: padBottom, left: padLeft });
+    ctx.fillStyle = theme.textMuted;
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.textAlign = 'right';
     for (let i = 0; i <= 5; i++) {
       const y = padTop + (chartH * i) / 5;
-      ctx.beginPath();
-      ctx.moveTo(padLeft, y);
-      ctx.lineTo(w - padRight, y);
-      ctx.stroke();
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.textAlign = 'right';
       const val = maxVal + padding - ((range + 2 * padding) * i) / 5;
       ctx.fillText(formatPrice(val), padLeft - 8, y + 3);
     }
 
-    // Historical line
-    ctx.strokeStyle = colors.accent || '#00e5ff';
+    ctx.strokeStyle = theme.primary;
     ctx.lineWidth = 2;
     ctx.beginPath();
     hist.forEach((p, i) => {
@@ -122,8 +109,8 @@ export default function MonteCarloFan(props: { symbol?: string }) {
 
     // Percentile fan bands (filled areas, widest first)
     const bands: Array<[number[], number[], string]> = [
-      [r.p5, r.p95, `${colors.accent || '#00e5ff'}15`],
-      [r.p25, r.p75, `${colors.accent || '#00e5ff'}30`],
+      [r.p5, r.p95, `${theme.primary}15`],
+      [r.p25, r.p75, `${theme.primary}30`],
     ];
     for (const [lower, upper, color] of bands) {
       ctx.fillStyle = color;
@@ -135,8 +122,7 @@ export default function MonteCarloFan(props: { symbol?: string }) {
       ctx.fill();
     }
 
-    // Median line (dashed)
-    ctx.strokeStyle = colors.accent || '#00e5ff';
+    ctx.strokeStyle = theme.primary;
     ctx.lineWidth = 1.5;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -146,8 +132,7 @@ export default function MonteCarloFan(props: { symbol?: string }) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Divider line
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.1)';
+    ctx.strokeStyle = theme.grid;
     ctx.lineWidth = 1;
     ctx.setLineDash([2, 4]);
     ctx.beginPath();
@@ -156,15 +141,13 @@ export default function MonteCarloFan(props: { symbol?: string }) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Labels
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.4)';
+    ctx.fillStyle = theme.textMuted;
     ctx.font = '9px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText('HISTORICAL', toX(Math.floor(histLen / 2)), h - 10);
     ctx.fillText(`${horizon()}d FORECAST`, toX(histLen + r.p50.length / 2), h - 10);
 
-    // Stats overlay
-    ctx.fillStyle = colors.accent || '#00e5ff';
+    ctx.fillStyle = theme.primary;
     ctx.font = 'bold 11px "JetBrains Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`vol: ${(r!.volatility * 100).toFixed(1)}%`, w - padRight - 120, padTop + 14);

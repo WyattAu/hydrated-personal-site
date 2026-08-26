@@ -1,4 +1,4 @@
-import { onMount, onCleanup } from 'solid-js';
+import { onCleanup, onMount } from 'solid-js';
 
 // Hook for single-asset components to listen for asset changes from AssetSelector.
 // Astro islands have separate reactive roots, so SolidJS createEffect

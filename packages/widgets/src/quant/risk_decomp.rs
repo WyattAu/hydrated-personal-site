@@ -5,7 +5,6 @@
 //! VaR(full) - VaR(without asset i).
 
 use super::risk;
-use super::stats;
 
 /// Compute component VaR for a portfolio of assets.
 ///

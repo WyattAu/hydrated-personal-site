@@ -59,7 +59,7 @@ export default function GuestbookList() {
   function formatTime(ts: string): string {
     if (!ts) return '';
     const d = new Date(ts);
-    if (isNaN(d.getTime())) return '';
+    if (Number.isNaN(d.getTime())) return '';
     return d.toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'short',

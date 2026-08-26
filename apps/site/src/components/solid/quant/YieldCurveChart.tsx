@@ -1,6 +1,7 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
+import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface YieldResult {
   beta0: number;
@@ -38,7 +39,7 @@ export default function YieldCurveChart() {
       const yieldVals = new Float64Array(yields.map((y: YieldPoint) => y.yield));
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js?v=j30';
+        const _w = `/wasm/hydrated_widgets.js?${WASM_VERSION}`;
         wasmMod = await import(_w);
         await wasmMod.default();
       }

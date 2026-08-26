@@ -3,11 +3,13 @@
 // simultaneously, causing a race condition in wasm-bindgen's init function
 // where multiple parallel loads corrupt the internal `wasm` variable.
 
+import { WASM_VERSION } from './wasm-version';
+
 let wasmPromise: Promise<any> | null = null;
 
 export async function getWasmMod(): Promise<any> {
   if (!wasmPromise) {
-    const _w = '/wasm/hydrated_widgets.js?v=j45';
+    const _w = `/wasm/hydrated_widgets.js?${WASM_VERSION}`;
     wasmPromise = import(_w).then(async (mod) => {
       await mod.default();
       return mod;

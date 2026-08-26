@@ -466,8 +466,8 @@ export default function HoldingsOverlapMatrix() {
         <div
           class="p-3 border flex items-center justify-between gap-3"
           style={{
-            'border-color': overlapColor(result()?.jaccard),
-            background: `${overlapColor(result()?.jaccard)}14`,
+            'border-color': overlapColor(result()?.jaccard ?? 0),
+            background: `${overlapColor(result()?.jaccard ?? 0)}14`,
           }}
         >
           <div>
@@ -479,13 +479,13 @@ export default function HoldingsOverlapMatrix() {
             </p>
             <p
               class="font-mono text-2xl font-bold"
-              style={{ color: overlapColor(result()?.jaccard) }}
+              style={{ color: overlapColor(result()?.jaccard ?? 0) }}
             >
-              {(result()?.jaccard * 100).toFixed(1)}%
+              {((result()?.jaccard ?? 0) * 100).toFixed(1)}%
             </p>
           </div>
-          <p class="font-mono text-xs font-bold" style={{ color: overlapColor(result()?.jaccard) }}>
-            {overlapLabel(result()?.jaccard)}
+          <p class="font-mono text-xs font-bold" style={{ color: overlapColor(result()?.jaccard ?? 0) }}>
+            {overlapLabel(result()?.jaccard ?? 0)}
           </p>
         </div>
       </Show>

@@ -103,10 +103,8 @@ fn find_min_variance(cov: &[f64], n: usize) -> Vec<f64> {
     for _ in 0..200 {
         let cov_w = matvec(cov, &w, n);
         let mut grad = vec![0.0; n];
-        let mut sum_w = 0.0;
         for i in 0..n {
             grad[i] = 2.0 * cov_w[i];
-            sum_w += w[i];
         }
         // Project gradient onto constraint surface (sum=1)
         let mean_grad: f64 = grad.iter().sum::<f64>() / n as f64;

@@ -269,39 +269,46 @@ export default function TailDependenceMatrix() {
           }}
         >
           <Show
-            when={hoverCell() && hoverCell()?.col >= 0 && hoverCell()?.row !== hoverCell()?.col}
+            when={hoverCell() && hoverCell()!.col >= 0 && hoverCell()!.row !== hoverCell()!.col}
             fallback={
               <p class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
                 Hover any cell to see tail dependence. Click headers to sort.
               </p>
             }
           >
-            <p class="font-mono text-[10px]" style={{ color: 'var(--text-primary)' }}>
-              <span style={{ color: 'var(--accent)' }}>{data()[hoverCell()?.row].label}</span>
-              {' vs '}
-              <span style={{ color: 'var(--accent)' }}>{data()[hoverCell()?.col].label}</span>
-              {' : '}
-              <span
-                style={{
-                  color:
-                    matrix()[hoverCell()?.row][hoverCell()?.col] > 0.3
-                      ? '#ff5252'
-                      : 'var(--text-secondary)',
-                  'font-weight': 'bold',
-                }}
-              >
-                {(matrix()[hoverCell()?.row][hoverCell()?.col] ?? 0).toFixed(4)}
-              </span>
-            </p>
-            <p
-              class="font-mono text-[9px] uppercase tracking-wider"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              {(() => {
-                const val = matrix()[hoverCell()?.row][hoverCell()?.col] ?? 0;
-                return val > 0.5 ? 'HIGH CRASH LINK' : val > 0.2 ? 'MODERATE' : 'LOW';
-              })()}
-            </p>
+            {(() => {
+              const h = hoverCell()!;
+              const row = h.row;
+              const col = h.col;
+              const d = data();
+              const m = matrix();
+              if (!d || !m || row === undefined || col === undefined || !d[row] || !m[row]) return null;
+              const val = m[row][col] ?? 0;
+              return (
+                <>
+                  <p class="font-mono text-[10px]" style={{ color: 'var(--text-primary)' }}>
+                    <span style={{ color: 'var(--accent)' }}>{d[row].label}</span>
+                    {' vs '}
+                    <span style={{ color: 'var(--accent)' }}>{d[col].label}</span>
+                    {' : '}
+                    <span
+                      style={{
+                        color: val > 0.3 ? '#ff5252' : 'var(--text-secondary)',
+                        'font-weight': 'bold',
+                      }}
+                    >
+                      {val.toFixed(4)}
+                    </span>
+                  </p>
+                  <p
+                    class="font-mono text-[9px] uppercase tracking-wider"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    {val > 0.5 ? 'HIGH CRASH LINK' : val > 0.2 ? 'MODERATE' : 'LOW'}
+                  </p>
+                </>
+              );
+            })()}
           </Show>
         </div>
 

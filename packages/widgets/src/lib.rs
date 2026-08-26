@@ -20,6 +20,7 @@ mod finance;
 mod creative;
 pub mod quant;
 pub mod showcase;
+pub mod data_structures;
 
 use wasm_bindgen::prelude::*;
 

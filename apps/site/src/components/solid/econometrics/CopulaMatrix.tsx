@@ -277,32 +277,42 @@ export default function CopulaMatrix() {
           }}
         >
           <Show
-            when={hoverCell() && hoverCell()?.col >= 0 && hoverCell()?.row !== hoverCell()?.col}
+            when={hoverCell() && hoverCell()!.col >= 0 && hoverCell()!.row !== hoverCell()!.col}
             fallback={
               <p class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
                 Hover any cell to see tail dependence details. Click headers to sort.
               </p>
             }
           >
-            <div class="flex flex-wrap gap-3 items-center">
-              <p class="font-mono text-[10px]" style={{ color: 'var(--text-primary)' }}>
-                <span style={{ color: 'var(--accent)' }}>{data()[hoverCell()?.row].label}</span>
-                {' vs '}
-                <span style={{ color: 'var(--accent)' }}>{data()[hoverCell()?.col].label}</span>
-              </p>
-              <span class="font-mono text-[9px]" style={{ color: 'var(--accent-warm)' }}>
-                LOWER {matrix()[hoverCell()?.row][hoverCell()?.col].lower.toFixed(3)}
-              </span>
-              <span class="font-mono text-[9px]" style={{ color: '#7c4dff' }}>
-                UPPER {matrix()[hoverCell()?.row][hoverCell()?.col].upper.toFixed(3)}
-              </span>
-              <span class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
-                KENDALL {matrix()[hoverCell()?.row][hoverCell()?.col].kendall_tau.toFixed(3)}
-              </span>
-              <span class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
-                SPEARMAN {matrix()[hoverCell()?.row][hoverCell()?.col].spearman_rho.toFixed(3)}
-              </span>
-            </div>
+            {(() => {
+              const h = hoverCell()!;
+              const row = h.row;
+              const col = h.col;
+              const d = data();
+              const m = matrix();
+              if (!d || !m || row === undefined || col === undefined || !d[row] || !m[row]) return null;
+              return (
+                <div class="flex flex-wrap gap-3 items-center">
+                  <p class="font-mono text-[10px]" style={{ color: 'var(--text-primary)' }}>
+                    <span style={{ color: 'var(--accent)' }}>{d[row].label}</span>
+                    {' vs '}
+                    <span style={{ color: 'var(--accent)' }}>{d[col].label}</span>
+                  </p>
+                  <span class="font-mono text-[9px]" style={{ color: 'var(--accent-warm)' }}>
+                    LOWER {m[row][col]?.lower?.toFixed(3) ?? '0'}
+                  </span>
+                  <span class="font-mono text-[9px]" style={{ color: '#7c4dff' }}>
+                    UPPER {m[row][col]?.upper?.toFixed(3) ?? '0'}
+                  </span>
+                  <span class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+                    KENDALL {m[row][col]?.kendall_tau?.toFixed(3) ?? '0'}
+                  </span>
+                  <span class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+                    SPEARMAN {m[row][col]?.spearman_rho?.toFixed(3) ?? '0'}
+                  </span>
+                </div>
+              );
+            })()}
           </Show>
         </div>
 

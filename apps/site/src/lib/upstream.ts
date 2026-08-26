@@ -35,7 +35,9 @@ async function multiFetch(chain: UpstreamAttempt[]): Promise<UpstreamResult | nu
       if (!res.ok) continue;
       const data = await upstream.parse(res);
       return { data, source: upstream.name, latency_ms: Date.now() - start };
-    } catch {}
+    } catch (e) {
+      console.warn(`[upstream] fetch ${upstream.name} failed: ${e}`);
+    }
   }
   return null;
 }
@@ -353,8 +355,8 @@ export async function fetchTreasuryYields(): Promise<{
       if (!Number.isNaN(val)) {
         yields.push({ label: s.label, maturity: s.maturity, yield: val });
       }
-    } catch {
-      // skip
+    } catch (e) {
+      console.warn(`[upstream] FRED ${s.code} failed: ${e}`);
     }
   }
 
@@ -392,8 +394,8 @@ export async function fetchTreasuryYields(): Promise<{
           }
         }
       }
-    } catch {
-      // skip
+    } catch (e) {
+      console.warn(`[upstream] Treasury direct fallback failed: ${e}`);
     }
   }
 
@@ -405,22 +407,10 @@ export async function fetchTreasuryYields(): Promise<{
 // SYMBOL MAPPING HELPERS
 // ============================================================
 
+import { KRAKEN_INTERVALS, KRAKEN_PAIRS, OKX_INTERVALS } from './symbol-maps';
+
 function symbolToKraken(symbol: string): string {
-  const map: Record<string, string> = {
-    BTCUSDT: 'XBTUSD',
-    ETHUSDT: 'ETHUSD',
-    SOLUSDT: 'SOLUSD',
-    XRPUSDT: 'XRPUSD',
-    ADAUSDT: 'ADAUSD',
-    DOGEUSDT: 'XDGUSD',
-    BNBUSDT: 'BNBUSD',
-    AVAXUSDT: 'AVAXUSD',
-    DOTUSDT: 'DOTUSD',
-    LINKUSDT: 'LINKUSD',
-    '^GSPC': '^GSPC',
-    '^DJI': '^DJI',
-  };
-  return map[symbol] || symbol.replace('USDT', 'USD');
+  return KRAKEN_PAIRS[symbol] || symbol.replace('USDT', 'USD');
 }
 
 function symbolToYahoo(symbol: string): string {
@@ -441,31 +431,11 @@ function symbolToYahoo(symbol: string): string {
 }
 
 function intervalToOkxBar(interval: string): string {
-  const map: Record<string, string> = {
-    '1m': '1m',
-    '5m': '5m',
-    '15m': '15m',
-    '30m': '30m',
-    '1h': '1H',
-    '4h': '4H',
-    '1d': '1D',
-    '1w': '1W',
-  };
-  return map[interval] || '1D';
+  return OKX_INTERVALS[interval] || '1D';
 }
 
 function intervalToKrakenMinutes(interval: string): number {
-  const map: Record<string, number> = {
-    '1m': 1,
-    '5m': 5,
-    '15m': 15,
-    '30m': 30,
-    '1h': 60,
-    '4h': 240,
-    '1d': 1440,
-    '1w': 10080,
-  };
-  return map[interval] || 1440;
+  return KRAKEN_INTERVALS[interval] || 1440;
 }
 
 function intervalToYahooRange(interval: string): string {

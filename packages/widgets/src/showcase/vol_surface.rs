@@ -109,7 +109,7 @@ pub fn update_vol_surface(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<()
     }
 
     // Draw data points as colored dots
-    for (_, _, iv, depth) in &points {
+    for (_, _, _iv, depth) in &points {
         let _ = depth;
     }
 

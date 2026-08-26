@@ -1,4 +1,3 @@
-use super::stats;
 
 /// Drawdown analysis from a price series.
 /// Returns the underwater curve, max drawdown stats, and recovery periods.

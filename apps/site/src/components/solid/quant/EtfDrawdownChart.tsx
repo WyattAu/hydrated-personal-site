@@ -2,6 +2,7 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { activeTicker } from '../../../lib/etf-store';
 import { getThemeColors } from '../../../lib/theme-colors';
+import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface DDResult {
   underwater: number[];
@@ -33,7 +34,7 @@ export default function EtfDrawdownChart() {
       if (closes.length < 30) throw new Error('insufficient');
 
       if (!sharedWasm) {
-        const _wasmUrl = '/wasm/hydrated_widgets.js?v=j30';
+        const _wasmUrl = `/wasm/hydrated_widgets.js?v=${WASM_VERSION}`;
         sharedWasm = await import(_wasmUrl);
         await sharedWasm.default();
       }

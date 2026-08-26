@@ -1,7 +1,7 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { activeAsset } from '../../../lib/asset-store';
 import { onAssetChanged } from '../../../lib/asset-events';
+import { activeAsset } from '../../../lib/asset-store';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 const BINS = 25;

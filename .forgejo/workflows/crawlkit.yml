@@ -1,0 +1,137 @@
+name: Crawlkit Site Audit
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly Monday 6am UTC
+  workflow_dispatch:
+    inputs:
+      max_pages:
+        description: 'Max pages to crawl'
+        required: false
+        default: '100'
+      force:
+        description: 'Force full re-crawl'
+        required: false
+        default: 'false'
+        type: boolean
+  push:
+    branches: [main]
+    paths:
+      - 'apps/site/src/pages/**'
+      - 'apps/site/src/layouts/**'
+      - 'worker/src/**'
+
+concurrency:
+  group: crawlkit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  crawl:
+    name: Crawlkit Site Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: crawlkit-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            crawlkit-${{ runner.os }}-
+
+      - name: Build crawlkit
+        working-directory: ${{ github.workspace }}/../crawlkit
+        run: cargo build --release --workspace 2>&1 | tail -5
+
+      - name: Verify crawlkit binary
+        run: |
+          ${{ github.workspace }}/../crawlkit/target/release/crawlkit --version
+
+      - name: Run crawl
+        run: |
+          CRAWLKIT=${{ github.workspace }}/../crawlkit/target/release/crawlkit
+          MAX_PAGES=${{ inputs.max_pages || '100' }}
+          FORCE_FLAG=""
+          if [ "${{ inputs.force }}" = "true" ]; then
+            FORCE_FLAG="--force"
+          fi
+          $CRAWLKIT crawl https://wyattau.com \
+            --max-pages "$MAX_PAGES" \
+            --concurrency 8 \
+            --delay 100 \
+            --output ./crawl-data \
+            --format all \
+            --respect-robots true \
+            --enable-ai \
+            --enable-wasm \
+            $FORCE_FLAG \
+            --metrics-json ./crawl-data/metrics.json
+
+      - name: Generate markdown report
+        run: |
+          ${{ github.workspace }}/../crawlkit/target/release/crawlkit report \
+            -c ./crawl-data \
+            --format md \
+            --output ./crawl-data/REPORT.md
+
+      - name: Check issue threshold
+        run: |
+          if [ ! -f ./crawl-data/crawl-results.json ]; then
+            echo "ERROR: crawl-results.json not found"
+            exit 1
+          fi
+          TOTAL=$(cat ./crawl-data/crawl-results.json | grep -o '"total_issues":[0-9]*' | cut -d: -f2)
+          echo "Total issues found: $TOTAL"
+          echo "total_issues=$TOTAL" >> "$GITHUB_ENV"
+
+      - name: Compare with previous crawl
+        if: hashFiles('crawl-results.json') != ''
+        run: |
+          echo "Previous crawl found. Comparison available in post-crawl-findings.json"
+          if [ -f ./crawl-data/post-crawl-findings.json ]; then
+            FINDINGS=$(cat ./crawl-data/post-crawl-findings.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d))" 2>/dev/null || echo "0")
+            echo "Post-crawl findings: $FINDINGS"
+          fi
+
+      - name: Upload crawl results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crawlkit-report-${{ github.run_id }}
+          path: |
+            ./crawl-data/crawl-results.json
+            ./crawl-data/REPORT.md
+            ./crawl-data/post-crawl-findings.json
+            ./crawl-data/alerts.json
+            ./crawl-data/metrics.json
+          retention-days: 30
+
+      - name: Upload SQLite database
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crawlkit-db-${{ github.run_id }}
+          path: ./crawl-data/crawlkit.db
+          retention-days: 30
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Crawlkit Audit Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Pages crawled:** $(cat ./crawl-data/crawl-results.json 2>/dev/null | grep -o '"pages_crawled":[0-9]*' | cut -d: -f2 || echo 'N/A')" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Total issues:** ${TOTAL:-N/A}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Target:** https://wyattau.com" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f ./crawl-data/REPORT.md ]; then
+            echo "### Report" >> "$GITHUB_STEP_SUMMARY"
+            cat ./crawl-data/REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          fi

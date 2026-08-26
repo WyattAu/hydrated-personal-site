@@ -24,7 +24,7 @@ pub fn detect_regimes(returns: &[f64], max_iter: usize) -> RegimeResult {
 
     // Initialize parameters using k-means-like split
     let mean_all = returns.iter().sum::<f64>() / n as f64;
-    let var_all = returns.iter().map(|r| (r - mean_all).powi(2)).sum::<f64>() / n as f64;
+    let _var_all = returns.iter().map(|r| (r - mean_all).powi(2)).sum::<f64>() / n as f64;
 
     // State 0: returns above median (bull), State 1: below (bear)
     let mut sorted = returns.to_vec();
@@ -267,7 +267,7 @@ fn gaussian(x: f64, mean: f64, var: f64) -> f64 {
 }
 
 fn gaussian_log(x: f64, mean: f64, var: f64) -> f64 {
-    let sigma = var.sqrt();
+    let _sigma = var.sqrt();
     -0.5 * (2.0 * PI * var).ln() - ((x - mean).powi(2)) / (2.0 * var)
 }
 

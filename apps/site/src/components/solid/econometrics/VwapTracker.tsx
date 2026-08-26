@@ -1,7 +1,7 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { activeAsset } from '../../../lib/asset-store';
 import { onAssetChanged } from '../../../lib/asset-events';
+import { activeAsset } from '../../../lib/asset-store';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 interface VwapState {
@@ -215,8 +215,11 @@ export default function VwapTracker() {
     if (!loading()) requestAnimationFrame(() => draw());
   });
 
-  const spreadColor = () =>
-    state() ? (state()?.spread >= 0 ? '#4caf50' : '#ff5252') : 'var(--text-secondary)';
+  const spreadColor = () => {
+    const s = state();
+    if (!s) return 'var(--text-secondary)';
+    return s.spread >= 0 ? '#4caf50' : '#ff5252';
+  };
 
   return (
     <div>
@@ -225,10 +228,11 @@ export default function VwapTracker() {
           VWAP TRACKER
         </p>
         <Show when={!loading() && state()}>
-          <span class="font-mono text-[10px]" style={{ color: spreadColor() }}>
-            spread {state()?.spread >= 0 ? '+' : ''}
-            {state()?.spread.toFixed(2)}
-          </span>
+          {(s) => (
+            <span class="font-mono text-[10px]" style={{ color: spreadColor() }}>
+              spread {s().spread >= 0 ? '+' : ''}{s().spread.toFixed(2)}
+            </span>
+          )}
         </Show>
       </div>
 

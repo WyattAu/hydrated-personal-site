@@ -3,9 +3,39 @@
 ## Current
 
 - **Phase:** 6 (Deployment & Verification) + Roadmap Execution
-- **Version:** 3.1.0
+- **Version:** 3.2.0
 - **Status:** In Progress — roadmap Phases A-E executed
-- **Last updated:** 2026-06-22
+- **Last updated:** 2026-08-27
+
+## v3.2.0 — HFT Infrastructure & Real-Time Streaming
+
+### Worker Module Extraction
+- Refactored the 1534-line monolithic worker `index.ts` into 10+ focused handler modules under `worker/src/handlers/`.
+- Separated concerns: routes, middleware, API handlers, SSE, WebSocket, and durable objects.
+- Improved maintainability and testability without changing runtime behavior.
+
+### HFT-Grade Infrastructure
+- Added lock-free SPSC ring buffer (`packages/widgets/src/data_structures/ring_buffer.rs`) for zero-copy streaming.
+- Added binary serialization for quant data transfer between Rust and JS.
+- Added SIMD-optimized numerics for portfolio math and risk calculations.
+- Added Criterion benchmarks (`packages/widgets/benches/quant_benchmarks.rs`) for all critical paths.
+
+### WebSocket/SSE Real-Time Streaming
+- Added Cloudflare Durable Objects for WebSocket fan-out with SSE fallback.
+- Real-time price streaming eliminates polling lag on `/world` and `/etf` dashboards.
+- See ADR-025 for architectural details.
+
+### crawlkit CI Integration
+- Added `crawlkit` site audit to the CI/CD pipeline for automated crawl-based quality checks.
+- Fresh crawl data stored in `crawl-results.json` for regression tracking.
+
+### Resilience
+- Added exponential backoff retry for all upstream API calls in the Worker.
+- Improves reliability under transient upstream failures.
+
+### Centralized Data
+- LLM benchmarks, WASM version metadata, and symbol maps now sourced from centralized configuration.
+- Reduces duplication and ensures consistency across build targets.
 
 ## v3.1.0 — Roadmap Execution (Phases A-E)
 
@@ -48,7 +78,7 @@ Goals: zero lint errors, zero TypeScript errors, zero Rust warnings, zero emojis
   - Pinned Bun to 1.3.11 to match local.
 - **Emoji audit:** 6 source occurrences and 56 docs occurrences purged. GUI traversal E2E enforces no-emoji invariant on every route.
 - **GUI traversal:** Enhanced to capture per-viewport screenshots (4 viewports x 9 routes), added Spatial Materialism z-index token chain assertions, shadow light-source assertions, cubic-bezier easing assertions, `prefers-reduced-motion` respect check.
-- **Documentation:** README rewritten to reflect actual widget count (16, not 13), endpoint count (24, not 20), test count (195 unit, not 89), correct page list.
+- **Documentation:** README rewritten to reflect actual widget count (16, not 13), endpoint count (24, not 20), test count (204 unit, not 89), correct page list.
 - **Test pool:** Vitest switched to `forks` pool to avoid esbuild service-terminated panics seen with the default `threads` pool on Node.js >= 23 under load.
 
 ### Verified state at release
@@ -58,7 +88,7 @@ Biome check . ............... 0 errors, 0 warnings
 tsc --noEmit (apps/site) .... 0 errors
 tsc --noEmit (worker) ....... 0 errors
 cargo check (wasm32) ........ 0 warnings
-vitest run .................. 195 / 195 passing
+vitest run .................. 204 / 204 passing
 astro build ................. complete (9 pages + rss + sitemap)
 ```
 

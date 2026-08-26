@@ -1,8 +1,9 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
-import { activeAsset } from '../../../lib/asset-store';
 import { onAssetChanged } from '../../../lib/asset-events';
+import { activeAsset } from '../../../lib/asset-store';
+import { getThemeColors } from '../../../lib/theme-colors';
+import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface GarchResult {
   omega: number;
@@ -32,12 +33,14 @@ export default function VolatilityForecast(props: { symbol?: string }) {
       if (!res.ok) return;
       const json = await res.json();
       const quote = json?.chart?.result?.[0]?.indicators?.quote?.[0];
-      const closes: number[] = (quote?.close ?? []).filter((c: number | null): c is number => c != null);
+      const closes: number[] = (quote?.close ?? []).filter(
+        (c: number | null): c is number => c != null,
+      );
       const returns = new Float64Array(closes.length - 1);
       for (let i = 1; i < closes.length; i++) returns[i - 1] = Math.log(closes[i] / closes[i - 1]);
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js?v=j35';
+        const _w = `/wasm/hydrated_widgets.js?${WASM_VERSION}`;
         wasmMod = await import(_w);
         await wasmMod.default();
       }
@@ -183,7 +186,10 @@ export default function VolatilityForecast(props: { symbol?: string }) {
                 color: forecastHorizon() === h ? 'var(--accent)' : 'var(--text-secondary)',
                 background: forecastHorizon() === h ? 'var(--bg-secondary)' : 'transparent',
               }}
-              onClick={() => { setForecastHorizon(h); loadData(); }}
+              onClick={() => {
+                setForecastHorizon(h);
+                loadData();
+              }}
             >
               {h}D
             </button>

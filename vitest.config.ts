@@ -12,9 +12,8 @@ export default defineConfig({
     // threads pool on Node.js >= 23 under load. Each test file runs in its own
     // process for isolation; trade-off is a small (~2s) wall-clock increase.
     pool: 'forks',
-    poolOptions: {
-      forks: { singleFork: false, maxForks: 4, minForks: 1 },
-    },
+    maxForks: 4,
+    minForks: 1,
     include: ['tests/unit/**/*.test.ts', 'apps/site/src/**/*.test.ts'],
     coverage: {
       provider: 'v8',

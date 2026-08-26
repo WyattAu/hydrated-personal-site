@@ -91,7 +91,7 @@ pub fn update_lorenz(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsV
         let cy = hf / 2.0;
 
         let colors = ["#00e5ff", "#ff4081"];
-        let labels = ["Particle A (δ=0)", "Particle B (δ=0.0001)"];
+        let _labels = ["Particle A (δ=0)", "Particle B (δ=0.0001)"];
 
         // Draw trails
         for p in 0..2 {

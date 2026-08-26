@@ -33,7 +33,7 @@ pub fn decompose(returns: &[f64]) -> RealizedVolDecomposition {
     // Bipower variation (running)
     let mut daily_bv = vec![0.0; n];
     let mut bv_sum = 0.0;
-    let bv_count = (n - 1) as f64;
+    let _bv_count = (n - 1) as f64;
     for i in 0..(n - 1) {
         let bp = (PI / 2.0) * returns[i].abs() * returns[i + 1].abs();
         daily_bv[i] = bp;

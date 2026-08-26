@@ -57,7 +57,7 @@ pub fn hrp_allocate(returns: &[f64], n_assets: usize, n_periods: usize) -> Vec<f
 fn cluster(dist: &[f64], n: usize) -> Vec<usize> {
     // Start with each asset in its own cluster
     let mut clusters: Vec<Vec<usize>> = (0..n).map(|i| vec![i]).collect();
-    let mut active_dist = dist.to_vec();
+    let active_dist = dist.to_vec();
 
     while clusters.len() > 1 {
         // Find the two closest clusters (single linkage: min distance between members)

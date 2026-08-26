@@ -28,6 +28,10 @@ hydrated_personal_site/
 | CI/CD       | Forgejo Actions                  | Build, test, deploy pipeline                     |
 | Deploy      | Cloudflare Pages + Workers       | Static + edge compute                            |
 
+### WASM Features
+
+Lock-free ring buffer, binary serialization, SIMD-optimized numerics.
+
 ### WASM Widgets
 
 16 standalone Rust/WASM modules for client-side computation, grouped under four domains:
@@ -73,7 +77,7 @@ Five themes with full CSS custom property coverage:
 
 ## API Endpoints
 
-24 Cloudflare Worker endpoints with in-memory stale-while-revalidate caching, request deduplication, circuit breaker, and per-IP rate limiting. Health, versioning, metrics, and CSP report endpoints are infra-only.
+24 Cloudflare Worker endpoints with in-memory stale-while-revalidate caching, request deduplication, circuit breaker, per-IP rate limiting, WebSocket/SSE real-time streaming, and exponential backoff retry. Health, versioning, metrics, and CSP report endpoints are infra-only.
 
 | Endpoint                                          | Cache TTL | Upstream                |
 | ------------------------------------------------- | --------- | ----------------------- |
@@ -148,9 +152,9 @@ Re-install the hook after a fresh clone via `bun run setup` (or `bun run prepare
 
 | Layer              | Tool             | Count | Coverage                                          |
 | ------------------ | ---------------- | ----- | ------------------------------------------------- |
-| Unit               | Vitest 4         | 195   | Worker endpoints, API client, schemas, types, utils |
-| Property-based     | fast-check       | 15    | Input validation, rate limiting, CSS idempotency  |
-| E2E                | Playwright 1.61  | 90    | Navigation, a11y, responsiveness, GUI traversal, design compliance |
+| Unit               | Vitest 4         | 204   | Worker endpoints, API client, schemas, types, utils |
+| Property-based     | fast-check       | 10    | Input validation, rate limiting, CSS idempotency  |
+| E2E                | Playwright 1.61  | 106   | Navigation, a11y, responsiveness, GUI traversal, design compliance |
 | GUI traversal      | Playwright       | 9 routes x 4 viewports | DOM JSON + screenshots written to `.tmp/gui-review/` |
 
 Coverage thresholds are enforced at 80% for branches, functions, lines, and statements via `vitest.config.ts`.

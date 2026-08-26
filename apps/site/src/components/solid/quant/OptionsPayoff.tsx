@@ -1,7 +1,6 @@
 import { createEffect, createSignal, onMount } from 'solid-js';
-import { getThemeColors } from '../../../lib/theme-colors';
-import { activeAsset } from '../../../lib/asset-store';
 import { onAssetChanged } from '../../../lib/asset-events';
+import { getThemeColors } from '../../../lib/theme-colors';
 
 interface Leg {
   type: 'call' | 'put';

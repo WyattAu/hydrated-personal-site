@@ -1,0 +1,33 @@
+[package]
+name = "widgets-fuzz"
+version = "0.0.0"
+authors = ["Automatically generated"]
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.hydrated_widgets]
+path = ".."
+
+[[bin]]
+name = "fuzz_montecarlo"
+path = "fuzz_targets/fuzz_montecarlo.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_blackscholes"
+path = "fuzz_targets/fuzz_blackscholes.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_var"
+path = "fuzz_targets/fuzz_var.rs"
+test = false
+doc = false

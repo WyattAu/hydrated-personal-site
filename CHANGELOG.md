@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] — 2026-08-27
+
+### Added
+
+- Worker module extraction: refactored 1534-line monolithic `index.ts` into 10+ focused handler modules under `worker/src/handlers/`.
+- HFT-grade infrastructure: lock-free SPSC ring buffer, binary serialization, SIMD-optimized numerics, Criterion benchmarks.
+- WebSocket/SSE real-time streaming via Cloudflare Durable Objects with SSE fallback.
+- Exponential backoff retry for all upstream API calls.
+- crawlkit CI integration for automated site audit.
+- Centralized data: LLM benchmarks, WASM version metadata, symbol maps.
+
+### Changed
+
+- Test counts updated: 204 unit tests, 10 property-based tests, 106 E2E tests.
+- Lighthouse thresholds raised from warn-level to error-level with 95+ targets.
+- `.browserslistrc` added targeting Chrome/Firefox/Edge >= 90, Safari >= 15.
+
+### Removed
+
+- uPlot references from documentation (library is not installed).
+
 ## [3.0.0] — 2026-06-21
 
 ### Added

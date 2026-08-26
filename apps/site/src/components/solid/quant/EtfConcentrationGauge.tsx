@@ -1,5 +1,6 @@
 import { Show, createEffect, createSignal } from 'solid-js';
 import { getThemeColors } from '../../../lib/theme-colors';
+import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface ConcentrationResult {
   hhi: number;
@@ -35,7 +36,7 @@ export default function EtfConcentrationGauge(props: { holdings: Holding[] }) {
       const weights = Float64Array.from(raw.map((w) => w / sum));
 
       if (!wasmMod) {
-        const _w = '/wasm/hydrated_widgets.js?v=j30';
+        const _w = `/wasm/hydrated_widgets.js?v=${WASM_VERSION}`;
         wasmMod = await import(_w);
         await wasmMod.default();
       }

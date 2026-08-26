@@ -213,7 +213,9 @@ export function useLlmData() {
           loading[1](false);
           return;
         }
-      } catch {}
+      } catch (e) {
+        console.warn(`[llm-data] primary API fetch failed: ${e}`);
+      }
       // Fallback: try the Worker directly
       try {
         const res = await fetch('https://hydrated-worker.wyatt-au.workers.dev/api/llm-benchmarks');
@@ -227,7 +229,9 @@ export function useLlmData() {
           loading[1](false);
           return;
         }
-      } catch {}
+      } catch (e) {
+        console.warn(`[llm-data] worker fallback failed: ${e}`);
+      }
       // Final fallback: use embedded data
       data[1](EMBEDDED_LLM_DATA);
       recordFetch('llm-benchmarks');
