@@ -1,7 +1,7 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { activeTicker } from '../../../lib/etf-store';
 import { drawGrid, getChartTheme, setupCanvas } from '../../../lib/chart-utils';
+import { activeTicker } from '../../../lib/etf-store';
 import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface VarResult {

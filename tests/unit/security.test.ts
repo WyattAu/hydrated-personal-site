@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sanitize, json, error, securityHeaders } from '../../worker/src/security';
+import { error, json, sanitize, securityHeaders } from '../../worker/src/security';
 
 describe('Security', () => {
   describe('sanitize', () => {
