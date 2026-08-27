@@ -10,3 +10,9 @@ ENVIRONMENT = "production"
 # [[kv_namespaces]]
 # binding = "GUESTBOOK"
 # id = "xxx"
+
+# Durable Object for WebSocket price streaming
+# Uncomment after creating the DO class in Cloudflare dashboard
+# [[durable_objects.bindings]]
+# name = "PRICE_STREAM"
+# class_name = "PriceStream"

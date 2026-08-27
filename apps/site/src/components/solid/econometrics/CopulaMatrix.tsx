@@ -180,6 +180,9 @@ export default function CopulaMatrix() {
                   class="cursor-pointer select-none font-mono text-[9px] uppercase tracking-wider px-2 py-1 text-left"
                   style={{ color: 'var(--text-secondary)', 'min-width': '60px' }}
                   onClick={() => toggleSort('label')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') toggleSort('label');
+                  }}
                 >
                   Asset {sortKey() === 'label' ? (sortDir() > 0 ? ' <' : ' >') : ''}
                 </th>
@@ -204,6 +207,9 @@ export default function CopulaMatrix() {
                   class="cursor-pointer select-none font-mono text-[9px] uppercase tracking-wider px-2 py-1 text-right"
                   style={{ color: 'var(--text-secondary)' }}
                   onClick={() => toggleSort('tail')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') toggleSort('tail');
+                  }}
                 >
                   Avg {sortKey() === 'tail' ? (sortDir() > 0 ? ' <' : ' >') : ''}
                 </th>
@@ -277,7 +283,10 @@ export default function CopulaMatrix() {
           }}
         >
           <Show
-            when={hoverCell() && hoverCell()!.col >= 0 && hoverCell()!.row !== hoverCell()!.col}
+            when={(() => {
+              const h = hoverCell();
+              return h && h.col >= 0 && h.row !== h.col;
+            })()}
             fallback={
               <p class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
                 Hover any cell to see tail dependence details. Click headers to sort.
@@ -285,12 +294,14 @@ export default function CopulaMatrix() {
             }
           >
             {(() => {
-              const h = hoverCell()!;
+              const h = hoverCell();
+              if (!h) return null;
               const row = h.row;
               const col = h.col;
               const d = data();
               const m = matrix();
-              if (!d || !m || row === undefined || col === undefined || !d[row] || !m[row]) return null;
+              if (!d || !m || row === undefined || col === undefined || !d[row] || !m[row])
+                return null;
               return (
                 <div class="flex flex-wrap gap-3 items-center">
                   <p class="font-mono text-[10px]" style={{ color: 'var(--text-primary)' }}>

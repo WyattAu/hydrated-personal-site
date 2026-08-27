@@ -1,14 +1,9 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { getThemeColors } from '../../../lib/theme-colors';
 import { onTickersChanged } from '../../../lib/ticker-events';
 import { activeTickers } from '../../../lib/ticker-universe';
 import { getWasmMod } from '../../../lib/wasm-loader';
-
-interface HrpResult {
-  weights: number[];
-  method: string;
-}
 
 async function fetchRets(symbol: string, range: string): Promise<number[]> {
   const res = await fetch(
@@ -63,7 +58,7 @@ export default function HrpAllocation() {
       if (
         !parsed.weights ||
         !Array.isArray(parsed.weights) ||
-        parsed.weights.some((w: any) => w === null || Number.isNaN(w))
+        parsed.weights.some((w: unknown) => w === null || Number.isNaN(w))
       ) {
         throw new Error('HRP computation failed - check ticker data');
       }

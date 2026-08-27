@@ -75,7 +75,8 @@ export default function FibonacciLevels() {
     const w = rect.width;
     const h = 300;
     const colors = getThemeColors();
-    const s = state()!;
+    const s = state();
+    if (!s) return;
     const closes = s.closes;
     const n = closes.length;
     if (n < 2) return;

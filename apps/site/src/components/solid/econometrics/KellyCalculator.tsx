@@ -113,6 +113,7 @@ export default function KellyCalculator() {
           <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
             {cards(d).map((card) => (
               <div
+                key={card.label}
                 class="border p-3 flex flex-col gap-1"
                 style={{ 'border-color': 'var(--border)', background: 'var(--bg-secondary)' }}
               >

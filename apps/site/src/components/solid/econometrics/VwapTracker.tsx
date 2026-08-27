@@ -230,7 +230,8 @@ export default function VwapTracker() {
         <Show when={!loading() && state()}>
           {(s) => (
             <span class="font-mono text-[10px]" style={{ color: spreadColor() }}>
-              spread {s().spread >= 0 ? '+' : ''}{s().spread.toFixed(2)}
+              spread {s().spread >= 0 ? '+' : ''}
+              {s().spread.toFixed(2)}
             </span>
           )}
         </Show>

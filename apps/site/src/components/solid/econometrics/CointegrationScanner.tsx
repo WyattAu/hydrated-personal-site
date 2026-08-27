@@ -161,6 +161,9 @@ export default function CointegrationScanner() {
                   class="cursor-pointer select-none font-mono text-[10px] uppercase tracking-wider px-2 py-1 text-left"
                   style={{ color: 'var(--text-secondary)' }}
                   onClick={() => toggleSort('pair')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') toggleSort('pair');
+                  }}
                 >
                   Pair{sortMark('pair')}
                 </th>
@@ -168,6 +171,9 @@ export default function CointegrationScanner() {
                   class="cursor-pointer select-none font-mono text-[10px] uppercase tracking-wider px-2 py-1 text-right"
                   style={{ color: 'var(--text-secondary)' }}
                   onClick={() => toggleSort('adf')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') toggleSort('adf');
+                  }}
                 >
                   ADF Stat{sortMark('adf')}
                 </th>
@@ -175,6 +181,9 @@ export default function CointegrationScanner() {
                   class="cursor-pointer select-none font-mono text-[10px] uppercase tracking-wider px-2 py-1 text-right"
                   style={{ color: 'var(--text-secondary)' }}
                   onClick={() => toggleSort('hl')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') toggleSort('hl');
+                  }}
                 >
                   Half-Life{sortMark('hl')}
                 </th>
@@ -182,6 +191,9 @@ export default function CointegrationScanner() {
                   class="cursor-pointer select-none font-mono text-[10px] uppercase tracking-wider px-2 py-1 text-right"
                   style={{ color: 'var(--text-secondary)' }}
                   onClick={() => toggleSort('z')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') toggleSort('z');
+                  }}
                 >
                   Z-Score{sortMark('z')}
                 </th>

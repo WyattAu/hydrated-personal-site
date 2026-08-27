@@ -140,10 +140,11 @@ export default function IvSolver() {
       <Show when={!loading()}>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
           <div>
-            <label class={labelCls} style={{ color: 'var(--text-secondary)' }}>
+            <label for="spot-price" class={labelCls} style={{ color: 'var(--text-secondary)' }}>
               Spot Price
             </label>
             <input
+              id="spot-price"
               type="number"
               min="0"
               step="0.01"
@@ -154,10 +155,11 @@ export default function IvSolver() {
             />
           </div>
           <div>
-            <label class={labelCls} style={{ color: 'var(--text-secondary)' }}>
+            <label for="strike-price" class={labelCls} style={{ color: 'var(--text-secondary)' }}>
               Strike Price
             </label>
             <input
+              id="strike-price"
               type="number"
               min="0"
               step="0.5"
@@ -168,10 +170,11 @@ export default function IvSolver() {
             />
           </div>
           <div>
-            <label class={labelCls} style={{ color: 'var(--text-secondary)' }}>
+            <label for="days-to-expiry" class={labelCls} style={{ color: 'var(--text-secondary)' }}>
               Days to Expiry
             </label>
             <input
+              id="days-to-expiry"
               type="number"
               min="1"
               step="1"
@@ -182,10 +185,11 @@ export default function IvSolver() {
             />
           </div>
           <div>
-            <label class={labelCls} style={{ color: 'var(--text-secondary)' }}>
+            <label for="risk-free-rate" class={labelCls} style={{ color: 'var(--text-secondary)' }}>
               Risk-free Rate %
             </label>
             <input
+              id="risk-free-rate"
               type="number"
               min="0"
               step="0.1"
@@ -196,10 +200,11 @@ export default function IvSolver() {
             />
           </div>
           <div>
-            <label class={labelCls} style={{ color: 'var(--text-secondary)' }}>
+            <label for="market-price" class={labelCls} style={{ color: 'var(--text-secondary)' }}>
               Market Price
             </label>
             <input
+              id="market-price"
               type="number"
               min="0"
               step="0.01"
@@ -210,9 +215,9 @@ export default function IvSolver() {
             />
           </div>
           <div>
-            <label class={labelCls} style={{ color: 'var(--text-secondary)' }}>
+            <div class={labelCls} style={{ color: 'var(--text-secondary)' }}>
               Option Type
-            </label>
+            </div>
             <div class="flex gap-1">
               <button
                 type="button"

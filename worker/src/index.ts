@@ -29,7 +29,7 @@ import {
   resolveVersionedRoute,
 } from './handlers';
 import { handleCryptoTickerSSE, handleMetricsSSE } from './handlers/sse';
-import { log } from './logger';
+import { clearTraceId, log, setTraceId } from './logger';
 import { checkAlerts, metrics, recordResponseTime } from './metrics';
 import { error, json } from './security';
 import type { Env } from './types';
@@ -42,6 +42,8 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const start = Date.now();
     metrics.requests++;
+    const traceId = request.headers.get('cf-ray') || crypto.randomUUID();
+    setTraceId(traceId);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, {
@@ -145,11 +147,13 @@ export default {
       recordResponseTime(path, duration);
       response.headers.set('X-Response-Time', `${duration}ms`);
       log('info', 'request', { path, status: response.status, duration, method: request.method });
+      clearTraceId();
       return response;
     } catch (e) {
       metrics.errors++;
       checkAlerts();
       log('error', 'unhandled error', { path, error: String(e) });
+      clearTraceId();
       return error('Internal server error', 500);
     }
   },

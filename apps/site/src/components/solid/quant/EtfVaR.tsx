@@ -96,9 +96,7 @@ export default function EtfVaR() {
       const x = pad.l + i * barW;
       const barH = toH(c);
       const isTail = edges[i] <= d.var_historical;
-      ctx.fillStyle = isTail
-        ? `${theme.negative}80`
-        : `${theme.primary}40`;
+      ctx.fillStyle = isTail ? `${theme.negative}80` : `${theme.primary}40`;
       ctx.fillRect(x + 1, pad.t + cH - barH, barW - 2, barH);
     });
 

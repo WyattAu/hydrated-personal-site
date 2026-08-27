@@ -484,7 +484,10 @@ export default function HoldingsOverlapMatrix() {
               {((result()?.jaccard ?? 0) * 100).toFixed(1)}%
             </p>
           </div>
-          <p class="font-mono text-xs font-bold" style={{ color: overlapColor(result()?.jaccard ?? 0) }}>
+          <p
+            class="font-mono text-xs font-bold"
+            style={{ color: overlapColor(result()?.jaccard ?? 0) }}
+          >
             {overlapLabel(result()?.jaccard ?? 0)}
           </p>
         </div>

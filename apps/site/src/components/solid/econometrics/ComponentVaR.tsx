@@ -110,7 +110,8 @@ export default function ComponentVaR() {
     ctx.fillStyle = colors.bgCard || '#0c0c0c';
     ctx.fillRect(0, 0, w, h);
 
-    const d = data()!;
+    const d = data();
+    if (!d) return;
     const labs = labels();
     const pcts = d.percentages ?? [];
     const n = Math.min(pcts.length, labs.length);

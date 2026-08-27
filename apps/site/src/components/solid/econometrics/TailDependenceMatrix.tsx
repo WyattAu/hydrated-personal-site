@@ -282,7 +282,8 @@ export default function TailDependenceMatrix() {
               const col = h.col;
               const d = data();
               const m = matrix();
-              if (!d || !m || row === undefined || col === undefined || !d[row] || !m[row]) return null;
+              if (!d || !m || row === undefined || col === undefined || !d[row] || !m[row])
+                return null;
               const val = m[row][col] ?? 0;
               return (
                 <>
