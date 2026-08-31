@@ -744,7 +744,7 @@ export default function WorldMap() {
       });
 
       tileLayer = L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
+        'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png?key=cb1_2nfr_1_0b48dbccee090ed43078445f',
         {
           attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
@@ -753,11 +753,14 @@ export default function WorldMap() {
         },
       ).addTo(leafletMap);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-        subdomains: 'abcd',
-        maxZoom: 19,
-        pane: 'overlayPane',
-      }).addTo(leafletMap);
+      L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png?key=cb1_2nfr_1_0b48dbccee090ed43078445f',
+        {
+          subdomains: 'abcd',
+          maxZoom: 19,
+          pane: 'overlayPane',
+        },
+      ).addTo(leafletMap);
 
       for (const cap of CAPITALS) {
         const m = L.circleMarker([cap.lat, cap.lon], {

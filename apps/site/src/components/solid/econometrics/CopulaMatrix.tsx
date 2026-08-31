@@ -284,8 +284,8 @@ export default function CopulaMatrix() {
         >
           <Show
             when={(() => {
-              const h = hoverCell();
-              return h && h.col >= 0 && h.row !== h.col;
+              const cell = hoverCell();
+              return cell && cell.col >= 0 && cell.row !== cell.col;
             })()}
             fallback={
               <p class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
@@ -294,32 +294,26 @@ export default function CopulaMatrix() {
             }
           >
             {(() => {
-              const h = hoverCell();
-              if (!h) return null;
-              const row = h.row;
-              const col = h.col;
-              const d = data();
-              const m = matrix();
-              if (!d || !m || row === undefined || col === undefined || !d[row] || !m[row])
-                return null;
+              const cell = hoverCell();
+              if (!cell) return null;
               return (
                 <div class="flex flex-wrap gap-3 items-center">
                   <p class="font-mono text-[10px]" style={{ color: 'var(--text-primary)' }}>
-                    <span style={{ color: 'var(--accent)' }}>{d[row].label}</span>
+                    <span style={{ color: 'var(--accent)' }}>{data()[cell.row].label}</span>
                     {' vs '}
-                    <span style={{ color: 'var(--accent)' }}>{d[col].label}</span>
+                    <span style={{ color: 'var(--accent)' }}>{data()[cell.col].label}</span>
                   </p>
                   <span class="font-mono text-[9px]" style={{ color: 'var(--accent-warm)' }}>
-                    LOWER {m[row][col]?.lower?.toFixed(3) ?? '0'}
+                    LOWER {matrix()[cell.row][cell.col].lower.toFixed(3)}
                   </span>
                   <span class="font-mono text-[9px]" style={{ color: '#7c4dff' }}>
-                    UPPER {m[row][col]?.upper?.toFixed(3) ?? '0'}
+                    UPPER {matrix()[cell.row][cell.col].upper.toFixed(3)}
                   </span>
                   <span class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
-                    KENDALL {m[row][col]?.kendall_tau?.toFixed(3) ?? '0'}
+                    KENDALL {matrix()[cell.row][cell.col].kendall_tau.toFixed(3)}
                   </span>
                   <span class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
-                    SPEARMAN {m[row][col]?.spearman_rho?.toFixed(3) ?? '0'}
+                    SPEARMAN {matrix()[cell.row][cell.col].spearman_rho.toFixed(3)}
                   </span>
                 </div>
               );

@@ -1,4 +1,750 @@
 {
+  "pagesCrawled": 10,
+  "totalIssues": 6,
+  "totalWarnings": 45,
+  "totalPassed": 274,
+  "categories": [
+    {
+      "category": "SEO",
+      "issues": 0,
+      "warnings": 9,
+      "passed": 12
+    },
+    {
+      "category": "Security",
+      "issues": 0,
+      "warnings": 0,
+      "passed": 15
+    },
+    {
+      "category": "Accessibility",
+      "issues": 1,
+      "warnings": 2,
+      "passed": 0
+    },
+    {
+      "category": "Performance",
+      "issues": 0,
+      "warnings": 0,
+      "passed": 0
+    },
+    {
+      "category": "Content",
+      "issues": 0,
+      "warnings": 6,
+      "passed": 33
+    },
+    {
+      "category": "Links",
+      "issues": 2,
+      "warnings": 0,
+      "passed": 9
+    }
+  ],
+  "overallScore": 94,
+  "lastRun": "2026-07-24",
+  "recommendations": [
+    {
+      "code": "HTTP004",
+      "title": "Page not found (404)",
+      "description": "The page returned a 404 status code.",
+      "severity": "error",
+      "category": "http"
+    },
+    {
+      "code": "HTTP006",
+      "title": "Status category: client_error",
+      "description": "HTTP 404 \u2014 categorized as client_error.",
+      "severity": "info",
+      "category": "http"
+    },
+    {
+      "code": "CANON003",
+      "title": "Canonical URL mismatch",
+      "description": "Canonical URL (https://wyattau.com/404/) does not match the current page URL (https://wyattau.com/sitemap.xml).",
+      "severity": "warning",
+      "category": "seo"
+    },
+    {
+      "code": "SITEMAP001",
+      "title": "No sitemap data available",
+      "description": "No sitemap URLs were loaded for validation.",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "META002",
+      "title": "Title too short",
+      "description": "Title is 17 characters, below the recommended minimum of 30.",
+      "severity": "warning",
+      "category": "seo"
+    },
+    {
+      "code": "META005",
+      "title": "Meta description too short",
+      "description": "Description is 15 characters, below the recommended minimum of 120.",
+      "severity": "warning",
+      "category": "seo"
+    },
+    {
+      "code": "HEAD001",
+      "title": "No headings found",
+      "description": "The page contains no heading elements (H1-H6).",
+      "severity": "warning",
+      "category": "content"
+    },
+    {
+      "code": "LINK001",
+      "title": "Link counts",
+      "description": "Internal: 2, External: 0, Nofollow: 0",
+      "severity": "info",
+      "category": "links"
+    },
+    {
+      "code": "LINK002",
+      "title": "Link on broken page",
+      "description": "Link \"Skip to content\" points to \"https://wyattau.com/sitemap.xml#main-content\" but the current page itself returned HTTP 404.",
+      "severity": "error",
+      "category": "links"
+    },
+    {
+      "code": "LINK002",
+      "title": "Link on broken page",
+      "description": "Link \"Return Home\" points to \"https://wyattau.com/\" but the current page itself returned HTTP 404.",
+      "severity": "error",
+      "category": "links"
+    },
+    {
+      "code": "CQ001",
+      "title": "Flesch-Kincaid readability score",
+      "description": "Readability score: 100.0/100 (words: 25, sentences: 0, syllables: 0).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "CQ004",
+      "title": "Thin content",
+      "description": "Page has only 25 words. Pages with fewer than 300 words may be considered thin content.",
+      "severity": "warning",
+      "category": "content"
+    },
+    {
+      "code": "WC001",
+      "title": "Word count statistics",
+      "description": "Words: 25, Characters: 0, Sentences: 0, Avg words/sentence: 0.0.",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "WC003",
+      "title": "Very low word count",
+      "description": "Page has only 25 words. This is very thin content.",
+      "severity": "warning",
+      "category": "content"
+    },
+    {
+      "code": "SEC009",
+      "title": "Missing Cross-Origin-Embedder-Policy header",
+      "description": "No COEP header was found. COEP prevents resources from loading cross-origin without explicit permission.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SEC010",
+      "title": "Missing Cross-Origin-Opener-Policy header",
+      "description": "No COOP header was found. COOP isolates your browsing context from cross-origin popups.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SEC011",
+      "title": "Missing Cross-Origin-Resource-Policy header",
+      "description": "No CORP header was found. CORP prevents cross-origin reads of embedded resources.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SEC012",
+      "title": "Security posture score",
+      "description": "Security header score: 100/100.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SSL007",
+      "title": "No SSL certificate data available",
+      "description": "No TLS certificate information was provided for validation.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "A11Y002",
+      "title": "No headings found",
+      "description": "The page has no heading elements. Headings provide structure for screen reader users.",
+      "severity": "warning",
+      "category": "accessibility"
+    },
+    {
+      "code": "SOCIAL001",
+      "title": "OG image missing dimensions",
+      "description": "og:image is set but og:image:width and og:image:height are missing. Social platforms may crop or scale the image incorrectly.",
+      "severity": "warning",
+      "category": "social"
+    },
+    {
+      "code": "SOCIAL008",
+      "title": "Social preview completeness score",
+      "description": "Social metadata score: 8/8 (OG: 5/5, Twitter: 3/3).",
+      "severity": "info",
+      "category": "social"
+    },
+    {
+      "code": "ENTITY005",
+      "title": "Content sentiment analysis",
+      "description": "Sentiment score: 0 (neutral).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "ENTITY006",
+      "title": "Entity counts per page",
+      "description": "People: 0, Organizations: 0, Locations: 0, Topics: 0.",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "ISEO004",
+      "title": "Single-language page without hreflang",
+      "description": "Page has a lang attribute but no hreflang tags. If this site serves multiple languages, add hreflang annotations.",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "AI-ACC009",
+      "title": "No robots.txt found",
+      "description": "Site has no robots.txt file. All crawlers, including AI bots, have unrestricted access.",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "AI-AB007",
+      "title": "Missing speakable schema",
+      "description": "No speakable property in structured data. speakable marks content for voice AI assistants (Siri, Alexa, Google Assistant).",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "HTTP006",
+      "title": "Status category: success",
+      "description": "HTTP 200 \u2014 categorized as success.",
+      "severity": "info",
+      "category": "http"
+    },
+    {
+      "code": "SITEMAP001",
+      "title": "No sitemap data available",
+      "description": "No sitemap URLs were loaded for validation.",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "META002",
+      "title": "Title too short",
+      "description": "Title is 17 characters, below the recommended minimum of 30.",
+      "severity": "warning",
+      "category": "seo"
+    },
+    {
+      "code": "META005",
+      "title": "Meta description too short",
+      "description": "Description is 81 characters, below the recommended minimum of 120.",
+      "severity": "warning",
+      "category": "seo"
+    },
+    {
+      "code": "HEAD004",
+      "title": "Skipped heading level",
+      "description": "Heading level jumps from H1 to H3, skipping intermediate levels.",
+      "severity": "warning",
+      "category": "content"
+    },
+    {
+      "code": "LINK001",
+      "title": "Link counts",
+      "description": "Internal: 19, External: 22, Nofollow: 0",
+      "severity": "info",
+      "category": "links"
+    },
+    {
+      "code": "LINK005",
+      "title": "Very short anchor text",
+      "description": "Link \"ML\" has very short anchor text (2 chars).",
+      "severity": "info",
+      "category": "links"
+    },
+    {
+      "code": "LINK005",
+      "title": "Very short anchor text",
+      "description": "Link \"ML\" has very short anchor text (2 chars).",
+      "severity": "info",
+      "category": "links"
+    },
+    {
+      "code": "CQ001",
+      "title": "Flesch-Kincaid readability score",
+      "description": "Readability score: 0.0/100 (words: 288, sentences: 1, syllables: 26).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "CQ002",
+      "title": "Top keywords",
+      "description": "Top 10 keyword occurrences in headings: \"uses\" (1), \"git\" (1), \"languages\" (1), \"edge\" (1), \"selfhosted\" (1), \"cicd\" (1), \"tools\" (1), \"hosting\" (1), \"editors\" (1), \"terminal\" (1).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "CQ004",
+      "title": "Thin content",
+      "description": "Page has only 288 words. Pages with fewer than 300 words may be considered thin content.",
+      "severity": "warning",
+      "category": "content"
+    },
+    {
+      "code": "WC001",
+      "title": "Word count statistics",
+      "description": "Words: 288, Characters: 86, Sentences: 1, Avg words/sentence: 288.0.",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "WC004",
+      "title": "Long average sentence length",
+      "description": "Average sentence length is 288.0 words. Sentences longer than 25 words may be difficult to read.",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "SEC009",
+      "title": "Missing Cross-Origin-Embedder-Policy header",
+      "description": "No COEP header was found. COEP prevents resources from loading cross-origin without explicit permission.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SEC010",
+      "title": "Missing Cross-Origin-Opener-Policy header",
+      "description": "No COOP header was found. COOP isolates your browsing context from cross-origin popups.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SEC011",
+      "title": "Missing Cross-Origin-Resource-Policy header",
+      "description": "No CORP header was found. CORP prevents cross-origin reads of embedded resources.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SEC012",
+      "title": "Security posture score",
+      "description": "Security header score: 100/100.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SSL007",
+      "title": "No SSL certificate data available",
+      "description": "No TLS certificate information was provided for validation.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "A11Y005",
+      "title": "Skipped heading level",
+      "description": "Heading jumps from H1 to H3, skipping intermediate levels.",
+      "severity": "warning",
+      "category": "accessibility"
+    },
+    {
+      "code": "SOCIAL001",
+      "title": "OG image missing dimensions",
+      "description": "og:image is set but og:image:width and og:image:height are missing. Social platforms may crop or scale the image incorrectly.",
+      "severity": "warning",
+      "category": "social"
+    },
+    {
+      "code": "SOCIAL008",
+      "title": "Social preview completeness score",
+      "description": "Social metadata score: 8/8 (OG: 5/5, Twitter: 3/3).",
+      "severity": "info",
+      "category": "social"
+    },
+    {
+      "code": "ENTITY004",
+      "title": "Detected topics and themes",
+      "description": "Primary topics: editors, uses, selfhosted, databases, edge.",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "ENTITY005",
+      "title": "Content sentiment analysis",
+      "description": "Sentiment score: 0 (neutral).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "ENTITY006",
+      "title": "Entity counts per page",
+      "description": "People: 0, Organizations: 0, Locations: 0, Topics: 5.",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "READ001",
+      "title": "Flesch-Kincaid Grade Level",
+      "description": "Grade level: 13.1 (college)",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "READ002",
+      "title": "Coleman-Liau Index",
+      "description": "Index: 13.6",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "READ003",
+      "title": "Automated Readability Index",
+      "description": "ARI: 10.4",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "READ004",
+      "title": "Gunning Fog Index",
+      "description": "Fog index: 20.6",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "READ005",
+      "title": "Flesch Reading Ease score",
+      "description": "Score: 24.4/100 (very difficult)",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "KW001",
+      "title": "Top TF-IDF keywords",
+      "description": "Top keywords by TF-IDF score: edge (0.09), hosting (0.09), selfhosted (0.09), cicd (0.09), terminal (0.09), editors (0.09), uses (0.09), databases (0.09), languages (0.09), tools (0.09).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "KW002",
+      "title": "Keyword density",
+      "description": "Top keyword densities (of 288 words): languages (0.3%), git (0.3%), tools (0.3%), cicd (0.3%), uses (0.3%), edge (0.3%), hosting (0.3%), databases (0.3%), terminal (0.3%), selfhosted (0.3%).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "KW004",
+      "title": "Keyword co-occurrence",
+      "description": "Top keyword pairs: \"languages\" + \"uses\" (1), \"git\" + \"tools\" (1), \"hosting\" + \"terminal\" (1), \"languages\" + \"tools\" (1), \"cicd\" + \"hosting\" (1).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "ISEO004",
+      "title": "Single-language page without hreflang",
+      "description": "Page has a lang attribute but no hreflang tags. If this site serves multiple languages, add hreflang annotations.",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "AI-ACC009",
+      "title": "No robots.txt found",
+      "description": "Site has no robots.txt file. All crawlers, including AI bots, have unrestricted access.",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "AI-AB007",
+      "title": "Missing speakable schema",
+      "description": "No speakable property in structured data. speakable marks content for voice AI assistants (Siri, Alexa, Google Assistant).",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "HTTP006",
+      "title": "Status category: success",
+      "description": "HTTP 200 \u2014 categorized as success.",
+      "severity": "info",
+      "category": "http"
+    },
+    {
+      "code": "SITEMAP001",
+      "title": "No sitemap data available",
+      "description": "No sitemap URLs were loaded for validation.",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "META002",
+      "title": "Title too short",
+      "description": "Title is 22 characters, below the recommended minimum of 30.",
+      "severity": "warning",
+      "category": "seo"
+    },
+    {
+      "code": "META005",
+      "title": "Meta description too short",
+      "description": "Description is 39 characters, below the recommended minimum of 120.",
+      "severity": "warning",
+      "category": "seo"
+    },
+    {
+      "code": "LINK001",
+      "title": "Link counts",
+      "description": "Internal: 19, External: 2, Nofollow: 0",
+      "severity": "info",
+      "category": "links"
+    },
+    {
+      "code": "LINK005",
+      "title": "Very short anchor text",
+      "description": "Link \"ML\" has very short anchor text (2 chars).",
+      "severity": "info",
+      "category": "links"
+    },
+    {
+      "code": "LINK005",
+      "title": "Very short anchor text",
+      "description": "Link \"ML\" has very short anchor text (2 chars).",
+      "severity": "info",
+      "category": "links"
+    },
+    {
+      "code": "CQ001",
+      "title": "Flesch-Kincaid readability score",
+      "description": "Readability score: 89.6/100 (words: 114, sentences: 1, syllables: 2).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "CQ002",
+      "title": "Top keywords",
+      "description": "Top 10 keyword occurrences in headings: \"guestbook\" (1).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "CQ004",
+      "title": "Thin content",
+      "description": "Page has only 114 words. Pages with fewer than 300 words may be considered thin content.",
+      "severity": "warning",
+      "category": "content"
+    },
+    {
+      "code": "WC001",
+      "title": "Word count statistics",
+      "description": "Words: 114, Characters: 9, Sentences: 1, Avg words/sentence: 114.0.",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "WC004",
+      "title": "Long average sentence length",
+      "description": "Average sentence length is 114.0 words. Sentences longer than 25 words may be difficult to read.",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "SEC009",
+      "title": "Missing Cross-Origin-Embedder-Policy header",
+      "description": "No COEP header was found. COEP prevents resources from loading cross-origin without explicit permission.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SEC010",
+      "title": "Missing Cross-Origin-Opener-Policy header",
+      "description": "No COOP header was found. COOP isolates your browsing context from cross-origin popups.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SEC011",
+      "title": "Missing Cross-Origin-Resource-Policy header",
+      "description": "No CORP header was found. CORP prevents cross-origin reads of embedded resources.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SEC012",
+      "title": "Security posture score",
+      "description": "Security header score: 100/100.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "SSL007",
+      "title": "No SSL certificate data available",
+      "description": "No TLS certificate information was provided for validation.",
+      "severity": "info",
+      "category": "security"
+    },
+    {
+      "code": "A11Y016",
+      "title": "Missing html lang attribute",
+      "description": "The <html> element has no lang attribute. Screen readers use this to select the correct pronunciation engine.",
+      "severity": "error",
+      "category": "accessibility"
+    },
+    {
+      "code": "SOCIAL001",
+      "title": "OG image missing dimensions",
+      "description": "og:image is set but og:image:width and og:image:height are missing. Social platforms may crop or scale the image incorrectly.",
+      "severity": "warning",
+      "category": "social"
+    },
+    {
+      "code": "SOCIAL008",
+      "title": "Social preview completeness score",
+      "description": "Social metadata score: 8/8 (OG: 5/5, Twitter: 3/3).",
+      "severity": "info",
+      "category": "social"
+    },
+    {
+      "code": "ENTITY004",
+      "title": "Detected topics and themes",
+      "description": "Primary topics: guestbook.",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "ENTITY005",
+      "title": "Content sentiment analysis",
+      "description": "Sentiment score: 0 (neutral).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "ENTITY006",
+      "title": "Entity counts per page",
+      "description": "People: 0, Organizations: 0, Locations: 0, Topics: 1.",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "READ001",
+      "title": "Flesch-Kincaid Grade Level",
+      "description": "Grade level: 8.4 (middle school)",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "READ002",
+      "title": "Coleman-Liau Index",
+      "description": "Index: 7.5",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "READ003",
+      "title": "Automated Readability Index",
+      "description": "ARI: 21.5",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "READ004",
+      "title": "Gunning Fog Index",
+      "description": "Fog index: 0.4",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "READ005",
+      "title": "Flesch Reading Ease score",
+      "description": "Score: 36.6/100 (difficult)",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "KW001",
+      "title": "Top TF-IDF keywords",
+      "description": "Top keywords by TF-IDF score: guestbook (1.00).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "KW002",
+      "title": "Keyword density",
+      "description": "Top keyword densities (of 114 words): guestbook (0.9%).",
+      "severity": "info",
+      "category": "content"
+    },
+    {
+      "code": "AI-ACC009",
+      "title": "No robots.txt found",
+      "description": "Site has no robots.txt file. All crawlers, including AI bots, have unrestricted access.",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "AI-AB007",
+      "title": "Missing speakable schema",
+      "description": "No speakable property in structured data. speakable marks content for voice AI assistants (Siri, Alexa, Google Assistant).",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "HTTP006",
+      "title": "Status category: success",
+      "description": "HTTP 200 \u2014 categorized as success.",
+      "severity": "info",
+      "category": "http"
+    },
+    {
+      "code": "SITEMAP001",
+      "title": "No sitemap data available",
+      "description": "No sitemap URLs were loaded for validation.",
+      "severity": "info",
+      "category": "seo"
+    },
+    {
+      "code": "META002",
+      "title": "Title too short",
+      "description": "Title is 29 characters, below the recommended minimum of 30.",
+      "severity": "warning",
+      "category": "seo"
+    },
+    {
+      "code": "META005",
+      "title": "Meta description too short",
+      "description": "Description is 105 characters, below the recommended minimum of 120.",
+      "severity": "warning",
+      "category": "seo"
+    },
+    {
+      "code": "LINK001",
+      "title": "Link counts",
+      "description": "Internal: 19, External: 2, Nofollow: 0",
+      "severity": "info",
+      "category": "links"
+    },
+    {
+      "code": "LINK005",
+      "title": "Very short anchor text",
+      "description": "Link \"ML\" has very short anchor text (2 chars).",
+      "severity": "info",
+      "category": "links"
+    }
+  ],
   "summary": {
     "pages_crawled": 10,
     "total_findings": 325,
@@ -2106,908 +2852,6 @@
           "page": "//"
         }
       ]
-    }
-  ],
-  "findings": [
-    {
-      "category": "http",
-      "code": "HTTP004",
-      "description": "The page returned a 404 status code.",
-      "recommendation": "Remove links to this page or redirect to a valid URL.",
-      "severity": "error",
-      "title": "Page not found (404)",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "http",
-      "code": "HTTP006",
-      "description": "HTTP 404 \u2014 categorized as client_error.",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Status category: client_error",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "seo",
-      "code": "CANON003",
-      "description": "Canonical URL (https://wyattau.com/404/) does not match the current page URL (https://wyattau.com/sitemap.xml).",
-      "recommendation": "Ensure the canonical URL points to the correct preferred version of this page.",
-      "severity": "warning",
-      "title": "Canonical URL mismatch",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "seo",
-      "code": "SITEMAP001",
-      "description": "No sitemap URLs were loaded for validation.",
-      "recommendation": "Provide sitemap data to enable sitemap validation.",
-      "severity": "info",
-      "title": "No sitemap data available",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "seo",
-      "code": "META002",
-      "description": "Title is 17 characters, below the recommended minimum of 30.",
-      "recommendation": "Expand the title to 30-60 characters to improve search snippet quality.",
-      "severity": "warning",
-      "title": "Title too short",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "seo",
-      "code": "META005",
-      "description": "Description is 15 characters, below the recommended minimum of 120.",
-      "recommendation": "Expand the description to 120-160 characters.",
-      "severity": "warning",
-      "title": "Meta description too short",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "content",
-      "code": "HEAD001",
-      "description": "The page contains no heading elements (H1-H6).",
-      "recommendation": "Add at least one H1 heading to define the page topic.",
-      "severity": "warning",
-      "title": "No headings found",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "links",
-      "code": "LINK001",
-      "description": "Internal: 2, External: 0, Nofollow: 0",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Link counts",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "links",
-      "code": "LINK002",
-      "description": "Link \"Skip to content\" points to \"https://wyattau.com/sitemap.xml#main-content\" but the current page itself returned HTTP 404.",
-      "recommendation": "Fix the broken page or remove links from it.",
-      "severity": "error",
-      "title": "Link on broken page",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "links",
-      "code": "LINK002",
-      "description": "Link \"Return Home\" points to \"https://wyattau.com/\" but the current page itself returned HTTP 404.",
-      "recommendation": "Fix the broken page or remove links from it.",
-      "severity": "error",
-      "title": "Link on broken page",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "content",
-      "code": "CQ001",
-      "description": "Readability score: 100.0/100 (words: 25, sentences: 0, syllables: 0).",
-      "recommendation": "Content is easy to read. Good for general audiences.",
-      "severity": "info",
-      "title": "Flesch-Kincaid readability score",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "content",
-      "code": "CQ004",
-      "description": "Page has only 25 words. Pages with fewer than 300 words may be considered thin content.",
-      "recommendation": "Expand the content to at least 300 words for better search visibility.",
-      "severity": "warning",
-      "title": "Thin content",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "content",
-      "code": "WC001",
-      "description": "Words: 25, Characters: 0, Sentences: 0, Avg words/sentence: 0.0.",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Word count statistics",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "content",
-      "code": "WC003",
-      "description": "Page has only 25 words. This is very thin content.",
-      "recommendation": "Add more substantive content to the page.",
-      "severity": "warning",
-      "title": "Very low word count",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "security",
-      "code": "SEC009",
-      "description": "No COEP header was found. COEP prevents resources from loading cross-origin without explicit permission.",
-      "recommendation": "Set COEP to require-corp for stricter cross-origin isolation.",
-      "severity": "info",
-      "title": "Missing Cross-Origin-Embedder-Policy header",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "security",
-      "code": "SEC010",
-      "description": "No COOP header was found. COOP isolates your browsing context from cross-origin popups.",
-      "recommendation": "Set COOP to same-origin for stricter isolation.",
-      "severity": "info",
-      "title": "Missing Cross-Origin-Opener-Policy header",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "security",
-      "code": "SEC011",
-      "description": "No CORP header was found. CORP prevents cross-origin reads of embedded resources.",
-      "recommendation": "Set CORP to same-origin if the resource should only be used by the same origin.",
-      "severity": "info",
-      "title": "Missing Cross-Origin-Resource-Policy header",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "security",
-      "code": "SEC012",
-      "description": "Security header score: 100/100.",
-      "recommendation": "Security posture is strong. Minor improvements possible.",
-      "severity": "info",
-      "title": "Security posture score",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "security",
-      "code": "SSL007",
-      "description": "No TLS certificate information was provided for validation.",
-      "recommendation": "Provide certificate data from the TLS connection to enable SSL validation.",
-      "severity": "info",
-      "title": "No SSL certificate data available",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "accessibility",
-      "code": "A11Y002",
-      "description": "The page has no heading elements. Headings provide structure for screen reader users.",
-      "recommendation": "Add heading elements (H1-H6) to provide page structure.",
-      "severity": "warning",
-      "title": "No headings found",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "social",
-      "code": "SOCIAL001",
-      "description": "og:image is set but og:image:width and og:image:height are missing. Social platforms may crop or scale the image incorrectly.",
-      "recommendation": "Add <meta property=\"og:image:width\" content=\"1200\"> and <meta property=\"og:image:height\" content=\"630\">.",
-      "severity": "warning",
-      "title": "OG image missing dimensions",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "social",
-      "code": "SOCIAL008",
-      "description": "Social metadata score: 8/8 (OG: 5/5, Twitter: 3/3).",
-      "recommendation": "Social metadata is complete.",
-      "severity": "info",
-      "title": "Social preview completeness score",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "content",
-      "code": "ENTITY005",
-      "description": "Sentiment score: 0 (neutral).",
-      "recommendation": "Neutral sentiment detected.",
-      "severity": "info",
-      "title": "Content sentiment analysis",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "content",
-      "code": "ENTITY006",
-      "description": "People: 0, Organizations: 0, Locations: 0, Topics: 0.",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Entity counts per page",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "seo",
-      "code": "ISEO004",
-      "description": "Page has a lang attribute but no hreflang tags. If this site serves multiple languages, add hreflang annotations.",
-      "recommendation": "For multilingual sites, add hreflang tags to all language variants of each page.",
-      "severity": "info",
-      "title": "Single-language page without hreflang",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "seo",
-      "code": "AI-ACC009",
-      "description": "Site has no robots.txt file. All crawlers, including AI bots, have unrestricted access.",
-      "recommendation": "Consider adding robots.txt to control AI crawler access.",
-      "severity": "info",
-      "title": "No robots.txt found",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "seo",
-      "code": "AI-AB007",
-      "description": "No speakable property in structured data. speakable marks content for voice AI assistants (Siri, Alexa, Google Assistant).",
-      "recommendation": "Add speakable property to JSON-LD schema for voice-friendly content.",
-      "severity": "info",
-      "title": "Missing speakable schema",
-      "page": "//sitemap.xml"
-    },
-    {
-      "category": "http",
-      "code": "HTTP006",
-      "description": "HTTP 200 \u2014 categorized as success.",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Status category: success",
-      "page": "//uses"
-    },
-    {
-      "category": "seo",
-      "code": "SITEMAP001",
-      "description": "No sitemap URLs were loaded for validation.",
-      "recommendation": "Provide sitemap data to enable sitemap validation.",
-      "severity": "info",
-      "title": "No sitemap data available",
-      "page": "//uses"
-    },
-    {
-      "category": "seo",
-      "code": "META002",
-      "description": "Title is 17 characters, below the recommended minimum of 30.",
-      "recommendation": "Expand the title to 30-60 characters to improve search snippet quality.",
-      "severity": "warning",
-      "title": "Title too short",
-      "page": "//uses"
-    },
-    {
-      "category": "seo",
-      "code": "META005",
-      "description": "Description is 81 characters, below the recommended minimum of 120.",
-      "recommendation": "Expand the description to 120-160 characters.",
-      "severity": "warning",
-      "title": "Meta description too short",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "HEAD004",
-      "description": "Heading level jumps from H1 to H3, skipping intermediate levels.",
-      "recommendation": "Use H2 after H1 to maintain proper document hierarchy.",
-      "severity": "warning",
-      "title": "Skipped heading level",
-      "page": "//uses"
-    },
-    {
-      "category": "links",
-      "code": "LINK001",
-      "description": "Internal: 19, External: 22, Nofollow: 0",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Link counts",
-      "page": "//uses"
-    },
-    {
-      "category": "links",
-      "code": "LINK005",
-      "description": "Link \"ML\" has very short anchor text (2 chars).",
-      "recommendation": "Use more descriptive anchor text for better usability.",
-      "severity": "info",
-      "title": "Very short anchor text",
-      "page": "//uses"
-    },
-    {
-      "category": "links",
-      "code": "LINK005",
-      "description": "Link \"ML\" has very short anchor text (2 chars).",
-      "recommendation": "Use more descriptive anchor text for better usability.",
-      "severity": "info",
-      "title": "Very short anchor text",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "CQ001",
-      "description": "Readability score: 0.0/100 (words: 288, sentences: 1, syllables: 26).",
-      "recommendation": "Content is very difficult to read. Consider simplifying language and shortening sentences.",
-      "severity": "info",
-      "title": "Flesch-Kincaid readability score",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "CQ002",
-      "description": "Top 10 keyword occurrences in headings: \"uses\" (1), \"git\" (1), \"languages\" (1), \"edge\" (1), \"selfhosted\" (1), \"cicd\" (1), \"tools\" (1), \"hosting\" (1), \"editors\" (1), \"terminal\" (1).",
-      "recommendation": "Ensure target keywords appear in headings and body content naturally.",
-      "severity": "info",
-      "title": "Top keywords",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "CQ004",
-      "description": "Page has only 288 words. Pages with fewer than 300 words may be considered thin content.",
-      "recommendation": "Expand the content to at least 300 words for better search visibility.",
-      "severity": "warning",
-      "title": "Thin content",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "WC001",
-      "description": "Words: 288, Characters: 86, Sentences: 1, Avg words/sentence: 288.0.",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Word count statistics",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "WC004",
-      "description": "Average sentence length is 288.0 words. Sentences longer than 25 words may be difficult to read.",
-      "recommendation": "Break long sentences into shorter ones for better readability.",
-      "severity": "info",
-      "title": "Long average sentence length",
-      "page": "//uses"
-    },
-    {
-      "category": "security",
-      "code": "SEC009",
-      "description": "No COEP header was found. COEP prevents resources from loading cross-origin without explicit permission.",
-      "recommendation": "Set COEP to require-corp for stricter cross-origin isolation.",
-      "severity": "info",
-      "title": "Missing Cross-Origin-Embedder-Policy header",
-      "page": "//uses"
-    },
-    {
-      "category": "security",
-      "code": "SEC010",
-      "description": "No COOP header was found. COOP isolates your browsing context from cross-origin popups.",
-      "recommendation": "Set COOP to same-origin for stricter isolation.",
-      "severity": "info",
-      "title": "Missing Cross-Origin-Opener-Policy header",
-      "page": "//uses"
-    },
-    {
-      "category": "security",
-      "code": "SEC011",
-      "description": "No CORP header was found. CORP prevents cross-origin reads of embedded resources.",
-      "recommendation": "Set CORP to same-origin if the resource should only be used by the same origin.",
-      "severity": "info",
-      "title": "Missing Cross-Origin-Resource-Policy header",
-      "page": "//uses"
-    },
-    {
-      "category": "security",
-      "code": "SEC012",
-      "description": "Security header score: 100/100.",
-      "recommendation": "Security posture is strong. Minor improvements possible.",
-      "severity": "info",
-      "title": "Security posture score",
-      "page": "//uses"
-    },
-    {
-      "category": "security",
-      "code": "SSL007",
-      "description": "No TLS certificate information was provided for validation.",
-      "recommendation": "Provide certificate data from the TLS connection to enable SSL validation.",
-      "severity": "info",
-      "title": "No SSL certificate data available",
-      "page": "//uses"
-    },
-    {
-      "category": "accessibility",
-      "code": "A11Y005",
-      "description": "Heading jumps from H1 to H3, skipping intermediate levels.",
-      "recommendation": "Use H2 after H1 to maintain document outline.",
-      "severity": "warning",
-      "title": "Skipped heading level",
-      "page": "//uses"
-    },
-    {
-      "category": "social",
-      "code": "SOCIAL001",
-      "description": "og:image is set but og:image:width and og:image:height are missing. Social platforms may crop or scale the image incorrectly.",
-      "recommendation": "Add <meta property=\"og:image:width\" content=\"1200\"> and <meta property=\"og:image:height\" content=\"630\">.",
-      "severity": "warning",
-      "title": "OG image missing dimensions",
-      "page": "//uses"
-    },
-    {
-      "category": "social",
-      "code": "SOCIAL008",
-      "description": "Social metadata score: 8/8 (OG: 5/5, Twitter: 3/3).",
-      "recommendation": "Social metadata is complete.",
-      "severity": "info",
-      "title": "Social preview completeness score",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "ENTITY004",
-      "description": "Primary topics: editors, uses, selfhosted, databases, edge.",
-      "recommendation": "Ensure these topics align with the target keywords and page intent.",
-      "severity": "info",
-      "title": "Detected topics and themes",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "ENTITY005",
-      "description": "Sentiment score: 0 (neutral).",
-      "recommendation": "Neutral sentiment detected.",
-      "severity": "info",
-      "title": "Content sentiment analysis",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "ENTITY006",
-      "description": "People: 0, Organizations: 0, Locations: 0, Topics: 5.",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Entity counts per page",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "READ001",
-      "description": "Grade level: 13.1 (college)",
-      "recommendation": "Content is at a college reading level. Consider simplifying for broader audiences.",
-      "severity": "info",
-      "title": "Flesch-Kincaid Grade Level",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "READ002",
-      "description": "Index: 13.6",
-      "recommendation": "High Coleman-Liau index. Consider reducing sentence complexity.",
-      "severity": "info",
-      "title": "Coleman-Liau Index",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "READ003",
-      "description": "ARI: 10.4",
-      "recommendation": "Readability is within acceptable range.",
-      "severity": "info",
-      "title": "Automated Readability Index",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "READ004",
-      "description": "Fog index: 20.6",
-      "recommendation": "Very high Fog index. Content is extremely complex. Simplify vocabulary and shorten sentences.",
-      "severity": "info",
-      "title": "Gunning Fog Index",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "READ005",
-      "description": "Score: 24.4/100 (very difficult)",
-      "recommendation": "Very difficult to read. Aim for a score of 60+ for general audiences.",
-      "severity": "info",
-      "title": "Flesch Reading Ease score",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "KW001",
-      "description": "Top keywords by TF-IDF score: edge (0.09), hosting (0.09), selfhosted (0.09), cicd (0.09), terminal (0.09), editors (0.09), uses (0.09), databases (0.09), languages (0.09), tools (0.09).",
-      "recommendation": "TF-IDF highlights the most distinctive terms on this page. Ensure these align with your target keywords.",
-      "severity": "info",
-      "title": "Top TF-IDF keywords",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "KW002",
-      "description": "Top keyword densities (of 288 words): languages (0.3%), git (0.3%), tools (0.3%), cicd (0.3%), uses (0.3%), edge (0.3%), hosting (0.3%), databases (0.3%), terminal (0.3%), selfhosted (0.3%).",
-      "recommendation": "Ideal keyword density is 1-2%. Higher may indicate keyword stuffing.",
-      "severity": "info",
-      "title": "Keyword density",
-      "page": "//uses"
-    },
-    {
-      "category": "content",
-      "code": "KW004",
-      "description": "Top keyword pairs: \"languages\" + \"uses\" (1), \"git\" + \"tools\" (1), \"hosting\" + \"terminal\" (1), \"languages\" + \"tools\" (1), \"cicd\" + \"hosting\" (1).",
-      "recommendation": "Co-occurring keywords help search engines understand topic relationships.",
-      "severity": "info",
-      "title": "Keyword co-occurrence",
-      "page": "//uses"
-    },
-    {
-      "category": "seo",
-      "code": "ISEO004",
-      "description": "Page has a lang attribute but no hreflang tags. If this site serves multiple languages, add hreflang annotations.",
-      "recommendation": "For multilingual sites, add hreflang tags to all language variants of each page.",
-      "severity": "info",
-      "title": "Single-language page without hreflang",
-      "page": "//uses"
-    },
-    {
-      "category": "seo",
-      "code": "AI-ACC009",
-      "description": "Site has no robots.txt file. All crawlers, including AI bots, have unrestricted access.",
-      "recommendation": "Consider adding robots.txt to control AI crawler access.",
-      "severity": "info",
-      "title": "No robots.txt found",
-      "page": "//uses"
-    },
-    {
-      "category": "seo",
-      "code": "AI-AB007",
-      "description": "No speakable property in structured data. speakable marks content for voice AI assistants (Siri, Alexa, Google Assistant).",
-      "recommendation": "Add speakable property to JSON-LD schema for voice-friendly content.",
-      "severity": "info",
-      "title": "Missing speakable schema",
-      "page": "//uses"
-    },
-    {
-      "category": "http",
-      "code": "HTTP006",
-      "description": "HTTP 200 \u2014 categorized as success.",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Status category: success",
-      "page": "//guestbook"
-    },
-    {
-      "category": "seo",
-      "code": "SITEMAP001",
-      "description": "No sitemap URLs were loaded for validation.",
-      "recommendation": "Provide sitemap data to enable sitemap validation.",
-      "severity": "info",
-      "title": "No sitemap data available",
-      "page": "//guestbook"
-    },
-    {
-      "category": "seo",
-      "code": "META002",
-      "description": "Title is 22 characters, below the recommended minimum of 30.",
-      "recommendation": "Expand the title to 30-60 characters to improve search snippet quality.",
-      "severity": "warning",
-      "title": "Title too short",
-      "page": "//guestbook"
-    },
-    {
-      "category": "seo",
-      "code": "META005",
-      "description": "Description is 39 characters, below the recommended minimum of 120.",
-      "recommendation": "Expand the description to 120-160 characters.",
-      "severity": "warning",
-      "title": "Meta description too short",
-      "page": "//guestbook"
-    },
-    {
-      "category": "links",
-      "code": "LINK001",
-      "description": "Internal: 19, External: 2, Nofollow: 0",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Link counts",
-      "page": "//guestbook"
-    },
-    {
-      "category": "links",
-      "code": "LINK005",
-      "description": "Link \"ML\" has very short anchor text (2 chars).",
-      "recommendation": "Use more descriptive anchor text for better usability.",
-      "severity": "info",
-      "title": "Very short anchor text",
-      "page": "//guestbook"
-    },
-    {
-      "category": "links",
-      "code": "LINK005",
-      "description": "Link \"ML\" has very short anchor text (2 chars).",
-      "recommendation": "Use more descriptive anchor text for better usability.",
-      "severity": "info",
-      "title": "Very short anchor text",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "CQ001",
-      "description": "Readability score: 89.6/100 (words: 114, sentences: 1, syllables: 2).",
-      "recommendation": "Content is easy to read. Good for general audiences.",
-      "severity": "info",
-      "title": "Flesch-Kincaid readability score",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "CQ002",
-      "description": "Top 10 keyword occurrences in headings: \"guestbook\" (1).",
-      "recommendation": "Ensure target keywords appear in headings and body content naturally.",
-      "severity": "info",
-      "title": "Top keywords",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "CQ004",
-      "description": "Page has only 114 words. Pages with fewer than 300 words may be considered thin content.",
-      "recommendation": "Expand the content to at least 300 words for better search visibility.",
-      "severity": "warning",
-      "title": "Thin content",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "WC001",
-      "description": "Words: 114, Characters: 9, Sentences: 1, Avg words/sentence: 114.0.",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Word count statistics",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "WC004",
-      "description": "Average sentence length is 114.0 words. Sentences longer than 25 words may be difficult to read.",
-      "recommendation": "Break long sentences into shorter ones for better readability.",
-      "severity": "info",
-      "title": "Long average sentence length",
-      "page": "//guestbook"
-    },
-    {
-      "category": "security",
-      "code": "SEC009",
-      "description": "No COEP header was found. COEP prevents resources from loading cross-origin without explicit permission.",
-      "recommendation": "Set COEP to require-corp for stricter cross-origin isolation.",
-      "severity": "info",
-      "title": "Missing Cross-Origin-Embedder-Policy header",
-      "page": "//guestbook"
-    },
-    {
-      "category": "security",
-      "code": "SEC010",
-      "description": "No COOP header was found. COOP isolates your browsing context from cross-origin popups.",
-      "recommendation": "Set COOP to same-origin for stricter isolation.",
-      "severity": "info",
-      "title": "Missing Cross-Origin-Opener-Policy header",
-      "page": "//guestbook"
-    },
-    {
-      "category": "security",
-      "code": "SEC011",
-      "description": "No CORP header was found. CORP prevents cross-origin reads of embedded resources.",
-      "recommendation": "Set CORP to same-origin if the resource should only be used by the same origin.",
-      "severity": "info",
-      "title": "Missing Cross-Origin-Resource-Policy header",
-      "page": "//guestbook"
-    },
-    {
-      "category": "security",
-      "code": "SEC012",
-      "description": "Security header score: 100/100.",
-      "recommendation": "Security posture is strong. Minor improvements possible.",
-      "severity": "info",
-      "title": "Security posture score",
-      "page": "//guestbook"
-    },
-    {
-      "category": "security",
-      "code": "SSL007",
-      "description": "No TLS certificate information was provided for validation.",
-      "recommendation": "Provide certificate data from the TLS connection to enable SSL validation.",
-      "severity": "info",
-      "title": "No SSL certificate data available",
-      "page": "//guestbook"
-    },
-    {
-      "category": "accessibility",
-      "code": "A11Y016",
-      "description": "The <html> element has no lang attribute. Screen readers use this to select the correct pronunciation engine.",
-      "recommendation": "Add lang=\"en\" (or the appropriate language code) to the <html> element.",
-      "severity": "error",
-      "title": "Missing html lang attribute",
-      "page": "//guestbook"
-    },
-    {
-      "category": "social",
-      "code": "SOCIAL001",
-      "description": "og:image is set but og:image:width and og:image:height are missing. Social platforms may crop or scale the image incorrectly.",
-      "recommendation": "Add <meta property=\"og:image:width\" content=\"1200\"> and <meta property=\"og:image:height\" content=\"630\">.",
-      "severity": "warning",
-      "title": "OG image missing dimensions",
-      "page": "//guestbook"
-    },
-    {
-      "category": "social",
-      "code": "SOCIAL008",
-      "description": "Social metadata score: 8/8 (OG: 5/5, Twitter: 3/3).",
-      "recommendation": "Social metadata is complete.",
-      "severity": "info",
-      "title": "Social preview completeness score",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "ENTITY004",
-      "description": "Primary topics: guestbook.",
-      "recommendation": "Ensure these topics align with the target keywords and page intent.",
-      "severity": "info",
-      "title": "Detected topics and themes",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "ENTITY005",
-      "description": "Sentiment score: 0 (neutral).",
-      "recommendation": "Neutral sentiment detected.",
-      "severity": "info",
-      "title": "Content sentiment analysis",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "ENTITY006",
-      "description": "People: 0, Organizations: 0, Locations: 0, Topics: 1.",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Entity counts per page",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "READ001",
-      "description": "Grade level: 8.4 (middle school)",
-      "recommendation": "Content is at a high school reading level. Suitable for most web audiences.",
-      "severity": "info",
-      "title": "Flesch-Kincaid Grade Level",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "READ002",
-      "description": "Index: 7.5",
-      "recommendation": "Readability is within acceptable range.",
-      "severity": "info",
-      "title": "Coleman-Liau Index",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "READ003",
-      "description": "ARI: 21.5",
-      "recommendation": "High ARI score. Content may be difficult for general audiences.",
-      "severity": "info",
-      "title": "Automated Readability Index",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "READ004",
-      "description": "Fog index: 0.4",
-      "recommendation": "Fog index is within acceptable range.",
-      "severity": "info",
-      "title": "Gunning Fog Index",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "READ005",
-      "description": "Score: 36.6/100 (difficult)",
-      "recommendation": "Fairly difficult. Consider simplifying language.",
-      "severity": "info",
-      "title": "Flesch Reading Ease score",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "KW001",
-      "description": "Top keywords by TF-IDF score: guestbook (1.00).",
-      "recommendation": "TF-IDF highlights the most distinctive terms on this page. Ensure these align with your target keywords.",
-      "severity": "info",
-      "title": "Top TF-IDF keywords",
-      "page": "//guestbook"
-    },
-    {
-      "category": "content",
-      "code": "KW002",
-      "description": "Top keyword densities (of 114 words): guestbook (0.9%).",
-      "recommendation": "Ideal keyword density is 1-2%. Higher may indicate keyword stuffing.",
-      "severity": "info",
-      "title": "Keyword density",
-      "page": "//guestbook"
-    },
-    {
-      "category": "seo",
-      "code": "AI-ACC009",
-      "description": "Site has no robots.txt file. All crawlers, including AI bots, have unrestricted access.",
-      "recommendation": "Consider adding robots.txt to control AI crawler access.",
-      "severity": "info",
-      "title": "No robots.txt found",
-      "page": "//guestbook"
-    },
-    {
-      "category": "seo",
-      "code": "AI-AB007",
-      "description": "No speakable property in structured data. speakable marks content for voice AI assistants (Siri, Alexa, Google Assistant).",
-      "recommendation": "Add speakable property to JSON-LD schema for voice-friendly content.",
-      "severity": "info",
-      "title": "Missing speakable schema",
-      "page": "//guestbook"
-    },
-    {
-      "category": "http",
-      "code": "HTTP006",
-      "description": "HTTP 200 \u2014 categorized as success.",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Status category: success",
-      "page": "//etf"
-    },
-    {
-      "category": "seo",
-      "code": "SITEMAP001",
-      "description": "No sitemap URLs were loaded for validation.",
-      "recommendation": "Provide sitemap data to enable sitemap validation.",
-      "severity": "info",
-      "title": "No sitemap data available",
-      "page": "//etf"
-    },
-    {
-      "category": "seo",
-      "code": "META002",
-      "description": "Title is 29 characters, below the recommended minimum of 30.",
-      "recommendation": "Expand the title to 30-60 characters to improve search snippet quality.",
-      "severity": "warning",
-      "title": "Title too short",
-      "page": "//etf"
-    },
-    {
-      "category": "seo",
-      "code": "META005",
-      "description": "Description is 105 characters, below the recommended minimum of 120.",
-      "recommendation": "Expand the description to 120-160 characters.",
-      "severity": "warning",
-      "title": "Meta description too short",
-      "page": "//etf"
-    },
-    {
-      "category": "links",
-      "code": "LINK001",
-      "description": "Internal: 19, External: 2, Nofollow: 0",
-      "recommendation": "",
-      "severity": "info",
-      "title": "Link counts",
-      "page": "//etf"
-    },
-    {
-      "category": "links",
-      "code": "LINK005",
-      "description": "Link \"ML\" has very short anchor text (2 chars).",
-      "recommendation": "Use more descriptive anchor text for better usability.",
-      "severity": "info",
-      "title": "Very short anchor text",
-      "page": "//etf"
     }
   ]
 }

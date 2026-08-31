@@ -101,7 +101,8 @@ export default function VwapTracker() {
     const w = rect.width;
     const h = 250;
     const colors = getThemeColors();
-    const s = state()!;
+    const s = state();
+    if (!s) return;
     const closes = s.closes;
     const vwap = s.vwap;
     const n = closes.length;
@@ -217,8 +218,7 @@ export default function VwapTracker() {
 
   const spreadColor = () => {
     const s = state();
-    if (!s) return 'var(--text-secondary)';
-    return s.spread >= 0 ? '#4caf50' : '#ff5252';
+    return s ? (s.spread >= 0 ? '#4caf50' : '#ff5252') : 'var(--text-secondary)';
   };
 
   return (
@@ -228,12 +228,16 @@ export default function VwapTracker() {
           VWAP TRACKER
         </p>
         <Show when={!loading() && state()}>
-          {(s) => (
-            <span class="font-mono text-[10px]" style={{ color: spreadColor() }}>
-              spread {s().spread >= 0 ? '+' : ''}
-              {s().spread.toFixed(2)}
-            </span>
-          )}
+          {(() => {
+            const s = state();
+            if (!s) return null;
+            return (
+              <span class="font-mono text-[10px]" style={{ color: spreadColor() }}>
+                spread {s.spread >= 0 ? '+' : ''}
+                {s.spread.toFixed(2)}
+              </span>
+            );
+          })()}
         </Show>
       </div>
 

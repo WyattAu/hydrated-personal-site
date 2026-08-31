@@ -463,34 +463,35 @@ export default function HoldingsOverlapMatrix() {
           </div>
         </div>
 
-        <div
-          class="p-3 border flex items-center justify-between gap-3"
-          style={{
-            'border-color': overlapColor(result()?.jaccard ?? 0),
-            background: `${overlapColor(result()?.jaccard ?? 0)}14`,
-          }}
-        >
-          <div>
-            <p
-              class="font-mono text-[9px] uppercase tracking-wider"
-              style={{ color: 'var(--text-secondary)' }}
+        <Show when={result()}>
+          {(r) => (
+            <div
+              class="p-3 border flex items-center justify-between gap-3"
+              style={{
+                'border-color': overlapColor(r().jaccard),
+                background: `${overlapColor(r().jaccard)}14`,
+              }}
             >
-              JACCARD INDEX
-            </p>
-            <p
-              class="font-mono text-2xl font-bold"
-              style={{ color: overlapColor(result()?.jaccard ?? 0) }}
-            >
-              {((result()?.jaccard ?? 0) * 100).toFixed(1)}%
-            </p>
-          </div>
-          <p
-            class="font-mono text-xs font-bold"
-            style={{ color: overlapColor(result()?.jaccard ?? 0) }}
-          >
-            {overlapLabel(result()?.jaccard ?? 0)}
-          </p>
-        </div>
+              <div>
+                <p
+                  class="font-mono text-[9px] uppercase tracking-wider"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  JACCARD INDEX
+                </p>
+                <p
+                  class="font-mono text-2xl font-bold"
+                  style={{ color: overlapColor(r().jaccard) }}
+                >
+                  {(r().jaccard * 100).toFixed(1)}%
+                </p>
+              </div>
+              <p class="font-mono text-xs font-bold" style={{ color: overlapColor(r().jaccard) }}>
+                {overlapLabel(r().jaccard)}
+              </p>
+            </div>
+          )}
+        </Show>
       </Show>
 
       <p class="font-mono text-[10px] mt-3" style={{ color: 'var(--text-secondary)' }}>

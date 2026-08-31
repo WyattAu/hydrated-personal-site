@@ -173,6 +173,9 @@ export default function TailDependenceMatrix() {
                   class="cursor-pointer select-none font-mono text-[9px] uppercase tracking-wider px-2 py-1 text-left"
                   style={{ color: 'var(--text-secondary)', 'min-width': '60px' }}
                   onClick={() => toggleSort('label')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') toggleSort('label');
+                  }}
                 >
                   Asset {sortKey() === 'label' ? (sortDir() > 0 ? ' <' : ' >') : ''}
                 </th>
@@ -197,6 +200,9 @@ export default function TailDependenceMatrix() {
                   class="cursor-pointer select-none font-mono text-[9px] uppercase tracking-wider px-2 py-1 text-right"
                   style={{ color: 'var(--text-secondary)' }}
                   onClick={() => toggleSort('tail')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') toggleSort('tail');
+                  }}
                 >
                   Avg {sortKey() === 'tail' ? (sortDir() > 0 ? ' <' : ' >') : ''}
                 </th>
@@ -269,7 +275,10 @@ export default function TailDependenceMatrix() {
           }}
         >
           <Show
-            when={hoverCell() && hoverCell()!.col >= 0 && hoverCell()!.row !== hoverCell()!.col}
+            when={(() => {
+              const cell = hoverCell();
+              return cell && cell.col >= 0 && cell.row !== cell.col;
+            })()}
             fallback={
               <p class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
                 Hover any cell to see tail dependence. Click headers to sort.
@@ -277,35 +286,34 @@ export default function TailDependenceMatrix() {
             }
           >
             {(() => {
-              const h = hoverCell()!;
-              const row = h.row;
-              const col = h.col;
-              const d = data();
-              const m = matrix();
-              if (!d || !m || row === undefined || col === undefined || !d[row] || !m[row])
-                return null;
-              const val = m[row][col] ?? 0;
+              const cell = hoverCell();
+              if (!cell) return null;
               return (
                 <>
                   <p class="font-mono text-[10px]" style={{ color: 'var(--text-primary)' }}>
-                    <span style={{ color: 'var(--accent)' }}>{d[row].label}</span>
+                    <span style={{ color: 'var(--accent)' }}>{data()[cell.row].label}</span>
                     {' vs '}
-                    <span style={{ color: 'var(--accent)' }}>{d[col].label}</span>
+                    <span style={{ color: 'var(--accent)' }}>{data()[cell.col].label}</span>
                     {' : '}
                     <span
                       style={{
-                        color: val > 0.3 ? '#ff5252' : 'var(--text-secondary)',
+                        color:
+                          matrix()[cell.row][cell.col] > 0.3 ? '#ff5252' : 'var(--text-secondary)',
                         'font-weight': 'bold',
                       }}
                     >
-                      {val.toFixed(4)}
+                      {matrix()[cell.row][cell.col].toFixed(4)}
                     </span>
                   </p>
                   <p
                     class="font-mono text-[9px] uppercase tracking-wider"
                     style={{ color: 'var(--text-secondary)' }}
                   >
-                    {val > 0.5 ? 'HIGH CRASH LINK' : val > 0.2 ? 'MODERATE' : 'LOW'}
+                    {matrix()[cell.row][cell.col] > 0.5
+                      ? 'HIGH CRASH LINK'
+                      : matrix()[cell.row][cell.col] > 0.2
+                        ? 'MODERATE'
+                        : 'LOW'}
                   </p>
                 </>
               );
