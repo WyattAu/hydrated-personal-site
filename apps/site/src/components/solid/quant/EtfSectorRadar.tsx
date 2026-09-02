@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { activeTicker } from '../../../lib/etf-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 const GICS_SECTORS = [
   'Technology',
@@ -37,10 +37,9 @@ interface EtfEntry {
 }
 
 export default function EtfSectorRadar() {
-  // Ticker from shared store
   const [allocations, setAllocations] = createSignal<Record<string, number>>({});
   const [loading, setLoading] = createSignal(true);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -63,112 +62,39 @@ export default function EtfSectorRadar() {
     return GICS_SECTORS.map((s) => Number(alloc[s]) || 0);
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 340 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 340;
-    const colors = getThemeColors();
-    const cx = w / 2;
-    const cy = h / 2;
-    const radius = Math.min(w, h) / 2 - 50;
-    const n = GICS_SECTORS.length;
-    const vals = values();
-    const maxVal = Math.max(1, ...vals);
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    // Grid rings
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 1;
-    for (let ring = 1; ring <= 4; ring++) {
-      const r = (radius * ring) / 4;
-      ctx.beginPath();
-      for (let i = 0; i <= n; i++) {
-        const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
-        const x = cx + r * Math.cos(angle);
-        const y = cy + r * Math.sin(angle);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  async function initWasm() {
+    try {
+      const plychart = await getPlychart();
+      const canvas = document.getElementById('sector-radar') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        plychart.create_chart('sector-radar', Math.round(rect.width), 340);
       }
-      ctx.stroke();
-    }
-
-    // Axis lines
-    for (let i = 0; i < n; i++) {
-      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle));
-      ctx.stroke();
-    }
-
-    // Axis labels
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.4)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    for (let i = 0; i < n; i++) {
-      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
-      const lx = cx + (radius + 20) * Math.cos(angle);
-      const ly = cy + (radius + 20) * Math.sin(angle);
-      ctx.fillText(SECTOR_LABELS[i], lx, ly);
-    }
-
-    // Data polygon
-    const accent = colors.accent || '#00e5ff';
-    ctx.fillStyle = `${accent}30`;
-    ctx.strokeStyle = accent;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    for (let i = 0; i <= n; i++) {
-      const idx = i % n;
-      const angle = (idx / n) * Math.PI * 2 - Math.PI / 2;
-      const r = (vals[idx] / maxVal) * radius;
-      const x = cx + r * Math.cos(angle);
-      const y = cy + r * Math.sin(angle);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Data points
-    ctx.fillStyle = accent;
-    for (let i = 0; i < n; i++) {
-      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
-      const r = (vals[i] / maxVal) * radius;
-      const x = cx + r * Math.cos(angle);
-      const y = cy + r * Math.sin(angle);
-      ctx.beginPath();
-      ctx.arc(x, y, 3, 0, Math.PI * 2);
-      ctx.fill();
-      // Percentage label near the point
-      if (vals[i] > 0) {
-        ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-        ctx.font = '8px "JetBrains Mono", monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${vals[i].toFixed(1)}%`, x, y - 8);
-        ctx.fillStyle = accent;
-      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
   }
 
-  onMount(() => loadData());
+  createEffect(() => {
+    const vals = values();
+    const ready = wasmReady();
+    if (vals.every((v) => v === 0) || !ready) return;
+
+    const labels = [...SECTOR_LABELS];
+    getPlychart().then((p) => {
+      p.update_radar('sector-radar', JSON.stringify(vals), JSON.stringify(labels), '#00e5ff', '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
+  });
+
   createEffect(() => {
     activeTicker();
     loadData();
-  });
-  createEffect(() => {
-    allocations();
-    draw();
   });
 
   return (
@@ -181,7 +107,7 @@ export default function EtfSectorRadar() {
           Loading {activeTicker()}...
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: '340px' }} />
+      <canvas id="sector-radar" class="w-full" style={{ height: '340px' }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         {activeTicker()} 11 GICS sector allocation radar chart
       </p>

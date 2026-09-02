@@ -1,8 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
-
-const H = 360;
+import { getPlychart } from '../../../lib/plychart-loader';
 
 interface Series {
   code: string;
@@ -21,17 +19,6 @@ const SERIES = [
   { code: 'INDPRO', label: 'INDPRO' },
 ];
 
-function parseFredCsv(csv: string): number[] {
-  const out: number[] = [];
-  for (const line of csv.split('\n')) {
-    const parts = line.split(',');
-    if (parts.length < 2) continue;
-    const v = Number(parts[1]);
-    if (Number.isFinite(v)) out.push(v);
-  }
-  return out;
-}
-
 function fmt(v: number): string {
   const a = Math.abs(v);
   if (a >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
@@ -45,14 +32,12 @@ export default function FredSparklines() {
   const [series, setSeries] = createSignal<Series[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
     setErr(null);
     try {
-      // FRED doesn't send CORS headers, so direct browser fetch is blocked.
-      // Proxy through our API which fetches server-side.
       const res = await fetch(`${apiBase()}/api/fred-sparklines`);
       if (!res.ok) throw new Error('API');
       const data = await res.json();
@@ -66,90 +51,48 @@ export default function FredSparklines() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    const list = series();
-    if (!canvas || list.length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, H);
-
-    const cols = 4;
-    const rows = 2;
-    const colW = w / cols;
-    const rowH = H / rows;
-    const pad = 10;
-
-    for (let i = 0; i < list.length; i++) {
-      const s = list[i];
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      const ox = col * colW;
-      const oy = row * rowH;
-      const vals = s.values;
-      const min = Math.min(...vals);
-      const max = Math.max(...vals);
-      const rng = max - min || 1;
-      const up = vals[vals.length - 1] >= vals[0];
-      const stroke = up ? '#22c55e' : '#ef4444';
-      const fill = up ? 'rgba(34,197,94,0.14)' : 'rgba(239,68,68,0.14)';
-      const plotW = colW - pad * 2;
-      const plotH = rowH - pad * 2 - 16;
-      const xAt = (j: number) => ox + pad + (j / (vals.length - 1)) * plotW;
-      const yAt = (v: number) => oy + pad + 12 + (1 - (v - min) / rng) * plotH;
-
-      ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.06)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(ox + pad, oy + pad, colW - pad * 2, rowH - pad * 2);
-
-      ctx.beginPath();
-      for (let j = 0; j < vals.length; j++) {
-        const x = xAt(j);
-        const y = yAt(vals[j]);
-        if (j === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+  async function initWasm() {
+    try {
+      const plychart = await getPlychart();
+      const list = series();
+      for (let i = 0; i < SERIES.length; i++) {
+        const id = `fred-sparkline-${i}`;
+        const canvas = document.getElementById(id) as HTMLCanvasElement | null;
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect();
+          plychart.create_chart(id, Math.round(rect.width), 100);
+        }
       }
-      ctx.lineTo(xAt(vals.length - 1), oy + pad + 12 + plotH);
-      ctx.lineTo(xAt(0), oy + pad + 12 + plotH);
-      ctx.closePath();
-      ctx.fillStyle = fill;
-      ctx.fill();
-
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      for (let j = 0; j < vals.length; j++) {
-        const x = xAt(j);
-        const y = yAt(vals[j]);
-        if (j === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      ctx.fillStyle = colors.textPrimary || '#fff';
-      ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillText(s.label, ox + pad + 4, oy + pad + 2);
-      ctx.fillStyle = stroke;
-      ctx.textAlign = 'right';
-      ctx.fillText(fmt(vals[vals.length - 1]), ox + colW - pad - 4, oy + pad + 2);
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
   }
 
-  onMount(() => loadData());
   createEffect(() => {
-    const v = series();
-    if (v.length) draw();
+    const list = series();
+    const ready = wasmReady();
+    if (list.length === 0 || !ready) return;
+
+    getPlychart().then((p) => {
+      for (let i = 0; i < list.length; i++) {
+        const s = list[i];
+        const up = s.values[s.values.length - 1] >= s.values[0];
+        const color = up ? '#22c55e' : '#ef4444';
+        p.update_sparkline(`fred-sparkline-${i}`, JSON.stringify(s.values), color, '');
+      }
+    });
+  });
+
+  onMount(() => {
+    loadData();
+  });
+
+  createEffect(() => {
+    const list = series();
+    if (list.length > 0 && !wasmReady()) {
+      initWasm();
+    }
   });
 
   return (
@@ -167,7 +110,34 @@ export default function FredSparklines() {
           {err()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: `${H}px` }} />
+      <Show when={series().length > 0}>
+        <div class="grid grid-cols-4 gap-2" style={{ height: '360px' }}>
+          <For each={series()}>
+            {(s, i) => {
+              const up = s.values[s.values.length - 1] >= s.values[0];
+              const stroke = up ? '#22c55e' : '#ef4444';
+              return (
+                <div class="flex flex-col">
+                  <div
+                    class="flex items-center justify-between px-1"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    <span class="font-mono text-[9px]">{s.label}</span>
+                    <span class="font-mono text-[9px]" style={{ color: stroke }}>
+                      {fmt(s.values[s.values.length - 1])}
+                    </span>
+                  </div>
+                  <canvas
+                    id={`fred-sparkline-${i()}`}
+                    class="w-full flex-1"
+                    style={{ height: '100px' }}
+                  />
+                </div>
+              );
+            }}
+          </For>
+        </div>
+      </Show>
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         8 macro series | last 30 obs | green = latest higher than first
       </p>
