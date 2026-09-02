@@ -1,22 +1,4 @@
-pub mod rng;
-pub mod montecarlo;
-pub mod blackscholes;
-pub mod portfolio;
-pub mod risk;
-pub mod volatility;
-pub mod stats;
-pub mod yieldcurve;
-pub mod drawdown;
-pub mod concentration;
-pub mod factor;
-pub mod overlap;
-pub mod cointegration;
-pub mod liquidity;
-pub mod realizedvol;
-pub mod copula;
-pub mod regime;
-pub mod pairs;
-pub mod stress;
-pub mod risk_decomp;
-pub mod hrp;
-pub mod simd_utils;
+// Re-export all quant computation modules from the shared plycompute crate.
+pub use plycompute::*;
+// simd_utils now lives in plycompute (moved from local).
+pub use plycompute::simd_utils;

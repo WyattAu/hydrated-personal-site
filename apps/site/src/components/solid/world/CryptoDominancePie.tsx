@@ -1,16 +1,13 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 const H = 280;
 
 interface Slice {
   label: string;
   pct: number;
-  color: string;
 }
-
-const PALETTE = ['#00e5ff', '#ff6b35', '#a855f7', '#22c55e', '#eab308', '#f97316', '#ec4899'];
 
 function volOf(t: {
   quoteVolume?: string | number;
@@ -25,6 +22,7 @@ export default function CryptoDominancePie() {
   const [slices, setSlices] = createSignal<Slice[] | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
+  const [wasmReady, setWasmReady] = createSignal(false);
   let canvasRef: HTMLCanvasElement | undefined;
 
   async function loadData() {
@@ -53,10 +51,10 @@ export default function CryptoDominancePie() {
       const rest = total - btc - eth - top10;
 
       const out: Slice[] = [
-        { label: 'BTC', pct: (btc / total) * 100, color: PALETTE[0] },
-        { label: 'ETH', pct: (eth / total) * 100, color: PALETTE[1] },
-        { label: 'TOP10 ALT', pct: (top10 / total) * 100, color: PALETTE[2] },
-        { label: 'REST', pct: (rest / total) * 100, color: PALETTE[3] },
+        { label: 'BTC', pct: (btc / total) * 100 },
+        { label: 'ETH', pct: (eth / total) * 100 },
+        { label: 'TOP10 ALT', pct: (top10 / total) * 100 },
+        { label: 'REST', pct: (rest / total) * 100 },
       ].filter((s) => s.pct > 0.01);
       if (out.length === 0) throw new Error('No volume');
       setSlices(out);
@@ -67,78 +65,33 @@ export default function CryptoDominancePie() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    const sl = slices();
-    if (!canvas || !sl) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, H);
-
-    const cx = Math.min(w / 2 - 60, H / 2 + 20);
-    const cy = H / 2;
-    const radius = Math.max(40, Math.min(cx - 20, H / 2 - 30));
-    const inner = radius * 0.55;
-
-    let start = -Math.PI / 2;
-    for (const s of sl) {
-      const ang = (s.pct / 100) * Math.PI * 2;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, radius, start, start + ang, false);
-      ctx.closePath();
-      ctx.fillStyle = s.color;
-      ctx.fill();
-      start += ang;
-    }
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.beginPath();
-    ctx.arc(cx, cy, inner, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = colors.textPrimary || '#fff';
-    ctx.font = 'bold 18px "JetBrains Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('MKT', cx, cy - 8);
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.fillText('DOMINANCE', cx, cy + 10);
-
-    // Legend
-    const lx = cx + radius + 20;
-    let ly = cy - (sl.length * 18) / 2;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    for (const s of sl) {
-      ctx.fillStyle = s.color;
-      ctx.fillRect(lx, ly - 5, 10, 10);
-      ctx.fillStyle = colors.textPrimary || '#fff';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(`${s.label}`, lx + 16, ly);
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.6)';
-      ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.textAlign = 'right';
-      ctx.fillText(`${s.pct.toFixed(1)}%`, lx + 110, ly);
-      ctx.textAlign = 'left';
-      ly += 18;
+  async function initWasm() {
+    try {
+      const plychart = await getPlychart();
+      if (canvasRef) {
+        const rect = canvasRef.getBoundingClientRect();
+        plychart.create_chart('crypto-pie', Math.round(rect.width), H);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
   }
 
-  onMount(() => loadData());
   createEffect(() => {
-    const v = slices();
-    if (v) draw();
+    const sl = slices();
+    const ready = wasmReady();
+    if (!sl || !ready || !canvasRef) return;
+
+    const data = sl.map((s) => [s.label, s.pct] as [string, number]);
+    getPlychart().then((p) => {
+      p.update_pie('crypto-pie', JSON.stringify(data), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -156,7 +109,7 @@ export default function CryptoDominancePie() {
           {err()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: `${H}px` }} />
+      <canvas ref={canvasRef} id="crypto-pie" class="w-full" style={{ height: `${H}px` }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         top 50 by 24h volume | BTC + ETH + top 10 alts + rest
       </p>

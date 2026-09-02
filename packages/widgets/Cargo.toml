@@ -22,6 +22,10 @@ web-sys = { version = "0.3", features = [
     "ImageData",
     "Performance",
 ] }
+# Shared charting + quant computation crates.
+plycore = { path = "/home/wyatt/dev/src/github.com/WyattAu/plychart/crates/plycore" }
+plychart = { path = "/home/wyatt/dev/src/github.com/WyattAu/plychart/crates/plychart" }
+plycompute = { path = "/home/wyatt/dev/src/github.com/WyattAu/plychart/crates/plycompute" }
 
 [profile.release]
 opt-level = "s"

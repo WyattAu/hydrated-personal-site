@@ -310,6 +310,9 @@ dependencies = [
  "criterion",
  "getrandom 0.2.17",
  "js-sys",
+ "plychart",
+ "plycompute",
+ "plycore",
  "proptest",
  "serde",
  "serde_json",
@@ -425,6 +428,37 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51bae2ac328883f7acdfea3d66a7c35751187f870bc81f94563733a154d7a670"
 dependencies = [
  "plotters-backend",
+]
+
+[[package]]
+name = "plychart"
+version = "0.1.0"
+dependencies = [
+ "console_error_panic_hook",
+ "js-sys",
+ "plycore",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "plycompute"
+version = "0.1.0"
+dependencies = [
+ "plycore",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "plycore"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
