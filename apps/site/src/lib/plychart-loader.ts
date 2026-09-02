@@ -9,7 +9,8 @@ let modPromise: Promise<any> | null = null;
 export async function getPlychart() {
   if (!modPromise) {
     modPromise = (async () => {
-      const mod = await import('/wasm/plychart.js');
+      const _p = '/wasm/plychart.js';
+      const mod = await import(/* @vite-ignore */ _p);
       await mod.default();
       return mod;
     })();
