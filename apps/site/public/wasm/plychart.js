@@ -179,31 +179,36 @@ export function update_sparkline(canvas_id, data_json, color, theme_json) {
 
 /**
  * Get click data for a mouse position.
- * Returns JSON: `{index, x, y}` with the nearest data index.
+ * `chart_type` selects behaviour: `"pie"` uses angle, `"scatter"` finds the
+ * nearest point, and any other value returns the nearest index.
+ * Returns JSON: `{index, x, y}` (scatter also adds `distance`).
  * @param {string} canvas_id
  * @param {number} x
  * @param {number} y
  * @param {number} data_len
+ * @param {string} chart_type
  * @returns {string}
  */
-export function get_click_data(canvas_id, x, y, data_len) {
-    let deferred3_0;
-    let deferred3_1;
+export function get_click_data(canvas_id, x, y, data_len, chart_type) {
+    let deferred4_0;
+    let deferred4_1;
     try {
         const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.get_click_data(ptr0, len0, x, y, data_len);
-        var ptr2 = ret[0];
-        var len2 = ret[1];
+        const ptr1 = passStringToWasm0(chart_type, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.get_click_data(ptr0, len0, x, y, data_len, ptr1, len1);
+        var ptr3 = ret[0];
+        var len3 = ret[1];
         if (ret[3]) {
-            ptr2 = 0; len2 = 0;
+            ptr3 = 0; len3 = 0;
             throw takeFromExternrefTable0(ret[2]);
         }
-        deferred3_0 = ptr2;
-        deferred3_1 = len2;
-        return getStringFromWasm0(ptr2, len2);
+        deferred4_0 = ptr3;
+        deferred4_1 = len3;
+        return getStringFromWasm0(ptr3, len3);
     } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
     }
 }
 
@@ -266,14 +271,18 @@ export function update_radar_multi(canvas_id, data_json, labels_json, theme_json
 
 /**
  * Get tooltip data for a mouse position over a candlestick/line/area/bar chart.
+ * Supports single-series (`[{time,open,...}]`) and multi-series
+ * (`[{color, data:[{time,open,...}]}]`) formats.
+ * `series_index` selects which series in multi-series mode (default 0).
  * Returns JSON: `{index, time, open, high, low, close, volume}` or `{}` if no data.
  * @param {string} canvas_id
  * @param {number} x
  * @param {number} y
  * @param {string} data_json
+ * @param {number} series_index
  * @returns {string}
  */
-export function get_tooltip_data(canvas_id, x, y, data_json) {
+export function get_tooltip_data(canvas_id, x, y, data_json, series_index) {
     let deferred4_0;
     let deferred4_1;
     try {
@@ -281,7 +290,7 @@ export function get_tooltip_data(canvas_id, x, y, data_json) {
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.get_tooltip_data(ptr0, len0, x, y, ptr1, len1);
+        const ret = wasm.get_tooltip_data(ptr0, len0, x, y, ptr1, len1, series_index);
         var ptr3 = ret[0];
         var len3 = ret[1];
         if (ret[3]) {

@@ -39,12 +39,12 @@ pub fn create_boids(canvas_id: &str, w: u32, h: u32) -> Result<(), JsValue> {
 
 #[wasm_bindgen]
 pub fn update_boids(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsValue> {
-    let window = web_sys::window().unwrap();
-    let document = window.document().unwrap();
+    let window = web_sys::window().ok_or_else(|| JsValue::from_str("No window"))?;
+    let document = window.document().ok_or_else(|| JsValue::from_str("No document"))?;
     let canvas = document.get_element_by_id(canvas_id).ok_or_else(|| JsValue::from_str("Canvas not found"))?;
     let canvas: HtmlCanvasElement = canvas.dyn_into()?;
     canvas.set_width(w); canvas.set_height(h);
-    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.unwrap().dyn_into()?;
+    let ctx: CanvasRenderingContext2d = canvas.get_context("2d")?.ok_or_else(|| JsValue::from_str("No 2d context"))?.dyn_into()?;
     let wf = w as f64;
     let hf = h as f64;
 
@@ -54,6 +54,14 @@ pub fn update_boids(canvas_id: &str, w: u32, h: u32, _t: f64) -> Result<(), JsVa
     const VISUAL_RANGE: f64 = 40.0;
     const PROTECTED_RANGE: f64 = 12.0;
     const MAX_SPEED: f64 = 4.0;
+
+    BIRDS.with(|birds_cell| {
+        let birds = birds_cell.borrow();
+        if birds.is_empty() {
+            drop(birds);
+            init_birds(wf, hf);
+        }
+    });
 
     BIRDS.with(|birds_cell| {
         let mut birds = birds_cell.borrow_mut();

@@ -33,6 +33,9 @@ fn xorshift(state: &mut u64) -> f64 {
 fn init_state(w: f64, h: f64) {
     STATE.with(|s| {
         let mut s = s.borrow_mut();
+        if !s.points.is_empty() {
+            return;
+        }
         s.points.clear();
         s.iteration = 0;
         s.converged = false;
