@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getThemeColors } from '../../../lib/theme-colors';
 import { recordFetch } from '../StaleIndicator';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 interface CategoryScore {
   category: string;
@@ -41,7 +41,7 @@ export default function SeoAuditReport() {
   const [data, setData] = createSignal<AuditSummary | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -59,131 +59,38 @@ export default function SeoAuditReport() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    const d = data();
-    if (!canvas || !d) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, H);
-
-    const cats = d.categories;
-    if (cats.length === 0) return;
-
-    const padLeft = 40;
-    const padRight = 20;
-    const padTop = 10;
-    const padBottom = 30;
-    const chartW = w - padLeft - padRight;
-    const chartH = H - padTop - padBottom;
-    const barW = Math.min(50, (chartW / cats.length) * 0.6);
-    const gap = (chartW - barW * cats.length) / (cats.length + 1);
-
-    const maxVal = Math.max(...cats.map((c) => c.issues + c.warnings + c.passed), 1);
-
-    // Grid lines
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.08)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i <= 4; i++) {
-      const y = padTop + (chartH / 4) * i;
-      ctx.beginPath();
-      ctx.moveTo(padLeft, y);
-      ctx.lineTo(w - padRight, y);
-      ctx.stroke();
-    }
-
-    // Bars
-    for (let i = 0; i < cats.length; i++) {
-      const c = cats[i];
-      const x = padLeft + gap + i * (barW + gap);
-      const _total = c.issues + c.warnings + c.passed;
-
-      // Stacked bar: passed (bottom) -> warnings -> issues (top)
-      const passedH = (c.passed / maxVal) * chartH;
-      const warningsH = (c.warnings / maxVal) * chartH;
-      const issuesH = (c.issues / maxVal) * chartH;
-
-      let y = padTop + chartH;
-
-      // Passed
-      ctx.fillStyle = CATEGORY_COLORS[c.category] || '#00e5ff';
-      ctx.globalAlpha = 0.4;
-      ctx.fillRect(x, y - passedH, barW, passedH);
-      y -= passedH;
-
-      // Warnings
-      ctx.fillStyle = '#eab308';
-      ctx.globalAlpha = 0.7;
-      ctx.fillRect(x, y - warningsH, barW, warningsH);
-      y -= warningsH;
-
-      // Issues
-      ctx.fillStyle = '#f44336';
-      ctx.globalAlpha = 0.9;
-      ctx.fillRect(x, y - issuesH, barW, issuesH);
-      ctx.globalAlpha = 1;
-
-      // Category label
-      ctx.fillStyle = colors.textSecondary || '#888';
-      ctx.font = '8px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(c.category.slice(0, 6).toUpperCase(), x + barW / 2, padTop + chartH + 16);
-
-      // Issue count on top
-      if (c.issues > 0) {
-        ctx.fillStyle = CATEGORY_COLORS[c.category] || '#00e5ff';
-        ctx.font = 'bold 10px "JetBrains Mono", monospace';
-        ctx.fillText(
-          String(c.issues),
-          x + barW / 2,
-          padTop + chartH - issuesH - warningsH - passedH - 4,
-        );
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('seo-audit') as HTMLCanvasElement | null;
+      if (canvas) {
+        const w = canvas.clientWidth || 600;
+        p.create_chart('seo-audit', w, H);
       }
-    }
-
-    // Y-axis labels
-    ctx.fillStyle = colors.textSecondary || '#888';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'right';
-    for (let i = 0; i <= 4; i++) {
-      const val = Math.round((maxVal / 4) * (4 - i));
-      const y = padTop + (chartH / 4) * i;
-      ctx.fillText(String(val), padLeft - 6, y + 3);
-    }
-
-    // Legend
-    const legendY = H - 4;
-    const legendItems = [
-      { label: 'Issues', color: '#f44336' },
-      { label: 'Warnings', color: '#eab308' },
-      { label: 'Passed', color: CATEGORY_COLORS.SEO || '#00e5ff' },
-    ];
-    let lx = padLeft;
-    ctx.textAlign = 'left';
-    for (const item of legendItems) {
-      ctx.fillStyle = item.color;
-      ctx.fillRect(lx, legendY - 6, 8, 8);
-      ctx.fillStyle = colors.textSecondary || '#888';
-      ctx.font = '8px "JetBrains Mono", monospace';
-      ctx.fillText(item.label, lx + 12, legendY + 1);
-      lx += ctx.measureText(item.label).width + 24;
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
   }
 
-  onMount(() => loadData());
   createEffect(() => {
     const d = data();
-    if (d) requestAnimationFrame(draw);
+    const ready = wasmReady();
+    if (!d || !ready) return;
+    const canvas = document.getElementById('seo-audit') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth || 600;
+      p.create_chart('seo-audit', w, H);
+      const matrix = d.categories.map((c) => [c.issues, c.warnings, c.passed]);
+      const labels = d.categories.map((c) => c.category);
+      p.update_stacked_bar('seo-audit', JSON.stringify(matrix), JSON.stringify(labels), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -251,7 +158,7 @@ export default function SeoAuditReport() {
           </div>
         </div>
 
-        <canvas ref={canvasRef} class="w-full" style={{ height: `${H}px` }} />
+        <canvas id="seo-audit" class="w-full" style={{ height: `${H}px` }} />
 
         <div class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
           <For each={data()?.categories ?? []}>

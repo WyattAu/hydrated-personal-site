@@ -1,5 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 const H = 300;
 
@@ -50,7 +50,7 @@ export default function RealizedVolRanking() {
   const [rows, setRows] = createSignal<VolRow[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -83,59 +83,37 @@ export default function RealizedVolRanking() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    const list = rows();
-    if (!canvas || list.length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, H);
-
-    const labelW = 48;
-    const maxVol = Math.max(...list.map((r) => r.vol)) || 1;
-    const rowH = (H - 24) / list.length;
-    const barH = Math.min(18, rowH - 6);
-
-    for (let i = 0; i < list.length; i++) {
-      const r = list[i];
-      const y = 12 + i * rowH;
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.6)';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(r.label, labelW - 6, y + barH / 2);
-
-      const barW = ((w - labelW - 56) * r.vol) / maxVol;
-      const intensity = Math.min(1, r.vol / maxVol);
-      const red = Math.floor(60 + intensity * 195);
-      ctx.fillStyle = `rgb(${red},80,80)`;
-      ctx.fillRect(labelW, y, barW, barH);
-
-      ctx.fillStyle = colors.textPrimary || '#fff';
-      ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText(`${(r.vol * 100).toFixed(1)}%`, labelW + barW + 4, y + barH / 2);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('realized-vol') as HTMLCanvasElement | null;
+      if (canvas) {
+        const w = canvas.clientWidth || 600;
+        p.create_chart('realized-vol', w, H);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.35)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'right';
-    ctx.fillText('30d annualized vol', w - 4, H - 8);
   }
 
-  onMount(() => loadData());
   createEffect(() => {
-    const v = rows();
-    if (v.length) draw();
+    const list = rows();
+    const ready = wasmReady();
+    if (list.length === 0 || !ready) return;
+    const canvas = document.getElementById('realized-vol') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth || 600;
+      p.create_chart('realized-vol', w, H);
+      const data = list.map((r) => ({ time: 0, open: 0, high: 0, low: 0, close: r.vol, volume: 0 }));
+      p.update_bar('realized-vol', JSON.stringify(data), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -153,7 +131,7 @@ export default function RealizedVolRanking() {
           {err()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: `${H}px` }} />
+      <canvas id="realized-vol" class="w-full" style={{ height: `${H}px` }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         8 assets | 30d log returns | annualized (x sqrt 252) | sorted desc
       </p>

@@ -1,5 +1,6 @@
-import { For, Show, createEffect, createSignal } from 'solid-js';
+import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { getThemeColors } from '../../lib/theme-colors';
+import { getPlychart } from '../../lib/plychart-loader';
 import type { EtfEntry } from '../../lib/types';
 
 interface PortfolioOptimizerProps {
@@ -89,54 +90,43 @@ const COLORS = [
   '#ff5722',
 ];
 
-function drawPieChart(canvas: HTMLCanvasElement, weights: number[], _tickers: string[]) {
-  const dpr = window.devicePixelRatio || 1;
-  const size = Math.min(canvas.clientWidth, 300);
-  canvas.width = size * dpr;
-  canvas.height = size * dpr;
-  canvas.style.width = `${size}px`;
-  canvas.style.height = `${size}px`;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.scale(dpr, dpr);
+function ResultCard(props: { result: OptimizationResult; tickers: string[]; idx: number }) {
+  const [wasmReady, setWasmReady] = createSignal(false);
+  const H = 280;
+  const chartId = () => `portfolio-pie-${props.idx}`;
 
-  const cx = size / 2;
-  const cy = size / 2;
-  const radius = size / 2 - 10;
-  let start = -Math.PI / 2;
-
-  weights.forEach((w, i) => {
-    const angle = w * 2 * Math.PI;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, radius, start, start + angle);
-    ctx.closePath();
-    ctx.fillStyle = COLORS[i % COLORS.length];
-    ctx.fill();
-
-    // Label
-    if (w > 0.03) {
-      const mid = start + angle / 2;
-      const lx = cx + Math.cos(mid) * (radius * 0.65);
-      const ly = cy + Math.sin(mid) * (radius * 0.65);
-      ctx.fillStyle = '#000';
-      ctx.font = 'bold 10px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(`${(w * 100).toFixed(0)}%`, lx, ly);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById(chartId()) as HTMLCanvasElement | null;
+      if (canvas) {
+        const w = canvas.clientWidth || 280;
+        p.create_chart(chartId(), w, H);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
+  }
 
-    start += angle;
+  onMount(() => {
+    initWasm();
   });
-}
-
-function ResultCard(props: { result: OptimizationResult; tickers: string[] }) {
-  let canvasRef: HTMLCanvasElement | undefined;
 
   createEffect(() => {
-    if (canvasRef) {
-      drawPieChart(canvasRef, props.result.weights, props.tickers);
-    }
+    const ready = wasmReady();
+    const weights = props.result.weights;
+    if (!ready || weights.length === 0) return;
+    const canvas = document.getElementById(chartId()) as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth || 280;
+      p.create_chart(chartId(), w, H);
+      const data: [string, number][] = props.tickers.map(
+        (t, i) => [t, weights[i] ?? 0] as [string, number],
+      );
+      p.update_pie(chartId(), JSON.stringify(data), '');
+    });
   });
 
   return (
@@ -155,7 +145,13 @@ function ResultCard(props: { result: OptimizationResult; tickers: string[] }) {
       </p>
 
       <div class="flex justify-center mb-3">
-        <canvas ref={canvasRef} role="img" aria-label={`Pie chart for ${props.result.name}`} />
+        <canvas
+          id={`portfolio-pie-${props.idx}`}
+          class="w-full"
+          style={{ height: `${H}px` }}
+          role="img"
+          aria-label={`Pie chart for ${props.result.name}`}
+        />
       </div>
 
       <div class="grid grid-cols-3 gap-2 mb-3">
@@ -293,8 +289,8 @@ export default function PortfolioOptimizer(props: PortfolioOptimizerProps) {
       <Show when={props.selectedEtfs.length >= 2}>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <For each={results()}>
-            {(result) => (
-              <ResultCard result={result} tickers={props.selectedEtfs.map((e) => e.ticker)} />
+            {(result, idx) => (
+              <ResultCard result={result} tickers={props.selectedEtfs.map((e) => e.ticker)} idx={idx()} />
             )}
           </For>
         </div>

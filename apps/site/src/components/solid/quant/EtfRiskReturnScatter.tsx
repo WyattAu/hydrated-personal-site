@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 interface EtfEntry {
   ticker: string;
@@ -36,7 +36,7 @@ export default function EtfRiskReturnScatter() {
   const [points, setPoints] = createSignal<ScatterPoint[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -96,122 +96,37 @@ export default function EtfRiskReturnScatter() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || points().length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 360 * dpr;
-    ctx.scale(dpr, dpr);
-
-    const w = rect.width;
-    const h = 360;
-    const colors = getThemeColors();
-    const pad = { l: 50, r: 16, t: 16, b: 36 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const pts = points();
-    const allRisk = pts.map((p) => p.risk * 100);
-    const allRet = pts.map((p) => p.ret * 100);
-    const minR = Math.min(...allRisk);
-    const maxR = Math.max(...allRisk);
-    const minRet = Math.min(...allRet, 0);
-    const maxRet = Math.max(...allRet, 0);
-    const rangeR = maxR - minR || 1;
-    const rangeRet = maxRet - minRet || 1;
-    const padR = rangeR * 0.08;
-    const padRet = rangeRet * 0.08;
-
-    const toX = (v: number) => pad.l + ((v - minR + padR) / (rangeR + 2 * padR)) * cW;
-    const toY = (v: number) => pad.t + (1 - (v - minRet + padRet) / (rangeRet + 2 * padRet)) * cH;
-
-    // Grid + axis ticks
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.06)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 5; i++) {
-      const y = pad.t + (cH * i) / 5;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.fillText(
-        `${(maxRet + padRet - ((rangeRet + 2 * padRet) * i) / 5).toFixed(0)}%`,
-        pad.l - 5,
-        y + 3,
-      );
-      const x = pad.l + (cW * i) / 5;
-      ctx.beginPath();
-      ctx.moveTo(x, pad.t);
-      ctx.lineTo(x, h - pad.b);
-      ctx.stroke();
-      ctx.textAlign = 'center';
-      ctx.fillText(
-        `${(minR + padR + ((rangeR + 2 * padR) * i) / 5).toFixed(0)}%`,
-        x,
-        h - pad.b + 14,
-      );
+  async function initWasm() {
+    try {
+      const plychart = await getPlychart();
+      const canvas = document.getElementById('risk-return-scatter') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        plychart.create_chart('risk-return-scatter', Math.round(rect.width), 360);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    // Zero-return reference line
-    if (minRet < 0) {
-      const zy = toY(0);
-      ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.15)';
-      ctx.setLineDash([2, 4]);
-      ctx.beginPath();
-      ctx.moveTo(pad.l, zy);
-      ctx.lineTo(w - pad.r, zy);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    // Scatter points coloured by Sharpe (red -> cyan -> green)
-    for (const p of pts) {
-      const intensity = Math.max(0, Math.min(1, (p.sharpe + 1) / 3));
-      const r = Math.floor(255 * (1 - intensity));
-      const g = Math.floor(120 + intensity * 135);
-      const b = Math.floor(80 + intensity * 175);
-      ctx.fillStyle = `rgb(${r},${g},${b})`;
-      ctx.beginPath();
-      ctx.arc(toX(p.risk * 100), toY(p.ret * 100), 4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Ticker labels
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.55)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    for (const p of pts) {
-      ctx.fillText(p.ticker, toX(p.risk * 100) + 6, toY(p.ret * 100) + 3);
-    }
-
-    // Axis titles
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.4)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('RISK (annualized std dev)', w / 2, h - 4);
-    ctx.save();
-    ctx.translate(12, h / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillText('RETURN (annualized)', 0, 0);
-    ctx.restore();
   }
 
-  onMount(() => {
-    loadData();
+  createEffect(() => {
+    const pts = points();
+    const ready = wasmReady();
+    if (pts.length === 0 || !ready) return;
+    const scatterData: [number, number][] = pts.map((p) => [p.risk, p.ret]);
+    // color based on avg Sharpe (computed for potential theme use)
+    const avgSharpe = pts.reduce((s, p) => s + p.sharpe, 0) / pts.length;
+    const _color = avgSharpe > 1 ? '#4ade80' : avgSharpe > 0 ? '#c8a23c' : '#ff4081';
+    void _color;
+    getPlychart().then((p) => {
+      p.update_scatter('risk-return-scatter', JSON.stringify(scatterData), '');
+    });
   });
 
-  createEffect(() => {
-    const v = points();
-    if (v) draw();
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -238,7 +153,7 @@ export default function EtfRiskReturnScatter() {
           {error()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: '360px' }} />
+      <canvas id="risk-return-scatter" class="w-full" style={{ height: '360px' }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         1y daily returns | colour = Sharpe (rf 4%) | top {PLOT_TOP_N} by volume
       </p>
