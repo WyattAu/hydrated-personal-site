@@ -2,7 +2,7 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface VolResult {
@@ -21,7 +21,7 @@ export default function RealizedVolDecomposition() {
   const [data, setData] = createSignal<VolResult | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -51,27 +51,26 @@ export default function RealizedVolDecomposition() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || !data()) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 280 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 280;
-    const colors = getThemeColors();
-    const pad = { l: 50, r: 16, t: 16, b: 28 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('realized-vol-decomp') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        p.create_chart('realized-vol-decomp', Math.round(rect.width), 280);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
+    }
+  }
 
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const d = data()!;
+  createEffect(() => {
+    const d = data();
+    const ready = wasmReady();
+    if (!d || !ready) return;
+    const canvas = document.getElementById('realized-vol-decomp') as HTMLCanvasElement | null;
+    if (!canvas) return;
     const rv = d.daily_rv_tail;
     const bv = d.daily_bv_tail;
     const jumpVar = rv.map((r, i) => Math.max(0, r - (bv[i] ?? 0)));
@@ -81,80 +80,41 @@ export default function RealizedVolDecomposition() {
     const n = rv.length - start;
     if (n < 2) return;
 
-    const maxV = Math.max(...rv.slice(start)) * 1.1 || 1;
-    const toX = (i: number) => pad.l + (i / (n - 1)) * cW;
-    const toY = (v: number) => pad.t + (1 - v / maxV) * cH;
+    const contData = contVar.slice(start, start + n).map((v, i) => ({
+      time: i,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: v ?? 0,
+      volume: 0,
+    }));
+    const jumpData = jumpVar.slice(start, start + n).map((v, i) => ({
+      time: i,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: v ?? 0,
+      volume: 0,
+    }));
 
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.1)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.fillText(`${(maxV - (maxV * i) / 4).toExponential(1)}`, pad.l - 5, y + 3);
-    }
-
-    // Continuous (bottom) area — blue
-    ctx.fillStyle = `${colors.accent || '#00e5ff'}66`;
-    ctx.beginPath();
-    ctx.moveTo(toX(0), pad.t + cH);
-    for (let i = 0; i < n; i++) ctx.lineTo(toX(i), toY(contVar[start + i] ?? 0));
-    ctx.lineTo(toX(n - 1), pad.t + cH);
-    ctx.closePath();
-    ctx.fill();
-
-    // Jump (top) area stacked on continuous — red
-    ctx.fillStyle = `${colors.accentWarm || '#ff6b35'}99`;
-    ctx.beginPath();
-    ctx.moveTo(toX(0), toY(contVar[start + 0] ?? 0));
-    for (let i = 0; i < n; i++)
-      ctx.lineTo(toX(i), toY((contVar[start + i] ?? 0) + (jumpVar[start + i] ?? 0)));
-    ctx.lineTo(toX(n - 1), toY(contVar[start + n - 1] ?? 0));
-    ctx.closePath();
-    ctx.fill();
-
-    // Jump day markers
-    for (let i = 0; i < n; i++) {
-      if (d.jump_days[start + i]) {
-        const x = toX(i);
-        ctx.strokeStyle = '#ff5252aa';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(x, pad.t);
-        ctx.lineTo(x, pad.t + cH);
-        ctx.stroke();
-      }
-    }
-
-    // Legend
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    const legend: [string, string][] = [
-      ['CONTINUOUS', colors.accent || '#00e5ff'],
-      ['JUMP', colors.accentWarm || '#ff6b35'],
+    const series = [
+      { color: '#00e5ff', data: contData },
+      { color: '#ff6b35', data: jumpData },
     ];
-    legend.forEach(([label, color], i) => {
-      const x = pad.l + 10 + i * 90;
-      ctx.fillStyle = color;
-      ctx.fillRect(x, h - 14, 8, 8);
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.fillText(label, x + 12, h - 7);
-    });
-  }
 
-  onMount(() => loadData());
+    getPlychart().then((p) => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) p.create_chart('realized-vol-decomp', Math.round(rect.width), 280);
+      p.update_area('realized-vol-decomp', JSON.stringify(series), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
+  });
 
   onAssetChanged(() => loadData());
-
-  createEffect(() => {
-    data();
-    if (!loading()) requestAnimationFrame(() => draw());
-  });
 
   return (
     <div>
@@ -181,7 +141,24 @@ export default function RealizedVolDecomposition() {
         </p>
       </Show>
 
-      <canvas ref={canvasRef} class="w-full" style={{ height: '280px' }} />
+      <canvas id="realized-vol-decomp" class="w-full" style={{ height: '280px' }} />
+
+      {/* Jump day markers as HTML overlay */}
+      <Show when={!loading() && data()}>
+        <div class="mt-1 flex flex-wrap gap-1 font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+          <span class="flex items-center gap-1">
+            <span class="inline-block w-2 h-2" style={{ background: '#00e5ff' }} /> CONTINUOUS
+          </span>
+          <span class="flex items-center gap-1">
+            <span class="inline-block w-2 h-2" style={{ background: '#ff6b35' }} /> JUMP
+          </span>
+          <Show when={(data()?.jump_days?.filter(Boolean).length ?? 0) > 0}>
+            <span style={{ color: '#ff5252' }}>
+              {data()?.jump_days?.filter(Boolean).length} jump days detected
+            </span>
+          </Show>
+        </div>
+      </Show>
 
       <Show when={!loading() && data()} keyed>
         {(d) => (

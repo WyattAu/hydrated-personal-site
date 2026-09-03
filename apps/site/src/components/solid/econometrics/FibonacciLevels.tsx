@@ -2,7 +2,7 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 const FIB_LEVELS: { ratio: number; label: string; golden?: boolean }[] = [
   { ratio: 0, label: '0%' },
@@ -36,7 +36,7 @@ export default function FibonacciLevels() {
   const [state, setState] = createSignal<FibState | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -62,111 +62,48 @@ export default function FibonacciLevels() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || !state()) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 300 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 300;
-    const colors = getThemeColors();
-    const s = state();
-    if (!s) return;
-    const closes = s.closes;
-    const n = closes.length;
-    if (n < 2) return;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const pad = { l: 96, r: 16, t: 16, b: 28 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    const lo = s.swingLow;
-    const hi = s.swingHigh;
-    const range = hi - lo || 1;
-    const padY = range * 0.04;
-    const yLo = lo - padY;
-    const yHi = hi + padY;
-    const yRange = yHi - yLo || 1;
-    const toX = (i: number) => pad.l + (i / (n - 1)) * cW;
-    const toY = (v: number) => pad.t + (1 - (v - yLo) / yRange) * cH;
-
-    // Fibonacci level lines
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.lineWidth = 1;
-    for (const lv of s.levels) {
-      const y = toY(lv.price);
-      const isSupport = lv.price < s.current;
-      const baseColor = isSupport ? '#4caf50' : '#ff5252';
-      ctx.strokeStyle = lv.golden ? '#ffc107' : baseColor;
-      ctx.lineWidth = lv.golden ? 2 : 1;
-      ctx.setLineDash(lv.golden ? [] : [4, 3]);
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      // Label (% + price)
-      ctx.textAlign = 'right';
-      ctx.fillStyle = lv.golden ? '#ffc107' : colors.canvasText || 'rgba(255,255,255,0.7)';
-      const tag = lv.golden
-        ? `${lv.label} GOLDEN ${lv.price.toFixed(2)}`
-        : `${lv.label} ${lv.price.toFixed(2)}`;
-      ctx.fillText(tag, pad.l - 6, y + 3);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('fib-levels') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        p.create_chart('fib-levels', Math.round(rect.width), 300);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    // Price line over time
-    ctx.strokeStyle = colors.accent || '#00e5ff';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    for (let i = 0; i < n; i++) {
-      i === 0 ? ctx.moveTo(toX(i), toY(closes[i])) : ctx.lineTo(toX(i), toY(closes[i]));
-    }
-    ctx.stroke();
-
-    // Current price marker
-    const lastX = toX(n - 1);
-    const curY = toY(s.current);
-    ctx.fillStyle = colors.accent || '#00e5ff';
-    ctx.beginPath();
-    ctx.arc(lastX, curY, 3.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = colors.textPrimary || '#ffffff';
-    ctx.textAlign = 'left';
-    ctx.fillText(s.current.toFixed(2), lastX + 6, curY - 4);
-
-    // Legend
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    const legend: [string, string][] = [
-      ['SUPPORT', '#4caf50'],
-      ['RESISTANCE', '#ff5252'],
-      ['GOLDEN 61.8%', '#ffc107'],
-    ];
-    legend.forEach(([label, color], i) => {
-      const x = pad.l + 4 + i * 100;
-      ctx.fillStyle = color;
-      ctx.fillRect(x, h - 14, 8, 8);
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.fillText(label, x + 12, h - 7);
-    });
   }
 
-  onMount(() => loadData());
+  createEffect(() => {
+    const s = state();
+    const ready = wasmReady();
+    if (!s || !ready) return;
+    const canvas = document.getElementById('fib-levels') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const data = s.closes.map((v, i) => ({
+      time: i,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: v,
+      volume: 0,
+    }));
+    const series = [{ color: '#00e5ff', data }];
+    getPlychart().then((p) => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) p.create_chart('fib-levels', Math.round(rect.width), 300);
+      p.update_line('fib-levels', JSON.stringify(series), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
+  });
 
   onAssetChanged(() => loadData());
-
-  createEffect(() => {
-    state();
-    if (!loading()) requestAnimationFrame(() => draw());
-  });
 
   return (
     <div>
@@ -195,7 +132,52 @@ export default function FibonacciLevels() {
       </Show>
 
       <Show when={!loading() && state()}>
-        <canvas ref={canvasRef} class="w-full" style={{ height: '300px' }} />
+        <canvas id="fib-levels" class="w-full" style={{ height: '300px' }} />
+        {/* Fibonacci level overlays as HTML below canvas */}
+        <div class="mt-2 flex flex-col gap-1">
+          <Show when={state()} keyed>
+            {(s) => (
+              <>
+                <div class="flex flex-wrap gap-1.5">
+                  {s.levels.map((lv) => {
+                    const isSupport = lv.price < s.current;
+                    const color = lv.golden ? '#ffc107' : isSupport ? '#4caf50' : '#ff5252';
+                    const borderStyle = lv.golden ? 'solid' : 'dashed';
+                    return (
+                      <div
+                        class="font-mono text-[9px] px-2 py-1 border flex items-center gap-1.5"
+                        style={{
+                          'border-color': color,
+                          'border-style': borderStyle,
+                          background: `${color}14`,
+                          color: color,
+                        }}
+                      >
+                        <span
+                          class="inline-block w-2 h-2 rounded-full"
+                          style={{ background: color }}
+                        />
+                        {lv.label} {lv.price.toFixed(2)}
+                        {lv.golden ? ' GOLDEN' : ''}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div class="flex gap-3 font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+                  <span class="flex items-center gap-1">
+                    <span class="inline-block w-2 h-2" style={{ background: '#4caf50' }} /> SUPPORT
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="inline-block w-2 h-2" style={{ background: '#ff5252' }} /> RESISTANCE
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="inline-block w-2 h-2" style={{ background: '#ffc107' }} /> GOLDEN 61.8%
+                  </span>
+                </div>
+              </>
+            )}
+          </Show>
+        </div>
         <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
           Auto-detected swing high/low | 6M lookback | 61.8% = golden ratio
         </p>

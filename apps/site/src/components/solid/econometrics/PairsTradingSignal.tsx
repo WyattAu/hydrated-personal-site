@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 import { onTickersChanged } from '../../../lib/ticker-events';
 import { activeTickers } from '../../../lib/ticker-universe';
 import { getWasmMod } from '../../../lib/wasm-loader';
@@ -55,7 +55,7 @@ export default function PairsTradingSignal() {
   const [pairs, setPairs] = createSignal<ReturnType<typeof buildPairs>>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -116,110 +116,52 @@ export default function PairsTradingSignal() {
     return { color: '#ff5252', label: s.replace('_', ' ') };
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || !data()) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 280 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 280;
-    const colors = getThemeColors();
-    const pad = { l: 44, r: 16, t: 16, b: 28 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const d = data()!;
-    const tail = d.spread_tail ?? [];
-    if (tail.length < 2) return;
-    const n = tail.length;
-    const yMax = Math.max(4, Math.max(...tail.map((v) => Math.abs(v))) * 1.1);
-    const toX = (i: number) => pad.l + (i / (n - 1)) * cW;
-    const toY = (v: number) => pad.t + (1 - (v + yMax) / (2 * yMax)) * cH;
-
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.1)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.fillText(`${(yMax - (2 * yMax * i) / 4).toFixed(1)}σ`, pad.l - 5, y + 3);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('pairs-signal') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        p.create_chart('pairs-signal', Math.round(rect.width), 280);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    // Reference lines
-    const refLine = (val: number, color: string, dash: number[]) => {
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.setLineDash(dash);
-      ctx.beginPath();
-      ctx.moveTo(pad.l, toY(val));
-      ctx.lineTo(w - pad.r, toY(val));
-      ctx.stroke();
-      ctx.setLineDash([]);
-    };
-    refLine(3.5, '#ff9800', [6, 3]);
-    refLine(-3.5, '#ff9800', [6, 3]);
-    refLine(2, '#ff5252', [4, 3]);
-    refLine(-2, '#ff5252', [4, 3]);
-    refLine(0.5, '#4caf50', [2, 3]);
-    refLine(-0.5, '#4caf50', [2, 3]);
-    refLine(0, colors.canvasGrid || 'rgba(255,255,255,0.25)', []);
-
-    // Z-score line
-    ctx.strokeStyle = colors.accent || '#00e5ff';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    for (let i = 0; i < n; i++) {
-      i === 0 ? ctx.moveTo(toX(i), toY(tail[i])) : ctx.lineTo(toX(i), toY(tail[i]));
-    }
-    ctx.stroke();
-
-    // Current z marker
-    const lastZ = tail[n - 1];
-    ctx.fillStyle = signalStyle(d.signal).color;
-    ctx.beginPath();
-    ctx.arc(toX(n - 1), toY(lastZ), 4, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Legend
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    const legend: [string, string][] = [
-      ['±2 ENTRY', '#ff5252'],
-      ['±0.5 EXIT', '#4caf50'],
-      ['±3.5 STOP', '#ff9800'],
-    ];
-    legend.forEach(([label, color], i) => {
-      const x = pad.l + 8 + i * 90;
-      ctx.fillStyle = color;
-      ctx.fillRect(x, h - 14, 8, 8);
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.fillText(label, x + 12, h - 7);
-    });
   }
 
-  onMount(() => loadData());
+  createEffect(() => {
+    const d = data();
+    const ready = wasmReady();
+    if (!d || !ready) return;
+    const canvas = document.getElementById('pairs-signal') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const tail = d.spread_tail ?? [];
+    if (tail.length < 2) return;
+    const seriesData = tail.map((v, i) => ({
+      time: i,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: v,
+      volume: 0,
+    }));
+    const series = [{ color: '#00e5ff', data: seriesData }];
+    getPlychart().then((p) => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) p.create_chart('pairs-signal', Math.round(rect.width), 280);
+      p.update_line('pairs-signal', JSON.stringify(series), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
+  });
 
   onTickersChanged(() => {
     setPairIdx(0);
     loadData();
-  });
-
-  createEffect(() => {
-    data();
-    if (!loading()) requestAnimationFrame(() => draw());
   });
 
   const cur = () => pairs()[Math.min(pairIdx(), Math.max(0, pairs().length - 1))];
@@ -289,7 +231,38 @@ export default function PairsTradingSignal() {
                   {st.label}
                 </span>
               </div>
-              <canvas ref={canvasRef} class="w-full" style={{ height: '280px' }} />
+              <canvas id="pairs-signal" class="w-full" style={{ height: '280px' }} />
+              {/* Threshold bands as HTML overlay below canvas */}
+              <div class="mt-2 flex flex-wrap gap-1.5 font-mono text-[9px]">
+                <div
+                  class="px-2 py-1 border border-dashed flex items-center gap-1.5"
+                  style={{ 'border-color': '#ff5252', background: '#ff525214', color: '#ff5252' }}
+                >
+                  <span class="inline-block w-2 h-0.5" style={{ background: '#ff5252' }} /> ±2 ENTRY
+                </div>
+                <div
+                  class="px-2 py-1 border border-dashed flex items-center gap-1.5"
+                  style={{ 'border-color': '#4caf50', background: '#4caf5014', color: '#4caf50' }}
+                >
+                  <span class="inline-block w-2 h-0.5" style={{ background: '#4caf50' }} /> ±0.5 EXIT
+                </div>
+                <div
+                  class="px-2 py-1 border border-dashed flex items-center gap-1.5"
+                  style={{ 'border-color': '#ff9800', background: '#ff980014', color: '#ff9800' }}
+                >
+                  <span class="inline-block w-2 h-0.5" style={{ background: '#ff9800' }} /> ±3.5 STOP
+                </div>
+                <div
+                  class="px-2 py-1 border flex items-center gap-1.5"
+                  style={{
+                    'border-color': 'rgba(255,255,255,0.25)',
+                    background: 'rgba(255,255,255,0.06)',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  0σ MID
+                </div>
+              </div>
               <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
                 Hedge ratio: {d.hedge_ratio.toFixed(3)} | Half-life:{' '}
                 {d.half_life > 9000 ? 'inf' : `${d.half_life.toFixed(1)} days`} | Entry ±2σ | Exit

@@ -1,6 +1,6 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 const H = 340;
 
@@ -13,7 +13,7 @@ export default function CurrencyMatrix() {
   } | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -45,67 +45,36 @@ export default function CurrencyMatrix() {
     }
   }
 
-  function cellColor(v: number): string {
-    const clamped = Math.max(-0.5, Math.min(0.5, v));
-    const a = Math.min(1, Math.abs(clamped) / 0.5);
-    return clamped >= 0 ? `rgba(34,197,94,${a})` : `rgba(239,68,68,${a})`;
-  }
-
-  function draw() {
-    const canvas = canvasRef;
-    const m = matrix();
-    if (!canvas || !m) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, H);
-
-    const n = CURRENCIES.length;
-    const labelPad = 46;
-    const gridW = w - labelPad * 2;
-    const gridH = H - labelPad * 2;
-    const cellW = gridW / n;
-    const cellH = gridH / n;
-    const sx = labelPad;
-    const sy = labelPad;
-
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        ctx.fillStyle = cellColor(m.grid[i][j]);
-        ctx.fillRect(sx + j * cellW, sy + i * cellH, cellW - 1, cellH - 1);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('currency-matrix') as HTMLCanvasElement | null;
+      if (canvas) {
+        const w = canvas.clientWidth || 600;
+        p.create_chart('currency-matrix', w, H);
       }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.6)';
-    for (let i = 0; i < n; i++) {
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(CURRENCIES[i], sx - 4, sy + i * cellH + cellH / 2);
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(CURRENCIES[i], sx + i * cellW + cellW / 2, sy - 4);
-    }
-
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.35)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('row relative strength vs column | green = stronger', w - 4, H - 4);
   }
 
-  onMount(() => loadData());
   createEffect(() => {
-    const v = matrix();
-    if (v) draw();
+    const m = matrix();
+    const ready = wasmReady();
+    if (!m || !ready) return;
+    const canvas = document.getElementById('currency-matrix') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth || 600;
+      p.create_chart('currency-matrix', w, H);
+      p.update_heatmap('currency-matrix', JSON.stringify(m.grid), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -123,7 +92,7 @@ export default function CurrencyMatrix() {
           {err()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: `${H}px` }} />
+      <canvas id="currency-matrix" class="w-full" style={{ height: `${H}px` }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         8x8 FX cross-rates | spot snapshot | green = row stronger than column
       </p>

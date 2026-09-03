@@ -1,5 +1,5 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 const H = 300;
 
@@ -65,17 +65,11 @@ function beta(a: number[], b: number[], window: number): number {
   return varB === 0 ? 0 : cov / varB;
 }
 
-function betaColor(b: number): string {
-  const f = Math.max(-1, Math.min(1, b - 1));
-  if (f < 0) return `rgba(0,180,255,${Math.min(1, -f)})`;
-  return `rgba(255,90,90,${Math.min(1, f)})`;
-}
-
 export default function BetaMatrix() {
   const [grid, setGrid] = createSignal<{ label: string; cells: number[] }[] | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -116,67 +110,37 @@ export default function BetaMatrix() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    const rows = grid();
-    if (!canvas || !rows) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, H);
-
-    const labelW = 56;
-    const colW = (w - labelW - 12) / COLS.length;
-    const headerH = 22;
-    const rowH = (H - headerH - 20) / rows.length;
-
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.textBaseline = 'bottom';
-    ctx.textAlign = 'center';
-    for (let c = 0; c < COLS.length; c++) {
-      ctx.fillText(COLS[c], labelW + c * colW + colW / 2, headerH - 4);
-    }
-
-    for (let i = 0; i < rows.length; i++) {
-      const r = rows[i];
-      const y = headerH + i * rowH;
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.6)';
-      ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(r.label, labelW - 4, y + rowH / 2);
-
-      for (let c = 0; c < r.cells.length; c++) {
-        ctx.fillStyle = betaColor(r.cells[c]);
-        ctx.fillRect(labelW + c * colW, y, colW - 2, rowH - 2);
-        ctx.fillStyle = colors.textPrimary || '#fff';
-        ctx.font = '9px "JetBrains Mono", monospace';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(r.cells[c].toFixed(2), labelW + c * colW + colW / 2, y + rowH / 2);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('beta-matrix') as HTMLCanvasElement | null;
+      if (canvas) {
+        const w = canvas.clientWidth || 600;
+        p.create_chart('beta-matrix', w, H);
       }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.35)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('cool = beta < 1 | warm = beta > 1', w - 4, H - 4);
   }
 
-  onMount(() => loadData());
   createEffect(() => {
-    const v = grid();
-    if (v) draw();
+    const rows = grid();
+    const ready = wasmReady();
+    if (!rows || !ready) return;
+    const canvas = document.getElementById('beta-matrix') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth || 600;
+      p.create_chart('beta-matrix', w, H);
+      const matrix: number[][] = rows.map((r) => r.cells);
+      p.update_heatmap('beta-matrix', JSON.stringify(matrix), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -194,7 +158,7 @@ export default function BetaMatrix() {
           {err()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: `${H}px` }} />
+      <canvas id="beta-matrix" class="w-full" style={{ height: `${H}px` }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         10 alts vs BTC + ETH | 30d / 90d rolling beta | log returns
       </p>

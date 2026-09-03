@@ -2,7 +2,7 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface RegimeResult {
@@ -20,7 +20,7 @@ export default function RegimeDetector() {
   const [returns, setReturns] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -51,100 +51,52 @@ export default function RegimeDetector() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || !data() || returns().length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 280 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 280;
-    const colors = getThemeColors();
-    const pad = { l: 50, r: 16, t: 16, b: 28 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const d = data()!;
-    const rets = returns();
-    const states = d.states_tail;
-    const win = 120;
-    const start = Math.max(0, rets.length - win);
-    const n = rets.length - start;
-    if (n < 2) return;
-
-    const toX = (i: number) => pad.l + (i / (n - 1)) * cW;
-    const maxAbs = Math.max(...rets.slice(start).map((r) => Math.abs(r))) || 0.05;
-    const toY = (v: number) => pad.t + (1 - (v + maxAbs) / (2 * maxAbs)) * cH;
-
-    // Background by state
-    for (let i = 0; i < n; i++) {
-      const st = states[start + i] ?? 0;
-      ctx.fillStyle = st === 0 ? 'rgba(76, 175, 80, 0.12)' : 'rgba(255, 82, 82, 0.12)';
-      ctx.fillRect(toX(i), pad.t, cW / (n - 1) + 1, cH);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('regime-detector') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        p.create_chart('regime-detector', Math.round(rect.width), 280);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.1)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.fillText(`${(((maxAbs * 2 * i) / 4 - maxAbs) * 100).toFixed(1)}%`, pad.l - 5, y + 3);
-    }
-
-    // Zero line
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.2)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(pad.l, toY(0));
-    ctx.lineTo(w - pad.r, toY(0));
-    ctx.stroke();
-
-    // Returns line
-    ctx.strokeStyle = colors.accent || '#00e5ff';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    for (let i = 0; i < n; i++) {
-      i === 0 ? ctx.moveTo(toX(i), toY(rets[start + i])) : ctx.lineTo(toX(i), toY(rets[start + i]));
-    }
-    ctx.stroke();
-
-    // Legend
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    const legend: [string, string][] = [
-      ['LOW-VOL', '#4caf50'],
-      ['HIGH-VOL', '#ff5252'],
-    ];
-    legend.forEach(([label, color], i) => {
-      const x = pad.l + 10 + i * 90;
-      ctx.fillStyle = color;
-      ctx.fillRect(x, h - 14, 8, 8);
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.fillText(label, x + 12, h - 7);
-    });
   }
 
-  onMount(() => loadData());
+  createEffect(() => {
+    const d = data();
+    const rets = returns();
+    const ready = wasmReady();
+    if (!d || rets.length === 0 || !ready) return;
+    const canvas = document.getElementById('regime-detector') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const win = 120;
+    const start = Math.max(0, rets.length - win);
+    const slice = rets.slice(start);
+    const chartData = slice.map((v, i) => ({
+      time: i,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: v,
+      volume: 0,
+    }));
+    const series = [{ color: '#00e5ff', data: chartData }];
+    getPlychart().then((p) => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) p.create_chart('regime-detector', Math.round(rect.width), 280);
+      p.update_line('regime-detector', JSON.stringify(series), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
+  });
 
   onAssetChanged(() => loadData());
-
-  createEffect(() => {
-    data();
-    if (!loading()) requestAnimationFrame(() => draw());
-  });
 
   return (
     <div>
@@ -171,7 +123,41 @@ export default function RegimeDetector() {
         </p>
       </Show>
 
-      <canvas ref={canvasRef} class="w-full" style={{ height: '280px' }} />
+      <canvas id="regime-detector" class="w-full" style={{ height: '280px' }} />
+
+      {/* Regime bands as HTML colored divs below canvas */}
+      <Show when={!loading() && data() && returns().length > 0}>
+        <div class="mt-2">
+          <div class="flex h-3 w-full overflow-hidden border" style={{ 'border-color': 'var(--border)' }}>
+            {(() => {
+              const d = data()!;
+              const rets = returns();
+              const win = 120;
+              const start = Math.max(0, rets.length - win);
+              const n = rets.length - start;
+              const states = d.states_tail;
+              return Array.from({ length: n }, (_, i) => {
+                const st = states[start + i] ?? 0;
+                return (
+                  <div
+                    class="flex-1"
+                    style={{ background: st === 0 ? 'rgba(76, 175, 80, 0.7)' : 'rgba(255, 82, 82, 0.7)' }}
+                    title={st === 0 ? 'LOW-VOL' : 'HIGH-VOL'}
+                  />
+                );
+              });
+            })()}
+          </div>
+          <div class="mt-1 flex gap-3 font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+            <span class="flex items-center gap-1">
+              <span class="inline-block w-2 h-2" style={{ background: '#4caf50' }} /> LOW-VOL
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="inline-block w-2 h-2" style={{ background: '#ff5252' }} /> HIGH-VOL
+            </span>
+          </div>
+        </div>
+      </Show>
 
       <Show when={!loading() && data()} keyed>
         {(d) => {

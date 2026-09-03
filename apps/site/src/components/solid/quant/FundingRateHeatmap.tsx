@@ -1,11 +1,13 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
+
+const H = 300;
 
 export default function FundingRateHeatmap() {
   const [data, setData] = createSignal<Array<{ symbol: string; rate: number }>>([]);
   const [loading, setLoading] = createSignal(true);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -21,64 +23,44 @@ export default function FundingRateHeatmap() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 300 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 300;
-    const colors = getThemeColors();
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const d = data();
-    if (d.length === 0) return;
-
-    const barH = Math.max(12, Math.min(22, (h - 20) / d.length));
-    const pad = { l: 80, r: 16, t: 10 };
-    const cW = w - pad.l - pad.r;
-
-    d.forEach((item, i) => {
-      const y = 10 + i * (barH + 2);
-      // Label
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.font = `${Math.max(8, barH * 0.55)}px "JetBrains Mono", monospace`;
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(item.symbol.replace('USDT', ''), pad.l - 8, y + barH / 2);
-
-      // Bar
-      const maxRate = Math.max(...d.map((x) => Math.abs(x.rate)));
-      const barW = (Math.abs(item.rate) / (maxRate || 1)) * cW;
-      if (item.rate > 0) {
-        ctx.fillStyle = `rgba(76, 175, 80, ${0.3 + (Math.abs(item.rate) / maxRate) * 0.5})`;
-        ctx.fillRect(pad.l, y, barW, barH);
-      } else {
-        ctx.fillStyle = `rgba(255, 64, 129, ${0.3 + (Math.abs(item.rate) / maxRate) * 0.5})`;
-        ctx.fillRect(pad.l + cW - barW, y, barW, barH);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('funding-rate-heatmap') as HTMLCanvasElement | null;
+      if (canvas) {
+        const w = canvas.clientWidth || 600;
+        p.create_chart('funding-rate-heatmap', w, H);
       }
-
-      // Rate text
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.6)';
-      ctx.font = `${Math.max(7, barH * 0.5)}px "JetBrains Mono", monospace`;
-      ctx.textAlign = 'left';
-      ctx.fillText(`${(item.rate * 100).toFixed(4)}%`, pad.l + cW + 4, y + barH / 2);
-    });
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
+    }
   }
 
-  onMount(() => {
-    loadData();
+  createEffect(() => {
+    const d = data();
+    const ready = wasmReady();
+    if (d.length === 0 || !ready) return;
+    const canvas = document.getElementById('funding-rate-heatmap') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth || 600;
+      p.create_chart('funding-rate-heatmap', w, H);
+      const barData = d.map((item, i) => ({
+        time: i,
+        open: 0,
+        high: 0,
+        low: 0,
+        close: item.rate,
+        volume: 0,
+      }));
+      p.update_bar('funding-rate-heatmap', JSON.stringify(barData), '');
+    });
   });
 
-  createEffect(() => {
-    const v = data();
-    if (v && v.length > 0) draw();
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -91,7 +73,7 @@ export default function FundingRateHeatmap() {
           Loading...
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: '300px' }} />
+      <canvas id="funding-rate-heatmap" class="w-full" style={{ height: '300px' }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         Binance perpetuals | green = longs pay shorts | red = shorts pay longs
       </p>

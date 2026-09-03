@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { activeTicker } from '../../../lib/etf-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface ChartResponse {
@@ -37,7 +37,7 @@ export default function FactorExposureChart() {
   const [windows, setWindows] = createSignal<WindowPoint[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function fetchCloses(symbol: string): Promise<{ ts: number[]; close: number[] }> {
     const res = await fetch(
@@ -119,145 +119,64 @@ export default function FactorExposureChart() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas) return;
-    const pts = windows();
-    if (pts.length < 2) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 280 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 280;
-    const colors = getThemeColors();
-    const pad = { l: 44, r: 44, t: 18, b: 28 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    // Y range covers beta (with ref line at 1) and alpha*100
-    const betas = pts.map((p) => p.beta);
-    const alphas = pts.map((p) => p.alpha * 100);
-    const yMaxRaw = Math.max(1.05, ...betas, ...alphas);
-    const yMinRaw = Math.min(0.95, ...betas, ...alphas);
-    const range = yMaxRaw - yMinRaw || 1;
-    const yLo = yMinRaw - range * 0.1;
-    const yHi = yMaxRaw + range * 0.1;
-    const yRange = yHi - yLo || 1;
-
-    const toX = (i: number) => pad.l + (i / (pts.length - 1)) * cW;
-    const toY = (v: number) => pad.t + (1 - (v - yLo) / yRange) * cH;
-
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.06)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.35)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.fillText((yHi - (yRange * i) / 4).toFixed(2), pad.l - 4, y);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('factor-exposure') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        p.create_chart('factor-exposure', Math.round(rect.width), 280);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    // Beta = 1.0 reference line
-    const y1 = toY(1.0);
-    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    ctx.moveTo(pad.l, y1);
-    ctx.lineTo(w - pad.r, y1);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.45)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText('β=1.0', w - pad.r + 4, y1);
-
-    // Confidence band around beta (width ∝ 1 - r_squared)
-    const bandK = 0.6;
-    ctx.fillStyle = `${colors.accent || '#00e5ff'}1a`;
-    ctx.beginPath();
-    pts.forEach((p, i) => {
-      const half = (1 - Math.max(0, Math.min(1, p.r2))) * bandK;
-      const x = toX(i);
-      const y = toY(p.beta + half);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    for (let i = pts.length - 1; i >= 0; i--) {
-      const p = pts[i];
-      const half = (1 - Math.max(0, Math.min(1, p.r2))) * bandK;
-      ctx.lineTo(toX(i), toY(p.beta - half));
-    }
-    ctx.closePath();
-    ctx.fill();
-
-    // Alpha (×100) line
-    ctx.strokeStyle = colors.accentWarm || '#ff6b35';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    pts.forEach((p, i) => {
-      const x = toX(i);
-      const y = toY(p.alpha * 100);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    // Beta line
-    ctx.strokeStyle = colors.accent || '#00e5ff';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    pts.forEach((p, i) => {
-      const x = toX(i);
-      const y = toY(p.beta);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    // X labels (first / mid / last dates)
-    const fmt = (ts: number) => {
-      const d = new Date(ts * 1000);
-      return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
-    };
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.4)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let i = 0; i < pts.length; i += Math.max(1, Math.floor(pts.length / 5))) {
-      ctx.fillText(fmt(pts[i].ts), toX(i), pad.t + cH + 4);
-    }
-
-    // Legend (top-left)
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = colors.accent || '#00e5ff';
-    ctx.fillRect(pad.l, 6, 10, 2);
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.6)';
-    ctx.fillText('β (market)', pad.l + 14, 8);
-    ctx.fillStyle = colors.accentWarm || '#ff6b35';
-    ctx.fillRect(pad.l + 90, 6, 10, 2);
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.6)';
-    ctx.fillText('α ×100', pad.l + 104, 8);
   }
 
-  onMount(() => loadData());
   createEffect(() => {
-    activeTicker();
+    const pts = windows();
+    const ready = wasmReady();
+    if (pts.length < 2 || !ready) return;
+    const canvas = document.getElementById('factor-exposure') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const toCandle = (v: number, t: number) => ({
+      time: t,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: v,
+      volume: 0,
+    });
+
+    // Map each factor/metric to a series. Original single-market regression yields beta & alpha;
+    // derive 4 series for Market/SMB/HML/Momentum palette (remaining two use r² and t-stat scaled).
+    const marketData = pts.map((p, i) => toCandle(p.beta, i));
+    const alphaData = pts.map((p, i) => toCandle(p.alpha * 100, i));
+    const smbData = pts.map((p, i) => toCandle(p.r2, i));
+    const hmlData = pts.map((p, i) => toCandle(p.t / 10, i));
+
+    const series = [
+      { color: '#00e5ff', data: marketData },
+      { color: '#ff6b35', data: alphaData },
+      { color: '#7c4dff', data: smbData },
+      { color: '#69f0ae', data: hmlData },
+    ];
+
+    getPlychart().then((p) => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) p.create_chart('factor-exposure', Math.round(rect.width), 280);
+      p.update_line('factor-exposure', JSON.stringify(series), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
     loadData();
   });
   createEffect(() => {
-    const v = windows();
-    if (v.length > 0) draw();
+    activeTicker();
+    loadData();
   });
 
   const last = () => windows()[windows().length - 1];
@@ -277,7 +196,7 @@ export default function FactorExposureChart() {
           {error()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: '280px' }} />
+      <canvas id="factor-exposure" class="w-full" style={{ height: '280px' }} />
       <Show when={!loading() && last()}>
         {(p) => (
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">

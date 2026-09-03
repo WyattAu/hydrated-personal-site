@@ -1,5 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 const H = 300;
 
@@ -67,7 +67,7 @@ export default function MultiDrawdown() {
   const [curves, setCurves] = createSignal<Curve[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   function setSel(i: number, v: string) {
     setSels((prev) => {
@@ -100,80 +100,46 @@ export default function MultiDrawdown() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    const cv = curves();
-    if (!canvas || cv.length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, H);
-
-    const pad = { l: 44, r: 16, t: 12, b: 26 };
-    const cW = w - pad.l - pad.r;
-    const cH = H - pad.t - pad.b;
-    const zeroY = pad.t;
-
-    const maxDD = Math.max(0.05, ...cv.flatMap((c) => c.dd).map((d) => Math.abs(d)));
-
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.08)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.4)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 4; i++) {
-      const y = zeroY + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(`${((-(maxDD * i) / 4) * 100).toFixed(0)}%`, pad.l - 4, y);
-    }
-
-    for (let ci = 0; ci < cv.length; ci++) {
-      const c = cv[ci];
-      const color = COLORS[ci % COLORS.length];
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1.6;
-      ctx.beginPath();
-      for (let i = 0; i < c.dd.length; i++) {
-        const x = pad.l + (i / (c.dd.length - 1)) * cW;
-        const y = zeroY + (Math.abs(c.dd[i]) / maxDD) * cH;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('multi-drawdown') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        p.create_chart('multi-drawdown', Math.round(rect.width), H);
       }
-      ctx.stroke();
-
-      ctx.fillStyle = color;
-      ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillText(c.symbol, pad.l + 4 + ci * 64, zeroY + 2);
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.35)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('underwater curves (peak-to-trough)', w - pad.r, H - 4);
   }
 
-  onMount(() => loadData());
   createEffect(() => {
-    sels();
+    const cv = curves();
+    const ready = wasmReady();
+    if (cv.length === 0 || !ready) return;
+    const canvas = document.getElementById('multi-drawdown') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const series = cv.map((c, ci) => ({
+      color: COLORS[ci % COLORS.length],
+      data: c.dd.map((v, i) => ({ time: i, open: 0, high: 0, low: 0, close: v * 100, volume: 0 })),
+    }));
+
+    getPlychart().then((p) => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) p.create_chart('multi-drawdown', Math.round(rect.width), H);
+      p.update_line('multi-drawdown', JSON.stringify(series), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
     loadData();
   });
   createEffect(() => {
-    const v = curves();
-    if (v.length) draw();
+    sels();
+    loadData();
   });
 
   return (
@@ -219,7 +185,7 @@ export default function MultiDrawdown() {
           {err()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: `${H}px` }} />
+      <canvas id="multi-drawdown" class="w-full" style={{ height: `${H}px` }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         select up to 3 assets | overlapping underwater curves | 1Y daily
       </p>
