@@ -1,8 +1,7 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getThemeColors } from '../../../lib/theme-colors';
 
 interface RangeData {
   wHigh: number;
@@ -40,7 +39,6 @@ export default function WeekRange52() {
   const [data, setData] = createSignal<RangeData | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
 
   async function loadData() {
     setLoading(true);
@@ -57,81 +55,9 @@ export default function WeekRange52() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || !data()) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 80 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 80;
-    const colors = getThemeColors();
-    const d = data()!;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const x0 = 52;
-    const x1 = Math.max(x0 + 10, w - 52);
-    const barW = x1 - x0;
-    const barTop = 44;
-    const barH = 14;
-
-    const lo = d.wLow;
-    const hi = d.wHigh;
-    const range = hi - lo || 1;
-    const pos = Math.max(0, Math.min(1, (d.current - lo) / range));
-    const markerX = x0 + pos * barW;
-
-    // Gradient gauge: red (low) -> yellow (mid) -> green (high)
-    const grad = ctx.createLinearGradient(x0, 0, x1, 0);
-    grad.addColorStop(0, '#ff5252');
-    grad.addColorStop(0.5, '#ffc107');
-    grad.addColorStop(1, '#4caf50');
-    ctx.fillStyle = grad;
-    ctx.fillRect(x0, barTop, barW, barH);
-
-    ctx.strokeStyle = colors.border || '#1a1a1a';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x0, barTop, barW, barH);
-
-    // Triangle marker (pointing down) at current price
-    ctx.fillStyle = colors.textPrimary || '#ffffff';
-    ctx.beginPath();
-    ctx.moveTo(markerX, barTop - 1);
-    ctx.lineTo(markerX - 6, barTop - 11);
-    ctx.lineTo(markerX + 6, barTop - 11);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.font = '9px "JetBrains Mono", monospace';
-    // Current price above marker
-    ctx.fillStyle = colors.textPrimary || '#ffffff';
-    ctx.textAlign = 'center';
-    const labelX = Math.max(x0 + 24, Math.min(x1 - 24, markerX));
-    ctx.fillText(d.current.toFixed(2), labelX, barTop - 14);
-
-    // Low / High labels
-    ctx.fillStyle = '#ff5252';
-    ctx.textAlign = 'left';
-    ctx.fillText(d.wLow.toFixed(2), x0, h - 4);
-    ctx.fillStyle = '#4caf50';
-    ctx.textAlign = 'right';
-    ctx.fillText(d.wHigh.toFixed(2), x1, h - 4);
-  }
-
   onMount(() => loadData());
 
   onAssetChanged(() => loadData());
-
-  createEffect(() => {
-    data();
-    if (!loading()) requestAnimationFrame(() => draw());
-  });
 
   return (
     <div>
@@ -158,8 +84,58 @@ export default function WeekRange52() {
         </p>
       </Show>
 
+      <Show when={!loading() && data()} keyed>
+        {(d) => {
+          const range = d.wHigh - d.wLow || 1;
+          const pos = Math.max(0, Math.min(1, (d.current - d.wLow) / range));
+          // Clamp so the price label never clips at the edges
+          const markerPct = Math.max(4, Math.min(96, pos * 100));
+          return (
+            <div class="py-4">
+              <div class="relative">
+                {/* Current price label + triangle marker */}
+                <div
+                  class="absolute -top-1 flex flex-col items-center"
+                  style={{ left: `${markerPct}%`, transform: 'translateX(-50%)' }}
+                >
+                  <span
+                    class="font-mono text-[9px] mb-0.5"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    {d.current.toFixed(2)}
+                  </span>
+                  <div
+                    style={{
+                      width: '0',
+                      height: '0',
+                      'border-left': '6px solid transparent',
+                      'border-right': '6px solid transparent',
+                      'border-top': '10px solid var(--text-primary)',
+                    }}
+                  />
+                </div>
+
+                {/* Gradient gauge: red (low) -> yellow (mid) -> green (high) */}
+                <div
+                  class="h-3.5 w-full mt-4"
+                  style={{
+                    background: 'linear-gradient(to right, #ff5252, #ffc107, #4caf50)',
+                    border: '1px solid var(--border)',
+                  }}
+                />
+
+                {/* Low / High labels */}
+                <div class="flex justify-between mt-1 font-mono text-[9px]">
+                  <span style={{ color: '#ff5252' }}>{d.wLow.toFixed(2)}</span>
+                  <span style={{ color: '#4caf50' }}>{d.wHigh.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          );
+        }}
+      </Show>
+
       <Show when={!loading() && data()}>
-        <canvas ref={canvasRef} class="w-full" style={{ height: '80px' }} />
         <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
           Position within 52-week trading range
         </p>

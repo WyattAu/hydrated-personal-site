@@ -1,4 +1,5 @@
-import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { getPlychart } from '../../lib/plychart-loader';
 import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 
@@ -6,66 +7,17 @@ interface PortfolioComparisonProps {
   database: EtfEntry[];
 }
 
-function drawComparison(canvas: HTMLCanvasElement, a: EtfEntry, b: EtfEntry) {
-  const dpr = window.devicePixelRatio || 1;
-  const w = canvas.clientWidth;
-  const h = canvas.clientHeight || 320;
-  canvas.width = w * dpr;
-  canvas.height = h * dpr;
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.scale(dpr, dpr);
+const H = 320;
+const CANVAS_A = 'pf-compare-a';
+const CANVAS_B = 'pf-compare-b';
 
-  const colors = getThemeColors();
-  const bg = colors.bgCard || '#0c0c0c';
-  const textColor = colors.textSecondary || '#888';
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
+function toBar(v: number) {
+  return { time: 0, open: 0, high: 0, low: 0, close: v, volume: 0 };
+}
 
-  const allSectors = new Set([
-    ...Object.keys(a.sector_allocation),
-    ...Object.keys(b.sector_allocation),
-  ]);
-  const sectors = [...allSectors].sort();
-  const maxVal = Math.max(
-    ...sectors.map((s) => Math.max(a.sector_allocation[s] || 0, b.sector_allocation[s] || 0)),
-    1,
-  );
-
-  const padLeft = 140;
-  const padRight = 40;
-  const padTop = 16;
-  const padBottom = 16;
-  const chartW = w - padLeft - padRight;
-  const chartH = h - padTop - padBottom;
-  const groupH = chartH / sectors.length;
-  const barH = Math.min(12, groupH / 2 - 2);
-
-  const accent = colors.accent || '#00e5ff';
-
-  sectors.forEach((sector, i) => {
-    const y = padTop + i * groupH + groupH / 2;
-    const valA = a.sector_allocation[sector] || 0;
-    const valB = b.sector_allocation[sector] || 0;
-
-    // ETF A bar (above center)
-    const barWA = (valA / maxVal) * chartW;
-    ctx.fillStyle = `${accent}99`;
-    ctx.fillRect(padLeft, y - barH - 1, barWA, barH);
-
-    // ETF B bar (below center)
-    const barWB = (valB / maxVal) * chartW;
-    ctx.fillStyle = '#b388ff99';
-    ctx.fillRect(padLeft, y + 1, barWB, barH);
-
-    // Label
-    ctx.fillStyle = textColor;
-    ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.textAlign = 'right';
-    ctx.fillText(sector, padLeft - 8, y + 3);
-  });
+// Sorted descending by weight (same ordering the manual draw used)
+function sectorRows(etf: EtfEntry): [string, number][] {
+  return Object.entries(etf.sector_allocation).sort((a, b) => b[1] - a[1]);
 }
 
 function EtfSelector(props: {
@@ -170,28 +122,44 @@ function EtfSelector(props: {
 export default function PortfolioComparison(props: PortfolioComparisonProps) {
   const [etfA, setEtfA] = createSignal<EtfEntry | null>(null);
   const [etfB, setEtfB] = createSignal<EtfEntry | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   const accentColor = () => {
     return getThemeColors().accent || '#00e5ff';
   };
 
+  async function initWasm() {
+    try {
+      await getPlychart();
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
+    }
+  }
+
   createEffect(() => {
     const a = etfA();
     const b = etfB();
-    if (a && b && canvasRef) {
-      drawComparison(canvasRef, a, b);
-    }
+    const ready = wasmReady();
+    if (!a || !b || !ready) return;
+    getPlychart().then((p) => {
+      const canvasA = document.getElementById(CANVAS_A) as HTMLCanvasElement | null;
+      const canvasB = document.getElementById(CANVAS_B) as HTMLCanvasElement | null;
+      if (canvasA) {
+        const w = canvasA.clientWidth || 600;
+        p.create_chart(CANVAS_A, w, H);
+        p.update_bar(CANVAS_A, JSON.stringify(sectorRows(a).map(([, v]) => toBar(v))), '');
+      }
+      if (canvasB) {
+        const w = canvasB.clientWidth || 600;
+        p.create_chart(CANVAS_B, w, H);
+        p.update_bar(CANVAS_B, JSON.stringify(sectorRows(b).map(([, v]) => toBar(v))), '');
+      }
+    });
   });
 
   onMount(() => {
-    const observer = new ResizeObserver(() => {
-      const a = etfA();
-      const b = etfB();
-      if (a && b && canvasRef) drawComparison(canvasRef, a, b);
-    });
-    if (canvasRef) observer.observe(canvasRef);
-    onCleanup(() => observer.disconnect());
+    initWasm();
   });
 
   return (
@@ -224,27 +192,44 @@ export default function PortfolioComparison(props: PortfolioComparisonProps) {
         />
       </div>
 
-      {/* Chart */}
+      {/* Charts */}
       <Show
         when={etfA() && etfB() ? ([etfA(), etfB()] as [EtfEntry, EtfEntry] | null) : null}
         keyed
       >
         {([a, b]) => (
           <>
-            <div
-              class="border mb-4"
-              style={{
-                'border-color': 'var(--border)',
-                background: 'var(--bg-secondary)',
-              }}
-            >
-              <canvas
-                ref={canvasRef}
-                class="w-full"
-                style={{ height: '320px' }}
-                role="img"
-                aria-label="Sector allocation comparison chart"
-              />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div
+                class="border"
+                style={{
+                  'border-color': 'var(--border)',
+                  background: 'var(--bg-secondary)',
+                }}
+              >
+                <canvas
+                  id={CANVAS_A}
+                  class="w-full"
+                  style={{ height: `${H}px` }}
+                  role="img"
+                  aria-label={`${a.ticker} sector allocation chart`}
+                />
+              </div>
+              <div
+                class="border"
+                style={{
+                  'border-color': 'var(--border)',
+                  background: 'var(--bg-secondary)',
+                }}
+              >
+                <canvas
+                  id={CANVAS_B}
+                  class="w-full"
+                  style={{ height: `${H}px` }}
+                  role="img"
+                  aria-label={`${b.ticker} sector allocation chart`}
+                />
+              </div>
             </div>
 
             {/* Legend */}

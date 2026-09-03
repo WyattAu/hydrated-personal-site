@@ -1,12 +1,15 @@
 import { Show, createSignal, onMount } from 'solid-js';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
+
+const CANVAS_ID = 'rolling-corr';
+const H = 340;
 
 export default function RollingCorrelationHeatmap() {
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
   const [step, setStep] = createSignal(0);
   const [maxSteps, setMaxSteps] = createSignal(0);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
   let matrices: number[][][] = []; // [time_steps][N][N]
   let labels: string[] = [];
   let rafId = 0;
@@ -82,61 +85,26 @@ export default function RollingCorrelationHeatmap() {
     }
   }
 
-  function drawStep() {
-    const canvas = canvasRef;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    if (canvas.width !== rect.width * dpr) {
-      canvas.width = rect.width * dpr;
-      canvas.height = 340 * dpr;
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+      if (canvas) {
+        p.create_chart(CANVAS_ID, canvas.clientWidth || 600, H);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const w = rect.width;
-    const h = 340;
-    const colors = getThemeColors();
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
+  }
 
+  function drawStep() {
+    if (!wasmReady()) return;
     if (matrices.length === 0) return;
     const m = matrices[Math.min(step(), matrices.length - 1)];
-    const n = m.length;
-    const labelPad = 40;
-    const cellW = (w - labelPad * 2) / n;
-    const cellH = (h - labelPad * 2) / n;
-    const startX = labelPad;
-    const startY = labelPad;
-
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        const val = m[i][j];
-        const _r = val < 0 ? 255 : 0;
-        const _g = val > 0 ? 200 + val * 55 : 0;
-        const _b = val < 0 ? 129 : 0;
-        const alpha = Math.min(1, Math.abs(val));
-        ctx.fillStyle = val < 0 ? `rgba(255, 64, 129, ${alpha})` : `rgba(0, 229, 255, ${alpha})`;
-        ctx.fillRect(startX + j * cellW, startY + i * cellH, cellW - 1, cellH - 1);
-      }
-    }
-
-    // Labels
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    for (let i = 0; i < n; i++) {
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(labels[i], startX - 4, startY + i * cellH + cellH / 2);
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(labels[i], startX + i * cellW + cellW / 2, startY - 4);
-    }
-
-    // Time indicator
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'top';
-    ctx.fillText(`step ${step()}/${maxSteps()}`, w - 10, 4);
+    getPlychart().then((p) => {
+      p.update_heatmap(CANVAS_ID, JSON.stringify(m), '');
+    });
   }
 
   function animate(ts: number) {
@@ -149,9 +117,12 @@ export default function RollingCorrelationHeatmap() {
   }
 
   onMount(() => {
+    initWasm();
     loadData();
     onMount(() => cancelAnimationFrame(rafId));
   });
+
+  const labelsLine = () => labels.join(' ');
 
   return (
     <div>
@@ -161,7 +132,7 @@ export default function RollingCorrelationHeatmap() {
         </p>
         <Show when={!loading()}>
           <span class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-            30d window
+            30d window | step {step()}/{maxSteps()}
           </span>
         </Show>
       </div>
@@ -175,9 +146,10 @@ export default function RollingCorrelationHeatmap() {
           {error()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: '340px' }} />
+      <canvas id={CANVAS_ID} class="w-full" style={{ height: `${H}px` }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-        8 assets | 180d daily | animated 30d rolling window | cyan = positive | magenta = negative
+        {labelsLine()} | 8 assets | 180d daily | animated 30d rolling window | cyan = positive |
+        magenta = negative
       </p>
     </div>
   );

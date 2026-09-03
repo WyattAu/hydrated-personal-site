@@ -2,9 +2,11 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 const BINS = 25;
+const H = 300;
+const CANVAS_ID = 'volume-profile';
 
 interface Ohlcv {
   closes: number[];
@@ -66,7 +68,7 @@ export default function VolumeProfile() {
   const [profile, setProfile] = createSignal<ProfileState | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -84,104 +86,52 @@ export default function VolumeProfile() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || !profile()) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 300 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 300;
-    const colors = getThemeColors();
-    const p = profile()!;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const pad = { l: 56, r: 16, t: 16, b: 24 };
-    const plotX0 = pad.l;
-    const plotW = Math.max(10, w - pad.r - plotX0);
-    const cH = h - pad.t - pad.b;
-    const rowH = cH / BINS;
-    const maxVol = Math.max(...p.buckets) || 1;
-
-    const priceAt = (i: number) => p.minP + (i + 0.5) * p.step;
-    const _yAt = (i: number) => pad.t + (BINS - 1 - i) * rowH + rowH / 2;
-
-    // Horizontal gridlines + price labels (every ~5 buckets)
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.08)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < BINS; i += 5) {
-      const y = pad.t + (BINS - 1 - i) * rowH;
-      ctx.beginPath();
-      ctx.moveTo(plotX0, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.fillText(priceAt(i).toFixed(2), plotX0 - 4, y + rowH / 2 + 3);
-    }
-
-    // Bars grow rightward from the price axis (center baseline)
-    for (let i = 0; i < BINS; i++) {
-      const v = p.buckets[i];
-      const ratio = v / maxVol;
-      const barW = Math.max(1, ratio * plotW);
-      const y = pad.t + (BINS - 1 - i) * rowH;
-      const barH = Math.max(1, rowH - 1);
-      if (i === p.pocIdx) {
-        ctx.fillStyle = '#ffc107';
-      } else {
-        // brightness by volume: dim -> bright cyan
-        const alpha = 0.18 + 0.72 * ratio;
-        ctx.fillStyle = `rgba(0, 229, 255, ${alpha.toFixed(3)})`;
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+      if (canvas) {
+        p.create_chart(CANVAS_ID, canvas.clientWidth || 600, H);
       }
-      ctx.fillRect(plotX0, y + 0.5, barW, barH);
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    // X-axis volume scale (max)
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.textAlign = 'left';
-    ctx.fillText(fmtVol(maxVol), plotX0 + 2, h - 6);
-    ctx.textAlign = 'right';
-    ctx.fillText('volume', w - pad.r, h - 6);
-
-    // Current price dashed line
-    const curIdx = (p.current - p.minP) / p.step;
-    const curY = pad.t + (BINS - 0.5 - curIdx) * rowH;
-    if (curY >= pad.t && curY <= pad.t + cH) {
-      ctx.strokeStyle = colors.accent || '#00e5ff';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([5, 4]);
-      ctx.beginPath();
-      ctx.moveTo(plotX0, curY);
-      ctx.lineTo(w - pad.r, curY);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = colors.accent || '#00e5ff';
-      ctx.textAlign = 'left';
-      ctx.fillText(`cur ${p.current.toFixed(2)}`, w - pad.r - 70, curY - 3);
-    }
-
-    // POC label
-    ctx.fillStyle = '#ffc107';
-    ctx.textAlign = 'left';
-    ctx.fillText(`POC ${priceAt(p.pocIdx).toFixed(2)}`, plotX0 + 2, pad.t + 10);
   }
 
-  onMount(() => loadData());
+  onMount(() => {
+    initWasm();
+    loadData();
+  });
 
   onAssetChanged(() => loadData());
 
   createEffect(() => {
-    profile();
-    if (!loading()) requestAnimationFrame(() => draw());
+    const p = profile();
+    const ready = wasmReady();
+    if (!p || !ready) return;
+    const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const bars = p.buckets.map((v) => ({
+      time: 0,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: v,
+      volume: 0,
+    }));
+    getPlychart().then((ply) => {
+      ply.create_chart(CANVAS_ID, canvas.clientWidth || 600, H);
+      ply.update_bar(CANVAS_ID, JSON.stringify(bars), '');
+    });
   });
+
+  const curPct = () => {
+    const p = profile();
+    if (!p) return 50;
+    const span = p.maxP - p.minP || 1;
+    return Math.min(97, Math.max(3, (1 - (p.current - p.minP) / span) * 100));
+  };
 
   return (
     <div>
@@ -209,10 +159,40 @@ export default function VolumeProfile() {
       </Show>
 
       <Show when={!loading() && profile()}>
-        <canvas ref={canvasRef} class="w-full" style={{ height: '300px' }} />
+        <div class="relative">
+          <canvas id={CANVAS_ID} class="w-full" style={{ height: `${H}px` }} />
+          <Show when={profile()}>
+            {(p) => (
+              <div
+                class="absolute left-0 right-0 border-t border-dashed pointer-events-none z-10"
+                style={{
+                  top: `${curPct()}%`,
+                  'border-color': 'var(--accent)',
+                }}
+              >
+                <span
+                  class="absolute right-1 -translate-y-full font-mono text-[9px]"
+                  style={{ color: 'var(--accent)' }}
+                >
+                  cur {p().current.toFixed(2)}
+                </span>
+              </div>
+            )}
+          </Show>
+        </div>
         <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
           3M daily | Price-binned volume | POC = Point of Control (highest volume node)
         </p>
+        <Show when={profile()}>
+          {(p) => (
+            <p class="font-mono text-[9px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+              <span style={{ color: '#ffc107' }}>
+                POC {(p().minP + (p().pocIdx + 0.5) * p().step).toFixed(2)}
+              </span>
+              {` | peak ${fmtVol(Math.max(...p().buckets))} vol`}
+            </p>
+          )}
+        </Show>
       </Show>
     </div>
   );

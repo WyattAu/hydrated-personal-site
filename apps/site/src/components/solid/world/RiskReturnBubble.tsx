@@ -1,5 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 const H = 360;
 const RISK_FREE = 0.04;
@@ -62,11 +62,17 @@ function stats(closes: number[], volume: number, label: string): Bubble | null {
   return { label, ret: annRet, vol: annVol, sharpe: (annRet - RISK_FREE) / annVol, volume };
 }
 
+const VOLUME_BUCKETS = [
+  { color: '#546e7a', label: 'LOW VOL' },
+  { color: '#42a5f5', label: 'MED VOL' },
+  { color: '#00e5ff', label: 'HIGH VOL' },
+];
+
 export default function RiskReturnBubble() {
   const [bubbles, setBubbles] = createSignal<Bubble[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -89,117 +95,50 @@ export default function RiskReturnBubble() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    const pts = bubbles();
-    if (!canvas || pts.length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, H);
-
-    const pad = { l: 48, r: 16, t: 16, b: 36 };
-    const cW = w - pad.l - pad.r;
-    const cH = H - pad.t - pad.b;
-
-    const risks = pts.map((p) => p.vol * 100);
-    const rets = pts.map((p) => p.ret * 100);
-    const minR = Math.min(...risks, 0);
-    const maxR = Math.max(...risks);
-    const minRet = Math.min(...rets, 0);
-    const maxRet = Math.max(...rets, 0);
-    const rangeR = maxR - minR || 1;
-    const rangeRet = maxRet - minRet || 1;
-    const padR = rangeR * 0.1;
-    const padRet = rangeRet * 0.1;
-    const toX = (v: number) => pad.l + ((v - minR + padR) / (rangeR + 2 * padR)) * cW;
-    const toY = (v: number) => pad.t + (1 - (v - minRet + padRet) / (rangeRet + 2 * padRet)) * cH;
-
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.06)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 5; i++) {
-      const y = pad.t + (cH * i) / 5;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(
-        `${(maxRet + padRet - ((rangeRet + 2 * padRet) * i) / 5).toFixed(0)}%`,
-        pad.l - 5,
-        y,
-      );
-      const x = pad.l + (cW * i) / 5;
-      ctx.beginPath();
-      ctx.moveTo(x, pad.t);
-      ctx.lineTo(x, H - pad.b);
-      ctx.stroke();
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText(
-        `${(minR + padR + ((rangeR + 2 * padR) * i) / 5).toFixed(0)}%`,
-        x,
-        H - pad.b + 6,
-      );
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('risk-return-bubble') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        p.create_chart('risk-return-bubble', Math.round(rect.width), H);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    if (minRet < 0) {
-      const zy = toY(0);
-      ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.2)';
-      ctx.setLineDash([2, 4]);
-      ctx.beginPath();
-      ctx.moveTo(pad.l, zy);
-      ctx.lineTo(w - pad.r, zy);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    const maxVol = Math.max(...pts.map((p) => p.volume)) || 1;
-    for (const p of pts) {
-      const x = toX(p.vol * 100);
-      const y = toY(p.ret * 100);
-      const radius = 4 + Math.sqrt(Math.max(0, p.volume) / maxVol) * 14;
-      const intensity = Math.max(0, Math.min(1, (p.sharpe + 1) / 3));
-      const r = Math.floor(255 * (1 - intensity));
-      const g = Math.floor(120 + intensity * 135);
-      const b = Math.floor(80 + intensity * 175);
-      ctx.fillStyle = `rgba(${r},${g},${b},0.55)`;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = `rgb(${r},${g},${b})`;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.55)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    for (const p of pts) {
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(p.label, toX(p.vol * 100) + 7, toY(p.ret * 100));
-    }
-
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.35)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('VOL (annualized %)', w / 2, H - 6);
   }
 
-  onMount(() => loadData());
   createEffect(() => {
-    const v = bubbles();
-    if (v.length) draw();
+    const pts = bubbles();
+    const ready = wasmReady();
+    if (pts.length === 0 || !ready) return;
+
+    const maxVol = Math.max(...pts.map((p) => p.volume)) || 1;
+    const buckets: number[][][] = [[], [], []];
+    for (const p of pts) {
+      const ratio = Math.max(0, p.volume) / maxVol;
+      const b = ratio >= 0.66 ? 2 : ratio >= 0.33 ? 1 : 0;
+      buckets[b].push([p.vol * 100, p.ret * 100]);
+    }
+
+    const series = VOLUME_BUCKETS.map((bucket, i) => ({
+      color: bucket.color,
+      points: buckets[i],
+    }));
+
+    getPlychart().then((p) => {
+      const canvas = document.getElementById('risk-return-bubble') as HTMLCanvasElement | null;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) p.create_chart('risk-return-bubble', Math.round(rect.width), H);
+      p.update_scatter_multi('risk-return-bubble', JSON.stringify(series), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -217,9 +156,21 @@ export default function RiskReturnBubble() {
           {err()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: `${H}px` }} />
+      <canvas id="risk-return-bubble" class="w-full" style={{ height: `${H}px` }} />
+      <div class="flex items-center gap-4 mt-1 flex-wrap">
+        <For each={VOLUME_BUCKETS}>
+          {(bucket) => (
+            <span class="font-mono text-[9px]" style={{ color: bucket.color }}>
+              ■ {bucket.label}
+            </span>
+          )}
+        </For>
+        <span class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+          bucket = 24h volume (S/M/L)
+        </span>
+      </div>
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-        1y daily | size = 24h volume | colour = Sharpe (rf 4%)
+        1y daily | {ASSETS.map((a) => a.label).join(' ')} | Sharpe vs rf 4%
       </p>
     </div>
   );

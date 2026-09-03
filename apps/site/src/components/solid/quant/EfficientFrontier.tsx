@@ -1,5 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 interface PortfolioPoint {
   ret: number;
@@ -12,7 +12,7 @@ export default function EfficientFrontier() {
   const [frontier, setFrontier] = createSignal<PortfolioPoint[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -65,7 +65,9 @@ export default function EfficientFrontier() {
           weights.push(w);
           sum += w;
         }
-        weights.forEach((w, i) => (weights[i] = w / sum));
+        weights.forEach((w, i) => {
+          weights[i] = w / sum;
+        });
 
         let ret = 0;
         for (let i = 0; i < nAssets; i++) ret += weights[i] * means[i];
@@ -108,123 +110,51 @@ export default function EfficientFrontier() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || points().length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 360 * dpr;
-    ctx.scale(dpr, dpr);
-
-    const w = rect.width;
-    const h = 360;
-    const colors = getThemeColors();
-    const pad = { l: 50, r: 16, t: 16, b: 36 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const pts = points();
-    const allRisk = pts.map((p) => p.risk);
-    const allRet = pts.map((p) => p.ret);
-    const minR = Math.min(...allRisk);
-    const maxR = Math.max(...allRisk);
-    const minRet = Math.min(...allRet);
-    const maxRet = Math.max(...allRet);
-    const rangeR = maxR - minR || 1;
-    const rangeRet = maxRet - minRet || 1;
-    const padR = rangeR * 0.05;
-    const padRet = rangeRet * 0.05;
-
-    const toX = (v: number) => pad.l + ((v - minR + padR) / (rangeR + 2 * padR)) * cW;
-    const toY = (v: number) => pad.t + (1 - (v - minRet + padRet) / (rangeRet + 2 * padRet)) * cH;
-
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.04)';
-    for (let i = 0; i <= 5; i++) {
-      const y = pad.t + (cH * i) / 5;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
-      ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.textAlign = 'right';
-      ctx.fillText(
-        `${(maxRet + padRet - ((rangeRet + 2 * padRet) * i) / 5).toFixed(0)}%`,
-        pad.l - 5,
-        y + 3,
-      );
-      const x = pad.l + (cW * i) / 5;
-      ctx.beginPath();
-      ctx.moveTo(x, pad.t);
-      ctx.lineTo(x, h - pad.b);
-      ctx.stroke();
-      ctx.textAlign = 'center';
-      ctx.fillText(
-        `${(minR + padR + ((rangeR + 2 * padR) * i) / 5).toFixed(0)}%`,
-        x,
-        h - pad.b + 14,
-      );
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('efficient-frontier') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        p.create_chart('efficient-frontier', Math.round(rect.width), 360);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    // Scatter points
-    for (const p of pts) {
-      const intensity = Math.max(0, Math.min(1, (p.sharpe + 1) / 3));
-      const r = Math.floor(0 + intensity * 0);
-      const g = Math.floor(100 + intensity * 155);
-      const b = Math.floor(150 + intensity * 105);
-      ctx.fillStyle = `rgb(${r},${g},${b})`;
-      ctx.beginPath();
-      ctx.arc(toX(p.risk), toY(p.ret), 1.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Efficient frontier
-    ctx.strokeStyle = colors.accent || '#00e5ff';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    frontier().forEach((p, i) => {
-      i === 0 ? ctx.moveTo(toX(p.risk), toY(p.ret)) : ctx.lineTo(toX(p.risk), toY(p.ret));
-    });
-    ctx.stroke();
-
-    // Tangency portfolio (max Sharpe)
-    const tan = pts.reduce((a, b) => (a.sharpe > b.sharpe ? a : b));
-    ctx.fillStyle = colors.accentWarm || '#f0883e';
-    ctx.beginPath();
-    ctx.arc(toX(tan.risk), toY(tan.ret), 5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = colors.accent || '#00e5ff';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText('MAX SHARPE', toX(tan.risk) + 8, toY(tan.ret) - 5);
-
-    // Axis labels
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.4)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('RISK (annualized std dev)', w / 2, h - 4);
-    ctx.save();
-    ctx.translate(12, h / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillText('RETURN (annualized)', 0, 0);
-    ctx.restore();
   }
 
-  onMount(() => {
-    loadData();
-  });
-  const pts = points();
-
   createEffect(() => {
-    const v = points();
-    if (v) draw();
+    const pts = points();
+    const ready = wasmReady();
+    if (pts.length === 0 || !ready) return;
+
+    const series = [
+      { color: '#666666', points: pts.map((p) => [p.risk, p.ret]) },
+      {
+        color: '#00e5ff',
+        points: frontier().map((p) => [p.risk, p.ret]),
+      },
+    ];
+
+    getPlychart().then((p) => {
+      const canvas = document.getElementById('efficient-frontier') as HTMLCanvasElement | null;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) p.create_chart('efficient-frontier', Math.round(rect.width), 360);
+      p.update_scatter_multi('efficient-frontier', JSON.stringify(series), '');
+    });
+  });
+
+  const tangency = () => {
+    const pts = points();
+    if (pts.length === 0) return null;
+    return pts.reduce((a, b) => (a.sharpe > b.sharpe ? a : b));
+  };
+
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -251,9 +181,19 @@ export default function EfficientFrontier() {
           {error()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: '360px' }} />
+      <canvas id="efficient-frontier" class="w-full" style={{ height: '360px' }} />
+      <Show when={tangency()} keyed>
+        {(tan) => (
+          <p class="font-mono text-[10px] mt-1" style={{ color: 'var(--accent-warm)' }}>
+            ★ MAX SHARPE: {tan.ret.toFixed(1)}% ret @ {tan.risk.toFixed(1)}% risk (sharpe{' '}
+            {tan.sharpe.toFixed(2)})
+          </p>
+        )}
+      </Show>
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-        5000 random portfolios | 8 assets | 90d daily returns | risk-free 4%
+        <span style={{ color: '#666666' }}>■</span> random portfolios{' '}
+        <span style={{ color: '#00e5ff' }}>■</span> efficient frontier | 5000 portfolios | 8 assets
+        | 90d daily returns | risk-free 4%
       </p>
     </div>
   );

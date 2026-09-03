@@ -1,8 +1,19 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 import { onTickersChanged } from '../../../lib/ticker-events';
 import { activeTickers } from '../../../lib/ticker-universe';
 import { getWasmMod } from '../../../lib/wasm-loader';
+
+const EQ_ID = 'bl-equilibrium';
+const POST_ID = 'bl-posterior';
+const WGT_ID = 'bl-weights';
+const EQ_H = 220;
+const POST_H = 220;
+const WGT_H = 180;
+
+function toBar(v: number) {
+  return { time: 0, open: 0, high: 0, low: 0, close: v, volume: 0 };
+}
 
 interface ReturnsData {
   flat: Float64Array;
@@ -49,8 +60,7 @@ export default function BlackLitterman() {
   const [computing, setComputing] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
   const [viewMsg, setViewMsg] = createSignal<string | null>(null);
-  let returnsCanvasRef: HTMLCanvasElement | undefined;
-  let weightsCanvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -139,169 +149,56 @@ export default function BlackLitterman() {
     }
   }
 
-  function drawBar(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    bw: number,
-    v: number,
-    toY: (v: number) => number,
-    baseY: number,
-    color: string,
-  ) {
-    ctx.fillStyle = color;
-    const y1 = toY(v);
-    const top = Math.min(baseY, y1);
-    const bh = Math.max(1, Math.abs(y1 - baseY));
-    ctx.fillRect(x, top, bw, bh);
-  }
-
-  function drawReturns() {
-    const canvas = returnsCanvasRef;
-    const r = result();
-    const rd = returnsData();
-    if (!canvas || !r || !rd) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 220 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 220;
-    const colors = getThemeColors();
-    const pad = { l: 50, r: 12, t: 16, b: 40 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const eq = r.equilibrium_returns;
-    const post = r.posterior_returns;
-    const labs = rd.labels;
-    const n = Math.min(labs.length, eq.length, post.length);
-    if (n < 1) return;
-
-    const allVals = [...eq.slice(0, n), ...post.slice(0, n)];
-    let minY = Math.min(0, ...allVals);
-    let maxY = Math.max(0, ...allVals);
-    if (minY === maxY) {
-      minY -= 0.001;
-      maxY += 0.001;
-    }
-    const span = maxY - minY;
-    minY -= span * 0.1;
-    maxY += span * 0.1;
-    const range = maxY - minY || 1;
-    const toY = (v: number) => pad.t + (1 - (v - minY) / range) * cH;
-    const baseY = toY(0);
-
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.08)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.fillText(`${((maxY - (range * i) / 4) * 100).toFixed(2)}%`, pad.l - 5, y + 3);
-    }
-
-    const groupW = cW / n;
-    const barW = Math.min(12, groupW * 0.32);
-    for (let i = 0; i < n; i++) {
-      const gx = pad.l + i * groupW + groupW / 2;
-      drawBar(ctx, gx - barW - 1, barW, eq[i], toY, baseY, colors.accent || '#00e5ff');
-      drawBar(ctx, gx + 1, barW, post[i], toY, baseY, colors.accentWarm || '#ff6b35');
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.textAlign = 'center';
-      const lbl = labs[i].length > 6 ? labs[i].slice(0, 6) : labs[i];
-      ctx.fillText(lbl, gx, h - pad.b + 12);
-    }
-
-    // Legend
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = colors.accent || '#00e5ff';
-    ctx.fillRect(pad.l, pad.t + 2, 8, 8);
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.7)';
-    ctx.fillText('EQUILIBRIUM', pad.l + 12, pad.t + 9);
-    ctx.fillStyle = colors.accentWarm || '#ff6b35';
-    ctx.fillRect(pad.l + 92, pad.t + 2, 8, 8);
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.7)';
-    ctx.fillText('POSTERIOR', pad.l + 104, pad.t + 9);
-  }
-
-  function drawWeights() {
-    const canvas = weightsCanvasRef;
-    const r = result();
-    const rd = returnsData();
-    if (!canvas || !r || !rd) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 180 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 180;
-    const colors = getThemeColors();
-    const pad = { l: 50, r: 12, t: 16, b: 40 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const wgt = r.weights;
-    const labs = rd.labels;
-    const n = Math.min(labs.length, wgt.length);
-    if (n < 1) return;
-
-    const maxW = Math.max(0.0001, ...wgt.slice(0, n));
-    const toY = (v: number) => pad.t + (1 - v / maxW) * cH;
-
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.08)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.fillText(`${(((maxW * i) / 4) * 100).toFixed(0)}%`, pad.l - 5, y + 3);
-    }
-
-    const groupW = cW / n;
-    const barW = Math.min(20, groupW * 0.5);
-    for (let i = 0; i < n; i++) {
-      const gx = pad.l + i * groupW + groupW / 2;
-      drawBar(ctx, gx - barW / 2, barW, wgt[i], toY, pad.t + cH, '#4caf50');
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.textAlign = 'center';
-      const lbl = labs[i].length > 6 ? labs[i].slice(0, 6) : labs[i];
-      ctx.fillText(lbl, gx, h - pad.b + 12);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      for (const [id, h] of [
+        [EQ_ID, EQ_H],
+        [POST_ID, POST_H],
+        [WGT_ID, WGT_H],
+      ] as const) {
+        const canvas = document.getElementById(id) as HTMLCanvasElement | null;
+        if (canvas) p.create_chart(id, canvas.clientWidth || 600, h);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
   }
-
-  onMount(() => loadData());
-
-  onTickersChanged(() => loadData());
 
   createEffect(() => {
-    result();
-    if (!loading() && !computing())
-      requestAnimationFrame(() => {
-        drawReturns();
-        drawWeights();
-      });
+    const r = result();
+    const rd = returnsData();
+    const ready = wasmReady();
+    if (!r || !rd || !ready) return;
+
+    const n = Math.min(rd.labels.length, r.equilibrium_returns.length, r.posterior_returns.length);
+    if (n < 1) return;
+    const eqBars = r.equilibrium_returns.slice(0, n).map(toBar);
+    const postBars = r.posterior_returns.slice(0, n).map(toBar);
+    const nw = Math.min(rd.labels.length, r.weights.length);
+    const wgtBars = r.weights.slice(0, nw).map(toBar);
+
+    getPlychart().then((p) => {
+      for (const [id, h, bars] of [
+        [EQ_ID, EQ_H, eqBars],
+        [POST_ID, POST_H, postBars],
+        [WGT_ID, WGT_H, wgtBars],
+      ] as const) {
+        const canvas = document.getElementById(id) as HTMLCanvasElement | null;
+        if (!canvas) continue;
+        p.create_chart(id, canvas.clientWidth || 600, h);
+        p.update_bar(id, JSON.stringify(bars), '');
+      }
+    });
   });
+
+  onMount(() => {
+    initWasm();
+    loadData();
+  });
+
+  onTickersChanged(() => loadData());
 
   return (
     <div>
@@ -474,7 +371,21 @@ export default function BlackLitterman() {
               >
                 Equilibrium vs Posterior Returns
               </p>
-              <canvas ref={returnsCanvasRef} class="w-full" style={{ height: '220px' }} />
+              <div
+                class="flex items-center gap-4 mb-1 font-mono text-[9px]"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                <span class="flex items-center gap-1">
+                  <span class="inline-block w-2 h-2" style={{ background: '#00e5ff' }} />
+                  EQUILIBRIUM
+                </span>
+                <span class="flex items-center gap-1">
+                  <span class="inline-block w-2 h-2" style={{ background: '#ff6b35' }} />
+                  POSTERIOR
+                </span>
+              </div>
+              <canvas id={EQ_ID} class="w-full" style={{ height: `${EQ_H}px` }} />
+              <canvas id={POST_ID} class="w-full mt-2" style={{ height: `${POST_H}px` }} />
 
               <p
                 class="font-mono text-[9px] uppercase tracking-wider mb-1 mt-3"
@@ -482,7 +393,7 @@ export default function BlackLitterman() {
               >
                 Optimal Weights
               </p>
-              <canvas ref={weightsCanvasRef} class="w-full" style={{ height: '180px' }} />
+              <canvas id={WGT_ID} class="w-full" style={{ height: `${WGT_H}px` }} />
             </>
           )}
         </Show>

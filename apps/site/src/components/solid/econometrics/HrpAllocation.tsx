@@ -1,9 +1,12 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 import { onTickersChanged } from '../../../lib/ticker-events';
 import { activeTickers } from '../../../lib/ticker-universe';
 import { getWasmMod } from '../../../lib/wasm-loader';
+
+const H = 280;
+const CANVAS_ID = 'hrp-alloc';
 
 async function fetchRets(symbol: string, range: string): Promise<number[]> {
   const res = await fetch(
@@ -25,7 +28,7 @@ export default function HrpAllocation() {
   const [weights, setWeights] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -74,80 +77,53 @@ export default function HrpAllocation() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || weights().length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 280 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 280;
-    const colors = getThemeColors();
-    const labelW = 64;
-    const pad = { l: 8, r: 40, t: 16, b: 28 };
-    const plotX0 = pad.l + labelW;
-    const plotW = w - pad.r - plotX0;
-    const cH = h - pad.t - pad.b;
+  // Sorted descending by weight (same ordering the manual draw used)
+  const sorted = () =>
+    labels()
+      .map((label, i) => ({ label, w: weights()[i] ?? 0 }))
+      .sort((a, b) => b.w - a.w);
 
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    // Sort descending by weight
-    const labs = labels();
-    const ws = weights();
-    const order = labs.map((_, i) => i).sort((a, b) => (ws[b] ?? 0) - (ws[a] ?? 0));
-    const n = Math.min(order.length, labs.length, ws.length);
-    if (n < 1) return;
-
-    const maxW = Math.max(...order.slice(0, n).map((i) => ws[i] ?? 0)) || 1;
-    const rowH = cH / n;
-    const barH = Math.min(20, rowH * 0.6);
-
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.1)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 4; i++) {
-      const x = plotX0 + (plotW * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(x, pad.t);
-      ctx.lineTo(x, pad.t + cH);
-      ctx.stroke();
-      ctx.textAlign = 'center';
-      ctx.fillText(`${(((maxW * i) / 4) * 100).toFixed(0)}%`, x, h - pad.b + 14);
-    }
-
-    for (let r = 0; r < n; r++) {
-      const idx = order[r];
-      const v = ws[idx] ?? 0;
-      const y = pad.t + r * rowH + (rowH - barH) / 2;
-      const barW = (v / maxW) * plotW;
-      ctx.fillStyle = '#4caf50';
-      ctx.fillRect(plotX0, y, Math.max(1, barW), barH);
-      // label
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.textAlign = 'right';
-      const lbl = labs[idx].length > 8 ? labs[idx].slice(0, 8) : labs[idx];
-      ctx.fillText(lbl, plotX0 - 4, y + barH / 2 + 3);
-      // value
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#4caf50';
-      ctx.fillText(`${(v * 100).toFixed(1)}%`, plotX0 + barW + 4, y + barH / 2 + 3);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+      if (canvas) {
+        const w = canvas.clientWidth || 600;
+        p.create_chart(CANVAS_ID, w, H);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
   }
 
-  onMount(() => loadData());
+  createEffect(() => {
+    const rows = sorted();
+    const ready = wasmReady();
+    if (rows.length === 0 || !ready) return;
+    const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth || 600;
+      p.create_chart(CANVAS_ID, w, H);
+      const bars = rows.map((r) => ({
+        time: 0,
+        open: 0,
+        high: 0,
+        low: 0,
+        close: r.w,
+        volume: 0,
+      }));
+      p.update_bar(CANVAS_ID, JSON.stringify(bars), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
+  });
 
   onTickersChanged(() => loadData());
-
-  createEffect(() => {
-    weights();
-    if (!loading()) requestAnimationFrame(() => draw());
-  });
 
   return (
     <div>
@@ -180,8 +156,20 @@ export default function HrpAllocation() {
         </p>
       </Show>
 
+      <canvas id={CANVAS_ID} class="w-full" style={{ height: `${H}px` }} />
+
       <Show when={!loading() && weights().length > 0}>
-        <canvas ref={canvasRef} class="w-full" style={{ height: '280px' }} />
+        <div class="mt-2 font-mono text-[10px]">
+          <For each={sorted()}>
+            {(row) => (
+              <div class="flex items-center justify-between py-0.5">
+                <span style={{ color: 'var(--text-secondary)' }}>{row.label}</span>
+                <span style={{ color: '#4caf50' }}>{(row.w * 100).toFixed(1)}%</span>
+              </div>
+            )}
+          </For>
+        </div>
+
         <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
           Hierarchical Risk Parity | Distance-correlation clustering | Recursive bisection | No
           matrix inversion

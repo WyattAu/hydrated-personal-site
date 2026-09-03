@@ -2,7 +2,7 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface RegressionResult {
@@ -42,7 +42,7 @@ export default function RollingFactorExposure() {
   const [latest, setLatest] = createSignal<WindowPoint | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -88,103 +88,66 @@ export default function RollingFactorExposure() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || data().length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 280 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 280;
-    const colors = getThemeColors();
-    const pad = { l: 50, r: 16, t: 16, b: 28 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const pts = data();
-    const n = pts.length;
-    if (n < 2) return;
-    const betas = pts.map((p) => p.beta);
-    const minB = Math.min(0, Math.min(...betas));
-    const maxB = Math.max(2, Math.max(...betas));
-    const range = maxB - minB || 1;
-    const toX = (i: number) => pad.l + (i / (n - 1)) * cW;
-    const toY = (v: number) => pad.t + (1 - (v - minB) / range) * cH;
-
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.1)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.fillText(`${(maxB - (range * i) / 4).toFixed(2)}`, pad.l - 5, y + 3);
-    }
-
-    // Confidence band where r_squared > 0.3
-    ctx.fillStyle = `${colors.accent || '#00e5ff'}22`;
-    for (let i = 0; i < n; i++) {
-      if (pts[i].r_squared > 0.3) {
-        const bandH = 0.15;
-        const yTop = toY(pts[i].beta + bandH);
-        const yBot = toY(pts[i].beta - bandH);
-        const xL = i === 0 ? toX(i) : toX(i - 1);
-        const xR = toX(i);
-        ctx.fillRect(xL, yTop, xR - xL, yBot - yTop);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('rolling-factor-exposure') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        p.create_chart('rolling-factor-exposure', Math.round(rect.width), 280);
       }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    // Beta=1 reference line
-    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    ctx.moveTo(pad.l, toY(1));
-    ctx.lineTo(w - pad.r, toY(1));
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText('β=1.0', w - pad.r - 30, toY(1) - 3);
-
-    // Rolling beta line
-    ctx.strokeStyle = colors.accent || '#00e5ff';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    pts.forEach((p, i) => {
-      i === 0 ? ctx.moveTo(toX(i), toY(p.beta)) : ctx.lineTo(toX(i), toY(p.beta));
-    });
-    ctx.stroke();
-
-    // Legend
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = colors.accent || '#00e5ff';
-    ctx.fillRect(pad.l + 10, h - 14, 8, 8);
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.fillText('ROLLING β (60d)', pad.l + 22, h - 7);
   }
 
-  onMount(() => loadData());
+  createEffect(() => {
+    const pts = data();
+    const ready = wasmReady();
+    if (pts.length < 2 || !ready) return;
+
+    const toCandle = (v: number, t: number) => ({
+      time: t,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: v,
+      volume: 0,
+    });
+
+    const bandH = 0.15;
+    const betaData = pts.map((p, i) => toCandle(p.beta, i));
+    const upperData: ReturnType<typeof toCandle>[] = [];
+    const lowerData: ReturnType<typeof toCandle>[] = [];
+    pts.forEach((p, i) => {
+      if (p.r_squared > 0.3) {
+        upperData.push(toCandle(p.beta + bandH, i));
+        lowerData.push(toCandle(p.beta - bandH, i));
+      }
+    });
+
+    const series = [
+      { color: '#00e5ff', data: betaData },
+      { color: '#00e5ff', data: upperData },
+      { color: '#00e5ff', data: lowerData },
+    ];
+
+    getPlychart().then((p) => {
+      const canvas = document.getElementById('rolling-factor-exposure') as HTMLCanvasElement | null;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) p.create_chart('rolling-factor-exposure', Math.round(rect.width), 280);
+      p.update_line('rolling-factor-exposure', JSON.stringify(series), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
+  });
 
   onAssetChanged(() => loadData());
-
-  createEffect(() => {
-    data();
-    if (!loading()) requestAnimationFrame(() => draw());
-  });
 
   return (
     <div>
@@ -211,7 +174,18 @@ export default function RollingFactorExposure() {
         </p>
       </Show>
 
-      <canvas ref={canvasRef} class="w-full" style={{ height: '280px' }} />
+      <canvas id="rolling-factor-exposure" class="w-full" style={{ height: '280px' }} />
+
+      <Show when={!loading() && data().length > 0}>
+        <div class="flex items-center gap-4 mt-1 flex-wrap">
+          <span class="font-mono text-[9px]" style={{ color: '#00e5ff' }}>
+            ■ ROLLING β (60d)
+          </span>
+          <span class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+            - - β=1.0 reference | ±0.15 band where R² &gt; 0.3
+          </span>
+        </div>
+      </Show>
 
       <Show when={!loading() && latest()} keyed>
         {(l) => (

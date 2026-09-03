@@ -1,6 +1,9 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
+
+const H = 280;
+const CANVAS_ID = 'sector-rotation';
 
 const SECTOR_ETFS = ['XLK', 'XLV', 'XLF', 'XLE', 'XLI', 'XLP', 'XLU', 'XLB', 'XLRE', 'XLC'];
 
@@ -23,7 +26,7 @@ export default function SectorRotation() {
   const [rows, setRows] = createSignal<{ label: string; rs: number }[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -47,85 +50,47 @@ export default function SectorRotation() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || rows().length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 280 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 280;
-    const colors = getThemeColors();
-    const labelW = 44;
-    const pad = { l: 8, r: 40, t: 16, b: 28 };
-    const plotX0 = pad.l + labelW;
-    const plotW = w - pad.r - plotX0;
-    const cH = h - pad.t - pad.b;
+  // Sorted descending by relative strength (same ordering the manual draw used)
+  const sortedRows = () => [...rows()].sort((a, b) => b.rs - a.rs);
 
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const sorted = [...rows()].sort((a, b) => b.rs - a.rs);
-    const n = sorted.length;
-    const vmax = Math.max(0, ...sorted.map((r) => r.rs));
-    const vmin = Math.min(0, ...sorted.map((r) => r.rs));
-    const range = vmax - vmin || 1;
-    const zeroX = plotX0 + (-vmin / range) * plotW;
-    const xOf = (v: number) => plotX0 + ((v - vmin) / range) * plotW;
-    const rowH = cH / n;
-    const barH = Math.min(20, rowH * 0.6);
-
-    ctx.font = '9px "JetBrains Mono", monospace';
-    for (let i = 0; i < n; i++) {
-      const r = sorted[i];
-      const y = pad.t + i * rowH + (rowH - barH) / 2;
-      const xL = Math.min(zeroX, xOf(r.rs));
-      const xR = Math.max(zeroX, xOf(r.rs));
-      ctx.fillStyle = r.rs >= 0 ? '#4caf50' : '#ff5252';
-      ctx.fillRect(xL, y, Math.max(1, xR - xL), barH);
-      // label
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.textAlign = 'right';
-      ctx.fillText(r.label, plotX0 - 4, y + barH / 2 + 3);
-      // value
-      ctx.textAlign = 'left';
-      ctx.fillStyle = r.rs >= 0 ? '#4caf50' : '#ff5252';
-      ctx.fillText(`${r.rs >= 0 ? '+' : ''}${r.rs.toFixed(2)}%`, xR + 4, y + barH / 2 + 3);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+      if (canvas) {
+        const w = canvas.clientWidth || 600;
+        p.create_chart(CANVAS_ID, w, H);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    // Zero line
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.3)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(zeroX, pad.t);
-    ctx.lineTo(zeroX, pad.t + cH);
-    ctx.stroke();
-
-    // Legend
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    const legend: [string, string][] = [
-      ['OUTPERFORM', '#4caf50'],
-      ['LAGGING', '#ff5252'],
-    ];
-    legend.forEach(([label, color], i) => {
-      const x = pad.l + 8 + i * 110;
-      ctx.fillStyle = color;
-      ctx.fillRect(x, h - 14, 8, 8);
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.fillText(label, x + 12, h - 7);
-    });
   }
 
-  onMount(() => loadData());
-
   createEffect(() => {
-    rows();
-    if (!loading()) requestAnimationFrame(() => draw());
+    const list = sortedRows();
+    const ready = wasmReady();
+    if (list.length === 0 || !ready) return;
+    const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth || 600;
+      p.create_chart(CANVAS_ID, w, H);
+      const bars = list.map((r) => ({
+        time: 0,
+        open: 0,
+        high: 0,
+        low: 0,
+        close: r.rs,
+        volume: 0,
+      }));
+      p.update_bar(CANVAS_ID, JSON.stringify(bars), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -159,8 +124,37 @@ export default function SectorRotation() {
         </p>
       </Show>
 
+      <canvas id={CANVAS_ID} class="w-full" style={{ height: `${H}px` }} />
+
       <Show when={!loading() && rows().length > 0}>
-        <canvas ref={canvasRef} class="w-full" style={{ height: '280px' }} />
+        <div class="mt-2 font-mono text-[10px]">
+          <For each={sortedRows()}>
+            {(row) => (
+              <div class="flex items-center justify-between py-0.5">
+                <span style={{ color: 'var(--text-secondary)' }}>{row.label}</span>
+                <span style={{ color: row.rs >= 0 ? '#4caf50' : '#ff5252' }}>
+                  {row.rs >= 0 ? '+' : ''}
+                  {row.rs.toFixed(2)}%
+                </span>
+              </div>
+            )}
+          </For>
+        </div>
+
+        <div
+          class="flex items-center gap-4 mt-2 font-mono text-[9px]"
+          style={{ color: 'var(--text-secondary)' }}
+        >
+          <span class="flex items-center gap-1">
+            <span class="inline-block w-2 h-2" style={{ background: '#4caf50' }} />
+            OUTPERFORM
+          </span>
+          <span class="flex items-center gap-1">
+            <span class="inline-block w-2 h-2" style={{ background: '#ff5252' }} />
+            LAGGING
+          </span>
+        </div>
+
         <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
           3-month relative strength vs S&amp;P 500 | Green = outperforming | Red = lagging
         </p>

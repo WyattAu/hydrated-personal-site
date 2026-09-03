@@ -1,8 +1,8 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface GreeksResult {
@@ -20,7 +20,7 @@ export default function GreeksDashboard() {
   const [selected, setSelected] = createSignal<string>('');
   const [loading, setLoading] = createSignal(true);
   const [error, _setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
   let wasmMod: any = null;
 
   interface Opt {
@@ -31,10 +31,6 @@ export default function GreeksDashboard() {
     expiry: string;
     mark_price: number;
     underlying_price: number;
-  }
-  function useStateSignal() {
-    const [v, set] = createSignal<Opt[]>([]);
-    return { get: v, set };
   }
 
   async function loadOptions() {
@@ -184,95 +180,67 @@ export default function GreeksDashboard() {
     setLoading(false);
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || !greeks()) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 300 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 300;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const g = greeks()!;
-    const labels = ['DELTA', 'GAMMA', 'THETA', 'VEGA', 'RHO'];
-    const series = [g.delta, g.gamma, g.theta, g.vega, g.rho];
-    const colors5 = [colors.accent || '#00e5ff', '#7c4dff', '#ff4081', '#4caf50', '#ffa726'];
-
-    const pad = { l: 50, r: 16, t: 16, b: 28 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    // Y range (normalize each to [-1, 1] relative to its max abs)
-    let yMax = 0;
-    for (const s of series) for (const v of s) yMax = Math.max(yMax, Math.abs(v));
-
-    const toX = (i: number) => pad.l + (i / (g.spot.length - 1)) * cW;
-    const toY = (v: number) => pad.t + (1 - (v / yMax + 1) / 2) * cH;
-
-    // Zero line
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.08)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(pad.l, toY(0));
-    ctx.lineTo(w - pad.r, toY(0));
-    ctx.stroke();
-
-    // Curves
-    series.forEach((s, idx) => {
-      ctx.strokeStyle = colors5[idx];
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      s.forEach((v, i) => {
-        i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v));
-      });
-      ctx.stroke();
-    });
-
-    // Legend
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    labels.forEach((label, idx) => {
-      const x = pad.l + idx * 80;
-      ctx.fillStyle = colors5[idx];
-      ctx.fillRect(x, 4, 8, 8);
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.fillText(label, x + 12, 11);
-    });
-
-    // X axis labels
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
-    ctx.textAlign = 'center';
-    for (let i = 0; i < 5; i++) {
-      const idx = Math.floor(((g.spot.length - 1) * i) / 4);
-      ctx.fillText(formatPrice(g.spot[idx]), toX(idx), h - 10);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('greeks-dashboard') as HTMLCanvasElement | null;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        p.create_chart('greeks-dashboard', Math.round(rect.width), 300);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
   }
 
+  createEffect(() => {
+    const g = greeks();
+    const ready = wasmReady();
+    if (!g || !ready) return;
+
+    const toCandle = (v: number, t: number) => ({
+      time: t,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: v,
+      volume: 0,
+    });
+
+    const labels = ['DELTA', 'GAMMA', 'THETA', 'VEGA', 'RHO'];
+    const seriesArr = [g.delta, g.gamma, g.theta, g.vega, g.rho];
+    const seriesColors = ['#00e5ff', '#ff4081', '#4caf50', '#ff9800', '#7c4dff'];
+
+    // Normalize each series against global max abs (shared axis)
+    let yMax = 0;
+    for (const s of seriesArr) for (const v of s) yMax = Math.max(yMax, Math.abs(v));
+    if (yMax <= 0) yMax = 1;
+
+    const series = seriesArr.map((s, idx) => ({
+      color: seriesColors[idx],
+      label: labels[idx],
+      data: s.map((v, i) => toCandle(v / yMax, i)),
+    }));
+
+    getPlychart().then((p) => {
+      const canvas = document.getElementById('greeks-dashboard') as HTMLCanvasElement | null;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) p.create_chart('greeks-dashboard', Math.round(rect.width), 300);
+      p.update_line('greeks-dashboard', JSON.stringify(series), '');
+    });
+  });
+
   onMount(async () => {
+    initWasm();
     await loadOptions();
     await computeGreeks();
-    setTimeout(draw, 10);
   });
 
   onAssetChanged(async () => {
     await loadOptions();
     await computeGreeks();
-    setTimeout(draw, 10);
-  });
-
-  const g = greeks();
-
-  createEffect(() => {
-    const v = greeks();
-    if (v) draw();
   });
 
   return (
@@ -314,15 +282,31 @@ export default function GreeksDashboard() {
           {error()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: '300px' }} />
-      <Show when={greeks()}>
-        <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-          Deribit BTC options | Greeks computed in WASM | erf via Abramowitz-Stegun
-        </p>
+      <canvas id="greeks-dashboard" class="w-full" style={{ height: '300px' }} />
+      <Show when={greeks()} keyed>
+        {(g) => (
+          <div>
+            <div class="flex items-center gap-4 mt-1 flex-wrap">
+              <For each={['DELTA', 'GAMMA', 'THETA', 'VEGA', 'RHO']}>
+                {(label, idx) => (
+                  <span class="font-mono text-[9px]" style={{ color: GREEK_COLORS[idx()] }}>
+                    ■ {label}
+                  </span>
+                )}
+              </For>
+            </div>
+            <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
+              Spot {formatPrice(g.spot[0] ?? 0)} → {formatPrice(g.spot[g.spot.length - 1] ?? 0)} |
+              values normalized to max |greek| | erf via Abramowitz-Stegun
+            </p>
+          </div>
+        )}
       </Show>
     </div>
   );
 }
+
+const GREEK_COLORS = ['#00e5ff', '#ff4081', '#4caf50', '#ff9800', '#7c4dff'];
 
 function formatPrice(v: number): string {
   if (v >= 10000) return v.toFixed(0);

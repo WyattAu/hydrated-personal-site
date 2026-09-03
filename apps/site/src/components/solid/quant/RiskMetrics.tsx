@@ -2,8 +2,11 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 import { WASM_VERSION } from '../../../lib/wasm-version';
+
+const H = 260;
+const CANVAS_ID = 'risk-metrics';
 
 interface VarResult {
   var_historical: number;
@@ -18,7 +21,8 @@ export default function RiskMetrics(props: { symbol?: string }) {
   const symbol = () => activeAsset();
   const [data, setData] = createSignal<VarResult | null>(null);
   const [loading, setLoading] = createSignal(true);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
+  let returnsFlat: Float64Array | null = null;
   let wasmMod: any = null;
 
   async function loadData() {
@@ -42,6 +46,7 @@ export default function RiskMetrics(props: { symbol?: string }) {
         await wasmMod.default();
       }
       const wasmJson = wasmMod.quant_var(returns, 0.05);
+      returnsFlat = returns;
       setData(JSON.parse(wasmJson));
     } catch {
       /* skip */
@@ -50,107 +55,37 @@ export default function RiskMetrics(props: { symbol?: string }) {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || !data()) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 260 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 260;
-    const colors = getThemeColors();
-    const pad = { l: 50, r: 16, t: 16, b: 28 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-    const d = data()!;
-    const edges = d.histogram_edges;
-    const counts = d.histogram_counts;
-    if (edges.length < 2) return;
-
-    const maxCount = Math.max(...counts) || 1;
-    const minRet = edges[0];
-    const maxRet = edges[edges.length - 1];
-    const range = maxRet - minRet || 1;
-    const barW = cW / counts.length;
-
-    const toX = (v: number) => pad.l + ((v - minRet) / range) * cW;
-    const toH = (c: number) => (c / maxCount) * cH;
-
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.04)';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-    }
-
-    // Histogram bars
-    counts.forEach((c, i) => {
-      const x = pad.l + i * barW;
-      const barH = toH(c);
-      const isTail = edges[i] <= d!.var_historical;
-      ctx.fillStyle = isTail
-        ? `${colors.accentWarm || '#f0883e'}80`
-        : `${colors.accent || '#00e5ff'}40`;
-      ctx.fillRect(x + 1, pad.t + cH - barH, barW - 2, barH);
-    });
-
-    // VaR line
-    const varX = toX(d!.var_historical);
-    ctx.strokeStyle = colors.accentWarm || '#f0883e';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(varX, pad.t);
-    ctx.lineTo(varX, pad.t + cH);
-    ctx.stroke();
-    ctx.fillStyle = colors.accentWarm || '#f0883e';
-    ctx.font = 'bold 9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText(`VaR(95%) ${(d!.var_historical * 100).toFixed(2)}%`, varX + 4, pad.t + 12);
-
-    // ES line
-    const esX = toX(d!.es_historical);
-    ctx.strokeStyle = '#ff4081';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath();
-    ctx.moveTo(esX, pad.t);
-    ctx.lineTo(esX, pad.t + cH);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#ff4081';
-    ctx.fillText(`ES(95%) ${(d!.es_historical * 100).toFixed(2)}%`, esX + 4, pad.t + 26);
-
-    // X axis
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.3)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'center';
-    for (let i = 0; i <= 5; i++) {
-      const val = minRet + (range * i) / 5;
-      ctx.fillText(`${(val * 100).toFixed(1)}%`, pad.l + (cW * i) / 5, h - 8);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+      if (canvas) {
+        p.create_chart(CANVAS_ID, canvas.clientWidth || 600, H);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
   }
 
   onMount(() => {
+    initWasm();
     loadData();
   });
 
   onAssetChanged(() => loadData());
 
-  const d = data();
-
   createEffect(() => {
-    const v = data();
-    if (v) draw();
+    const d = data();
+    const ready = wasmReady();
+    if (!d || !ready || !returnsFlat || returnsFlat.length === 0) return;
+    const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const binCount = Math.max(1, d.histogram_edges.length - 1);
+    getPlychart().then((p) => {
+      p.create_chart(CANVAS_ID, canvas.clientWidth || 600, H);
+      p.update_histogram(CANVAS_ID, JSON.stringify(Array.from(returnsFlat!)), binCount, '');
+    });
   });
 
   return (
@@ -163,13 +98,35 @@ export default function RiskMetrics(props: { symbol?: string }) {
           Computing...
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: '260px' }} />
-      <Show when={d}>
-        <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-          {symbol()} 1d returns | VaR(95%): {((d?.var_historical ?? 0) * 100).toFixed(2)}% |
-          ES(95%): {((d?.es_historical ?? 0) * 100).toFixed(2)}% | Parametric VaR:{' '}
-          {((d?.var_parametric ?? 0) * 100).toFixed(2)}%
-        </p>
+      <canvas id={CANVAS_ID} class="w-full" style={{ height: `${H}px` }} />
+      <Show when={data()} keyed>
+        {(d) => (
+          <>
+            <div class="flex items-center gap-2 mt-2 flex-wrap font-mono text-[10px]">
+              <span
+                class="border px-2 py-0.5"
+                style={{ 'border-color': 'var(--accent-warm)', color: 'var(--accent-warm)' }}
+              >
+                VaR(95%) {(d.var_historical * 100).toFixed(2)}%
+              </span>
+              <span
+                class="border px-2 py-0.5"
+                style={{ 'border-color': '#ff4081', color: '#ff4081' }}
+              >
+                ES(95%) {(d.es_historical * 100).toFixed(2)}%
+              </span>
+              <span
+                class="border px-2 py-0.5"
+                style={{ 'border-color': 'var(--border)', color: 'var(--text-secondary)' }}
+              >
+                Parametric VaR {(d.var_parametric * 100).toFixed(2)}%
+              </span>
+            </div>
+            <p class="font-mono text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+              {symbol()} 1d log returns histogram | {d.histogram_edges.length - 1} bins
+            </p>
+          </>
+        )}
       </Show>
     </div>
   );

@@ -1,4 +1,5 @@
-import { For, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { For, createEffect, createSignal, onMount } from 'solid-js';
+import { getPlychart } from '../../lib/plychart-loader';
 import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 
@@ -6,153 +7,66 @@ interface EtfDetailProps {
   etf: EtfEntry;
 }
 
-const CHART_COLORS = [
-  '#00e5ff',
-  '#69f0ae',
-  '#b388ff',
-  '#ff6b35',
-  '#ff4081',
-  '#ffd740',
-  '#64ffda',
-  '#ff8a80',
-  '#82b1ff',
-  '#ccff90',
-  '#ea80fc',
-  '#84ffff',
-  '#f4ff81',
-  '#ff9e80',
-  '#a7ffeb',
-];
+const H = 280;
+const BARS_ID = 'etf-detail-bars';
+const DONUT_ID = 'etf-detail-donut';
 
-function drawBarChart(canvas: HTMLCanvasElement, data: Record<string, number>) {
-  const dpr = window.devicePixelRatio || 1;
-  const entries = Object.entries(data).sort((a, b) => b[1] - a[1]);
-  const w = canvas.clientWidth;
-  const h = canvas.clientHeight || 280;
-  canvas.width = w * dpr;
-  canvas.height = h * dpr;
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.scale(dpr, dpr);
-
-  const colors = getThemeColors();
-  const bg = colors.bgCard || '#0c0c0c';
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
-
-  const padLeft = 130;
-  const padRight = 40;
-  const padTop = 12;
-  const padBottom = 12;
-  const chartW = w - padLeft - padRight;
-  const chartH = h - padTop - padBottom;
-  const barH = Math.min(22, chartH / entries.length - 4);
-  const maxVal = Math.max(...entries.map((e) => e[1]), 1);
-
-  entries.forEach(([label, val], i) => {
-    const y = padTop + i * (chartH / entries.length) + (chartH / entries.length - barH) / 2;
-    const barW = (val / maxVal) * chartW;
-
-    ctx.fillStyle = `${CHART_COLORS[i % CHART_COLORS.length]}33`;
-    ctx.fillRect(padLeft, y, barW, barH);
-    ctx.fillStyle = CHART_COLORS[i % CHART_COLORS.length];
-    ctx.fillRect(padLeft, y, barW, barH);
-
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.7)';
-    ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.textAlign = 'right';
-    ctx.fillText(label, padLeft - 8, y + barH / 2 + 3);
-
-    ctx.textAlign = 'left';
-    ctx.fillText(`${val.toFixed(1)}%`, padLeft + barW + 6, y + barH / 2 + 3);
-  });
-}
-
-function drawDonutChart(canvas: HTMLCanvasElement, data: Record<string, number>) {
-  const dpr = window.devicePixelRatio || 1;
-  const entries = Object.entries(data).sort((a, b) => b[1] - a[1]);
-  const w = canvas.clientWidth;
-  const h = canvas.clientHeight || 280;
-  canvas.width = w * dpr;
-  canvas.height = h * dpr;
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.scale(dpr, dpr);
-
-  const colors = getThemeColors();
-  const bg = colors.bgCard || '#0c0c0c';
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
-
-  const total = entries.reduce((s, e) => s + e[1], 0);
-  if (total === 0) return;
-
-  const cx = w / 2;
-  const cy = h / 2;
-  const outerR = Math.min(w, h) / 2 - 20;
-  const innerR = outerR * 0.55;
-  let startAngle = -Math.PI / 2;
-
-  entries.forEach(([_label, val], i) => {
-    const sliceAngle = (val / total) * 2 * Math.PI;
-    ctx.beginPath();
-    ctx.moveTo(cx + innerR * Math.cos(startAngle), cy + innerR * Math.sin(startAngle));
-    ctx.arc(cx, cy, outerR, startAngle, startAngle + sliceAngle);
-    ctx.arc(cx, cy, innerR, startAngle + sliceAngle, startAngle, true);
-    ctx.closePath();
-    ctx.fillStyle = CHART_COLORS[i % CHART_COLORS.length];
-    ctx.fill();
-    startAngle += sliceAngle;
-  });
-
-  ctx.fillStyle = bg;
-  ctx.beginPath();
-  ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
-  ctx.fill();
-
-  const textColor = colors.textPrimary || '#fff';
-  ctx.fillStyle = textColor;
-  ctx.font = 'bold 16px "JetBrains Mono", monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(`${entries.length}`, cx, cy - 8);
-  ctx.font = '9px "JetBrains Mono", monospace';
-  ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-  ctx.fillText('REGIONS', cx, cy + 8);
+function toBar(v: number) {
+  return { time: 0, open: 0, high: 0, low: 0, close: v, volume: 0 };
 }
 
 export default function EtfDetail(props: EtfDetailProps) {
-  let sectorCanvas: HTMLCanvasElement | undefined;
-  let regionCanvas: HTMLCanvasElement | undefined;
-
   const [price, setPrice] = createSignal((Math.random() * 400 + 50).toFixed(2));
   const [change, setChange] = createSignal(((Math.random() - 0.45) * 6).toFixed(2));
+  const [wasmReady, setWasmReady] = createSignal(false);
+
+  // Sorted descending by weight (same ordering the manual draws used)
+  const sectors = () => Object.entries(props.etf.sector_allocation).sort((a, b) => b[1] - a[1]);
+  const regions = () => Object.entries(props.etf.region_allocation).sort((a, b) => b[1] - a[1]);
+
+  async function initWasm() {
+    try {
+      await getPlychart();
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
+    }
+  }
+
+  createEffect(() => {
+    const entries = sectors();
+    const ready = wasmReady();
+    if (!ready || entries.length === 0) return;
+    const canvas = document.getElementById(BARS_ID) as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth || 600;
+      p.create_chart(BARS_ID, w, H);
+      p.update_bar(BARS_ID, JSON.stringify(entries.map(([, v]) => toBar(v))), '');
+    });
+  });
+
+  createEffect(() => {
+    const entries = regions();
+    const ready = wasmReady();
+    if (!ready || entries.length === 0) return;
+    const canvas = document.getElementById(DONUT_ID) as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth || 600;
+      p.create_chart(DONUT_ID, w, H);
+      p.update_pie(DONUT_ID, JSON.stringify(entries), '');
+    });
+  });
 
   createEffect(() => {
     props.etf;
     setPrice((Math.random() * 400 + 50).toFixed(2));
     setChange(((Math.random() - 0.45) * 6).toFixed(2));
-    queueMicrotask(() => {
-      if (sectorCanvas) drawBarChart(sectorCanvas, props.etf.sector_allocation);
-      if (regionCanvas) drawDonutChart(regionCanvas, props.etf.region_allocation);
-    });
   });
 
   onMount(() => {
-    if (sectorCanvas) drawBarChart(sectorCanvas, props.etf.sector_allocation);
-    if (regionCanvas) drawDonutChart(regionCanvas, props.etf.region_allocation);
-
-    const observer = new ResizeObserver(() => {
-      if (sectorCanvas) drawBarChart(sectorCanvas, props.etf.sector_allocation);
-      if (regionCanvas) drawDonutChart(regionCanvas, props.etf.region_allocation);
-    });
-    if (sectorCanvas) observer.observe(sectorCanvas);
-    if (regionCanvas) observer.observe(regionCanvas);
-    onCleanup(() => observer.disconnect());
+    initWasm();
   });
 
   const accentColor = () => {
@@ -218,9 +132,9 @@ export default function EtfDetail(props: EtfDetailProps) {
             }}
           >
             <canvas
-              ref={sectorCanvas}
+              id={BARS_ID}
               class="w-full"
-              style={{ height: '280px' }}
+              style={{ height: `${H}px` }}
               role="img"
               aria-label={`${props.etf.ticker} sector allocation chart`}
             />
@@ -240,9 +154,9 @@ export default function EtfDetail(props: EtfDetailProps) {
             }}
           >
             <canvas
-              ref={regionCanvas}
+              id={DONUT_ID}
               class="w-full"
-              style={{ height: '280px' }}
+              style={{ height: `${H}px` }}
               role="img"
               aria-label={`${props.etf.ticker} region allocation donut chart`}
             />
