@@ -66,6 +66,14 @@ jobs:
         run: |
           curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh \
             | sh -s -- --force --version v0.14.0
+      # packages/widgets path-deps on plychart at the dev-machine absolute
+      # path; provide the same layout on CI runners.
+      - name: Checkout plychart (path-dep target)
+        run: |
+          if [ ! -d /home/wyatt/dev/src/github.com/WyattAu/plychart ]; then
+            git clone --depth 1 https://github.com/WyattAu/plychart \
+              /home/wyatt/dev/src/github.com/WyattAu/plychart
+          fi
       - name: Build WASM (stages into apps/site/public/wasm)
         run: bash packages/widgets/scripts/build.sh
       - name: Verify WASM output

@@ -47,7 +47,16 @@ export default function CurrencyMatrix() {
   function renderChart() {
     const m = matrix();
     if (!m) return;
-    renderPlychart('currency-matrix', 'update_heatmap', JSON.stringify(m.grid), '');
+    // Diverging red-blue palette with axis labels (values are +/- relative
+    // strength differentials, so the correlation renderer fits better than
+    // the sequential green heatmap ramp).
+    renderPlychart(
+      'currency-matrix',
+      'update_correlation',
+      JSON.stringify(m.grid),
+      JSON.stringify(CURRENCIES),
+      '',
+    );
   }
 
   createEffect(() => {
