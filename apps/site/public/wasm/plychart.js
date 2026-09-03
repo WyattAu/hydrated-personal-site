@@ -155,77 +155,6 @@ export function update_backtest(canvas_id, equity_json, drawdown_json, theme_jso
 }
 
 /**
- * Update chart with sparkline data.
- * data_json: `[value1, value2, ...]`
- * @param {string} canvas_id
- * @param {string} data_json
- * @param {string} color
- * @param {string} theme_json
- */
-export function update_sparkline(canvas_id, data_json, color, theme_json) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ptr2 = passStringToWasm0(color, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len2 = WASM_VECTOR_LEN;
-    const ptr3 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len3 = WASM_VECTOR_LEN;
-    const ret = wasm.update_sparkline(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * Get click data for a mouse position.
- * `chart_type` selects behaviour: `"pie"` uses angle, `"scatter"` finds the
- * nearest point, and any other value returns the nearest index.
- * Returns JSON: `{index, x, y}` (scatter also adds `distance`).
- * @param {string} canvas_id
- * @param {number} x
- * @param {number} y
- * @param {number} data_len
- * @param {string} chart_type
- * @returns {string}
- */
-export function get_click_data(canvas_id, x, y, data_len, chart_type) {
-    let deferred4_0;
-    let deferred4_1;
-    try {
-        const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(chart_type, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.get_click_data(ptr0, len0, x, y, data_len, ptr1, len1);
-        var ptr3 = ret[0];
-        var len3 = ret[1];
-        if (ret[3]) {
-            ptr3 = 0; len3 = 0;
-            throw takeFromExternrefTable0(ret[2]);
-        }
-        deferred4_0 = ptr3;
-        deferred4_1 = len3;
-        return getStringFromWasm0(ptr3, len3);
-    } finally {
-        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
-    }
-}
-
-/**
- * Destroy a chart and clean up resources.
- * @param {string} canvas_id
- */
-export function destroy_chart(canvas_id) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.destroy_chart(ptr0, len0);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
  * Update chart with histogram data.
  * data_json: `[value1, value2, ...]`
  * @param {string} canvas_id
@@ -241,29 +170,6 @@ export function update_histogram(canvas_id, data_json, bin_count, theme_json) {
     const ptr2 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len2 = WASM_VECTOR_LEN;
     const ret = wasm.update_histogram(ptr0, len0, ptr1, len1, bin_count, ptr2, len2);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * Update chart with multi-series radar data.
- * data_json: `[{color: "#ff0000", values: [v1, v2, ...]}, ...]`
- * @param {string} canvas_id
- * @param {string} data_json
- * @param {string} labels_json
- * @param {string} theme_json
- */
-export function update_radar_multi(canvas_id, data_json, labels_json, theme_json) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ptr2 = passStringToWasm0(labels_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len2 = WASM_VECTOR_LEN;
-    const ptr3 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len3 = WASM_VECTOR_LEN;
-    const ret = wasm.update_radar_multi(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -302,6 +208,96 @@ export function get_tooltip_data(canvas_id, x, y, data_json, series_index) {
         return getStringFromWasm0(ptr3, len3);
     } finally {
         wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
+    }
+}
+
+/**
+ * Update chart with stacked bar data.
+ * matrix_json: `[[v1, v2, v3], [v1, v2, v3], ...]` (one inner array per bar)
+ * labels_json: `["cat1", "cat2", ...]`
+ * @param {string} canvas_id
+ * @param {string} matrix_json
+ * @param {string} labels_json
+ * @param {string} theme_json
+ */
+export function update_stacked_bar(canvas_id, matrix_json, labels_json, theme_json) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(matrix_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(labels_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len2 = WASM_VECTOR_LEN;
+    const ptr3 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len3 = WASM_VECTOR_LEN;
+    const ret = wasm.update_stacked_bar(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Update chart with pie/donut data.
+ * data_json: `[["label", value], ...]`
+ * @param {string} canvas_id
+ * @param {string} data_json
+ * @param {string} theme_json
+ */
+export function update_pie(canvas_id, data_json, theme_json) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len2 = WASM_VECTOR_LEN;
+    const ret = wasm.update_pie(ptr0, len0, ptr1, len1, ptr2, len2);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Update chart with multi-series radar data.
+ * data_json: `[{color: "#ff0000", values: [v1, v2, ...]}, ...]`
+ * @param {string} canvas_id
+ * @param {string} data_json
+ * @param {string} labels_json
+ * @param {string} theme_json
+ */
+export function update_radar_multi(canvas_id, data_json, labels_json, theme_json) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(labels_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len2 = WASM_VECTOR_LEN;
+    const ptr3 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len3 = WASM_VECTOR_LEN;
+    const ret = wasm.update_radar_multi(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Update chart with sparkline data.
+ * data_json: `[value1, value2, ...]`
+ * @param {string} canvas_id
+ * @param {string} data_json
+ * @param {string} color
+ * @param {string} theme_json
+ */
+export function update_sparkline(canvas_id, data_json, color, theme_json) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(color, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len2 = WASM_VECTOR_LEN;
+    const ptr3 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len3 = WASM_VECTOR_LEN;
+    const ret = wasm.update_sparkline(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
     }
 }
 
@@ -385,22 +381,50 @@ export function update_bar(canvas_id, data_json, theme_json) {
 }
 
 /**
- * Update chart with pie/donut data.
- * data_json: `[["label", value], ...]`
+ * Destroy a chart and clean up resources.
  * @param {string} canvas_id
- * @param {string} data_json
- * @param {string} theme_json
  */
-export function update_pie(canvas_id, data_json, theme_json) {
+export function destroy_chart(canvas_id) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ptr2 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len2 = WASM_VECTOR_LEN;
-    const ret = wasm.update_pie(ptr0, len0, ptr1, len1, ptr2, len2);
+    const ret = wasm.destroy_chart(ptr0, len0);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Get click data for a mouse position.
+ * `chart_type` selects behaviour: `"pie"` uses angle, `"scatter"` finds the
+ * nearest point, and any other value returns the nearest index.
+ * Returns JSON: `{index, x, y}` (scatter also adds `distance`).
+ * @param {string} canvas_id
+ * @param {number} x
+ * @param {number} y
+ * @param {number} data_len
+ * @param {string} chart_type
+ * @returns {string}
+ */
+export function get_click_data(canvas_id, x, y, data_len, chart_type) {
+    let deferred4_0;
+    let deferred4_1;
+    try {
+        const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(chart_type, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.get_click_data(ptr0, len0, x, y, data_len, ptr1, len1);
+        var ptr3 = ret[0];
+        var len3 = ret[1];
+        if (ret[3]) {
+            ptr3 = 0; len3 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred4_0 = ptr3;
+        deferred4_1 = len3;
+        return getStringFromWasm0(ptr3, len3);
+    } finally {
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
     }
 }
 
@@ -716,6 +740,9 @@ function __wbg_get_imports() {
     };
     imports.wbg.__wbg_setfont_42a163ef83420b93 = function(arg0, arg1, arg2) {
         arg0.font = getStringFromWasm0(arg1, arg2);
+    };
+    imports.wbg.__wbg_setglobalAlpha_4673ca870e9d3439 = function(arg0, arg1) {
+        arg0.globalAlpha = arg1;
     };
     imports.wbg.__wbg_setheight_da683a33fa99843c = function(arg0, arg1) {
         arg0.height = arg1 >>> 0;

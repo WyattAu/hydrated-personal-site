@@ -2,7 +2,7 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 async function fetchLastClose(symbol: string): Promise<number | null> {
   const res = await fetch(
@@ -22,7 +22,7 @@ export default function CommodityTermStructure() {
   const [symbol, setSymbol] = createSignal('');
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -50,95 +50,56 @@ export default function CommodityTermStructure() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    if (!canvas || prices().length === 0) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 280 * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const h = 280;
-    const colors = getThemeColors();
-    const pad = { l: 50, r: 16, t: 28, b: 36 };
-    const cW = w - pad.l - pad.r;
-    const cH = h - pad.t - pad.b;
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, h);
-
-    const p = prices();
-    const maxP = Math.max(...p) || 1;
-    const minP = Math.min(0, Math.min(...p));
-    const range = maxP - minP || 1;
-    const toY = (v: number) => pad.t + (1 - (v - minP) / range) * cH;
-
-    const contango = p[0] < p[1];
-    const barColor = contango ? '#ff5252' : '#4caf50';
-
-    // Grid
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.1)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-    ctx.font = '9px "JetBrains Mono", monospace';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (cH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.fillText(`${(maxP - (range * i) / 4).toFixed(2)}`, pad.l - 5, y + 3);
-    }
-
-    // Bars
-    const slotW = cW / 3;
-    const barW = slotW * 0.5;
-    const labels = ['M1', 'M2', 'M3'];
-    for (let i = 0; i < 3; i++) {
-      const x = pad.l + i * slotW + (slotW - barW) / 2;
-      const yTop = toY(p[i]);
-      const yBase = toY(0);
-      ctx.fillStyle = `${barColor}cc`;
-      ctx.fillRect(x, yTop, barW, yBase - yTop);
-      // price label
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.7)';
-      ctx.textAlign = 'center';
-      ctx.fillText(p[i].toFixed(2), x + barW / 2, yTop - 4);
-      // month label
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.fillText(labels[i], x + barW / 2, h - pad.b + 14);
-    }
-
-    // Status header
-    ctx.font = 'bold 10px "JetBrains Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = barColor;
-    const status = contango ? 'CONTANGO (normal carry)' : 'BACKWARDATION (supply stress)';
-    ctx.fillText(status, pad.l, 16);
-
-    // Spread
-    if (p[0] > 0 && p[1] > 0) {
-      const spread = p[1] - p[0];
-      ctx.textAlign = 'right';
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.6)';
-      ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.fillText(`M2−M1: ${spread >= 0 ? '+' : ''}${spread.toFixed(3)}`, w - pad.r, 16);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('commodity-bars') as HTMLCanvasElement | null;
+      if (canvas) {
+        const w = canvas.clientWidth;
+        const h = 280;
+        p.create_chart('commodity-bars', w, h);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
   }
 
-  onMount(() => loadData());
+  createEffect(() => {
+    const vals = prices();
+    const ready = wasmReady();
+    if (vals.length === 0 || !ready) return;
+    const canvas = document.getElementById('commodity-bars') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth;
+      const h = 280;
+      p.create_chart('commodity-bars', w, h);
+      const data = vals.map((v) => ({ time: 0, open: 0, high: 0, low: 0, close: v, volume: 0 }));
+      p.update_bar('commodity-bars', JSON.stringify(data), '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
+  });
 
   onAssetChanged(() => loadData());
 
-  createEffect(() => {
-    prices();
-    if (!loading()) requestAnimationFrame(() => draw());
-  });
-
   const isCommodity = () => activeAsset().endsWith('=F');
+
+  const contango = () => {
+    const p = prices();
+    if (p.length < 2) return false;
+    return p[0] < p[1];
+  };
+
+  const spread = () => {
+    const p = prices();
+    if (p.length < 2 || p[0] === 0 || p[1] === 0) return null;
+    return p[1] - p[0];
+  };
 
   return (
     <div>
@@ -179,7 +140,21 @@ export default function CommodityTermStructure() {
       </Show>
 
       <Show when={!loading() && prices().length > 0}>
-        <canvas ref={canvasRef} class="w-full" style={{ height: '280px' }} />
+        <canvas id="commodity-bars" class="w-full" style={{ height: '280px' }} />
+        <div class="flex items-center justify-between mt-2 font-mono text-[10px]">
+          <span style={{ color: contango() ? '#ff5252' : '#4caf50', 'font-weight': 'bold' }}>
+            {contango() ? 'CONTANGO (normal carry)' : 'BACKWARDATION (supply stress)'}
+          </span>
+          <Show when={spread() !== null}>
+            <span style={{ color: 'var(--text-secondary)' }}>
+              M2−M1: {spread()! >= 0 ? '+' : ''}
+              {spread()!.toFixed(3)}
+            </span>
+          </Show>
+        </div>
+        <p class="font-mono text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+          M1 / M2 / M3 bars via plychart | {prices().map((v) => v.toFixed(2)).join(' / ')}
+        </p>
       </Show>
     </div>
   );

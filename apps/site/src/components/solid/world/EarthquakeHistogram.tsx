@@ -1,6 +1,6 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getThemeColors } from '../../../lib/theme-colors';
+import { getPlychart } from '../../../lib/plychart-loader';
 
 const H = 220;
 
@@ -16,9 +16,10 @@ const BINS = [
 
 export default function EarthquakeHistogram() {
   const [counts, setCounts] = createSignal<number[] | null>(null);
+  const [mags, setMags] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  let canvasRef: HTMLCanvasElement | undefined;
+  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -29,6 +30,10 @@ export default function EarthquakeHistogram() {
       const raw = await res.json();
       const features: Array<{ properties: { mag: number | null } }> =
         (raw.data || raw).features || [];
+      const allMags = features
+        .map((f) => f.properties.mag ?? 0)
+        .filter((m) => m != null && !Number.isNaN(m) && m > 0);
+      setMags(allMags);
       const out = BINS.map(
         (b) =>
           features.filter(
@@ -43,77 +48,44 @@ export default function EarthquakeHistogram() {
     }
   }
 
-  function draw() {
-    const canvas = canvasRef;
-    const c = counts();
-    if (!canvas || !c) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
-    const colors = getThemeColors();
-
-    ctx.fillStyle = colors.bgCard || '#0c0c0c';
-    ctx.fillRect(0, 0, w, H);
-
-    const pad = { l: 40, r: 12, t: 14, b: 30 };
-    const cW = w - pad.l - pad.r;
-    const cH = H - pad.t - pad.b;
-    const maxCount = Math.max(1, ...c);
-    const logMax = Math.log10(maxCount + 1);
-
-    // Y axis log ticks
-    ctx.strokeStyle = colors.canvasGrid || 'rgba(255,255,255,0.08)';
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.4)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    const ticks = [1, 10, 100, 1000].filter((t) => t <= maxCount);
-    for (const t of ticks) {
-      const y = pad.t + cH - (Math.log10(t + 1) / logMax) * cH;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(`${t}`, pad.l - 4, y);
+  async function initWasm() {
+    try {
+      const p = await getPlychart();
+      const canvas = document.getElementById('quake-hist') as HTMLCanvasElement | null;
+      if (canvas) {
+        const w = canvas.clientWidth;
+        p.create_chart('quake-hist', w, H);
+      }
+      setWasmReady(true);
+    } catch (e) {
+      console.error('plychart init failed:', e);
     }
-
-    const barW = cW / BINS.length;
-    for (let i = 0; i < BINS.length; i++) {
-      const count = c[i];
-      const x = pad.l + i * barW;
-      const hgt = count > 0 ? (Math.log10(count + 1) / logMax) * cH : 0;
-      const y = pad.t + cH - hgt;
-      const intensity = Math.min(1, (i + 1) / BINS.length);
-      const red = Math.floor(120 + intensity * 135);
-      ctx.fillStyle = `rgb(${red},${Math.floor(60 + (1 - intensity) * 80)},60)`;
-      ctx.fillRect(x + 2, y, barW - 4, hgt);
-      ctx.fillStyle = colors.textPrimary || '#fff';
-      ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      if (count > 0) ctx.fillText(`${count}`, x + barW / 2, y - 2);
-      ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.5)';
-      ctx.font = '8px "JetBrains Mono", monospace';
-      ctx.textBaseline = 'top';
-      ctx.fillText(BINS[i].label, x + barW / 2, pad.t + cH + 4);
-    }
-
-    ctx.fillStyle = colors.canvasText || 'rgba(255,255,255,0.35)';
-    ctx.font = '8px "JetBrains Mono", monospace';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'top';
-    ctx.fillText('log scale (Gutenberg-Richter)', w - pad.r, 2);
   }
 
-  onMount(() => loadData());
   createEffect(() => {
-    const v = counts();
-    if (v) draw();
+    const dataMags = mags();
+    const c = counts();
+    const ready = wasmReady();
+    if (!ready || !c) return;
+    const canvas = document.getElementById('quake-hist') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    getPlychart().then((p) => {
+      const w = canvas.clientWidth;
+      p.create_chart('quake-hist', w, H);
+      // plychart histogram handles linear Y only (original was log scale Gutenberg-Richter).
+      // Use raw magnitudes with 7 bins for linear histogram.
+      // Fallback to counts if mags empty (e.g. API gave no mags)
+      const dataJson = dataMags.length > 0 ? JSON.stringify(dataMags) : JSON.stringify(c);
+      const binCount = 7;
+      // update_histogram(canvas_id, data_json, bin_count, theme_json)
+      p.update_histogram('quake-hist', dataJson, binCount, '');
+    });
+  });
+
+  onMount(() => {
+    initWasm();
+    loadData();
   });
 
   return (
@@ -131,10 +103,17 @@ export default function EarthquakeHistogram() {
           {err()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: `${H}px` }} />
+      <canvas id="quake-hist" class="w-full" style={{ height: `${H}px` }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-        USGS 24h feed | binned by magnitude | log Y axis
+        USGS 24h feed | binned by magnitude | plychart linear Y (original log scale Gutenberg-Richter)
       </p>
+      <Show when={counts()}>
+        {(c) => (
+          <p class="font-mono text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+            counts: {c().join(' / ')} | bins: {BINS.map((b) => b.label).join(', ')}
+          </p>
+        )}
+      </Show>
     </div>
   );
 }
