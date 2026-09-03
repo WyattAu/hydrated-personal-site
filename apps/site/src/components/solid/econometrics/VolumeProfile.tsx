@@ -2,7 +2,7 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const BINS = 25;
 const H = 300;
@@ -68,7 +68,6 @@ export default function VolumeProfile() {
   const [profile, setProfile] = createSignal<ProfileState | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -86,32 +85,15 @@ export default function VolumeProfile() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
-      if (canvas) {
-        p.create_chart(CANVAS_ID, canvas.clientWidth || 600, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
-
   onMount(() => {
-    initWasm();
     loadData();
   });
 
   onAssetChanged(() => loadData());
 
-  createEffect(() => {
+  function renderChart() {
     const p = profile();
-    const ready = wasmReady();
-    if (!p || !ready) return;
-    const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!p) return;
     const bars = p.buckets.map((v) => ({
       time: 0,
       open: 0,
@@ -120,11 +102,15 @@ export default function VolumeProfile() {
       close: v,
       volume: 0,
     }));
-    getPlychart().then((ply) => {
-      ply.create_chart(CANVAS_ID, canvas.clientWidth || 600, H);
-      ply.update_bar(CANVAS_ID, JSON.stringify(bars), '');
-    });
+    renderPlychart(CANVAS_ID, 'update_bar', JSON.stringify(bars), '');
+  }
+
+  createEffect(() => {
+    profile();
+    renderChart();
   });
+
+  usePlychartAuto(() => CANVAS_ID, renderChart);
 
   const curPct = () => {
     const p = profile();

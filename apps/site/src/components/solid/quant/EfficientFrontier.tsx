@@ -1,5 +1,9 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 
 interface PortfolioPoint {
   ret: number;
@@ -12,7 +16,6 @@ export default function EfficientFrontier() {
   const [frontier, setFrontier] = createSignal<PortfolioPoint[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -110,24 +113,11 @@ export default function EfficientFrontier() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('efficient-frontier') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('efficient-frontier', Math.round(rect.width), 360);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const pts = points();
-    const ready = wasmReady();
-    if (pts.length === 0 || !ready) return;
+    if (pts.length === 0) return;
 
     const series = [
       { color: '#666666', points: pts.map((p) => [p.risk, p.ret]) },
@@ -136,15 +126,17 @@ export default function EfficientFrontier() {
         points: frontier().map((p) => [p.risk, p.ret]),
       },
     ];
+    tipData = series[0].points;
 
-    getPlychart().then((p) => {
-      const canvas = document.getElementById('efficient-frontier') as HTMLCanvasElement | null;
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('efficient-frontier', Math.round(rect.width), 360);
-      p.update_scatter_multi('efficient-frontier', JSON.stringify(series), '');
-    });
+    renderPlychart('efficient-frontier', 'update_scatter_multi', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    points();
+    renderChart();
   });
+
+  usePlychartAuto(() => 'efficient-frontier', renderChart);
 
   const tangency = () => {
     const pts = points();
@@ -153,8 +145,9 @@ export default function EfficientFrontier() {
   };
 
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('efficient-frontier', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   return (

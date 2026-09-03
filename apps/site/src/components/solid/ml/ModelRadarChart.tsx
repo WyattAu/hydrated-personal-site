@@ -1,6 +1,6 @@
-import { For, Show, createEffect, createMemo, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createMemo } from 'solid-js';
 import { useLlmData } from '../../../lib/llm-data';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import type { LLMBenchmarkModel } from '../../../lib/types';
 
 const ALL_AXES: { key: keyof LLMBenchmarkModel; label: string }[] = [
@@ -17,7 +17,6 @@ const PALETTE = ['#00e5ff', '#ff4081', '#7c4dff', '#4caf50', '#ffa726'];
 
 export default function ModelRadarChart() {
   const { data, loading } = useLlmData();
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   const top5 = createMemo<LLMBenchmarkModel[]>(() => {
     const d = data();
@@ -37,25 +36,10 @@ export default function ModelRadarChart() {
     });
   });
 
-  async function initWasm() {
-    try {
-      const plychart = await getPlychart();
-      const canvas = document.getElementById('model-radar') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        plychart.create_chart('model-radar', Math.round(rect.width), 320);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
-
-  createEffect(() => {
+  function renderChart() {
     const models = top5();
     const ax = axes();
-    const ready = wasmReady();
-    if (models.length === 0 || ax.length < 3 || !ready) return;
+    if (models.length === 0 || ax.length < 3) return;
 
     const labels = ax.map((a) => a.label);
     const series = models.map((m, mi) => ({
@@ -66,14 +50,22 @@ export default function ModelRadarChart() {
       }),
     }));
 
-    getPlychart().then((p) => {
-      p.update_radar_multi('model-radar', JSON.stringify(series), JSON.stringify(labels), '');
-    });
+    renderPlychart(
+      'model-radar',
+      'update_radar_multi',
+      JSON.stringify(series),
+      JSON.stringify(labels),
+      '',
+    );
+  }
+
+  createEffect(() => {
+    top5();
+    axes();
+    renderChart();
   });
 
-  onMount(() => {
-    initWasm();
-  });
+  usePlychartAuto(() => 'model-radar', renderChart);
 
   return (
     <div>

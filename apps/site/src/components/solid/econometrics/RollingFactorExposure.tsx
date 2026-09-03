@@ -1,8 +1,12 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface RegressionResult {
@@ -42,7 +46,6 @@ export default function RollingFactorExposure() {
   const [latest, setLatest] = createSignal<WindowPoint | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -88,24 +91,11 @@ export default function RollingFactorExposure() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('rolling-factor-exposure') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('rolling-factor-exposure', Math.round(rect.width), 280);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const pts = data();
-    const ready = wasmReady();
-    if (pts.length < 2 || !ready) return;
+    if (pts.length < 2) return;
 
     const toCandle = (v: number, t: number) => ({
       time: t,
@@ -132,19 +122,24 @@ export default function RollingFactorExposure() {
       { color: '#00e5ff', data: upperData },
       { color: '#00e5ff', data: lowerData },
     ];
+    tipData = betaData;
 
-    getPlychart().then((p) => {
-      const canvas = document.getElementById('rolling-factor-exposure') as HTMLCanvasElement | null;
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('rolling-factor-exposure', Math.round(rect.width), 280);
-      p.update_line('rolling-factor-exposure', JSON.stringify(series), '');
-    });
+    renderPlychart('rolling-factor-exposure', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    data();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'rolling-factor-exposure', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('rolling-factor-exposure', () =>
+      JSON.stringify(tipData),
+    );
+    onCleanup(disposeTip);
   });
 
   onAssetChanged(() => loadData());

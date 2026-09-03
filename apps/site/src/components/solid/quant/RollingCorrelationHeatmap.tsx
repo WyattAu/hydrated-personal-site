@@ -1,5 +1,5 @@
 import { Show, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const CANVAS_ID = 'rolling-corr';
 const H = 340;
@@ -9,7 +9,6 @@ export default function RollingCorrelationHeatmap() {
   const [error, setError] = createSignal<string | null>(null);
   const [step, setStep] = createSignal(0);
   const [maxSteps, setMaxSteps] = createSignal(0);
-  const [wasmReady, setWasmReady] = createSignal(false);
   let matrices: number[][][] = []; // [time_steps][N][N]
   let labels: string[] = [];
   let rafId = 0;
@@ -85,27 +84,13 @@ export default function RollingCorrelationHeatmap() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
-      if (canvas) {
-        p.create_chart(CANVAS_ID, canvas.clientWidth || 600, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
-
   function drawStep() {
-    if (!wasmReady()) return;
     if (matrices.length === 0) return;
     const m = matrices[Math.min(step(), matrices.length - 1)];
-    getPlychart().then((p) => {
-      p.update_heatmap(CANVAS_ID, JSON.stringify(m), '');
-    });
+    renderPlychart(CANVAS_ID, 'update_heatmap', JSON.stringify(m), '');
   }
+
+  usePlychartAuto(() => CANVAS_ID, drawStep);
 
   function animate(ts: number) {
     if (ts - lastFrame > 500) {
@@ -117,7 +102,6 @@ export default function RollingCorrelationHeatmap() {
   }
 
   onMount(() => {
-    initWasm();
     loadData();
     onMount(() => cancelAnimationFrame(rafId));
   });

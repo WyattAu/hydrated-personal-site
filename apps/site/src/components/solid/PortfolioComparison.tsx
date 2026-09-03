@@ -1,5 +1,5 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../lib/plychart-loader';
+import { For, Show, createEffect, createSignal } from 'solid-js';
+import { renderPlychart, usePlychartAuto } from '../../lib/plychart-render';
 import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 
@@ -122,45 +122,47 @@ function EtfSelector(props: {
 export default function PortfolioComparison(props: PortfolioComparisonProps) {
   const [etfA, setEtfA] = createSignal<EtfEntry | null>(null);
   const [etfB, setEtfB] = createSignal<EtfEntry | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   const accentColor = () => {
     return getThemeColors().accent || '#00e5ff';
   };
 
-  async function initWasm() {
-    try {
-      await getPlychart();
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChartA() {
+    const a = etfA();
+    if (!a) return;
+    renderPlychart(
+      CANVAS_A,
+      'update_bar',
+      JSON.stringify(sectorRows(a).map(([, v]) => toBar(v))),
+      '',
+    );
+  }
+
+  function renderChartB() {
+    const b = etfB();
+    if (!b) return;
+    renderPlychart(
+      CANVAS_B,
+      'update_bar',
+      JSON.stringify(sectorRows(b).map(([, v]) => toBar(v))),
+      '',
+    );
   }
 
   createEffect(() => {
-    const a = etfA();
-    const b = etfB();
-    const ready = wasmReady();
-    if (!a || !b || !ready) return;
-    getPlychart().then((p) => {
-      const canvasA = document.getElementById(CANVAS_A) as HTMLCanvasElement | null;
-      const canvasB = document.getElementById(CANVAS_B) as HTMLCanvasElement | null;
-      if (canvasA) {
-        const w = canvasA.clientWidth || 600;
-        p.create_chart(CANVAS_A, w, H);
-        p.update_bar(CANVAS_A, JSON.stringify(sectorRows(a).map(([, v]) => toBar(v))), '');
-      }
-      if (canvasB) {
-        const w = canvasB.clientWidth || 600;
-        p.create_chart(CANVAS_B, w, H);
-        p.update_bar(CANVAS_B, JSON.stringify(sectorRows(b).map(([, v]) => toBar(v))), '');
-      }
-    });
+    etfA();
+    etfB();
+    renderChartA();
+    renderChartB();
   });
 
-  onMount(() => {
-    initWasm();
-  });
+  usePlychartAuto(
+    () => CANVAS_A,
+    () => {
+      renderChartA();
+      renderChartB();
+    },
+  );
 
   return (
     <div

@@ -1,6 +1,10 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface YieldResult {
@@ -23,7 +27,6 @@ export default function YieldCurveChart() {
   const [data, setData] = createSignal<YieldResult | null>(null);
   const [raw, setRaw] = createSignal<YieldPoint[]>([]);
   const [loading, setLoading] = createSignal(true);
-  const [wasmReady, setWasmReady] = createSignal(false);
   let wasmMod: any = null;
 
   async function loadData() {
@@ -52,26 +55,11 @@ export default function YieldCurveChart() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('yield-curve') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('yield-curve', Math.round(rect.width), 280);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const d = data();
-    const ready = wasmReady();
-    if (!d || !ready) return;
-    const canvas = document.getElementById('yield-curve') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!d) return;
 
     // Generate Nelson-Siegel fitted curve over 100 steps (log-spaced maturities)
     const minM = 0.05;
@@ -95,17 +83,22 @@ export default function YieldCurveChart() {
     }
 
     const series = [{ color: '#00e5ff', data: fittedData }];
+    tipData = fittedData;
 
-    getPlychart().then((p) => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('yield-curve', Math.round(rect.width), 280);
-      p.update_line('yield-curve', JSON.stringify(series), '');
-    });
+    renderPlychart('yield-curve', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    data();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'yield-curve', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('yield-curve', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   return (

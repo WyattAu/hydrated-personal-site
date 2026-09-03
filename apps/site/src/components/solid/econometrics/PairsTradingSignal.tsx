@@ -1,6 +1,10 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { onTickersChanged } from '../../../lib/ticker-events';
 import { activeTickers } from '../../../lib/ticker-universe';
 import { getWasmMod } from '../../../lib/wasm-loader';
@@ -55,7 +59,6 @@ export default function PairsTradingSignal() {
   const [pairs, setPairs] = createSignal<ReturnType<typeof buildPairs>>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -116,26 +119,11 @@ export default function PairsTradingSignal() {
     return { color: '#ff5252', label: s.replace('_', ' ') };
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('pairs-signal') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('pairs-signal', Math.round(rect.width), 280);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const d = data();
-    const ready = wasmReady();
-    if (!d || !ready) return;
-    const canvas = document.getElementById('pairs-signal') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!d) return;
     const tail = d.spread_tail ?? [];
     if (tail.length < 2) return;
     const seriesData = tail.map((v, i) => ({
@@ -147,16 +135,21 @@ export default function PairsTradingSignal() {
       volume: 0,
     }));
     const series = [{ color: '#00e5ff', data: seriesData }];
-    getPlychart().then((p) => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('pairs-signal', Math.round(rect.width), 280);
-      p.update_line('pairs-signal', JSON.stringify(series), '');
-    });
+    tipData = seriesData;
+    renderPlychart('pairs-signal', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    data();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'pairs-signal', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('pairs-signal', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   onTickersChanged(() => {
@@ -244,13 +237,15 @@ export default function PairsTradingSignal() {
                   class="px-2 py-1 border border-dashed flex items-center gap-1.5"
                   style={{ 'border-color': '#4caf50', background: '#4caf5014', color: '#4caf50' }}
                 >
-                  <span class="inline-block w-2 h-0.5" style={{ background: '#4caf50' }} /> ±0.5 EXIT
+                  <span class="inline-block w-2 h-0.5" style={{ background: '#4caf50' }} /> ±0.5
+                  EXIT
                 </div>
                 <div
                   class="px-2 py-1 border border-dashed flex items-center gap-1.5"
                   style={{ 'border-color': '#ff9800', background: '#ff980014', color: '#ff9800' }}
                 >
-                  <span class="inline-block w-2 h-0.5" style={{ background: '#ff9800' }} /> ±3.5 STOP
+                  <span class="inline-block w-2 h-0.5" style={{ background: '#ff9800' }} /> ±3.5
+                  STOP
                 </div>
                 <div
                   class="px-2 py-1 border flex items-center gap-1.5"

@@ -1,6 +1,6 @@
-import { createEffect, createSignal, onMount } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 import { useLlmData } from '../../lib/llm-data';
-import { getPlychart } from '../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../lib/plychart-render';
 
 interface Point {
   x: number;
@@ -18,41 +18,20 @@ function ScatterCanvas(props: {
   title: string;
 }) {
   const [tooltip, setTooltip] = createSignal<{ x: number; y: number; label: string } | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById(props.id) as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        if (rect.width > 0) p.create_chart(props.id, Math.round(rect.width), SCATTER_H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const pts = props.points();
+    if (pts.length === 0) return;
+    const scatterData = pts.map((p) => [p.x, p.y]);
+    renderPlychart(props.id, 'update_scatter', JSON.stringify(scatterData), '');
   }
 
   createEffect(() => {
-    const pts = props.points();
-    const ready = wasmReady();
-    if (pts.length === 0 || !ready) return;
-
-    const scatterData = pts.map((p) => [p.x, p.y]);
-
-    getPlychart().then((p) => {
-      const canvas = document.getElementById(props.id) as HTMLCanvasElement | null;
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart(props.id, Math.round(rect.width), SCATTER_H);
-      p.update_scatter(props.id, JSON.stringify(scatterData), '');
-    });
+    props.points();
+    renderChart();
   });
 
-  onMount(() => {
-    initWasm();
-  });
+  usePlychartAuto(() => props.id, renderChart);
 
   function handleMouseMove(e: MouseEvent) {
     const canvas = document.getElementById(props.id);

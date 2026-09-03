@@ -1,6 +1,6 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal } from 'solid-js';
+import { renderPlychart, usePlychartAuto } from '../../lib/plychart-render';
 import { getThemeColors } from '../../lib/theme-colors';
-import { getPlychart } from '../../lib/plychart-loader';
 import type { EtfEntry } from '../../lib/types';
 
 interface PortfolioOptimizerProps {
@@ -91,44 +91,6 @@ const COLORS = [
 ];
 
 function ResultCard(props: { result: OptimizationResult; tickers: string[]; idx: number }) {
-  const [wasmReady, setWasmReady] = createSignal(false);
-  const H = 280;
-  const chartId = () => `portfolio-pie-${props.idx}`;
-
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById(chartId()) as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth || 280;
-        p.create_chart(chartId(), w, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
-
-  onMount(() => {
-    initWasm();
-  });
-
-  createEffect(() => {
-    const ready = wasmReady();
-    const weights = props.result.weights;
-    if (!ready || weights.length === 0) return;
-    const canvas = document.getElementById(chartId()) as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 280;
-      p.create_chart(chartId(), w, H);
-      const data: [string, number][] = props.tickers.map(
-        (t, i) => [t, weights[i] ?? 0] as [string, number],
-      );
-      p.update_pie(chartId(), JSON.stringify(data), '');
-    });
-  });
-
   return (
     <div
       class="p-4 border"
@@ -148,7 +110,7 @@ function ResultCard(props: { result: OptimizationResult; tickers: string[]; idx:
         <canvas
           id={`portfolio-pie-${props.idx}`}
           class="w-full"
-          style={{ height: `${H}px` }}
+          style={{ height: '280px' }}
           role="img"
           aria-label={`Pie chart for ${props.result.name}`}
         />
@@ -271,6 +233,27 @@ export default function PortfolioOptimizer(props: PortfolioOptimizerProps) {
     ]);
   });
 
+  function renderChart() {
+    const list = results();
+    if (list.length === 0) return;
+    const tickers = props.selectedEtfs.map((e) => e.ticker);
+    for (let i = 0; i < list.length; i++) {
+      const weights = list[i].weights;
+      if (weights.length === 0) continue;
+      const data: [string, number][] = tickers.map(
+        (t, j) => [t, weights[j] ?? 0] as [string, number],
+      );
+      renderPlychart(`portfolio-pie-${i}`, 'update_pie', JSON.stringify(data), '');
+    }
+  }
+
+  createEffect(() => {
+    results();
+    renderChart();
+  });
+
+  usePlychartAuto(() => 'portfolio-pie-0', renderChart);
+
   return (
     <div
       class="border p-6"
@@ -290,7 +273,11 @@ export default function PortfolioOptimizer(props: PortfolioOptimizerProps) {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <For each={results()}>
             {(result, idx) => (
-              <ResultCard result={result} tickers={props.selectedEtfs.map((e) => e.ticker)} idx={idx()} />
+              <ResultCard
+                result={result}
+                tickers={props.selectedEtfs.map((e) => e.ticker)}
+                idx={idx()}
+              />
             )}
           </For>
         </div>

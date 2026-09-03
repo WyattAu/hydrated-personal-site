@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 280;
 const CANVAS_ID = 'sector-rotation';
@@ -26,7 +26,6 @@ export default function SectorRotation() {
   const [rows, setRows] = createSignal<{ label: string; rs: number }[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -53,43 +52,28 @@ export default function SectorRotation() {
   // Sorted descending by relative strength (same ordering the manual draw used)
   const sortedRows = () => [...rows()].sort((a, b) => b.rs - a.rs);
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth || 600;
-        p.create_chart(CANVAS_ID, w, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const list = sortedRows();
+    if (list.length === 0) return;
+    const bars = list.map((r) => ({
+      time: 0,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: r.rs,
+      volume: 0,
+    }));
+    renderPlychart(CANVAS_ID, 'update_bar', JSON.stringify(bars), '');
   }
 
   createEffect(() => {
-    const list = sortedRows();
-    const ready = wasmReady();
-    if (list.length === 0 || !ready) return;
-    const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 600;
-      p.create_chart(CANVAS_ID, w, H);
-      const bars = list.map((r) => ({
-        time: 0,
-        open: 0,
-        high: 0,
-        low: 0,
-        close: r.rs,
-        volume: 0,
-      }));
-      p.update_bar(CANVAS_ID, JSON.stringify(bars), '');
-    });
+    sortedRows();
+    renderChart();
   });
 
+  usePlychartAuto(() => CANVAS_ID, renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

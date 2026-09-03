@@ -1,5 +1,5 @@
-import { createEffect, createMemo, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { createEffect, createMemo, createSignal } from 'solid-js';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const QUANTS = [
   { key: 'FP32', bytes: 4 },
@@ -23,7 +23,6 @@ export default function InferenceSimulator() {
   const [seq, setSeq] = createSignal(2048);
   const [quant, setQuant] = createSignal<string>('FP16');
   const [bandwidth, setBandwidth] = createSignal(900);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   const bpp = createMemo(() => QUANTS.find((q) => q.key === quant())?.bytes ?? 2);
 
@@ -40,45 +39,23 @@ export default function InferenceSimulator() {
     return { modelMemoryGB, flopsPerToken, maxTokS, totalCompute };
   });
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('inference-bars') as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth;
-        const h = 200;
-        p.create_chart('inference-bars', w, h);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const p = params();
+    const bw = bandwidth();
+    const vals = QUANTS.map((q) => bw / (2 * p * q.bytes));
+    const data = vals.map((v) => ({ time: 0, open: 0, high: 0, low: 0, close: v, volume: 0 }));
+    renderPlychart('inference-bars', 'update_bar', JSON.stringify(data), '');
   }
 
   createEffect(() => {
-    const p = params();
-    const bw = bandwidth();
-    const ready = wasmReady();
+    params();
+    bandwidth();
     // depend on quant as well so selection change triggers update (even though bars show all quants, highlight handling is via WASM theme if needed)
     quant();
-    if (!ready) return;
-
-    const vals = QUANTS.map((q) => bw / (2 * p * q.bytes));
-    const canvas = document.getElementById('inference-bars') as HTMLCanvasElement | null;
-    if (!canvas) return;
-
-    getPlychart().then((ply) => {
-      const w = canvas.clientWidth;
-      const h = 200;
-      ply.create_chart('inference-bars', w, h);
-      const data = vals.map((v) => ({ time: 0, open: 0, high: 0, low: 0, close: v, volume: 0 }));
-      ply.update_bar('inference-bars', JSON.stringify(data), '');
-    });
+    renderChart();
   });
 
-  onMount(() => {
-    initWasm();
-  });
+  usePlychartAuto(() => 'inference-bars', renderChart);
 
   return (
     <div>
@@ -208,7 +185,8 @@ export default function InferenceSimulator() {
 
       <canvas id="inference-bars" class="w-full" style={{ height: '200px' }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-        Roofline estimate | memory-bound decode | bars scale with params &amp; bandwidth | FP32/FP16/INT8/INT4 via plychart
+        Roofline estimate | memory-bound decode | bars scale with params &amp; bandwidth |
+        FP32/FP16/INT8/INT4 via plychart
       </p>
     </div>
   );

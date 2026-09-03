@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../lib/api-base';
-import { getPlychart } from '../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../lib/plychart-render';
 
 interface TickerItem {
   symbol: string;
@@ -14,7 +14,6 @@ interface TickerItem {
 export default function TreemapWidget() {
   const [data, setData] = createSignal<TickerItem[]>([]);
   const [loading, setLoading] = createSignal(true);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     try {
@@ -29,24 +28,9 @@ export default function TreemapWidget() {
     setLoading(false);
   }
 
-  async function initWasm() {
-    try {
-      const plychart = await getPlychart();
-      const canvas = document.getElementById('treemap-canvas') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        plychart.create_chart('treemap-canvas', Math.round(rect.width), 300);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
-
-  createEffect(() => {
+  function renderChart() {
     const d = data();
-    const ready = wasmReady();
-    if (d.length === 0 || !ready) return;
+    if (d.length === 0) return;
 
     const entries = d
       .map((item) => {
@@ -64,13 +48,17 @@ export default function TreemapWidget() {
     if (entries.length === 0) return;
 
     const treemapData = entries.map((e) => [e.name, e.cap] as [string, number]);
-    getPlychart().then((p) => {
-      p.update_treemap('treemap-canvas', JSON.stringify(treemapData), '');
-    });
+    renderPlychart('treemap-canvas', 'update_treemap', JSON.stringify(treemapData), '');
+  }
+
+  createEffect(() => {
+    data();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'treemap-canvas', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
     const interval = setInterval(loadData, 30000);
     return () => clearInterval(interval);

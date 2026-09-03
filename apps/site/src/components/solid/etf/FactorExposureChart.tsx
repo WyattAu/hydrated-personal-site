@@ -1,6 +1,10 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { activeTicker } from '../../../lib/etf-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface ChartResponse {
@@ -37,7 +41,6 @@ export default function FactorExposureChart() {
   const [windows, setWindows] = createSignal<WindowPoint[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function fetchCloses(symbol: string): Promise<{ ts: number[]; close: number[] }> {
     const res = await fetch(
@@ -119,26 +122,11 @@ export default function FactorExposureChart() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('factor-exposure') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('factor-exposure', Math.round(rect.width), 280);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const pts = windows();
-    const ready = wasmReady();
-    if (pts.length < 2 || !ready) return;
-    const canvas = document.getElementById('factor-exposure') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (pts.length < 2) return;
 
     const toCandle = (v: number, t: number) => ({
       time: t,
@@ -162,17 +150,22 @@ export default function FactorExposureChart() {
       { color: '#7c4dff', data: smbData },
       { color: '#69f0ae', data: hmlData },
     ];
+    tipData = marketData;
 
-    getPlychart().then((p) => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('factor-exposure', Math.round(rect.width), 280);
-      p.update_line('factor-exposure', JSON.stringify(series), '');
-    });
+    renderPlychart('factor-exposure', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    windows();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'factor-exposure', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('factor-exposure', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
   createEffect(() => {
     activeTicker();

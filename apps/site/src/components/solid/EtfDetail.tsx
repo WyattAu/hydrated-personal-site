@@ -1,5 +1,5 @@
-import { For, createEffect, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../lib/plychart-loader';
+import { For, createEffect, createSignal } from 'solid-js';
+import { renderPlychart, usePlychartAuto } from '../../lib/plychart-render';
 import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 
@@ -18,55 +18,45 @@ function toBar(v: number) {
 export default function EtfDetail(props: EtfDetailProps) {
   const [price, setPrice] = createSignal((Math.random() * 400 + 50).toFixed(2));
   const [change, setChange] = createSignal(((Math.random() - 0.45) * 6).toFixed(2));
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   // Sorted descending by weight (same ordering the manual draws used)
   const sectors = () => Object.entries(props.etf.sector_allocation).sort((a, b) => b[1] - a[1]);
   const regions = () => Object.entries(props.etf.region_allocation).sort((a, b) => b[1] - a[1]);
 
-  async function initWasm() {
-    try {
-      await getPlychart();
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderBars() {
+    const entries = sectors();
+    if (entries.length === 0) return;
+    renderPlychart(BARS_ID, 'update_bar', JSON.stringify(entries.map(([, v]) => toBar(v))), '');
+  }
+
+  function renderDonut() {
+    const entries = regions();
+    if (entries.length === 0) return;
+    renderPlychart(DONUT_ID, 'update_pie', JSON.stringify(entries), '');
   }
 
   createEffect(() => {
-    const entries = sectors();
-    const ready = wasmReady();
-    if (!ready || entries.length === 0) return;
-    const canvas = document.getElementById(BARS_ID) as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 600;
-      p.create_chart(BARS_ID, w, H);
-      p.update_bar(BARS_ID, JSON.stringify(entries.map(([, v]) => toBar(v))), '');
-    });
+    sectors();
+    renderBars();
   });
 
   createEffect(() => {
-    const entries = regions();
-    const ready = wasmReady();
-    if (!ready || entries.length === 0) return;
-    const canvas = document.getElementById(DONUT_ID) as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 600;
-      p.create_chart(DONUT_ID, w, H);
-      p.update_pie(DONUT_ID, JSON.stringify(entries), '');
-    });
+    regions();
+    renderDonut();
   });
+
+  usePlychartAuto(
+    () => BARS_ID,
+    () => {
+      renderBars();
+      renderDonut();
+    },
+  );
 
   createEffect(() => {
     props.etf;
     setPrice((Math.random() * 400 + 50).toFixed(2));
     setChange(((Math.random() - 0.45) * 6).toFixed(2));
-  });
-
-  onMount(() => {
-    initWasm();
   });
 
   const accentColor = () => {

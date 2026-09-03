@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import { onTickersChanged } from '../../../lib/ticker-events';
 import { activeTickers } from '../../../lib/ticker-universe';
 import { getWasmMod } from '../../../lib/wasm-loader';
@@ -28,7 +28,6 @@ export default function HrpAllocation() {
   const [weights, setWeights] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -83,43 +82,28 @@ export default function HrpAllocation() {
       .map((label, i) => ({ label, w: weights()[i] ?? 0 }))
       .sort((a, b) => b.w - a.w);
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth || 600;
-        p.create_chart(CANVAS_ID, w, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const rows = sorted();
+    if (rows.length === 0) return;
+    const bars = rows.map((r) => ({
+      time: 0,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: r.w,
+      volume: 0,
+    }));
+    renderPlychart(CANVAS_ID, 'update_bar', JSON.stringify(bars), '');
   }
 
   createEffect(() => {
-    const rows = sorted();
-    const ready = wasmReady();
-    if (rows.length === 0 || !ready) return;
-    const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 600;
-      p.create_chart(CANVAS_ID, w, H);
-      const bars = rows.map((r) => ({
-        time: 0,
-        open: 0,
-        high: 0,
-        low: 0,
-        close: r.w,
-        volume: 0,
-      }));
-      p.update_bar(CANVAS_ID, JSON.stringify(bars), '');
-    });
+    sorted();
+    renderChart();
   });
 
+  usePlychartAuto(() => CANVAS_ID, renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

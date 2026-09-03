@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 340;
 
@@ -13,7 +13,6 @@ export default function CurrencyMatrix() {
   } | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -45,35 +44,20 @@ export default function CurrencyMatrix() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('currency-matrix') as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth || 600;
-        p.create_chart('currency-matrix', w, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const m = matrix();
+    if (!m) return;
+    renderPlychart('currency-matrix', 'update_heatmap', JSON.stringify(m.grid), '');
   }
 
   createEffect(() => {
-    const m = matrix();
-    const ready = wasmReady();
-    if (!m || !ready) return;
-    const canvas = document.getElementById('currency-matrix') as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 600;
-      p.create_chart('currency-matrix', w, H);
-      p.update_heatmap('currency-matrix', JSON.stringify(m.grid), '');
-    });
+    matrix();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'currency-matrix', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

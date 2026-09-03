@@ -1,5 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../lib/plychart-render';
 import type { EtfEntry } from '../../lib/types';
 
 interface CorrelationMatrixProps {
@@ -44,7 +44,6 @@ export default function CorrelationMatrix(props: CorrelationMatrixProps) {
   ]);
   const [hoverIdx, setHoverIdx] = createSignal<{ row: number; col: number } | null>(null);
   const [matrix, setMatrix] = createSignal<number[][]>([]);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   function addTicker(ticker: string) {
     if (selectedTickers().length >= 10) return;
@@ -56,38 +55,27 @@ export default function CorrelationMatrix(props: CorrelationMatrixProps) {
     setSelectedTickers((prev) => prev.filter((t) => t !== ticker));
   }
 
-  async function initWasm() {
-    try {
-      const plychart = await getPlychart();
-      const canvas = document.getElementById('corr-matrix') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        plychart.create_chart('corr-matrix', Math.round(rect.width), 400);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
-
   createEffect(() => {
     const tickers = selectedTickers();
     setMatrix(generateCorrelation(tickers));
   });
 
-  createEffect(() => {
+  function renderChart() {
     const tickers = selectedTickers();
     const mat = matrix();
-    const ready = wasmReady();
-    if (tickers.length < 2 || mat.length === 0 || !ready) return;
+    if (tickers.length < 2 || mat.length === 0) return;
+    renderPlychart('corr-matrix', 'update_heatmap', JSON.stringify(mat), '');
+  }
 
-    getPlychart().then((p) => {
-      p.update_heatmap('corr-matrix', JSON.stringify(mat), '');
-    });
+  createEffect(() => {
+    selectedTickers();
+    matrix();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'corr-matrix', renderChart);
+
   onMount(() => {
-    initWasm();
     const tickers = selectedTickers();
     setMatrix(generateCorrelation(tickers));
   });

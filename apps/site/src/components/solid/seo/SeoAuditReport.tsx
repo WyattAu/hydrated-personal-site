@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import { recordFetch } from '../StaleIndicator';
-import { getPlychart } from '../../../lib/plychart-loader';
 
 interface CategoryScore {
   category: string;
@@ -41,7 +41,6 @@ export default function SeoAuditReport() {
   const [data, setData] = createSignal<AuditSummary | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -59,37 +58,28 @@ export default function SeoAuditReport() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('seo-audit') as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth || 600;
-        p.create_chart('seo-audit', w, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const d = data();
+    if (!d) return;
+    const matrix = d.categories.map((c) => [c.issues, c.warnings, c.passed]);
+    const labels = d.categories.map((c) => c.category);
+    renderPlychart(
+      'seo-audit',
+      'update_stacked_bar',
+      JSON.stringify(matrix),
+      JSON.stringify(labels),
+      '',
+    );
   }
 
   createEffect(() => {
-    const d = data();
-    const ready = wasmReady();
-    if (!d || !ready) return;
-    const canvas = document.getElementById('seo-audit') as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 600;
-      p.create_chart('seo-audit', w, H);
-      const matrix = d.categories.map((c) => [c.issues, c.warnings, c.passed]);
-      const labels = d.categories.map((c) => c.category);
-      p.update_stacked_bar('seo-audit', JSON.stringify(matrix), JSON.stringify(labels), '');
-    });
+    data();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'seo-audit', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

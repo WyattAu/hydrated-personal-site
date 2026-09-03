@@ -1,6 +1,10 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface BetaPoint {
@@ -35,7 +39,6 @@ export default function RollingMultiFactor() {
   const [series, setSeries] = createSignal<BetaPoint[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -82,24 +85,11 @@ export default function RollingMultiFactor() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('rolling-multi-factor') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('rolling-multi-factor', Math.round(rect.width), 280);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const pts = series();
-    const ready = wasmReady();
-    if (pts.length < 2 || !ready) return;
+    if (pts.length < 2) return;
 
     const toCandle = (v: number, t: number) => ({
       time: t,
@@ -114,19 +104,22 @@ export default function RollingMultiFactor() {
       color: line.color,
       data: pts.map((p, i) => toCandle(p[line.key], i)),
     }));
+    tipData = lineSeries[0].data;
 
-    getPlychart().then((p) => {
-      const canvas = document.getElementById('rolling-multi-factor') as HTMLCanvasElement | null;
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('rolling-multi-factor', Math.round(rect.width), 280);
-      p.update_line('rolling-multi-factor', JSON.stringify(lineSeries), '');
-    });
+    renderPlychart('rolling-multi-factor', 'update_line', JSON.stringify(lineSeries), '');
+  }
+
+  createEffect(() => {
+    series();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'rolling-multi-factor', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('rolling-multi-factor', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   createEffect(() => {

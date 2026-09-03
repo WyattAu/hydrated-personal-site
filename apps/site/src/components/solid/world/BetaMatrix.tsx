@@ -1,5 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 300;
 
@@ -69,7 +69,6 @@ export default function BetaMatrix() {
   const [grid, setGrid] = createSignal<{ label: string; cells: number[] }[] | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -110,36 +109,21 @@ export default function BetaMatrix() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('beta-matrix') as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth || 600;
-        p.create_chart('beta-matrix', w, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const rows = grid();
+    if (!rows) return;
+    const matrix: number[][] = rows.map((r) => r.cells);
+    renderPlychart('beta-matrix', 'update_heatmap', JSON.stringify(matrix), '');
   }
 
   createEffect(() => {
-    const rows = grid();
-    const ready = wasmReady();
-    if (!rows || !ready) return;
-    const canvas = document.getElementById('beta-matrix') as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 600;
-      p.create_chart('beta-matrix', w, H);
-      const matrix: number[][] = rows.map((r) => r.cells);
-      p.update_heatmap('beta-matrix', JSON.stringify(matrix), '');
-    });
+    grid();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'beta-matrix', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

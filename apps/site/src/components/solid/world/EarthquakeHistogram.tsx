@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 220;
 
@@ -19,7 +19,6 @@ export default function EarthquakeHistogram() {
   const [mags, setMags] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -48,43 +47,28 @@ export default function EarthquakeHistogram() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('quake-hist') as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth;
-        p.create_chart('quake-hist', w, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const dataMags = mags();
+    const c = counts();
+    if (!c) return;
+    // plychart histogram handles linear Y only (original was log scale Gutenberg-Richter).
+    // Use raw magnitudes with 7 bins for linear histogram.
+    // Fallback to counts if mags empty (e.g. API gave no mags)
+    const dataJson = dataMags.length > 0 ? JSON.stringify(dataMags) : JSON.stringify(c);
+    const binCount = 7;
+    // update_histogram(canvas_id, data_json, bin_count, theme_json)
+    renderPlychart('quake-hist', 'update_histogram', dataJson, String(binCount), '');
   }
 
   createEffect(() => {
-    const dataMags = mags();
-    const c = counts();
-    const ready = wasmReady();
-    if (!ready || !c) return;
-    const canvas = document.getElementById('quake-hist') as HTMLCanvasElement | null;
-    if (!canvas) return;
-
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth;
-      p.create_chart('quake-hist', w, H);
-      // plychart histogram handles linear Y only (original was log scale Gutenberg-Richter).
-      // Use raw magnitudes with 7 bins for linear histogram.
-      // Fallback to counts if mags empty (e.g. API gave no mags)
-      const dataJson = dataMags.length > 0 ? JSON.stringify(dataMags) : JSON.stringify(c);
-      const binCount = 7;
-      // update_histogram(canvas_id, data_json, bin_count, theme_json)
-      p.update_histogram('quake-hist', dataJson, binCount, '');
-    });
+    mags();
+    counts();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'quake-hist', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 
@@ -105,7 +89,8 @@ export default function EarthquakeHistogram() {
       </Show>
       <canvas id="quake-hist" class="w-full" style={{ height: `${H}px` }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-        USGS 24h feed | binned by magnitude | plychart linear Y (original log scale Gutenberg-Richter)
+        USGS 24h feed | binned by magnitude | plychart linear Y (original log scale
+        Gutenberg-Richter)
       </p>
       <Show when={counts()}>
         {(c) => (

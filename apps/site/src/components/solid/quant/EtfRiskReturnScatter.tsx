@@ -1,6 +1,10 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 
 interface EtfEntry {
   ticker: string;
@@ -36,7 +40,6 @@ export default function EtfRiskReturnScatter() {
   const [points, setPoints] = createSignal<ScatterPoint[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -96,37 +99,31 @@ export default function EtfRiskReturnScatter() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const plychart = await getPlychart();
-      const canvas = document.getElementById('risk-return-scatter') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        plychart.create_chart('risk-return-scatter', Math.round(rect.width), 360);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const pts = points();
-    const ready = wasmReady();
-    if (pts.length === 0 || !ready) return;
+    if (pts.length === 0) return;
     const scatterData: [number, number][] = pts.map((p) => [p.risk, p.ret]);
     // color based on avg Sharpe (computed for potential theme use)
     const avgSharpe = pts.reduce((s, p) => s + p.sharpe, 0) / pts.length;
     const _color = avgSharpe > 1 ? '#4ade80' : avgSharpe > 0 ? '#c8a23c' : '#ff4081';
     void _color;
-    getPlychart().then((p) => {
-      p.update_scatter('risk-return-scatter', JSON.stringify(scatterData), '');
-    });
+    tipData = scatterData;
+    renderPlychart('risk-return-scatter', 'update_scatter', JSON.stringify(scatterData), '');
+  }
+
+  createEffect(() => {
+    points();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'risk-return-scatter', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('risk-return-scatter', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   return (

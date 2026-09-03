@@ -732,8 +732,8 @@ function __wbg_get_imports() {
     imports.wbg.__wbg_save_c675a7a4bbd44e4a = function(arg0) {
         arg0.save();
     };
-    imports.wbg.__wbg_scale_4105cc7f9ba9c045 = function() { return handleError(function (arg0, arg1, arg2) {
-        arg0.scale(arg1, arg2);
+    imports.wbg.__wbg_setTransform_8c4d954cafb34b75 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
+        arg0.setTransform(arg1, arg2, arg3, arg4, arg5, arg6);
     }, arguments) };
     imports.wbg.__wbg_setfillStyle_4f8f616d87dea4df = function(arg0, arg1) {
         arg0.fillStyle = arg1;

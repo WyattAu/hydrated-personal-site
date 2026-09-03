@@ -2,7 +2,7 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import { WASM_VERSION } from '../../../lib/wasm-version';
 
 const H = 260;
@@ -21,7 +21,6 @@ export default function RiskMetrics(props: { symbol?: string }) {
   const symbol = () => activeAsset();
   const [data, setData] = createSignal<VarResult | null>(null);
   const [loading, setLoading] = createSignal(true);
-  const [wasmReady, setWasmReady] = createSignal(false);
   let returnsFlat: Float64Array | null = null;
   let wasmMod: any = null;
 
@@ -55,38 +54,31 @@ export default function RiskMetrics(props: { symbol?: string }) {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
-      if (canvas) {
-        p.create_chart(CANVAS_ID, canvas.clientWidth || 600, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
-
   onMount(() => {
-    initWasm();
     loadData();
   });
 
   onAssetChanged(() => loadData());
 
-  createEffect(() => {
+  function renderChart() {
     const d = data();
-    const ready = wasmReady();
-    if (!d || !ready || !returnsFlat || returnsFlat.length === 0) return;
-    const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!d || !returnsFlat || returnsFlat.length === 0) return;
     const binCount = Math.max(1, d.histogram_edges.length - 1);
-    getPlychart().then((p) => {
-      p.create_chart(CANVAS_ID, canvas.clientWidth || 600, H);
-      p.update_histogram(CANVAS_ID, JSON.stringify(Array.from(returnsFlat!)), binCount, '');
-    });
+    renderPlychart(
+      CANVAS_ID,
+      'update_histogram',
+      JSON.stringify(Array.from(returnsFlat)),
+      String(binCount),
+      '',
+    );
+  }
+
+  createEffect(() => {
+    data();
+    renderChart();
   });
+
+  usePlychartAuto(() => CANVAS_ID, renderChart);
 
   return (
     <div>

@@ -1,13 +1,12 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 300;
 
 export default function FundingRateHeatmap() {
   const [data, setData] = createSignal<Array<{ symbol: string; rate: number }>>([]);
   const [loading, setLoading] = createSignal(true);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -23,43 +22,28 @@ export default function FundingRateHeatmap() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('funding-rate-heatmap') as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth || 600;
-        p.create_chart('funding-rate-heatmap', w, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const d = data();
+    if (d.length === 0) return;
+    const barData = d.map((item, i) => ({
+      time: i,
+      open: 0,
+      high: 0,
+      low: 0,
+      close: item.rate,
+      volume: 0,
+    }));
+    renderPlychart('funding-rate-heatmap', 'update_bar', JSON.stringify(barData), '');
   }
 
   createEffect(() => {
-    const d = data();
-    const ready = wasmReady();
-    if (d.length === 0 || !ready) return;
-    const canvas = document.getElementById('funding-rate-heatmap') as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 600;
-      p.create_chart('funding-rate-heatmap', w, H);
-      const barData = d.map((item, i) => ({
-        time: i,
-        open: 0,
-        high: 0,
-        low: 0,
-        close: item.rate,
-        volume: 0,
-      }));
-      p.update_bar('funding-rate-heatmap', JSON.stringify(barData), '');
-    });
+    data();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'funding-rate-heatmap', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

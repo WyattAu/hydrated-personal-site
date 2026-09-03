@@ -1,7 +1,11 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { activeTicker } from '../../../lib/etf-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface DDResult {
@@ -20,7 +24,6 @@ export default function EtfDrawdownChart() {
   // Ticker from shared store
   const [result, setResult] = createSignal<DDResult | null>(null);
   const [loading, setLoading] = createSignal(true);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -47,24 +50,11 @@ export default function EtfDrawdownChart() {
     setLoading(false);
   }
 
-  async function initWasm() {
-    try {
-      const plychart = await getPlychart();
-      const canvas = document.getElementById('etf-drawdown') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        plychart.create_chart('etf-drawdown', Math.round(rect.width), 260);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const r = result();
-    const ready = wasmReady();
-    if (!r || !ready) return;
+    if (!r) return;
     const color = Math.abs(r.max_drawdown) > 0.2 ? '#ff4081' : '#c8a23c';
     const data = r.underwater.map((v, i) => ({
       time: i,
@@ -74,14 +64,21 @@ export default function EtfDrawdownChart() {
       close: v,
       volume: 0,
     }));
-    getPlychart().then((p) => {
-      p.update_area('etf-drawdown', JSON.stringify([{ color, data }]), '');
-    });
+    tipData = data;
+    renderPlychart('etf-drawdown', 'update_area', JSON.stringify([{ color, data }]), '');
+  }
+
+  createEffect(() => {
+    result();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'etf-drawdown', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('etf-drawdown', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
   createEffect(() => {
     activeTicker();

@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 240;
 
@@ -22,7 +22,6 @@ export default function WeatherStrip() {
   const [data, setData] = createSignal<CityWeather[] | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -52,37 +51,22 @@ export default function WeatherStrip() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('weather-strip') as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth || 600;
-        p.create_chart('weather-strip', w, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const cities = data();
+    if (!cities) return;
+    // 5 cities x 7 days temp matrix
+    const matrix: number[][] = cities.map((c) => c.daily.slice(0, 7));
+    renderPlychart('weather-strip', 'update_heatmap', JSON.stringify(matrix), '');
   }
 
   createEffect(() => {
-    const cities = data();
-    const ready = wasmReady();
-    if (!cities || !ready) return;
-    const canvas = document.getElementById('weather-strip') as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 600;
-      p.create_chart('weather-strip', w, H);
-      // 5 cities x 7 days temp matrix
-      const matrix: number[][] = cities.map((c) => c.daily.slice(0, 7));
-      p.update_heatmap('weather-strip', JSON.stringify(matrix), '');
-    });
+    data();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'weather-strip', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

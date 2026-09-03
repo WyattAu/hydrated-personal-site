@@ -1,7 +1,11 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { activeTicker } from '../../../lib/etf-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface MCResult {
@@ -31,7 +35,6 @@ export default function EtfMonteCarlo() {
   const [historical, setHistorical] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
   let wasmMod: {
     default: () => Promise<void>;
     quant_seed: (a: number, b: number) => void;
@@ -80,25 +83,12 @@ export default function EtfMonteCarlo() {
     return v.toFixed(4);
   }
 
-  async function initWasm() {
-    try {
-      const plychart = await getPlychart();
-      const canvas = document.getElementById('etf-mc-fan') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        plychart.create_chart('etf-mc-fan', Math.round(rect.width), 320);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const r = result();
     const h = historical();
-    const ready = wasmReady();
-    if (!r || h.length === 0 || !ready) return;
+    if (!r || h.length === 0) return;
 
     const histLen = h.length;
 
@@ -132,15 +122,23 @@ export default function EtfMonteCarlo() {
       { color: '#c8a23c', data: p50Data },
       { color: '#4ade80', data: p5Data },
     ];
+    tipData = p95Data;
 
-    getPlychart().then((p) => {
-      p.update_area('etf-mc-fan', JSON.stringify(areaSeries), '');
-    });
+    renderPlychart('etf-mc-fan', 'update_area', JSON.stringify(areaSeries), '');
+  }
+
+  createEffect(() => {
+    result();
+    historical();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'etf-mc-fan', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('etf-mc-fan', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   createEffect(() => {

@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 interface Series {
   code: string;
@@ -32,7 +32,6 @@ export default function FredSparklines() {
   const [series, setSeries] = createSignal<Series[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -51,48 +50,32 @@ export default function FredSparklines() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const plychart = await getPlychart();
-      const list = series();
-      for (let i = 0; i < SERIES.length; i++) {
-        const id = `fred-sparkline-${i}`;
-        const canvas = document.getElementById(id) as HTMLCanvasElement | null;
-        if (canvas) {
-          const rect = canvas.getBoundingClientRect();
-          plychart.create_chart(id, Math.round(rect.width), 100);
-        }
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
+  function renderChart() {
+    const list = series();
+    if (list.length === 0) return;
+    for (let i = 0; i < list.length; i++) {
+      const s = list[i];
+      const up = s.values[s.values.length - 1] >= s.values[0];
+      const color = up ? '#22c55e' : '#ef4444';
+      renderPlychart(
+        `fred-sparkline-${i}`,
+        'update_sparkline',
+        JSON.stringify(s.values),
+        color,
+        '',
+      );
     }
   }
 
   createEffect(() => {
-    const list = series();
-    const ready = wasmReady();
-    if (list.length === 0 || !ready) return;
-
-    getPlychart().then((p) => {
-      for (let i = 0; i < list.length; i++) {
-        const s = list[i];
-        const up = s.values[s.values.length - 1] >= s.values[0];
-        const color = up ? '#22c55e' : '#ef4444';
-        p.update_sparkline(`fred-sparkline-${i}`, JSON.stringify(s.values), color, '');
-      }
-    });
+    series();
+    renderChart();
   });
+
+  usePlychartAuto(() => 'fred-sparkline-0', renderChart);
 
   onMount(() => {
     loadData();
-  });
-
-  createEffect(() => {
-    const list = series();
-    if (list.length > 0 && !wasmReady()) {
-      initWasm();
-    }
   });
 
   return (

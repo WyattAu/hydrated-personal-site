@@ -1,8 +1,12 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface VolResult {
@@ -21,7 +25,6 @@ export default function RealizedVolDecomposition() {
   const [data, setData] = createSignal<VolResult | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -51,26 +54,11 @@ export default function RealizedVolDecomposition() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('realized-vol-decomp') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('realized-vol-decomp', Math.round(rect.width), 280);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const d = data();
-    const ready = wasmReady();
-    if (!d || !ready) return;
-    const canvas = document.getElementById('realized-vol-decomp') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!d) return;
     const rv = d.daily_rv_tail;
     const bv = d.daily_bv_tail;
     const jumpVar = rv.map((r, i) => Math.max(0, r - (bv[i] ?? 0)));
@@ -101,17 +89,22 @@ export default function RealizedVolDecomposition() {
       { color: '#00e5ff', data: contData },
       { color: '#ff6b35', data: jumpData },
     ];
+    tipData = contData;
 
-    getPlychart().then((p) => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('realized-vol-decomp', Math.round(rect.width), 280);
-      p.update_area('realized-vol-decomp', JSON.stringify(series), '');
-    });
+    renderPlychart('realized-vol-decomp', 'update_area', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    data();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'realized-vol-decomp', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('realized-vol-decomp', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   onAssetChanged(() => loadData());
@@ -145,7 +138,10 @@ export default function RealizedVolDecomposition() {
 
       {/* Jump day markers as HTML overlay */}
       <Show when={!loading() && data()}>
-        <div class="mt-1 flex flex-wrap gap-1 font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+        <div
+          class="mt-1 flex flex-wrap gap-1 font-mono text-[9px]"
+          style={{ color: 'var(--text-secondary)' }}
+        >
           <span class="flex items-center gap-1">
             <span class="inline-block w-2 h-2" style={{ background: '#00e5ff' }} /> CONTINUOUS
           </span>

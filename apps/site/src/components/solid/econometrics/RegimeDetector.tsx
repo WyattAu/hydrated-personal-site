@@ -1,8 +1,12 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface RegimeResult {
@@ -20,7 +24,6 @@ export default function RegimeDetector() {
   const [returns, setReturns] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -51,27 +54,12 @@ export default function RegimeDetector() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('regime-detector') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('regime-detector', Math.round(rect.width), 280);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const d = data();
     const rets = returns();
-    const ready = wasmReady();
-    if (!d || rets.length === 0 || !ready) return;
-    const canvas = document.getElementById('regime-detector') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!d || rets.length === 0) return;
     const win = 120;
     const start = Math.max(0, rets.length - win);
     const slice = rets.slice(start);
@@ -84,16 +72,22 @@ export default function RegimeDetector() {
       volume: 0,
     }));
     const series = [{ color: '#00e5ff', data: chartData }];
-    getPlychart().then((p) => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('regime-detector', Math.round(rect.width), 280);
-      p.update_line('regime-detector', JSON.stringify(series), '');
-    });
+    tipData = chartData;
+    renderPlychart('regime-detector', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    data();
+    returns();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'regime-detector', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('regime-detector', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   onAssetChanged(() => loadData());
@@ -128,7 +122,10 @@ export default function RegimeDetector() {
       {/* Regime bands as HTML colored divs below canvas */}
       <Show when={!loading() && data() && returns().length > 0}>
         <div class="mt-2">
-          <div class="flex h-3 w-full overflow-hidden border" style={{ 'border-color': 'var(--border)' }}>
+          <div
+            class="flex h-3 w-full overflow-hidden border"
+            style={{ 'border-color': 'var(--border)' }}
+          >
             {(() => {
               const d = data()!;
               const rets = returns();
@@ -141,14 +138,19 @@ export default function RegimeDetector() {
                 return (
                   <div
                     class="flex-1"
-                    style={{ background: st === 0 ? 'rgba(76, 175, 80, 0.7)' : 'rgba(255, 82, 82, 0.7)' }}
+                    style={{
+                      background: st === 0 ? 'rgba(76, 175, 80, 0.7)' : 'rgba(255, 82, 82, 0.7)',
+                    }}
                     title={st === 0 ? 'LOW-VOL' : 'HIGH-VOL'}
                   />
                 );
               });
             })()}
           </div>
-          <div class="mt-1 flex gap-3 font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+          <div
+            class="mt-1 flex gap-3 font-mono text-[9px]"
+            style={{ color: 'var(--text-secondary)' }}
+          >
             <span class="flex items-center gap-1">
               <span class="inline-block w-2 h-2" style={{ background: '#4caf50' }} /> LOW-VOL
             </span>

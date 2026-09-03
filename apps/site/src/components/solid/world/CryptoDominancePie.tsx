@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 280;
 
@@ -22,8 +22,6 @@ export default function CryptoDominancePie() {
   const [slices, setSlices] = createSignal<Slice[] | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
-  let canvasRef: HTMLCanvasElement | undefined;
 
   async function loadData() {
     setLoading(true);
@@ -65,32 +63,21 @@ export default function CryptoDominancePie() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const plychart = await getPlychart();
-      if (canvasRef) {
-        const rect = canvasRef.getBoundingClientRect();
-        plychart.create_chart('crypto-pie', Math.round(rect.width), H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const sl = slices();
+    if (!sl) return;
+    const data = sl.map((s) => [s.label, s.pct] as [string, number]);
+    renderPlychart('crypto-pie', 'update_pie', JSON.stringify(data), '');
   }
 
   createEffect(() => {
-    const sl = slices();
-    const ready = wasmReady();
-    if (!sl || !ready || !canvasRef) return;
-
-    const data = sl.map((s) => [s.label, s.pct] as [string, number]);
-    getPlychart().then((p) => {
-      p.update_pie('crypto-pie', JSON.stringify(data), '');
-    });
+    slices();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'crypto-pie', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 
@@ -109,7 +96,7 @@ export default function CryptoDominancePie() {
           {err()}
         </p>
       </Show>
-      <canvas ref={canvasRef} id="crypto-pie" class="w-full" style={{ height: `${H}px` }} />
+      <canvas id="crypto-pie" class="w-full" style={{ height: `${H}px` }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         top 50 by 24h volume | BTC + ETH + top 10 alts + rest
       </p>

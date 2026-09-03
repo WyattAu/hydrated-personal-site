@@ -1,8 +1,12 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 
 interface VwapState {
   closes: number[];
@@ -70,7 +74,6 @@ export default function VwapTracker() {
   const [state, setState] = createSignal<VwapState | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -88,26 +91,11 @@ export default function VwapTracker() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('vwap-tracker') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('vwap-tracker', Math.round(rect.width), 250);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const s = state();
-    const ready = wasmReady();
-    if (!s || !ready) return;
-    const canvas = document.getElementById('vwap-tracker') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!s) return;
     const vwapData = s.vwap.map((v, i) => ({
       time: i,
       open: 0,
@@ -128,16 +116,21 @@ export default function VwapTracker() {
       { color: '#00e5ff', data: vwapData },
       { color: '#ff4081', data: priceData },
     ];
-    getPlychart().then((p) => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('vwap-tracker', Math.round(rect.width), 250);
-      p.update_line('vwap-tracker', JSON.stringify(series), '');
-    });
+    tipData = vwapData;
+    renderPlychart('vwap-tracker', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    state();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'vwap-tracker', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('vwap-tracker', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   onAssetChanged(() => loadData());
@@ -181,7 +174,10 @@ export default function VwapTracker() {
 
       <Show when={!loading() && state()}>
         <canvas id="vwap-tracker" class="w-full" style={{ height: '250px' }} />
-        <div class="mt-2 flex gap-3 font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+        <div
+          class="mt-2 flex gap-3 font-mono text-[9px]"
+          style={{ color: 'var(--text-secondary)' }}
+        >
           <span class="flex items-center gap-1">
             <span class="inline-block w-2 h-2" style={{ background: '#ff4081' }} /> PRICE
           </span>

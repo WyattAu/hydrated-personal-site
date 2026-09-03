@@ -1,6 +1,10 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 interface ForwardResult {
@@ -15,7 +19,6 @@ export default function ForwardRateCurve() {
   const [source, setSource] = createSignal<string>('FRED');
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -71,26 +74,11 @@ export default function ForwardRateCurve() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('forward-curve') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('forward-curve', Math.round(rect.width), 280);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const r = result();
-    const ready = wasmReady();
-    if (!r || !ready) return;
-    const canvas = document.getElementById('forward-curve') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!r) return;
     const n = Math.min(r.maturities.length, r.spot_rates.length, r.forward_rates.length);
     if (n < 2) return;
 
@@ -110,17 +98,22 @@ export default function ForwardRateCurve() {
       { color: '#42a5f5', data: spotData },
       { color: '#ffa726', data: fwdData },
     ];
+    tipData = spotData;
 
-    getPlychart().then((p) => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('forward-curve', Math.round(rect.width), 280);
-      p.update_line('forward-curve', JSON.stringify(series), '');
-    });
+    renderPlychart('forward-curve', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    result();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'forward-curve', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('forward-curve', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   return (

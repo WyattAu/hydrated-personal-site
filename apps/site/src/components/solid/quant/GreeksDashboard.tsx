@@ -1,8 +1,12 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface GreeksResult {
@@ -20,7 +24,6 @@ export default function GreeksDashboard() {
   const [selected, setSelected] = createSignal<string>('');
   const [loading, setLoading] = createSignal(true);
   const [error, _setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
   let wasmMod: any = null;
 
   interface Opt {
@@ -180,24 +183,11 @@ export default function GreeksDashboard() {
     setLoading(false);
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('greeks-dashboard') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('greeks-dashboard', Math.round(rect.width), 300);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const g = greeks();
-    const ready = wasmReady();
-    if (!g || !ready) return;
+    if (!g) return;
 
     const toCandle = (v: number, t: number) => ({
       time: t,
@@ -222,18 +212,21 @@ export default function GreeksDashboard() {
       label: labels[idx],
       data: s.map((v, i) => toCandle(v / yMax, i)),
     }));
+    tipData = series[0].data;
 
-    getPlychart().then((p) => {
-      const canvas = document.getElementById('greeks-dashboard') as HTMLCanvasElement | null;
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('greeks-dashboard', Math.round(rect.width), 300);
-      p.update_line('greeks-dashboard', JSON.stringify(series), '');
-    });
+    renderPlychart('greeks-dashboard', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    greeks();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'greeks-dashboard', renderChart);
+
   onMount(async () => {
-    initWasm();
+    const disposeTip = attachPlychartTooltip('greeks-dashboard', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
     await loadOptions();
     await computeGreeks();
   });

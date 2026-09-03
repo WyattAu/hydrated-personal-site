@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 260;
 
@@ -27,7 +27,6 @@ export default function GlobalStressGauge() {
   const [data, setData] = createSignal<StressData | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -97,32 +96,27 @@ export default function GlobalStressGauge() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const plychart = await getPlychart();
-      const canvas = document.getElementById('stress-gauge') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        plychart.create_chart('stress-gauge', Math.round(rect.width), H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const d = data();
+    if (!d) return;
+    renderPlychart(
+      'stress-gauge',
+      'update_gauge',
+      String(d.total),
+      '100',
+      stressColor(d.total),
+      '',
+    );
   }
 
   createEffect(() => {
-    const d = data();
-    const ready = wasmReady();
-    if (!d || !ready) return;
-
-    getPlychart().then((p) => {
-      p.update_gauge('stress-gauge', d.total, 100, stressColor(d.total), '');
-    });
+    data();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'stress-gauge', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

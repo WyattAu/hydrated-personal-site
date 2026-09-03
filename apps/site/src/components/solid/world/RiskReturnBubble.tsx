@@ -1,5 +1,9 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 
 const H = 360;
 const RISK_FREE = 0.04;
@@ -72,7 +76,6 @@ export default function RiskReturnBubble() {
   const [bubbles, setBubbles] = createSignal<Bubble[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -95,24 +98,9 @@ export default function RiskReturnBubble() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('risk-return-bubble') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('risk-return-bubble', Math.round(rect.width), H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
-
-  createEffect(() => {
+  function buildSeries() {
     const pts = bubbles();
-    const ready = wasmReady();
-    if (pts.length === 0 || !ready) return;
+    if (pts.length === 0) return null;
 
     const maxVol = Math.max(...pts.map((p) => p.volume)) || 1;
     const buckets: number[][][] = [[], [], []];
@@ -122,22 +110,28 @@ export default function RiskReturnBubble() {
       buckets[b].push([p.vol * 100, p.ret * 100]);
     }
 
-    const series = VOLUME_BUCKETS.map((bucket, i) => ({
+    return VOLUME_BUCKETS.map((bucket, i) => ({
       color: bucket.color,
       points: buckets[i],
     }));
+  }
 
-    getPlychart().then((p) => {
-      const canvas = document.getElementById('risk-return-bubble') as HTMLCanvasElement | null;
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('risk-return-bubble', Math.round(rect.width), H);
-      p.update_scatter_multi('risk-return-bubble', JSON.stringify(series), '');
-    });
+  function renderChart() {
+    const series = buildSeries();
+    if (!series) return;
+    renderPlychart('risk-return-bubble', 'update_scatter_multi', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    bubbles();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'risk-return-bubble', renderChart);
+
+  onCleanup(attachPlychartTooltip('risk-return-bubble', () => JSON.stringify(buildSeries() ?? [])));
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

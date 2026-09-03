@@ -1,5 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import { onTickersChanged } from '../../../lib/ticker-events';
 import { activeTickers } from '../../../lib/ticker-universe';
 import { getWasmMod } from '../../../lib/wasm-loader';
@@ -7,9 +7,6 @@ import { getWasmMod } from '../../../lib/wasm-loader';
 const EQ_ID = 'bl-equilibrium';
 const POST_ID = 'bl-posterior';
 const WGT_ID = 'bl-weights';
-const EQ_H = 220;
-const POST_H = 220;
-const WGT_H = 180;
 
 function toBar(v: number) {
   return { time: 0, open: 0, high: 0, low: 0, close: v, volume: 0 };
@@ -60,7 +57,6 @@ export default function BlackLitterman() {
   const [computing, setComputing] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
   const [viewMsg, setViewMsg] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -149,52 +145,58 @@ export default function BlackLitterman() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      for (const [id, h] of [
-        [EQ_ID, EQ_H],
-        [POST_ID, POST_H],
-        [WGT_ID, WGT_H],
-      ] as const) {
-        const canvas = document.getElementById(id) as HTMLCanvasElement | null;
-        if (canvas) p.create_chart(id, canvas.clientWidth || 600, h);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
-
-  createEffect(() => {
+  function renderEq() {
     const r = result();
     const rd = returnsData();
-    const ready = wasmReady();
-    if (!r || !rd || !ready) return;
-
+    if (!r || !rd) return;
     const n = Math.min(rd.labels.length, r.equilibrium_returns.length, r.posterior_returns.length);
     if (n < 1) return;
     const eqBars = r.equilibrium_returns.slice(0, n).map(toBar);
+    renderPlychart(EQ_ID, 'update_bar', JSON.stringify(eqBars), '');
+  }
+
+  function renderPost() {
+    const r = result();
+    const rd = returnsData();
+    if (!r || !rd) return;
+    const n = Math.min(rd.labels.length, r.equilibrium_returns.length, r.posterior_returns.length);
+    if (n < 1) return;
     const postBars = r.posterior_returns.slice(0, n).map(toBar);
+    renderPlychart(POST_ID, 'update_bar', JSON.stringify(postBars), '');
+  }
+
+  function renderWgt() {
+    const r = result();
+    const rd = returnsData();
+    if (!r || !rd) return;
     const nw = Math.min(rd.labels.length, r.weights.length);
     const wgtBars = r.weights.slice(0, nw).map(toBar);
+    renderPlychart(WGT_ID, 'update_bar', JSON.stringify(wgtBars), '');
+  }
 
-    getPlychart().then((p) => {
-      for (const [id, h, bars] of [
-        [EQ_ID, EQ_H, eqBars],
-        [POST_ID, POST_H, postBars],
-        [WGT_ID, WGT_H, wgtBars],
-      ] as const) {
-        const canvas = document.getElementById(id) as HTMLCanvasElement | null;
-        if (!canvas) continue;
-        p.create_chart(id, canvas.clientWidth || 600, h);
-        p.update_bar(id, JSON.stringify(bars), '');
-      }
-    });
+  createEffect(() => {
+    result();
+    returnsData();
+    renderEq();
   });
 
+  createEffect(() => {
+    result();
+    returnsData();
+    renderPost();
+  });
+
+  createEffect(() => {
+    result();
+    returnsData();
+    renderWgt();
+  });
+
+  usePlychartAuto(() => EQ_ID, renderEq);
+  usePlychartAuto(() => POST_ID, renderPost);
+  usePlychartAuto(() => WGT_ID, renderWgt);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

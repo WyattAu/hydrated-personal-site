@@ -1,8 +1,12 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 
 const FIB_LEVELS: { ratio: number; label: string; golden?: boolean }[] = [
   { ratio: 0, label: '0%' },
@@ -36,7 +40,6 @@ export default function FibonacciLevels() {
   const [state, setState] = createSignal<FibState | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -62,26 +65,11 @@ export default function FibonacciLevels() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('fib-levels') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('fib-levels', Math.round(rect.width), 300);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const s = state();
-    const ready = wasmReady();
-    if (!s || !ready) return;
-    const canvas = document.getElementById('fib-levels') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!s) return;
     const data = s.closes.map((v, i) => ({
       time: i,
       open: 0,
@@ -91,16 +79,21 @@ export default function FibonacciLevels() {
       volume: 0,
     }));
     const series = [{ color: '#00e5ff', data }];
-    getPlychart().then((p) => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('fib-levels', Math.round(rect.width), 300);
-      p.update_line('fib-levels', JSON.stringify(series), '');
-    });
+    tipData = data;
+    renderPlychart('fib-levels', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    state();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'fib-levels', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('fib-levels', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   onAssetChanged(() => loadData());
@@ -163,15 +156,20 @@ export default function FibonacciLevels() {
                     );
                   })}
                 </div>
-                <div class="flex gap-3 font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+                <div
+                  class="flex gap-3 font-mono text-[9px]"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   <span class="flex items-center gap-1">
                     <span class="inline-block w-2 h-2" style={{ background: '#4caf50' }} /> SUPPORT
                   </span>
                   <span class="flex items-center gap-1">
-                    <span class="inline-block w-2 h-2" style={{ background: '#ff5252' }} /> RESISTANCE
+                    <span class="inline-block w-2 h-2" style={{ background: '#ff5252' }} />{' '}
+                    RESISTANCE
                   </span>
                   <span class="flex items-center gap-1">
-                    <span class="inline-block w-2 h-2" style={{ background: '#ffc107' }} /> GOLDEN 61.8%
+                    <span class="inline-block w-2 h-2" style={{ background: '#ffc107' }} /> GOLDEN
+                    61.8%
                   </span>
                 </div>
               </>

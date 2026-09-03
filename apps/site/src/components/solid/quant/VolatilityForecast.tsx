@@ -1,8 +1,12 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface GarchResult {
@@ -21,7 +25,6 @@ export default function VolatilityForecast(props: { symbol?: string }) {
   const [data, setData] = createSignal<GarchResult | null>(null);
   const [loading, setLoading] = createSignal(true);
   const [forecastHorizon, setForecastHorizon] = createSignal(30);
-  const [wasmReady, setWasmReady] = createSignal(false);
   let wasmMod: any = null;
 
   async function loadData() {
@@ -53,26 +56,11 @@ export default function VolatilityForecast(props: { symbol?: string }) {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('vol-forecast') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('vol-forecast', Math.round(rect.width), 280);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const d = data();
-    const ready = wasmReady();
-    if (!d || !ready) return;
-    const canvas = document.getElementById('vol-forecast') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (!d) return;
 
     const histVol = d.conditional_vars.map((v) => Math.sqrt(Math.max(0, v)) * Math.sqrt(252) * 100);
     const ewmaVol = d.ewma_vol.map((v) => v * Math.sqrt(252) * 100);
@@ -96,17 +84,22 @@ export default function VolatilityForecast(props: { symbol?: string }) {
       { color: '#7c4dff', data: ewmaData },
       { color: '#f0883e', data: fcData },
     ];
+    tipData = garchData;
 
-    getPlychart().then((p) => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('vol-forecast', Math.round(rect.width), 280);
-      p.update_line('vol-forecast', JSON.stringify(series), '');
-    });
+    renderPlychart('vol-forecast', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    data();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'vol-forecast', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('vol-forecast', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
   });
 
   onAssetChanged(() => loadData());

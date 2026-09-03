@@ -1,5 +1,9 @@
-import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 
 const H = 300;
 
@@ -67,7 +71,6 @@ export default function MultiDrawdown() {
   const [curves, setCurves] = createSignal<Curve[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   function setSel(i: number, v: string) {
     setSels((prev) => {
@@ -100,41 +103,36 @@ export default function MultiDrawdown() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('multi-drawdown') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        p.create_chart('multi-drawdown', Math.round(rect.width), H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
-
-  createEffect(() => {
+  function renderChart() {
     const cv = curves();
-    const ready = wasmReady();
-    if (cv.length === 0 || !ready) return;
-    const canvas = document.getElementById('multi-drawdown') as HTMLCanvasElement | null;
-    if (!canvas) return;
+    if (cv.length === 0) return;
 
     const series = cv.map((c, ci) => ({
       color: COLORS[ci % COLORS.length],
       data: c.dd.map((v, i) => ({ time: i, open: 0, high: 0, low: 0, close: v * 100, volume: 0 })),
     }));
 
-    getPlychart().then((p) => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) p.create_chart('multi-drawdown', Math.round(rect.width), H);
-      p.update_line('multi-drawdown', JSON.stringify(series), '');
-    });
+    renderPlychart('multi-drawdown', 'update_line', JSON.stringify(series), '');
+  }
+
+  createEffect(() => {
+    curves();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'multi-drawdown', renderChart);
+
+  onCleanup(
+    attachPlychartTooltip('multi-drawdown', () => {
+      const primary = curves()[0];
+      if (!primary) return '[]';
+      return JSON.stringify(
+        primary.dd.map((v, i) => ({ time: i, open: 0, high: 0, low: 0, close: v, volume: 0 })),
+      );
+    }),
+  );
+
   onMount(() => {
-    initWasm();
     loadData();
   });
   createEffect(() => {

@@ -1,5 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
-import { getPlychart } from '../../../lib/plychart-loader';
+import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 300;
 
@@ -50,7 +50,6 @@ export default function RealizedVolRanking() {
   const [rows, setRows] = createSignal<VolRow[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
 
   async function loadData() {
     setLoading(true);
@@ -83,36 +82,21 @@ export default function RealizedVolRanking() {
     }
   }
 
-  async function initWasm() {
-    try {
-      const p = await getPlychart();
-      const canvas = document.getElementById('realized-vol') as HTMLCanvasElement | null;
-      if (canvas) {
-        const w = canvas.clientWidth || 600;
-        p.create_chart('realized-vol', w, H);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
+  function renderChart() {
+    const list = rows();
+    if (list.length === 0) return;
+    const data = list.map((r) => ({ time: 0, open: 0, high: 0, low: 0, close: r.vol, volume: 0 }));
+    renderPlychart('realized-vol', 'update_bar', JSON.stringify(data), '');
   }
 
   createEffect(() => {
-    const list = rows();
-    const ready = wasmReady();
-    if (list.length === 0 || !ready) return;
-    const canvas = document.getElementById('realized-vol') as HTMLCanvasElement | null;
-    if (!canvas) return;
-    getPlychart().then((p) => {
-      const w = canvas.clientWidth || 600;
-      p.create_chart('realized-vol', w, H);
-      const data = list.map((r) => ({ time: 0, open: 0, high: 0, low: 0, close: r.vol, volume: 0 }));
-      p.update_bar('realized-vol', JSON.stringify(data), '');
-    });
+    rows();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'realized-vol', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
   });
 

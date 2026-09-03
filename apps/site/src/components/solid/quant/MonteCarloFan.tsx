@@ -2,7 +2,11 @@ import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
-import { getPlychart } from '../../../lib/plychart-loader';
+import {
+  attachPlychartTooltip,
+  renderPlychart,
+  usePlychartAuto,
+} from '../../../lib/plychart-render';
 import { WASM_VERSION } from '../../../lib/wasm-version';
 
 interface MCResult {
@@ -23,7 +27,6 @@ export default function MonteCarloFan(props: { symbol?: string }) {
   const [loading, setLoading] = createSignal(true);
   const [horizon, setHorizon] = createSignal(90);
   const [error, setError] = createSignal<string | null>(null);
-  const [wasmReady, setWasmReady] = createSignal(false);
   let wasmMod: {
     default: () => Promise<void>;
     quant_seed: (a: number, b: number) => void;
@@ -74,25 +77,12 @@ export default function MonteCarloFan(props: { symbol?: string }) {
     return v.toFixed(4);
   }
 
-  async function initWasm() {
-    try {
-      const plychart = await getPlychart();
-      const canvas = document.getElementById('mc-fan') as HTMLCanvasElement | null;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        plychart.create_chart('mc-fan', Math.round(rect.width), 320);
-      }
-      setWasmReady(true);
-    } catch (e) {
-      console.error('plychart init failed:', e);
-    }
-  }
+  let tipData: object[] = [];
 
-  createEffect(() => {
+  function renderChart() {
     const r = result();
     const h = historical();
-    const ready = wasmReady();
-    if (!r || h.length === 0 || !ready) return;
+    if (!r || h.length === 0) return;
 
     const histLen = h.length;
 
@@ -126,15 +116,23 @@ export default function MonteCarloFan(props: { symbol?: string }) {
       { color: '#c8a23c', data: p50Data },
       { color: '#4ade80', data: p5Data },
     ];
+    tipData = p95Data;
 
-    getPlychart().then((p) => {
-      p.update_area('mc-fan', JSON.stringify(areaSeries), '');
-    });
+    renderPlychart('mc-fan', 'update_area', JSON.stringify(areaSeries), '');
+  }
+
+  createEffect(() => {
+    result();
+    historical();
+    renderChart();
   });
 
+  usePlychartAuto(() => 'mc-fan', renderChart);
+
   onMount(() => {
-    initWasm();
     loadData();
+    const disposeTip = attachPlychartTooltip('mc-fan', () => JSON.stringify(tipData));
+    onCleanup(disposeTip);
     const interval = setInterval(loadData, 120000);
     onCleanup(() => clearInterval(interval));
   });
