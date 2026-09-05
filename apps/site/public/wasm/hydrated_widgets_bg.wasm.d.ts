@@ -69,6 +69,7 @@ export const nbodysimulation_new: (a: number, b: number, c: number, d: number) =
 export const nbodysimulation_set_dt: (a: number, b: number) => void;
 export const nbodysimulation_set_gravity: (a: number, b: number) => void;
 export const nbodysimulation_step: (a: number) => void;
+export const quant_backtest: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number];
 export const quant_black_litterman: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => [number, number];
 export const quant_cointegration: (a: number, b: number, c: number, d: number) => [number, number];
 export const quant_component_var: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
@@ -103,6 +104,7 @@ export const terraingenerator_generate: (a: number, b: number, c: number, d: num
 export const terraingenerator_get_height: (a: number, b: number, c: number) => number;
 export const terraingenerator_new: (a: number, b: number, c: number) => number;
 export const terraingenerator_octaves: (a: number) => number;
+export const terraingenerator_persistence: (a: number) => number;
 export const terraingenerator_seed: (a: number) => number;
 export const terraingenerator_set_octaves: (a: number, b: number) => void;
 export const terraingenerator_set_persistence: (a: number, b: number) => void;
@@ -142,12 +144,11 @@ export const update_tsne: (a: number, b: number, c: number, d: number, e: number
 export const update_vol_surface: (a: number, b: number, c: number, d: number, e: number) => [number, number];
 export const update_voronoi: (a: number, b: number, c: number, d: number, e: number) => [number, number];
 export const update_wave: (a: number, b: number, c: number, d: number, e: number) => [number, number];
-export const terraingenerator_persistence: (a: number) => number;
-export const __wbindgen_malloc: (a: number, b: number) => number;
-export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
 export const __wbindgen_exn_store: (a: number) => void;
 export const __externref_table_alloc: () => number;
-export const __wbindgen_externrefs: WebAssembly.Table;
+export const __wbindgen_export_2: WebAssembly.Table;
 export const __wbindgen_free: (a: number, b: number, c: number) => void;
+export const __wbindgen_malloc: (a: number, b: number) => number;
+export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
 export const __externref_table_dealloc: (a: number) => void;
 export const __wbindgen_start: () => void;

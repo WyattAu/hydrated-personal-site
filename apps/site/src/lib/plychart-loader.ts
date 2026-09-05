@@ -3,9 +3,7 @@
  * Singleton pattern: loads exactly once across all SolidJS islands.
  */
 
-// Bump when apps/site/public/wasm/plychart_bg.wasm is replaced.
-// Cloudflare caches /wasm/* immutably; the query string busts it.
-const PLYCHART_VERSION = 'p1';
+import { PLYCHART_VERSION } from './plychart-version';
 
 // biome-ignore lint/suspicious/noExplicitAny: WASM module type
 let modPromise: Promise<any> | null = null;

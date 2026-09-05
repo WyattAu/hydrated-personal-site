@@ -64,7 +64,7 @@ pub fn quant_montecarlo(
     horizon_days: usize,
     num_paths: usize,
 ) -> String {
-    plycompute::wasm::quant_montecarlo(closes, periods_per_year, horizon_days, num_paths)
+    plycompute::json::quant_montecarlo(closes, periods_per_year, horizon_days, num_paths)
 }
 
 /// Black-Scholes call Greeks across a spot price range.
@@ -80,51 +80,51 @@ pub fn quant_greeks(
     implied_vol: f64,
     is_call: bool,
 ) -> String {
-    plycompute::wasm::quant_greeks(spot_min, spot_max, num_points, strike, time_to_expiry, risk_free_rate, implied_vol, is_call)
+    plycompute::json::quant_greeks(spot_min, spot_max, num_points, strike, time_to_expiry, risk_free_rate, implied_vol, is_call)
 }
 
 /// Value at Risk and Expected Shortfall from a return series.
 #[wasm_bindgen]
 pub fn quant_var(returns: &[f64], alpha: f64) -> String {
-    plycompute::wasm::quant_var(returns, alpha)
+    plycompute::json::quant_var(returns, alpha)
 }
 
 /// GARCH(1,1) fit and forecast.
 #[wasm_bindgen]
 pub fn quant_garch(returns: &[f64], forecast_steps: usize) -> String {
-    plycompute::wasm::quant_garch(returns, forecast_steps)
+    plycompute::json::quant_garch(returns, forecast_steps)
 }
 
 /// Correlation matrix from a returns matrix (N assets x T periods, row-major).
 #[wasm_bindgen]
 pub fn quant_correlation_matrix(returns: &[f64], n_assets: usize, n_periods: usize) -> String {
-    plycompute::wasm::quant_correlation_matrix(returns, n_assets, n_periods)
+    plycompute::json::quant_correlation_matrix(returns, n_assets, n_periods)
 }
 
 /// Nelson-Siegel yield curve fit.
 #[wasm_bindgen]
 pub fn quant_yield_curve(maturities: &[f64], yields: &[f64]) -> String {
-    plycompute::wasm::quant_yield_curve(maturities, yields)
+    plycompute::json::quant_yield_curve(maturities, yields)
 }
 
 /// Seed the WASM PRNG from JS (use crypto.getRandomValues for entropy).
 #[wasm_bindgen]
 pub fn quant_seed(s0: f64, s1: f64) {
-    plycompute::wasm::quant_seed(s0, s1)
+    plycompute::json::quant_seed(s0, s1)
 }
 
 /// Drawdown analysis from price series.
 /// Returns JSON: { underwater, max_drawdown, max_dd_duration, current_drawdown, calmar, ulcer, pain }
 #[wasm_bindgen]
 pub fn quant_drawdown(prices: &[f64], periods_per_year: u32) -> String {
-    plycompute::wasm::quant_drawdown(prices, periods_per_year)
+    plycompute::json::quant_drawdown(prices, periods_per_year)
 }
 
 /// Concentration analysis from portfolio weights.
 /// Returns JSON: { hhi, normalised_hhi, effective_n, entropy, max_entropy, top5, top10, gini, classification }
 #[wasm_bindgen]
 pub fn quant_concentration(weights: &[f64]) -> String {
-    plycompute::wasm::quant_concentration(weights)
+    plycompute::json::quant_concentration(weights)
 }
 
 /// Factor exposure regression (OLS).
@@ -136,7 +136,7 @@ pub fn quant_factor_regression(
     n_factors: usize,
     n_obs: usize,
 ) -> String {
-    plycompute::wasm::quant_factor_regression(y, x, n_factors, n_obs)
+    plycompute::json::quant_factor_regression(y, x, n_factors, n_obs)
 }
 
 /// Efficient frontier computation.
@@ -157,60 +157,60 @@ pub fn quant_efficient_frontier(
     n_frontier: usize,
     periods_per_year: u32,
 ) -> String {
-    plycompute::wasm::quant_efficient_frontier(returns, n_assets, n_periods, risk_free, n_random, n_frontier, periods_per_year)
+    plycompute::json::quant_efficient_frontier(returns, n_assets, n_periods, risk_free, n_random, n_frontier, periods_per_year)
 }
 
 /// Engle-Granger cointegration test for two price series.
 /// Returns JSON: { hedge_ratio, intercept, adf_statistic, half_life, is_cointegrated, z_score }
 #[wasm_bindgen]
 pub fn quant_cointegration(y: &[f64], x: &[f64]) -> String {
-    plycompute::wasm::quant_cointegration(y, x)
+    plycompute::json::quant_cointegration(y, x)
 }
 
 /// Liquidity analysis from OHLCV data.
 /// Returns JSON: { amihud, cs_spread, roll_spread, kyle_lambda, avg_dollar_volume }
 #[wasm_bindgen]
 pub fn quant_liquidity(highs: &[f64], lows: &[f64], closes: &[f64], volumes: &[f64]) -> String {
-    plycompute::wasm::quant_liquidity(highs, lows, closes, volumes)
+    plycompute::json::quant_liquidity(highs, lows, closes, volumes)
 }
 
 /// Realized volatility decomposition (bipower variation).
 /// Returns JSON: { realized_var, bipower_var, continuous_var, jump_var, jump_ratio, annualized_vol, jump_days }
 #[wasm_bindgen]
 pub fn quant_realized_vol(returns: &[f64]) -> String {
-    plycompute::wasm::quant_realized_vol(returns)
+    plycompute::json::quant_realized_vol(returns)
 }
 
 /// Tail dependence (copula) analysis for two return series.
 /// Returns JSON: { lower, upper, kendall_tau, spearman_rho }
 #[wasm_bindgen]
 pub fn quant_tail_dependence(x: &[f64], y: &[f64]) -> String {
-    plycompute::wasm::quant_tail_dependence(x, y)
+    plycompute::json::quant_tail_dependence(x, y)
 }
 
 /// Market regime detection via 2-state Gaussian HMM.
 /// Returns JSON: { states_tail, transition, means, variances, probs_tail, current_regime, regime_label }
 #[wasm_bindgen]
 pub fn quant_regime(returns: &[f64]) -> String {
-    plycompute::wasm::quant_regime(returns)
+    plycompute::json::quant_regime(returns)
 }
 
 /// Holdings overlap analysis (Jaccard index).
 #[wasm_bindgen]
 pub fn quant_holdings_overlap(a: &str, b: &str) -> String {
-    plycompute::wasm::quant_holdings_overlap(a, b)
+    plycompute::json::quant_holdings_overlap(a, b)
 }
 
 /// Pairs trading signal from two cointegrated price series.
 #[wasm_bindgen]
 pub fn quant_pairs_signal(y: &[f64], x: &[f64]) -> String {
-    plycompute::wasm::quant_pairs_signal(y, x)
+    plycompute::json::quant_pairs_signal(y, x)
 }
 
 /// Historical stress test on a portfolio.
 #[wasm_bindgen]
 pub fn quant_stress_test(symbols_json: &str, weights: &[f64]) -> String {
-    plycompute::wasm::quant_stress_test(symbols_json, weights)
+    plycompute::json::quant_stress_test(symbols_json, weights)
 }
 
 /// Component VaR decomposition.
@@ -218,38 +218,38 @@ pub fn quant_stress_test(symbols_json: &str, weights: &[f64]) -> String {
 pub fn quant_component_var(
     returns: &[f64], n_assets: usize, n_periods: usize, weights: &[f64], alpha: f64,
 ) -> String {
-    plycompute::wasm::quant_component_var(returns, n_assets, n_periods, weights, alpha)
+    plycompute::json::quant_component_var(returns, n_assets, n_periods, weights, alpha)
 }
 
 /// Kelly criterion analysis from returns.
 #[wasm_bindgen]
 pub fn quant_kelly(returns: &[f64]) -> String {
-    plycompute::wasm::quant_kelly(returns)
+    plycompute::json::quant_kelly(returns)
 }
 
 /// Hierarchical Risk Parity allocation.
 #[wasm_bindgen]
 pub fn quant_hrp(returns: &[f64], n_assets: usize, n_periods: usize) -> String {
-    plycompute::wasm::quant_hrp(returns, n_assets, n_periods)
+    plycompute::json::quant_hrp(returns, n_assets, n_periods)
 }
 
 /// Black-Scholes implied volatility solver (Newton-Raphson).
 #[wasm_bindgen]
 pub fn quant_implied_vol(market_price: f64, spot: f64, strike: f64, t: f64, r: f64, is_call: bool) -> f64 {
-    plycompute::wasm::quant_implied_vol(market_price, spot, strike, t, r, is_call)
+    plycompute::json::quant_implied_vol(market_price, spot, strike, t, r, is_call)
 }
 
 /// Risk-adjusted return ratios (Sharpe, Sortino, Calmar, Treynor).
 #[wasm_bindgen]
 pub fn quant_risk_ratios(closes: &[f64], risk_free: f64, periods_per_year: u32) -> String {
-    plycompute::wasm::quant_risk_ratios(closes, risk_free, periods_per_year)
+    plycompute::json::quant_risk_ratios(closes, risk_free, periods_per_year)
 }
 
 /// Forward rate curve from Nelson-Siegel parameters.
 /// Derives instantaneous forward rates: f(τ) = d/dτ [τ · y(τ)]
 #[wasm_bindgen]
 pub fn quant_forward_rates(maturities: &[f64], yields: &[f64]) -> String {
-    plycompute::wasm::quant_forward_rates(maturities, yields)
+    plycompute::json::quant_forward_rates(maturities, yields)
 }
 
 /// Full weighted ETF holdings overlap analysis.
@@ -258,13 +258,13 @@ pub fn quant_full_overlap(
     tickers_a: &str, weights_a: &[f64],
     tickers_b: &str, weights_b: &[f64],
 ) -> String {
-    plycompute::wasm::quant_full_overlap(tickers_a, weights_a, tickers_b, weights_b)
+    plycompute::json::quant_full_overlap(tickers_a, weights_a, tickers_b, weights_b)
 }
 
 /// N×N tail dependence matrix (lower tail, 5% level).
 #[wasm_bindgen]
 pub fn quant_tail_matrix(returns: &[f64], n_assets: usize, n_periods: usize) -> String {
-    plycompute::wasm::quant_tail_matrix(returns, n_assets, n_periods)
+    plycompute::json::quant_tail_matrix(returns, n_assets, n_periods)
 }
 
 /// Rolling multi-factor regression time series.
@@ -272,7 +272,7 @@ pub fn quant_tail_matrix(returns: &[f64], n_assets: usize, n_periods: usize) -> 
 pub fn quant_rolling_factor(
     y: &[f64], x: &[f64], n_factors: usize, window: usize, step: usize,
 ) -> String {
-    plycompute::wasm::quant_rolling_factor(y, x, n_factors, window, step)
+    plycompute::json::quant_rolling_factor(y, x, n_factors, window, step)
 }
 
 /// Black-Litterman portfolio optimization.
@@ -286,5 +286,19 @@ pub fn quant_black_litterman(
     risk_free: f64,
     tau: f64,
 ) -> String {
-    plycompute::wasm::quant_black_litterman(returns, n_assets, n_periods, views, picking, n_views, risk_free, tau)
+    plycompute::json::quant_black_litterman(returns, n_assets, n_periods, views, picking, n_views, risk_free, tau)
+}
+
+/// Walk-forward SMA-crossover backtest with slippage + commission.
+#[wasm_bindgen]
+pub fn quant_backtest(
+    closes: &[f64],
+    fasts: &[usize],
+    slows: &[usize],
+    is_window: usize,
+    oos_window: usize,
+    slippage_bps: f64,
+    commission_bps: f64,
+) -> String {
+    plycompute::json::quant_backtest(closes, fasts, slows, is_window, oos_window, slippage_bps, commission_bps)
 }

@@ -1,916 +1,178 @@
-/* @ts-self-types="./hydrated_widgets.d.ts" */
+let wasm;
 
-export class AudioVisualizer {
-    __destroy_into_raw() {
-        const ptr = this.__wbg_ptr;
-        this.__wbg_ptr = 0;
-        AudioVisualizerFinalization.unregister(this);
+function addToExternrefTable0(obj) {
+    const idx = wasm.__externref_table_alloc();
+    wasm.__wbindgen_export_2.set(idx, obj);
+    return idx;
+}
+
+function handleError(f, args) {
+    try {
+        return f.apply(this, args);
+    } catch (e) {
+        const idx = addToExternrefTable0(e);
+        wasm.__wbindgen_exn_store(idx);
+    }
+}
+
+function isLikeNone(x) {
+    return x === undefined || x === null;
+}
+
+const cachedTextDecoder = (typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8', { ignoreBOM: true, fatal: true }) : { decode: () => { throw Error('TextDecoder not available') } } );
+
+if (typeof TextDecoder !== 'undefined') { cachedTextDecoder.decode(); };
+
+let cachedUint8ArrayMemory0 = null;
+
+function getUint8ArrayMemory0() {
+    if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
+        cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
+    }
+    return cachedUint8ArrayMemory0;
+}
+
+function getStringFromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
+}
+
+let cachedUint8ClampedArrayMemory0 = null;
+
+function getUint8ClampedArrayMemory0() {
+    if (cachedUint8ClampedArrayMemory0 === null || cachedUint8ClampedArrayMemory0.byteLength === 0) {
+        cachedUint8ClampedArrayMemory0 = new Uint8ClampedArray(wasm.memory.buffer);
+    }
+    return cachedUint8ClampedArrayMemory0;
+}
+
+function getClampedArrayU8FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getUint8ClampedArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
+}
+
+let WASM_VECTOR_LEN = 0;
+
+const cachedTextEncoder = (typeof TextEncoder !== 'undefined' ? new TextEncoder('utf-8') : { encode: () => { throw Error('TextEncoder not available') } } );
+
+const encodeString = (typeof cachedTextEncoder.encodeInto === 'function'
+    ? function (arg, view) {
+    return cachedTextEncoder.encodeInto(arg, view);
+}
+    : function (arg, view) {
+    const buf = cachedTextEncoder.encode(arg);
+    view.set(buf);
+    return {
+        read: arg.length,
+        written: buf.length
+    };
+});
+
+function passStringToWasm0(arg, malloc, realloc) {
+
+    if (realloc === undefined) {
+        const buf = cachedTextEncoder.encode(arg);
+        const ptr = malloc(buf.length, 1) >>> 0;
+        getUint8ArrayMemory0().subarray(ptr, ptr + buf.length).set(buf);
+        WASM_VECTOR_LEN = buf.length;
         return ptr;
     }
-    free() {
-        const ptr = this.__destroy_into_raw();
-        wasm.__wbg_audiovisualizer_free(ptr, 0);
-    }
-    /**
-     * @returns {number}
-     */
-    fft_size() {
-        const ret = wasm.audiovisualizer_fft_size(this.__wbg_ptr);
-        return ret >>> 0;
-    }
-    /**
-     * @returns {number}
-     */
-    frequency_bins() {
-        const ret = wasm.audiovisualizer_frequency_bins(this.__wbg_ptr);
-        return ret >>> 0;
-    }
-    /**
-     * @returns {Float32Array}
-     */
-    get_frequency_data() {
-        const ret = wasm.audiovisualizer_get_frequency_data(this.__wbg_ptr);
-        var v1 = getArrayF32FromWasm0(ret[0], ret[1]).slice();
-        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
-        return v1;
-    }
-    /**
-     * @returns {Float32Array}
-     */
-    get_time_data() {
-        const ret = wasm.audiovisualizer_get_time_data(this.__wbg_ptr);
-        var v1 = getArrayF32FromWasm0(ret[0], ret[1]).slice();
-        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
-        return v1;
-    }
-    /**
-     * @param {string} canvas_id
-     * @param {number} width
-     * @param {number} height
-     */
-    constructor(canvas_id, width, height) {
-        const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.audiovisualizer_new(ptr0, len0, width, height);
-        this.__wbg_ptr = ret;
-        AudioVisualizerFinalization.register(this, this.__wbg_ptr, this);
-        return this;
-    }
-    /**
-     * @param {Float32Array} input
-     * @returns {Float32Array}
-     */
-    process_fft(input) {
-        const ptr0 = passArrayF32ToWasm0(input, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.audiovisualizer_process_fft(this.__wbg_ptr, ptr0, len0);
-        var v2 = getArrayF32FromWasm0(ret[0], ret[1]).slice();
-        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
-        return v2;
-    }
-    /**
-     * @param {Float32Array} data
-     */
-    set_time_data(data) {
-        const ptr0 = passArrayF32ToWasm0(data, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        wasm.audiovisualizer_set_time_data(this.__wbg_ptr, ptr0, len0);
-    }
-}
-if (Symbol.dispose) AudioVisualizer.prototype[Symbol.dispose] = AudioVisualizer.prototype.free;
 
-export class Body {
-    __destroy_into_raw() {
-        const ptr = this.__wbg_ptr;
-        this.__wbg_ptr = 0;
-        BodyFinalization.unregister(this);
-        return ptr;
-    }
-    free() {
-        const ptr = this.__destroy_into_raw();
-        wasm.__wbg_body_free(ptr, 0);
-    }
-    /**
-     * @param {number} x
-     * @param {number} y
-     * @param {number} vx
-     * @param {number} vy
-     * @param {number} mass
-     */
-    constructor(x, y, vx, vy, mass) {
-        const ret = wasm.body_new(x, y, vx, vy, mass);
-        this.__wbg_ptr = ret;
-        BodyFinalization.register(this, this.__wbg_ptr, this);
-        return this;
-    }
-    /**
-     * @returns {number}
-     */
-    get mass() {
-        const ret = wasm.__wbg_get_body_mass(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * @returns {number}
-     */
-    get vx() {
-        const ret = wasm.__wbg_get_body_vx(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * @returns {number}
-     */
-    get vy() {
-        const ret = wasm.__wbg_get_body_vy(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * @returns {number}
-     */
-    get x() {
-        const ret = wasm.__wbg_get_body_x(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * @returns {number}
-     */
-    get y() {
-        const ret = wasm.__wbg_get_body_y(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * @param {number} arg0
-     */
-    set mass(arg0) {
-        wasm.__wbg_set_body_mass(this.__wbg_ptr, arg0);
-    }
-    /**
-     * @param {number} arg0
-     */
-    set vx(arg0) {
-        wasm.__wbg_set_body_vx(this.__wbg_ptr, arg0);
-    }
-    /**
-     * @param {number} arg0
-     */
-    set vy(arg0) {
-        wasm.__wbg_set_body_vy(this.__wbg_ptr, arg0);
-    }
-    /**
-     * @param {number} arg0
-     */
-    set x(arg0) {
-        wasm.__wbg_set_body_x(this.__wbg_ptr, arg0);
-    }
-    /**
-     * @param {number} arg0
-     */
-    set y(arg0) {
-        wasm.__wbg_set_body_y(this.__wbg_ptr, arg0);
-    }
-}
-if (Symbol.dispose) Body.prototype[Symbol.dispose] = Body.prototype.free;
+    let len = arg.length;
+    let ptr = malloc(len, 1) >>> 0;
 
-export class NBodySimulation {
-    __destroy_into_raw() {
-        const ptr = this.__wbg_ptr;
-        this.__wbg_ptr = 0;
-        NBodySimulationFinalization.unregister(this);
-        return ptr;
-    }
-    free() {
-        const ptr = this.__destroy_into_raw();
-        wasm.__wbg_nbodysimulation_free(ptr, 0);
-    }
-    /**
-     * @param {number} x
-     * @param {number} y
-     * @param {number} vx
-     * @param {number} vy
-     * @param {number} mass
-     */
-    add_body(x, y, vx, vy, mass) {
-        wasm.nbodysimulation_add_body(this.__wbg_ptr, x, y, vx, vy, mass);
-    }
-    /**
-     * @returns {number}
-     */
-    body_count() {
-        const ret = wasm.nbodysimulation_body_count(this.__wbg_ptr);
-        return ret >>> 0;
-    }
-    clear() {
-        wasm.nbodysimulation_clear(this.__wbg_ptr);
-    }
-    /**
-     * @returns {Float64Array}
-     */
-    get_masses() {
-        const ret = wasm.nbodysimulation_get_masses(this.__wbg_ptr);
-        var v1 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-        wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-        return v1;
-    }
-    /**
-     * @returns {Float64Array}
-     */
-    get_positions() {
-        const ret = wasm.nbodysimulation_get_positions(this.__wbg_ptr);
-        var v1 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-        wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-        return v1;
-    }
-    /**
-     * @param {string} canvas_id
-     * @param {number} width
-     * @param {number} height
-     */
-    constructor(canvas_id, width, height) {
-        const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.nbodysimulation_new(ptr0, len0, width, height);
-        this.__wbg_ptr = ret;
-        NBodySimulationFinalization.register(this, this.__wbg_ptr, this);
-        return this;
-    }
-    /**
-     * @param {number} dt
-     */
-    set_dt(dt) {
-        wasm.nbodysimulation_set_dt(this.__wbg_ptr, dt);
-    }
-    /**
-     * @param {number} g
-     */
-    set_gravity(g) {
-        wasm.nbodysimulation_set_gravity(this.__wbg_ptr, g);
-    }
-    step() {
-        wasm.nbodysimulation_step(this.__wbg_ptr);
-    }
-}
-if (Symbol.dispose) NBodySimulation.prototype[Symbol.dispose] = NBodySimulation.prototype.free;
+    const mem = getUint8ArrayMemory0();
 
-export class TerrainGenerator {
-    __destroy_into_raw() {
-        const ptr = this.__wbg_ptr;
-        this.__wbg_ptr = 0;
-        TerrainGeneratorFinalization.unregister(this);
-        return ptr;
-    }
-    free() {
-        const ptr = this.__destroy_into_raw();
-        wasm.__wbg_terraingenerator_free(ptr, 0);
-    }
-    /**
-     * @param {number} width
-     * @param {number} height
-     * @param {number} scale
-     * @returns {Float64Array}
-     */
-    generate(width, height, scale) {
-        const ret = wasm.terraingenerator_generate(this.__wbg_ptr, width, height, scale);
-        var v1 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-        wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-        return v1;
-    }
-    /**
-     * @param {number} x
-     * @param {number} y
-     * @returns {number}
-     */
-    get_height(x, y) {
-        const ret = wasm.terraingenerator_get_height(this.__wbg_ptr, x, y);
-        return ret;
-    }
-    /**
-     * @param {number} seed
-     * @param {number} octaves
-     * @param {number} persistence
-     */
-    constructor(seed, octaves, persistence) {
-        const ret = wasm.terraingenerator_new(seed, octaves, persistence);
-        this.__wbg_ptr = ret;
-        TerrainGeneratorFinalization.register(this, this.__wbg_ptr, this);
-        return this;
-    }
-    /**
-     * @returns {number}
-     */
-    octaves() {
-        const ret = wasm.terraingenerator_octaves(this.__wbg_ptr);
-        return ret >>> 0;
-    }
-    /**
-     * @returns {number}
-     */
-    persistence() {
-        const ret = wasm.terraingenerator_persistence(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * @returns {number}
-     */
-    seed() {
-        const ret = wasm.terraingenerator_seed(this.__wbg_ptr);
-        return ret >>> 0;
-    }
-    /**
-     * @param {number} octaves
-     */
-    set_octaves(octaves) {
-        wasm.terraingenerator_set_octaves(this.__wbg_ptr, octaves);
-    }
-    /**
-     * @param {number} persistence
-     */
-    set_persistence(persistence) {
-        wasm.terraingenerator_set_persistence(this.__wbg_ptr, persistence);
-    }
-    /**
-     * @param {number} scale
-     */
-    set_scale(scale) {
-        wasm.terraingenerator_set_scale(this.__wbg_ptr, scale);
-    }
-    /**
-     * @param {number} seed
-     */
-    set_seed(seed) {
-        wasm.terraingenerator_set_seed(this.__wbg_ptr, seed);
-    }
-}
-if (Symbol.dispose) TerrainGenerator.prototype[Symbol.dispose] = TerrainGenerator.prototype.free;
+    let offset = 0;
 
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_audio_visualizer(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_audio_visualizer(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
+    for (; offset < len; offset++) {
+        const code = arg.charCodeAt(offset);
+        if (code > 0x7F) break;
+        mem[ptr + offset] = code;
     }
+
+    if (offset !== len) {
+        if (offset !== 0) {
+            arg = arg.slice(offset);
+        }
+        ptr = realloc(ptr, len, len = offset + arg.length * 3, 1) >>> 0;
+        const view = getUint8ArrayMemory0().subarray(ptr + offset, ptr + len);
+        const ret = encodeString(arg, view);
+
+        offset += ret.written;
+        ptr = realloc(ptr, len, offset, 1) >>> 0;
+    }
+
+    WASM_VECTOR_LEN = offset;
+    return ptr;
 }
 
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_backtest(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_backtest(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
+let cachedDataViewMemory0 = null;
 
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_boids(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_boids(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
+function getDataViewMemory0() {
+    if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || (cachedDataViewMemory0.buffer.detached === undefined && cachedDataViewMemory0.buffer !== wasm.memory.buffer)) {
+        cachedDataViewMemory0 = new DataView(wasm.memory.buffer);
     }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_btc_health(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_btc_health(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_ca_explorer(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_ca_explorer(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_cellular_automata(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_cellular_automata(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_climate(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_climate(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_colorblind(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_colorblind(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_correlation(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_correlation(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_double_pendulum(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_double_pendulum(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_fluids(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_fluids(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * wave_type: 0=sine, 1=square, 2=triangle, 3=sawtooth, 4=pulse
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_fourier_viz(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_fourier_viz(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_generative(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_generative(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_gradient_descent(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_gradient_descent(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_kmeans(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_kmeans(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * Lightning Network topology.
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_lightning(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_lightning(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_lorenz(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_lorenz(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * Renders the Mandelbrot set at a given center and zoom level.
- * center_x/center_y: complex-plane coordinates of the viewport center
- * scale: half-width of the visible region in complex plane (smaller = zoomed in)
- * max_iter: iteration cap (higher = more detail when zoomed in)
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_mandelbrot(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_mandelbrot(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_nbody_simulation(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_nbody_simulation(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_network(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_network(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_neural_net(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_neural_net(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_order_book(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_order_book(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_physics(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_physics(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_protein_folding(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_protein_folding(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_reaction_diffusion(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_reaction_diffusion(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_regex_playground(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_regex_playground(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * Sankey flow diagram.
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_sankey(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_sankey(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_solar(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_solar(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * Frequency spectrogram.
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_spectrogram(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_spectrogram(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_terrain_generator(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_terrain_generator(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * Trade flow particle system.
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_trade_flow(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_trade_flow(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- */
-export function create_treemap(canvas_id, width, height) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_treemap(ptr0, len0, width, height);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_tsne(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_tsne(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * 3D Implied Volatility Surface — rotating wireframe with labeled axes.
- * Shows the classic vol smile/skew shape: high IV at deep ITM/OTM,
- * lower at ATM. Term structure decreases with expiry for equity indices.
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_vol_surface(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_vol_surface(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * Voronoi treemap animation.
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_voronoi(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_voronoi(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- */
-export function create_wave(canvas_id, w, h) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.create_wave(ptr0, len0, w, h);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
+    return cachedDataViewMemory0;
 }
 
 export function main() {
     wasm.main();
 }
 
+let cachedFloat64ArrayMemory0 = null;
+
+function getFloat64ArrayMemory0() {
+    if (cachedFloat64ArrayMemory0 === null || cachedFloat64ArrayMemory0.byteLength === 0) {
+        cachedFloat64ArrayMemory0 = new Float64Array(wasm.memory.buffer);
+    }
+    return cachedFloat64ArrayMemory0;
+}
+
+function passArrayF64ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 8, 8) >>> 0;
+    getFloat64ArrayMemory0().set(arg, ptr / 8);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
 /**
- * Black-Litterman portfolio optimization.
- * Combines market equilibrium prior with investor views.
- * @param {Float64Array} returns
- * @param {number} n_assets
- * @param {number} n_periods
- * @param {Float64Array} views
- * @param {Float64Array} picking
- * @param {number} n_views
- * @param {number} risk_free
- * @param {number} tau
+ * Historical stress test on a portfolio.
+ * @param {string} symbols_json
+ * @param {Float64Array} weights
  * @returns {string}
  */
-export function quant_black_litterman(returns, n_assets, n_periods, views, picking, n_views, risk_free, tau) {
-    let deferred4_0;
-    let deferred4_1;
+export function quant_stress_test(symbols_json, weights) {
+    let deferred3_0;
+    let deferred3_1;
     try {
-        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const ptr0 = passStringToWasm0(symbols_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArrayF64ToWasm0(views, wasm.__wbindgen_malloc);
+        const ptr1 = passArrayF64ToWasm0(weights, wasm.__wbindgen_malloc);
         const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passArrayF64ToWasm0(picking, wasm.__wbindgen_malloc);
-        const len2 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_black_litterman(ptr0, len0, n_assets, n_periods, ptr1, len1, ptr2, len2, n_views, risk_free, tau);
-        deferred4_0 = ret[0];
-        deferred4_1 = ret[1];
+        const ret = wasm.quant_stress_test(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
     } finally {
-        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
     }
 }
 
 /**
- * Engle-Granger cointegration test for two price series.
- * Returns JSON: { hedge_ratio, intercept, adf_statistic, half_life, is_cointegrated, z_score }
- * @param {Float64Array} y
- * @param {Float64Array} x
+ * Nelson-Siegel yield curve fit.
+ * @param {Float64Array} maturities
+ * @param {Float64Array} yields
  * @returns {string}
  */
-export function quant_cointegration(y, x) {
+export function quant_yield_curve(maturities, yields) {
     let deferred3_0;
     let deferred3_1;
     try {
-        const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+        const ptr0 = passArrayF64ToWasm0(maturities, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+        const ptr1 = passArrayF64ToWasm0(yields, wasm.__wbindgen_malloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_cointegration(ptr0, len0, ptr1, len1);
+        const ret = wasm.quant_yield_curve(ptr0, len0, ptr1, len1);
         deferred3_0 = ret[0];
         deferred3_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
@@ -967,162 +229,6 @@ export function quant_concentration(weights) {
 }
 
 /**
- * Correlation matrix from a returns matrix (N assets x T periods, row-major).
- * @param {Float64Array} returns
- * @param {number} n_assets
- * @param {number} n_periods
- * @returns {string}
- */
-export function quant_correlation_matrix(returns, n_assets, n_periods) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_correlation_matrix(ptr0, len0, n_assets, n_periods);
-        deferred2_0 = ret[0];
-        deferred2_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-    }
-}
-
-/**
- * Drawdown analysis from price series.
- * Returns JSON: { underwater, max_drawdown, max_dd_duration, current_drawdown, calmar, ulcer, pain }
- * @param {Float64Array} prices
- * @param {number} periods_per_year
- * @returns {string}
- */
-export function quant_drawdown(prices, periods_per_year) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const ptr0 = passArrayF64ToWasm0(prices, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_drawdown(ptr0, len0, periods_per_year);
-        deferred2_0 = ret[0];
-        deferred2_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-    }
-}
-
-/**
- * Efficient frontier computation.
- * Returns JSON: {
- *   random: [{ret, risk, sharpe}, ...],
- *   frontier: [{ret, risk, sharpe}, ...],
- *   assets: [{label, ret, risk}, ...],
- *   tangency: {ret, risk, sharpe},
- *   min_variance: {ret, risk}
- * }
- * @param {Float64Array} returns
- * @param {number} n_assets
- * @param {number} n_periods
- * @param {number} risk_free
- * @param {number} n_random
- * @param {number} n_frontier
- * @param {number} periods_per_year
- * @returns {string}
- */
-export function quant_efficient_frontier(returns, n_assets, n_periods, risk_free, n_random, n_frontier, periods_per_year) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_efficient_frontier(ptr0, len0, n_assets, n_periods, risk_free, n_random, n_frontier, periods_per_year);
-        deferred2_0 = ret[0];
-        deferred2_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-    }
-}
-
-/**
- * Factor exposure regression (OLS).
- * Returns JSON: { alpha, betas, r_squared, adj_r_squared, f_statistic, t_stats }
- * @param {Float64Array} y
- * @param {Float64Array} x
- * @param {number} n_factors
- * @param {number} n_obs
- * @returns {string}
- */
-export function quant_factor_regression(y, x, n_factors, n_obs) {
-    let deferred3_0;
-    let deferred3_1;
-    try {
-        const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_factor_regression(ptr0, len0, ptr1, len1, n_factors, n_obs);
-        deferred3_0 = ret[0];
-        deferred3_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
-    }
-}
-
-/**
- * Forward rate curve from Nelson-Siegel parameters.
- * Derives instantaneous forward rates: f(τ) = d/dτ [τ · y(τ)]
- * @param {Float64Array} maturities
- * @param {Float64Array} yields
- * @returns {string}
- */
-export function quant_forward_rates(maturities, yields) {
-    let deferred3_0;
-    let deferred3_1;
-    try {
-        const ptr0 = passArrayF64ToWasm0(maturities, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArrayF64ToWasm0(yields, wasm.__wbindgen_malloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_forward_rates(ptr0, len0, ptr1, len1);
-        deferred3_0 = ret[0];
-        deferred3_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
-    }
-}
-
-/**
- * Full weighted ETF holdings overlap analysis.
- * @param {string} tickers_a
- * @param {Float64Array} weights_a
- * @param {string} tickers_b
- * @param {Float64Array} weights_b
- * @returns {string}
- */
-export function quant_full_overlap(tickers_a, weights_a, tickers_b, weights_b) {
-    let deferred5_0;
-    let deferred5_1;
-    try {
-        const ptr0 = passStringToWasm0(tickers_a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArrayF64ToWasm0(weights_a, wasm.__wbindgen_malloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passStringToWasm0(tickers_b, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len2 = WASM_VECTOR_LEN;
-        const ptr3 = passArrayF64ToWasm0(weights_b, wasm.__wbindgen_malloc);
-        const len3 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_full_overlap(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
-        deferred5_0 = ret[0];
-        deferred5_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred5_0, deferred5_1, 1);
-    }
-}
-
-/**
  * GARCH(1,1) fit and forecast.
  * @param {Float64Array} returns
  * @param {number} forecast_steps
@@ -1135,6 +241,118 @@ export function quant_garch(returns, forecast_steps) {
         const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.quant_garch(ptr0, len0, forecast_steps);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Engle-Granger cointegration test for two price series.
+ * Returns JSON: { hedge_ratio, intercept, adf_statistic, half_life, is_cointegrated, z_score }
+ * @param {Float64Array} y
+ * @param {Float64Array} x
+ * @returns {string}
+ */
+export function quant_cointegration(y, x) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_cointegration(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * N×N tail dependence matrix (lower tail, 5% level).
+ * @param {Float64Array} returns
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @returns {string}
+ */
+export function quant_tail_matrix(returns, n_assets, n_periods) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_tail_matrix(ptr0, len0, n_assets, n_periods);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Pairs trading signal from two cointegrated price series.
+ * @param {Float64Array} y
+ * @param {Float64Array} x
+ * @returns {string}
+ */
+export function quant_pairs_signal(y, x) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_pairs_signal(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Value at Risk and Expected Shortfall from a return series.
+ * @param {Float64Array} returns
+ * @param {number} alpha
+ * @returns {string}
+ */
+export function quant_var(returns, alpha) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_var(ptr0, len0, alpha);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Risk-adjusted return ratios (Sharpe, Sortino, Calmar, Treynor).
+ * @param {Float64Array} closes
+ * @param {number} risk_free
+ * @param {number} periods_per_year
+ * @returns {string}
+ */
+export function quant_risk_ratios(closes, risk_free, periods_per_year) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(closes, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_risk_ratios(ptr0, len0, risk_free, periods_per_year);
         deferred2_0 = ret[0];
         deferred2_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
@@ -1170,6 +388,49 @@ export function quant_greeks(spot_min, spot_max, num_points, strike, time_to_exp
 }
 
 /**
+ * Realized volatility decomposition (bipower variation).
+ * Returns JSON: { realized_var, bipower_var, continuous_var, jump_var, jump_ratio, annualized_vol, jump_days }
+ * @param {Float64Array} returns
+ * @returns {string}
+ */
+export function quant_realized_vol(returns) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_realized_vol(ptr0, len0);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Drawdown analysis from price series.
+ * Returns JSON: { underwater, max_drawdown, max_dd_duration, current_drawdown, calmar, ulcer, pain }
+ * @param {Float64Array} prices
+ * @param {number} periods_per_year
+ * @returns {string}
+ */
+export function quant_drawdown(prices, periods_per_year) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(prices, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_drawdown(ptr0, len0, periods_per_year);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
  * Holdings overlap analysis (Jaccard index).
  * @param {string} a
  * @param {string} b
@@ -1193,40 +454,25 @@ export function quant_holdings_overlap(a, b) {
 }
 
 /**
- * Hierarchical Risk Parity allocation.
+ * Correlation matrix from a returns matrix (N assets x T periods, row-major).
  * @param {Float64Array} returns
  * @param {number} n_assets
  * @param {number} n_periods
  * @returns {string}
  */
-export function quant_hrp(returns, n_assets, n_periods) {
+export function quant_correlation_matrix(returns, n_assets, n_periods) {
     let deferred2_0;
     let deferred2_1;
     try {
         const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_hrp(ptr0, len0, n_assets, n_periods);
+        const ret = wasm.quant_correlation_matrix(ptr0, len0, n_assets, n_periods);
         deferred2_0 = ret[0];
         deferred2_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
     } finally {
         wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
     }
-}
-
-/**
- * Black-Scholes implied volatility solver (Newton-Raphson).
- * @param {number} market_price
- * @param {number} spot
- * @param {number} strike
- * @param {number} t
- * @param {number} r
- * @param {boolean} is_call
- * @returns {number}
- */
-export function quant_implied_vol(market_price, spot, strike, t, r, is_call) {
-    const ret = wasm.quant_implied_vol(market_price, spot, strike, t, r, is_call);
-    return ret;
 }
 
 /**
@@ -1280,6 +526,150 @@ export function quant_liquidity(highs, lows, closes, volumes) {
 }
 
 /**
+ * Forward rate curve from Nelson-Siegel parameters.
+ * Derives instantaneous forward rates: f(τ) = d/dτ [τ · y(τ)]
+ * @param {Float64Array} maturities
+ * @param {Float64Array} yields
+ * @returns {string}
+ */
+export function quant_forward_rates(maturities, yields) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(maturities, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(yields, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_forward_rates(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Efficient frontier computation.
+ * Returns JSON: {
+ *   random: [{ret, risk, sharpe}, ...],
+ *   frontier: [{ret, risk, sharpe}, ...],
+ *   assets: [{label, ret, risk}, ...],
+ *   tangency: {ret, risk, sharpe},
+ *   min_variance: {ret, risk}
+ * }
+ * @param {Float64Array} returns
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @param {number} risk_free
+ * @param {number} n_random
+ * @param {number} n_frontier
+ * @param {number} periods_per_year
+ * @returns {string}
+ */
+export function quant_efficient_frontier(returns, n_assets, n_periods, risk_free, n_random, n_frontier, periods_per_year) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_efficient_frontier(ptr0, len0, n_assets, n_periods, risk_free, n_random, n_frontier, periods_per_year);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Black-Litterman portfolio optimization.
+ * Combines market equilibrium prior with investor views.
+ * @param {Float64Array} returns
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @param {Float64Array} views
+ * @param {Float64Array} picking
+ * @param {number} n_views
+ * @param {number} risk_free
+ * @param {number} tau
+ * @returns {string}
+ */
+export function quant_black_litterman(returns, n_assets, n_periods, views, picking, n_views, risk_free, tau) {
+    let deferred4_0;
+    let deferred4_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(views, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passArrayF64ToWasm0(picking, wasm.__wbindgen_malloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_black_litterman(ptr0, len0, n_assets, n_periods, ptr1, len1, ptr2, len2, n_views, risk_free, tau);
+        deferred4_0 = ret[0];
+        deferred4_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
+    }
+}
+
+/**
+ * Hierarchical Risk Parity allocation.
+ * @param {Float64Array} returns
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @returns {string}
+ */
+export function quant_hrp(returns, n_assets, n_periods) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_hrp(ptr0, len0, n_assets, n_periods);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Tail dependence (copula) analysis for two return series.
+ * Returns JSON: { lower, upper, kendall_tau, spearman_rho }
+ * @param {Float64Array} x
+ * @param {Float64Array} y
+ * @returns {string}
+ */
+export function quant_tail_dependence(x, y) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_tail_dependence(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Seed the WASM PRNG from JS (use crypto.getRandomValues for entropy).
+ * @param {number} s0
+ * @param {number} s1
+ */
+export function quant_seed(s0, s1) {
+    wasm.quant_seed(s0, s1);
+}
+
+/**
  * Monte Carlo GBM simulation from historical close prices.
  * Returns JSON: { drift, volatility, s0, p5, p25, p50, p75, p95 }
  * @param {Float64Array} closes
@@ -1304,47 +694,18 @@ export function quant_montecarlo(closes, periods_per_year, horizon_days, num_pat
 }
 
 /**
- * Pairs trading signal from two cointegrated price series.
- * @param {Float64Array} y
- * @param {Float64Array} x
- * @returns {string}
+ * Black-Scholes implied volatility solver (Newton-Raphson).
+ * @param {number} market_price
+ * @param {number} spot
+ * @param {number} strike
+ * @param {number} t
+ * @param {number} r
+ * @param {boolean} is_call
+ * @returns {number}
  */
-export function quant_pairs_signal(y, x) {
-    let deferred3_0;
-    let deferred3_1;
-    try {
-        const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_pairs_signal(ptr0, len0, ptr1, len1);
-        deferred3_0 = ret[0];
-        deferred3_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
-    }
-}
-
-/**
- * Realized volatility decomposition (bipower variation).
- * Returns JSON: { realized_var, bipower_var, continuous_var, jump_var, jump_ratio, annualized_vol, jump_days }
- * @param {Float64Array} returns
- * @returns {string}
- */
-export function quant_realized_vol(returns) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_realized_vol(ptr0, len0);
-        deferred2_0 = ret[0];
-        deferred2_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-    }
+export function quant_implied_vol(market_price, spot, strike, t, r, is_call) {
+    const ret = wasm.quant_implied_vol(market_price, spot, strike, t, r, is_call);
+    return ret;
 }
 
 /**
@@ -1369,24 +730,31 @@ export function quant_regime(returns) {
 }
 
 /**
- * Risk-adjusted return ratios (Sharpe, Sortino, Calmar, Treynor).
- * @param {Float64Array} closes
- * @param {number} risk_free
- * @param {number} periods_per_year
+ * Full weighted ETF holdings overlap analysis.
+ * @param {string} tickers_a
+ * @param {Float64Array} weights_a
+ * @param {string} tickers_b
+ * @param {Float64Array} weights_b
  * @returns {string}
  */
-export function quant_risk_ratios(closes, risk_free, periods_per_year) {
-    let deferred2_0;
-    let deferred2_1;
+export function quant_full_overlap(tickers_a, weights_a, tickers_b, weights_b) {
+    let deferred5_0;
+    let deferred5_1;
     try {
-        const ptr0 = passArrayF64ToWasm0(closes, wasm.__wbindgen_malloc);
+        const ptr0 = passStringToWasm0(tickers_a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_risk_ratios(ptr0, len0, risk_free, periods_per_year);
-        deferred2_0 = ret[0];
-        deferred2_1 = ret[1];
+        const ptr1 = passArrayF64ToWasm0(weights_a, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(tickers_b, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ptr3 = passArrayF64ToWasm0(weights_b, wasm.__wbindgen_malloc);
+        const len3 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_full_overlap(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+        deferred5_0 = ret[0];
+        deferred5_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
     } finally {
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+        wasm.__wbindgen_free(deferred5_0, deferred5_1, 1);
     }
 }
 
@@ -1416,54 +784,69 @@ export function quant_rolling_factor(y, x, n_factors, window, step) {
     }
 }
 
-/**
- * Seed the WASM PRNG from JS (use crypto.getRandomValues for entropy).
- * @param {number} s0
- * @param {number} s1
- */
-export function quant_seed(s0, s1) {
-    wasm.quant_seed(s0, s1);
+let cachedUint32ArrayMemory0 = null;
+
+function getUint32ArrayMemory0() {
+    if (cachedUint32ArrayMemory0 === null || cachedUint32ArrayMemory0.byteLength === 0) {
+        cachedUint32ArrayMemory0 = new Uint32Array(wasm.memory.buffer);
+    }
+    return cachedUint32ArrayMemory0;
 }
 
+function passArray32ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 4, 4) >>> 0;
+    getUint32ArrayMemory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
 /**
- * Historical stress test on a portfolio.
- * @param {string} symbols_json
- * @param {Float64Array} weights
+ * Walk-forward SMA-crossover backtest with slippage + commission.
+ * @param {Float64Array} closes
+ * @param {Uint32Array} fasts
+ * @param {Uint32Array} slows
+ * @param {number} is_window
+ * @param {number} oos_window
+ * @param {number} slippage_bps
+ * @param {number} commission_bps
  * @returns {string}
  */
-export function quant_stress_test(symbols_json, weights) {
-    let deferred3_0;
-    let deferred3_1;
+export function quant_backtest(closes, fasts, slows, is_window, oos_window, slippage_bps, commission_bps) {
+    let deferred4_0;
+    let deferred4_1;
     try {
-        const ptr0 = passStringToWasm0(symbols_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const ptr0 = passArrayF64ToWasm0(closes, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArrayF64ToWasm0(weights, wasm.__wbindgen_malloc);
+        const ptr1 = passArray32ToWasm0(fasts, wasm.__wbindgen_malloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_stress_test(ptr0, len0, ptr1, len1);
-        deferred3_0 = ret[0];
-        deferred3_1 = ret[1];
+        const ptr2 = passArray32ToWasm0(slows, wasm.__wbindgen_malloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_backtest(ptr0, len0, ptr1, len1, ptr2, len2, is_window, oos_window, slippage_bps, commission_bps);
+        deferred4_0 = ret[0];
+        deferred4_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
     } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
     }
 }
 
 /**
- * Tail dependence (copula) analysis for two return series.
- * Returns JSON: { lower, upper, kendall_tau, spearman_rho }
- * @param {Float64Array} x
+ * Factor exposure regression (OLS).
+ * Returns JSON: { alpha, betas, r_squared, adj_r_squared, f_statistic, t_stats }
  * @param {Float64Array} y
+ * @param {Float64Array} x
+ * @param {number} n_factors
+ * @param {number} n_obs
  * @returns {string}
  */
-export function quant_tail_dependence(x, y) {
+export function quant_factor_regression(y, x, n_factors, n_obs) {
     let deferred3_0;
     let deferred3_1;
     try {
-        const ptr0 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+        const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+        const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_tail_dependence(ptr0, len0, ptr1, len1);
+        const ret = wasm.quant_factor_regression(ptr0, len0, ptr1, len1, n_factors, n_obs);
         deferred3_0 = ret[0];
         deferred3_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
@@ -1472,122 +855,11 @@ export function quant_tail_dependence(x, y) {
     }
 }
 
-/**
- * N×N tail dependence matrix (lower tail, 5% level).
- * @param {Float64Array} returns
- * @param {number} n_assets
- * @param {number} n_periods
- * @returns {string}
- */
-export function quant_tail_matrix(returns, n_assets, n_periods) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_tail_matrix(ptr0, len0, n_assets, n_periods);
-        deferred2_0 = ret[0];
-        deferred2_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-    }
+function takeFromExternrefTable0(idx) {
+    const value = wasm.__wbindgen_export_2.get(idx);
+    wasm.__externref_table_dealloc(idx);
+    return value;
 }
-
-/**
- * Value at Risk and Expected Shortfall from a return series.
- * @param {Float64Array} returns
- * @param {number} alpha
- * @returns {string}
- */
-export function quant_var(returns, alpha) {
-    let deferred2_0;
-    let deferred2_1;
-    try {
-        const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_var(ptr0, len0, alpha);
-        deferred2_0 = ret[0];
-        deferred2_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
-    }
-}
-
-/**
- * Nelson-Siegel yield curve fit.
- * @param {Float64Array} maturities
- * @param {Float64Array} yields
- * @returns {string}
- */
-export function quant_yield_curve(maturities, yields) {
-    let deferred3_0;
-    let deferred3_1;
-    try {
-        const ptr0 = passArrayF64ToWasm0(maturities, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArrayF64ToWasm0(yields, wasm.__wbindgen_malloc);
-        const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_yield_curve(ptr0, len0, ptr1, len1);
-        deferred3_0 = ret[0];
-        deferred3_1 = ret[1];
-        return getStringFromWasm0(ret[0], ret[1]);
-    } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} center_x
- * @param {number} center_y
- * @param {number} scale
- * @param {number} max_iter
- */
-export function render_mandelbrot(canvas_id, w, h, center_x, center_y, scale, max_iter) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.render_mandelbrot(ptr0, len0, w, h, center_x, center_y, scale, max_iter);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- * @param {string} data_json
- */
-export function update_backtest(canvas_id, width, height, data_json) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_backtest(ptr0, len0, width, height, ptr1, len1);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} _t
- */
-export function update_boids(canvas_id, w, h, _t) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_boids(ptr0, len0, w, h, _t);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
 /**
  * @param {string} canvas_id
  * @param {number} width
@@ -1607,14 +879,13 @@ export function update_btc_health(canvas_id, width, height, data_json) {
 
 /**
  * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} _t
+ * @param {number} width
+ * @param {number} height
  */
-export function update_ca_explorer(canvas_id, w, h, _t) {
+export function create_btc_health(canvas_id, width, height) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_ca_explorer(ptr0, len0, w, h, _t);
+    const ret = wasm.create_btc_health(ptr0, len0, width, height);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1624,12 +895,11 @@ export function update_ca_explorer(canvas_id, w, h, _t) {
  * @param {string} canvas_id
  * @param {number} width
  * @param {number} height
- * @param {number} _time
  */
-export function update_cellular_automata(canvas_id, width, height, _time) {
+export function create_order_book(canvas_id, width, height) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_cellular_automata(ptr0, len0, width, height, _time);
+    const ret = wasm.create_order_book(ptr0, len0, width, height);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1639,31 +909,14 @@ export function update_cellular_automata(canvas_id, width, height, _time) {
  * @param {string} canvas_id
  * @param {number} width
  * @param {number} height
- * @param {string} csv_data
+ * @param {string} data_json
  */
-export function update_climate(canvas_id, width, height, csv_data) {
+export function update_order_book(canvas_id, width, height, data_json) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(csv_data, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_climate(ptr0, len0, width, height, ptr1, len1);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- * @param {string} img_data_json
- */
-export function update_colorblind(canvas_id, width, height, img_data_json) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(img_data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_colorblind(ptr0, len0, width, height, ptr1, len1);
+    const ret = wasm.update_order_book(ptr0, len0, width, height, ptr1, len1);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1688,14 +941,13 @@ export function update_correlation(canvas_id, width, height, data_json) {
 
 /**
  * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} _t
+ * @param {number} width
+ * @param {number} height
  */
-export function update_double_pendulum(canvas_id, w, h, _t) {
+export function create_correlation(canvas_id, width, height) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_double_pendulum(ptr0, len0, w, h, _t);
+    const ret = wasm.create_correlation(ptr0, len0, width, height);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1703,14 +955,110 @@ export function update_double_pendulum(canvas_id, w, h, _t) {
 
 /**
  * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} time
+ * @param {number} width
+ * @param {number} height
+ * @param {string} data_json
  */
-export function update_fluids(canvas_id, w, h, time) {
+export function update_treemap(canvas_id, width, height, data_json) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_fluids(ptr0, len0, w, h, time);
+    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.update_treemap(ptr0, len0, width, height, ptr1, len1);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_treemap(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_treemap(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_backtest(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_backtest(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ * @param {string} data_json
+ */
+export function update_backtest(canvas_id, width, height, data_json) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.update_backtest(ptr0, len0, width, height, ptr1, len1);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+function getArrayF64FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getFloat64ArrayMemory0().subarray(ptr / 8, ptr / 8 + len);
+}
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_nbody_simulation(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_nbody_simulation(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_climate(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_climate(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ * @param {string} csv_data
+ */
+export function update_climate(canvas_id, width, height, csv_data) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(csv_data, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.update_climate(ptr0, len0, width, height, ptr1, len1);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1749,6 +1097,172 @@ export function update_fourier_viz_full(canvas_id, width, height, time, harmonic
 }
 
 /**
+ * wave_type: 0=sine, 1=square, 2=triangle, 3=sawtooth, 4=pulse
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_fourier_viz(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_fourier_viz(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ * @param {number} _time
+ */
+export function update_physics(canvas_id, width, height, _time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_physics(ptr0, len0, width, height, _time);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_physics(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_physics(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_terrain_generator(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_terrain_generator(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ * @param {number} _time
+ */
+export function update_cellular_automata(canvas_id, width, height, _time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_cellular_automata(ptr0, len0, width, height, _time);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_cellular_automata(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_cellular_automata(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+let cachedFloat32ArrayMemory0 = null;
+
+function getFloat32ArrayMemory0() {
+    if (cachedFloat32ArrayMemory0 === null || cachedFloat32ArrayMemory0.byteLength === 0) {
+        cachedFloat32ArrayMemory0 = new Float32Array(wasm.memory.buffer);
+    }
+    return cachedFloat32ArrayMemory0;
+}
+
+function passArrayF32ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 4, 4) >>> 0;
+    getFloat32ArrayMemory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
+function getArrayF32FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getFloat32ArrayMemory0().subarray(ptr / 4, ptr / 4 + len);
+}
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_audio_visualizer(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_audio_visualizer(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ * @param {string} img_data_json
+ */
+export function update_colorblind(canvas_id, width, height, img_data_json) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(img_data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.update_colorblind(ptr0, len0, width, height, ptr1, len1);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_colorblind(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_colorblind(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ */
+export function create_generative(canvas_id, width, height) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_generative(ptr0, len0, width, height);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
  * @param {string} canvas_id
  * @param {number} width
  * @param {number} height
@@ -1768,14 +1282,13 @@ export function update_generative(canvas_id, width, height, _seed, _speed, _dens
 
 /**
  * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} _time
+ * @param {number} width
+ * @param {number} height
  */
-export function update_gradient_descent(canvas_id, w, h, _time) {
+export function create_regex_playground(canvas_id, width, height) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_gradient_descent(ptr0, len0, w, h, _time);
+    const ret = wasm.create_regex_playground(ptr0, len0, width, height);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1783,14 +1296,16 @@ export function update_gradient_descent(canvas_id, w, h, _time) {
 
 /**
  * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} _t
+ * @param {number} width
+ * @param {number} height
+ * @param {string} data_json
  */
-export function update_kmeans(canvas_id, w, h, _t) {
+export function update_regex_playground(canvas_id, width, height, data_json) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_kmeans(ptr0, len0, w, h, _t);
+    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.update_regex_playground(ptr0, len0, width, height, ptr1, len1);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1798,44 +1313,13 @@ export function update_kmeans(canvas_id, w, h, _t) {
 
 /**
  * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} time
+ * @param {number} width
+ * @param {number} height
  */
-export function update_lightning(canvas_id, w, h, time) {
+export function create_network(canvas_id, width, height) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_lightning(ptr0, len0, w, h, time);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} _t
- */
-export function update_lorenz(canvas_id, w, h, _t) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_lorenz(ptr0, len0, w, h, _t);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} _t
- */
-export function update_mandelbrot(canvas_id, w, h, _t) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_mandelbrot(ptr0, len0, w, h, _t);
+    const ret = wasm.create_network(ptr0, len0, width, height);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1862,6 +1346,57 @@ export function update_network(canvas_id, width, height, data_json) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
+ * @param {number} center_x
+ * @param {number} center_y
+ * @param {number} scale
+ * @param {number} max_iter
+ */
+export function render_mandelbrot(canvas_id, w, h, center_x, center_y, scale, max_iter) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.render_mandelbrot(ptr0, len0, w, h, center_x, center_y, scale, max_iter);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _t
+ */
+export function update_mandelbrot(canvas_id, w, h, _t) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_mandelbrot(ptr0, len0, w, h, _t);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Renders the Mandelbrot set at a given center and zoom level.
+ * center_x/center_y: complex-plane coordinates of the viewport center
+ * scale: half-width of the visible region in complex plane (smaller = zoomed in)
+ * max_iter: iteration cap (higher = more detail when zoomed in)
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_mandelbrot(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_mandelbrot(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
  * @param {number} _time
  */
 export function update_neural_net(canvas_id, w, h, _time) {
@@ -1875,16 +1410,13 @@ export function update_neural_net(canvas_id, w, h, _time) {
 
 /**
  * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- * @param {string} data_json
+ * @param {number} w
+ * @param {number} h
  */
-export function update_order_book(canvas_id, width, height, data_json) {
+export function create_neural_net(canvas_id, w, h) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_order_book(ptr0, len0, width, height, ptr1, len1);
+    const ret = wasm.create_neural_net(ptr0, len0, w, h);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1892,14 +1424,43 @@ export function update_order_book(canvas_id, width, height, data_json) {
 
 /**
  * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
+ * @param {number} w
+ * @param {number} h
  * @param {number} _time
  */
-export function update_physics(canvas_id, width, height, _time) {
+export function update_trade_flow(canvas_id, w, h, _time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_physics(ptr0, len0, width, height, _time);
+    const ret = wasm.update_trade_flow(ptr0, len0, w, h, _time);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Trade flow particle system.
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_trade_flow(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_trade_flow(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_ca_explorer(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_ca_explorer(ptr0, len0, w, h);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1911,10 +1472,25 @@ export function update_physics(canvas_id, width, height, _time) {
  * @param {number} h
  * @param {number} _t
  */
-export function update_protein_folding(canvas_id, w, h, _t) {
+export function update_ca_explorer(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_protein_folding(ptr0, len0, w, h, _t);
+    const ret = wasm.update_ca_explorer(ptr0, len0, w, h, _t);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Frequency spectrogram.
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_spectrogram(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_spectrogram(ptr0, len0, w, h);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1926,119 +1502,27 @@ export function update_protein_folding(canvas_id, w, h, _t) {
  * @param {number} h
  * @param {number} _time
  */
-export function update_reaction_diffusion(canvas_id, w, h, _time) {
+export function update_spectrogram(canvas_id, w, h, _time) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_reaction_diffusion(ptr0, len0, w, h, _time);
+    const ret = wasm.update_spectrogram(ptr0, len0, w, h, _time);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
 }
 
 /**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- * @param {string} data_json
- */
-export function update_regex_playground(canvas_id, width, height, data_json) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_regex_playground(ptr0, len0, width, height, ptr1, len1);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
+ * 3D Implied Volatility Surface — rotating wireframe with labeled axes.
+ * Shows the classic vol smile/skew shape: high IV at deep ITM/OTM,
+ * lower at ATM. Term structure decreases with expiry for equity indices.
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} time
  */
-export function update_sankey(canvas_id, w, h, time) {
+export function create_vol_surface(canvas_id, w, h) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_sankey(ptr0, len0, w, h, time);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} _t
- */
-export function update_solar(canvas_id, w, h, _t) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_solar(ptr0, len0, w, h, _t);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} time
- */
-export function update_spectrogram(canvas_id, w, h, time) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_spectrogram(ptr0, len0, w, h, time);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} time
- */
-export function update_trade_flow(canvas_id, w, h, time) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_trade_flow(ptr0, len0, w, h, time);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} width
- * @param {number} height
- * @param {string} data_json
- */
-export function update_treemap(canvas_id, width, height, data_json) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.update_treemap(ptr0, len0, width, height, ptr1, len1);
-    if (ret[1]) {
-        throw takeFromExternrefTable0(ret[0]);
-    }
-}
-
-/**
- * @param {string} canvas_id
- * @param {number} w
- * @param {number} h
- * @param {number} _time
- */
-export function update_tsne(canvas_id, w, h, _time) {
-    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_tsne(ptr0, len0, w, h, _time);
+    const ret = wasm.create_vol_surface(ptr0, len0, w, h);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -2063,12 +1547,127 @@ export function update_vol_surface(canvas_id, w, h, _t) {
  * @param {string} canvas_id
  * @param {number} w
  * @param {number} h
- * @param {number} time
+ * @param {number} _t
  */
-export function update_voronoi(canvas_id, w, h, time) {
+export function update_protein_folding(canvas_id, w, h, _t) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.update_voronoi(ptr0, len0, w, h, time);
+    const ret = wasm.update_protein_folding(ptr0, len0, w, h, _t);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_protein_folding(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_protein_folding(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _time
+ */
+export function update_gradient_descent(canvas_id, w, h, _time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_gradient_descent(ptr0, len0, w, h, _time);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_gradient_descent(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_gradient_descent(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_reaction_diffusion(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_reaction_diffusion(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _time
+ */
+export function update_reaction_diffusion(canvas_id, w, h, _time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_reaction_diffusion(ptr0, len0, w, h, _time);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_tsne(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_tsne(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _time
+ */
+export function update_tsne(canvas_id, w, h, _time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_tsne(ptr0, len0, w, h, _time);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_wave(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_wave(ptr0, len0, w, h);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -2088,445 +1687,631 @@ export function update_wave(canvas_id, w, h, time) {
         throw takeFromExternrefTable0(ret[0]);
     }
 }
-function __wbg_get_imports() {
-    const import0 = {
-        __proto__: null,
-        __wbg___wbindgen_boolean_get_edaed31a367ce1bd: function(arg0) {
-            const v = arg0;
-            const ret = typeof(v) === 'boolean' ? v : undefined;
-            return isLikeNone(ret) ? 0xFFFFFF : ret ? 1 : 0;
-        },
-        __wbg___wbindgen_is_undefined_721f8decd50c87a3: function(arg0) {
-            const ret = arg0 === undefined;
-            return ret;
-        },
-        __wbg___wbindgen_number_get_1cc01dd708740256: function(arg0, arg1) {
-            const obj = arg1;
-            const ret = typeof(obj) === 'number' ? obj : undefined;
-            getDataViewMemory0().setFloat64(arg0 + 8 * 1, isLikeNone(ret) ? 0 : ret, true);
-            getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
-        },
-        __wbg___wbindgen_string_get_71bb4348194e31f0: function(arg0, arg1) {
-            const obj = arg1;
-            const ret = typeof(obj) === 'string' ? obj : undefined;
-            var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-            var len1 = WASM_VECTOR_LEN;
-            getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
-            getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
-        },
-        __wbg___wbindgen_throw_ea4887a5f8f9a9db: function(arg0, arg1) {
-            throw new Error(getStringFromWasm0(arg0, arg1));
-        },
-        __wbg_arc_74cf0c033e9df542: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4, arg5) {
-            arg0.arc(arg1, arg2, arg3, arg4, arg5);
-        }, arguments); },
-        __wbg_beginPath_c99b5be3516a2077: function(arg0) {
-            arg0.beginPath();
-        },
-        __wbg_bezierCurveTo_22132b66df298a0b: function(arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
-            arg0.bezierCurveTo(arg1, arg2, arg3, arg4, arg5, arg6);
-        },
-        __wbg_closePath_47136fd7a8a2f043: function(arg0) {
-            arg0.closePath();
-        },
-        __wbg_document_2634180a4c694068: function(arg0) {
-            const ret = arg0.document;
-            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
-        },
-        __wbg_ellipse_69edbc4c6b78175b: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
-            arg0.ellipse(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-        }, arguments); },
-        __wbg_error_a6fa202b58aa1cd3: function(arg0, arg1) {
-            let deferred0_0;
-            let deferred0_1;
-            try {
-                deferred0_0 = arg0;
-                deferred0_1 = arg1;
-                console.error(getStringFromWasm0(arg0, arg1));
-            } finally {
-                wasm.__wbindgen_free(deferred0_0, deferred0_1, 1);
-            }
-        },
-        __wbg_exec_072e76b05687c361: function(arg0, arg1, arg2) {
-            const ret = arg0.exec(getStringFromWasm0(arg1, arg2));
-            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
-        },
-        __wbg_fillRect_3c420f5077df8d3b: function(arg0, arg1, arg2, arg3, arg4) {
-            arg0.fillRect(arg1, arg2, arg3, arg4);
-        },
-        __wbg_fillText_cdea0ac33ff3d2d1: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
-            arg0.fillText(getStringFromWasm0(arg1, arg2), arg3, arg4);
-        }, arguments); },
-        __wbg_fill_b39141050e50c461: function(arg0) {
-            arg0.fill();
-        },
-        __wbg_from_50138b2ca136f50c: function(arg0) {
-            const ret = Array.from(arg0);
-            return ret;
-        },
-        __wbg_getContext_486aab500e1c34c9: function() { return handleError(function (arg0, arg1, arg2) {
-            const ret = arg0.getContext(getStringFromWasm0(arg1, arg2));
-            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
-        }, arguments); },
-        __wbg_getElementById_c7aba6b93b34bf01: function(arg0, arg1, arg2) {
-            const ret = arg0.getElementById(getStringFromWasm0(arg1, arg2));
-            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
-        },
-        __wbg_get_197a3fe98f169e38: function(arg0, arg1) {
-            const ret = arg0[arg1 >>> 0];
-            return ret;
-        },
-        __wbg_get_dddb90ff5d27a080: function() { return handleError(function (arg0, arg1) {
-            const ret = Reflect.get(arg0, arg1);
-            return ret;
-        }, arguments); },
-        __wbg_get_unchecked_54a4374c38e08460: function(arg0, arg1) {
-            const ret = arg0[arg1 >>> 0];
-            return ret;
-        },
-        __wbg_instanceof_CanvasRenderingContext2d_d0cab9e931424c52: function(arg0) {
-            let result;
-            try {
-                result = arg0 instanceof CanvasRenderingContext2D;
-            } catch (_) {
-                result = false;
-            }
-            const ret = result;
-            return ret;
-        },
-        __wbg_instanceof_HtmlCanvasElement_8ce29a370a2b10a4: function(arg0) {
-            let result;
-            try {
-                result = arg0 instanceof HTMLCanvasElement;
-            } catch (_) {
-                result = false;
-            }
-            const ret = result;
-            return ret;
-        },
-        __wbg_instanceof_Window_0d356b88a2f77c42: function(arg0) {
-            let result;
-            try {
-                result = arg0 instanceof Window;
-            } catch (_) {
-                result = false;
-            }
-            const ret = result;
-            return ret;
-        },
-        __wbg_length_c6054974c0a6cdb9: function(arg0) {
-            const ret = arg0.length;
-            return ret;
-        },
-        __wbg_lineTo_2a649fce185f0bf0: function(arg0, arg1, arg2) {
-            arg0.lineTo(arg1, arg2);
-        },
-        __wbg_moveTo_8973531c3399ba16: function(arg0, arg1, arg2) {
-            arg0.moveTo(arg1, arg2);
-        },
-        __wbg_new_227d7c05414eb861: function() {
-            const ret = new Error();
-            return ret;
-        },
-        __wbg_new_36e147a8ced3c6e0: function() {
-            const ret = new Array();
-            return ret;
-        },
-        __wbg_new_823438cabd5628d6: function(arg0, arg1, arg2, arg3) {
-            const ret = new RegExp(getStringFromWasm0(arg0, arg1), getStringFromWasm0(arg2, arg3));
-            return ret;
-        },
-        __wbg_new_with_u8_clamped_array_and_sh_adb3f647b0414eb2: function() { return handleError(function (arg0, arg1, arg2, arg3) {
-            const ret = new ImageData(getClampedArrayU8FromWasm0(arg0, arg1), arg2 >>> 0, arg3 >>> 0);
-            return ret;
-        }, arguments); },
-        __wbg_now_d2e0afbad4edbe82: function() {
-            const ret = Date.now();
-            return ret;
-        },
-        __wbg_parse_1f9d3f9cbc8a7da2: function() { return handleError(function (arg0, arg1) {
-            const ret = JSON.parse(getStringFromWasm0(arg0, arg1));
-            return ret;
-        }, arguments); },
-        __wbg_push_f724b5db8acf89d2: function(arg0, arg1) {
-            const ret = arg0.push(arg1);
-            return ret;
-        },
-        __wbg_putImageData_d36ffa8305aea239: function() { return handleError(function (arg0, arg1, arg2, arg3) {
-            arg0.putImageData(arg1, arg2, arg3);
-        }, arguments); },
-        __wbg_random_3182549db57fb083: function() {
-            const ret = Math.random();
-            return ret;
-        },
-        __wbg_setLineDash_7394cefd476e675f: function() { return handleError(function (arg0, arg1) {
-            arg0.setLineDash(arg1);
-        }, arguments); },
-        __wbg_set_fillStyle_01152e00b5737643: function(arg0, arg1) {
-            arg0.fillStyle = arg1;
-        },
-        __wbg_set_font_e2bce6175ef42bc3: function(arg0, arg1, arg2) {
-            arg0.font = getStringFromWasm0(arg1, arg2);
-        },
-        __wbg_set_globalAlpha_60fedcc06aa9a61c: function(arg0, arg1) {
-            arg0.globalAlpha = arg1;
-        },
-        __wbg_set_height_ad5056ea051acd78: function(arg0, arg1) {
-            arg0.height = arg1 >>> 0;
-        },
-        __wbg_set_lineWidth_fef15cb5c15a6cdc: function(arg0, arg1) {
-            arg0.lineWidth = arg1;
-        },
-        __wbg_set_strokeStyle_77f54c809146a711: function(arg0, arg1) {
-            arg0.strokeStyle = arg1;
-        },
-        __wbg_set_width_031bdecd763c5855: function(arg0, arg1) {
-            arg0.width = arg1 >>> 0;
-        },
-        __wbg_stack_3b0d974bbf31e44f: function(arg0, arg1) {
-            const ret = arg1.stack;
-            const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-            const len1 = WASM_VECTOR_LEN;
-            getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
-            getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
-        },
-        __wbg_static_accessor_GLOBAL_THIS_2fee5048bcca5938: function() {
-            const ret = typeof globalThis === 'undefined' ? null : globalThis;
-            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
-        },
-        __wbg_static_accessor_GLOBAL_ce44e66a4935da8c: function() {
-            const ret = typeof global === 'undefined' ? null : global;
-            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
-        },
-        __wbg_static_accessor_SELF_44f6e0cb5e67cdad: function() {
-            const ret = typeof self === 'undefined' ? null : self;
-            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
-        },
-        __wbg_static_accessor_WINDOW_168f178805d978fe: function() {
-            const ret = typeof window === 'undefined' ? null : window;
-            return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
-        },
-        __wbg_strokeRect_a9cb57c3713e908d: function(arg0, arg1, arg2, arg3, arg4) {
-            arg0.strokeRect(arg1, arg2, arg3, arg4);
-        },
-        __wbg_stroke_d0c2cfbe28711bcb: function(arg0) {
-            arg0.stroke();
-        },
-        __wbindgen_cast_0000000000000001: function(arg0) {
-            // Cast intrinsic for `F64 -> Externref`.
-            const ret = arg0;
-            return ret;
-        },
-        __wbindgen_cast_0000000000000002: function(arg0, arg1) {
-            // Cast intrinsic for `Ref(String) -> Externref`.
-            const ret = getStringFromWasm0(arg0, arg1);
-            return ret;
-        },
-        __wbindgen_init_externref_table: function() {
-            const table = wasm.__wbindgen_externrefs;
-            const offset = table.grow(4);
-            table.set(0, undefined);
-            table.set(offset + 0, undefined);
-            table.set(offset + 1, null);
-            table.set(offset + 2, true);
-            table.set(offset + 3, false);
-        },
-    };
-    return {
-        __proto__: null,
-        "./hydrated_widgets_bg.js": import0,
-    };
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_boids(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_boids(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _t
+ */
+export function update_boids(canvas_id, w, h, _t) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_boids(ptr0, len0, w, h, _t);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_solar(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_solar(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _t
+ */
+export function update_solar(canvas_id, w, h, _t) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_solar(ptr0, len0, w, h, _t);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_fluids(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_fluids(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} time
+ */
+export function update_fluids(canvas_id, w, h, time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_fluids(ptr0, len0, w, h, time);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_kmeans(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_kmeans(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _t
+ */
+export function update_kmeans(canvas_id, w, h, _t) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_kmeans(ptr0, len0, w, h, _t);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _t
+ */
+export function update_lorenz(canvas_id, w, h, _t) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_lorenz(ptr0, len0, w, h, _t);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_lorenz(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_lorenz(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Sankey flow diagram.
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_sankey(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_sankey(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _time
+ */
+export function update_sankey(canvas_id, w, h, _time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_sankey(ptr0, len0, w, h, _time);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Voronoi treemap animation.
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_voronoi(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_voronoi(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _time
+ */
+export function update_voronoi(canvas_id, w, h, _time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_voronoi(ptr0, len0, w, h, _time);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_double_pendulum(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_double_pendulum(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _t
+ */
+export function update_double_pendulum(canvas_id, w, h, _t) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_double_pendulum(ptr0, len0, w, h, _t);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ * @param {number} _time
+ */
+export function update_lightning(canvas_id, w, h, _time) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_lightning(ptr0, len0, w, h, _time);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Lightning Network topology.
+ * @param {string} canvas_id
+ * @param {number} w
+ * @param {number} h
+ */
+export function create_lightning(canvas_id, w, h) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.create_lightning(ptr0, len0, w, h);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
 }
 
 const AudioVisualizerFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_audiovisualizer_free(ptr, 1));
-const BodyFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_body_free(ptr, 1));
-const NBodySimulationFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_nbodysimulation_free(ptr, 1));
-const TerrainGeneratorFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_terraingenerator_free(ptr, 1));
+    : new FinalizationRegistry(ptr => wasm.__wbg_audiovisualizer_free(ptr >>> 0, 1));
 
-function addToExternrefTable0(obj) {
-    const idx = wasm.__externref_table_alloc();
-    wasm.__wbindgen_externrefs.set(idx, obj);
-    return idx;
-}
+export class AudioVisualizer {
 
-function getArrayF32FromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return getFloat32ArrayMemory0().subarray(ptr / 4, ptr / 4 + len);
-}
-
-function getArrayF64FromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return getFloat64ArrayMemory0().subarray(ptr / 8, ptr / 8 + len);
-}
-
-function getClampedArrayU8FromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return getUint8ClampedArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
-}
-
-let cachedDataViewMemory0 = null;
-function getDataViewMemory0() {
-    if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || (cachedDataViewMemory0.buffer.detached === undefined && cachedDataViewMemory0.buffer !== wasm.memory.buffer)) {
-        cachedDataViewMemory0 = new DataView(wasm.memory.buffer);
-    }
-    return cachedDataViewMemory0;
-}
-
-let cachedFloat32ArrayMemory0 = null;
-function getFloat32ArrayMemory0() {
-    if (cachedFloat32ArrayMemory0 === null || cachedFloat32ArrayMemory0.byteLength === 0) {
-        cachedFloat32ArrayMemory0 = new Float32Array(wasm.memory.buffer);
-    }
-    return cachedFloat32ArrayMemory0;
-}
-
-let cachedFloat64ArrayMemory0 = null;
-function getFloat64ArrayMemory0() {
-    if (cachedFloat64ArrayMemory0 === null || cachedFloat64ArrayMemory0.byteLength === 0) {
-        cachedFloat64ArrayMemory0 = new Float64Array(wasm.memory.buffer);
-    }
-    return cachedFloat64ArrayMemory0;
-}
-
-function getStringFromWasm0(ptr, len) {
-    return decodeText(ptr >>> 0, len);
-}
-
-let cachedUint8ArrayMemory0 = null;
-function getUint8ArrayMemory0() {
-    if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
-        cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
-    }
-    return cachedUint8ArrayMemory0;
-}
-
-let cachedUint8ClampedArrayMemory0 = null;
-function getUint8ClampedArrayMemory0() {
-    if (cachedUint8ClampedArrayMemory0 === null || cachedUint8ClampedArrayMemory0.byteLength === 0) {
-        cachedUint8ClampedArrayMemory0 = new Uint8ClampedArray(wasm.memory.buffer);
-    }
-    return cachedUint8ClampedArrayMemory0;
-}
-
-function handleError(f, args) {
-    try {
-        return f.apply(this, args);
-    } catch (e) {
-        const idx = addToExternrefTable0(e);
-        wasm.__wbindgen_exn_store(idx);
-    }
-}
-
-function isLikeNone(x) {
-    return x === undefined || x === null;
-}
-
-function passArrayF32ToWasm0(arg, malloc) {
-    const ptr = malloc(arg.length * 4, 4) >>> 0;
-    getFloat32ArrayMemory0().set(arg, ptr / 4);
-    WASM_VECTOR_LEN = arg.length;
-    return ptr;
-}
-
-function passArrayF64ToWasm0(arg, malloc) {
-    const ptr = malloc(arg.length * 8, 8) >>> 0;
-    getFloat64ArrayMemory0().set(arg, ptr / 8);
-    WASM_VECTOR_LEN = arg.length;
-    return ptr;
-}
-
-function passStringToWasm0(arg, malloc, realloc) {
-    if (realloc === undefined) {
-        const buf = cachedTextEncoder.encode(arg);
-        const ptr = malloc(buf.length, 1) >>> 0;
-        getUint8ArrayMemory0().subarray(ptr, ptr + buf.length).set(buf);
-        WASM_VECTOR_LEN = buf.length;
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        AudioVisualizerFinalization.unregister(this);
         return ptr;
     }
 
-    let len = arg.length;
-    let ptr = malloc(len, 1) >>> 0;
-
-    const mem = getUint8ArrayMemory0();
-
-    let offset = 0;
-
-    for (; offset < len; offset++) {
-        const code = arg.charCodeAt(offset);
-        if (code > 0x7F) break;
-        mem[ptr + offset] = code;
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_audiovisualizer_free(ptr, 0);
     }
-    if (offset !== len) {
-        if (offset !== 0) {
-            arg = arg.slice(offset);
-        }
-        ptr = realloc(ptr, len, len = offset + arg.length * 3, 1) >>> 0;
-        const view = getUint8ArrayMemory0().subarray(ptr + offset, ptr + len);
-        const ret = cachedTextEncoder.encodeInto(arg, view);
+    /**
+     * @param {Float32Array} input
+     * @returns {Float32Array}
+     */
+    process_fft(input) {
+        const ptr0 = passArrayF32ToWasm0(input, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.audiovisualizer_process_fft(this.__wbg_ptr, ptr0, len0);
+        var v2 = getArrayF32FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
+        return v2;
+    }
+    /**
+     * @returns {Float32Array}
+     */
+    get_time_data() {
+        const ret = wasm.audiovisualizer_get_time_data(this.__wbg_ptr);
+        var v1 = getArrayF32FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
+        return v1;
+    }
+    /**
+     * @param {Float32Array} data
+     */
+    set_time_data(data) {
+        const ptr0 = passArrayF32ToWasm0(data, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.audiovisualizer_set_time_data(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * @returns {number}
+     */
+    frequency_bins() {
+        const ret = wasm.audiovisualizer_frequency_bins(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
+     * @returns {Float32Array}
+     */
+    get_frequency_data() {
+        const ret = wasm.audiovisualizer_get_frequency_data(this.__wbg_ptr);
+        var v1 = getArrayF32FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
+        return v1;
+    }
+    /**
+     * @param {string} canvas_id
+     * @param {number} width
+     * @param {number} height
+     */
+    constructor(canvas_id, width, height) {
+        const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.audiovisualizer_new(ptr0, len0, width, height);
+        this.__wbg_ptr = ret >>> 0;
+        AudioVisualizerFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @returns {number}
+     */
+    fft_size() {
+        const ret = wasm.audiovisualizer_fft_size(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+}
 
-        offset += ret.written;
-        ptr = realloc(ptr, len, offset, 1) >>> 0;
+const BodyFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_body_free(ptr >>> 0, 1));
+
+export class Body {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        BodyFinalization.unregister(this);
+        return ptr;
     }
 
-    WASM_VECTOR_LEN = offset;
-    return ptr;
-}
-
-function takeFromExternrefTable0(idx) {
-    const value = wasm.__wbindgen_externrefs.get(idx);
-    wasm.__externref_table_dealloc(idx);
-    return value;
-}
-
-let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
-cachedTextDecoder.decode();
-const MAX_SAFARI_DECODE_BYTES = 2146435072;
-let numBytesDecoded = 0;
-function decodeText(ptr, len) {
-    numBytesDecoded += len;
-    if (numBytesDecoded >= MAX_SAFARI_DECODE_BYTES) {
-        cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
-        cachedTextDecoder.decode();
-        numBytesDecoded = len;
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_body_free(ptr, 0);
     }
-    return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
+    /**
+     * @returns {number}
+     */
+    get x() {
+        const ret = wasm.__wbg_get_body_x(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @param {number} arg0
+     */
+    set x(arg0) {
+        wasm.__wbg_set_body_x(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @returns {number}
+     */
+    get y() {
+        const ret = wasm.__wbg_get_body_y(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @param {number} arg0
+     */
+    set y(arg0) {
+        wasm.__wbg_set_body_y(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @returns {number}
+     */
+    get vx() {
+        const ret = wasm.__wbg_get_body_vx(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @param {number} arg0
+     */
+    set vx(arg0) {
+        wasm.__wbg_set_body_vx(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @returns {number}
+     */
+    get vy() {
+        const ret = wasm.__wbg_get_body_vy(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @param {number} arg0
+     */
+    set vy(arg0) {
+        wasm.__wbg_set_body_vy(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @returns {number}
+     */
+    get mass() {
+        const ret = wasm.__wbg_get_body_mass(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @param {number} arg0
+     */
+    set mass(arg0) {
+        wasm.__wbg_set_body_mass(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} vx
+     * @param {number} vy
+     * @param {number} mass
+     */
+    constructor(x, y, vx, vy, mass) {
+        const ret = wasm.body_new(x, y, vx, vy, mass);
+        this.__wbg_ptr = ret >>> 0;
+        BodyFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
 }
 
-const cachedTextEncoder = new TextEncoder();
+const NBodySimulationFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_nbodysimulation_free(ptr >>> 0, 1));
 
-if (!('encodeInto' in cachedTextEncoder)) {
-    cachedTextEncoder.encodeInto = function (arg, view) {
-        const buf = cachedTextEncoder.encode(arg);
-        view.set(buf);
-        return {
-            read: arg.length,
-            written: buf.length
-        };
-    };
+export class NBodySimulation {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        NBodySimulationFinalization.unregister(this);
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_nbodysimulation_free(ptr, 0);
+    }
+    /**
+     * @returns {number}
+     */
+    body_count() {
+        const ret = wasm.nbodysimulation_body_count(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
+     * @returns {Float64Array}
+     */
+    get_masses() {
+        const ret = wasm.nbodysimulation_get_masses(this.__wbg_ptr);
+        var v1 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+        return v1;
+    }
+    /**
+     * @param {number} g
+     */
+    set_gravity(g) {
+        wasm.nbodysimulation_set_gravity(this.__wbg_ptr, g);
+    }
+    /**
+     * @returns {Float64Array}
+     */
+    get_positions() {
+        const ret = wasm.nbodysimulation_get_positions(this.__wbg_ptr);
+        var v1 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+        return v1;
+    }
+    /**
+     * @param {string} canvas_id
+     * @param {number} width
+     * @param {number} height
+     */
+    constructor(canvas_id, width, height) {
+        const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.nbodysimulation_new(ptr0, len0, width, height);
+        this.__wbg_ptr = ret >>> 0;
+        NBodySimulationFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    step() {
+        wasm.nbodysimulation_step(this.__wbg_ptr);
+    }
+    clear() {
+        wasm.nbodysimulation_clear(this.__wbg_ptr);
+    }
+    /**
+     * @param {number} dt
+     */
+    set_dt(dt) {
+        wasm.nbodysimulation_set_dt(this.__wbg_ptr, dt);
+    }
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} vx
+     * @param {number} vy
+     * @param {number} mass
+     */
+    add_body(x, y, vx, vy, mass) {
+        wasm.nbodysimulation_add_body(this.__wbg_ptr, x, y, vx, vy, mass);
+    }
 }
 
-let WASM_VECTOR_LEN = 0;
+const TerrainGeneratorFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_terraingenerator_free(ptr >>> 0, 1));
 
-let wasmModule, wasmInstance, wasm;
-function __wbg_finalize_init(instance, module) {
-    wasmInstance = instance;
-    wasm = instance.exports;
-    wasmModule = module;
-    cachedDataViewMemory0 = null;
-    cachedFloat32ArrayMemory0 = null;
-    cachedFloat64ArrayMemory0 = null;
-    cachedUint8ArrayMemory0 = null;
-    cachedUint8ClampedArrayMemory0 = null;
-    wasm.__wbindgen_start();
-    return wasm;
+export class TerrainGenerator {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        TerrainGeneratorFinalization.unregister(this);
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_terraingenerator_free(ptr, 0);
+    }
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {number}
+     */
+    get_height(x, y) {
+        const ret = wasm.terraingenerator_get_height(this.__wbg_ptr, x, y);
+        return ret;
+    }
+    /**
+     * @returns {number}
+     */
+    persistence() {
+        const ret = wasm.terraingenerator_persistence(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @param {number} octaves
+     */
+    set_octaves(octaves) {
+        wasm.terraingenerator_set_octaves(this.__wbg_ptr, octaves);
+    }
+    /**
+     * @param {number} persistence
+     */
+    set_persistence(persistence) {
+        wasm.terraingenerator_set_persistence(this.__wbg_ptr, persistence);
+    }
+    /**
+     * @param {number} seed
+     * @param {number} octaves
+     * @param {number} persistence
+     */
+    constructor(seed, octaves, persistence) {
+        const ret = wasm.terraingenerator_new(seed, octaves, persistence);
+        this.__wbg_ptr = ret >>> 0;
+        TerrainGeneratorFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @returns {number}
+     */
+    seed() {
+        const ret = wasm.terraingenerator_seed(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
+     * @returns {number}
+     */
+    octaves() {
+        const ret = wasm.terraingenerator_octaves(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
+     * @param {number} width
+     * @param {number} height
+     * @param {number} scale
+     * @returns {Float64Array}
+     */
+    generate(width, height, scale) {
+        const ret = wasm.terraingenerator_generate(this.__wbg_ptr, width, height, scale);
+        var v1 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+        return v1;
+    }
+    /**
+     * @param {number} seed
+     */
+    set_seed(seed) {
+        wasm.terraingenerator_set_seed(this.__wbg_ptr, seed);
+    }
+    /**
+     * @param {number} scale
+     */
+    set_scale(scale) {
+        wasm.terraingenerator_set_scale(this.__wbg_ptr, scale);
+    }
 }
 
 async function __wbg_load(module, imports) {
@@ -2534,41 +2319,306 @@ async function __wbg_load(module, imports) {
         if (typeof WebAssembly.instantiateStreaming === 'function') {
             try {
                 return await WebAssembly.instantiateStreaming(module, imports);
-            } catch (e) {
-                const validResponse = module.ok && expectedResponseType(module.type);
 
-                if (validResponse && module.headers.get('Content-Type') !== 'application/wasm') {
+            } catch (e) {
+                if (module.headers.get('Content-Type') != 'application/wasm') {
                     console.warn("`WebAssembly.instantiateStreaming` failed because your server does not serve Wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n", e);
 
-                } else { throw e; }
+                } else {
+                    throw e;
+                }
             }
         }
 
         const bytes = await module.arrayBuffer();
         return await WebAssembly.instantiate(bytes, imports);
+
     } else {
         const instance = await WebAssembly.instantiate(module, imports);
 
         if (instance instanceof WebAssembly.Instance) {
             return { instance, module };
+
         } else {
             return instance;
         }
     }
+}
 
-    function expectedResponseType(type) {
-        switch (type) {
-            case 'basic': case 'cors': case 'default': return true;
+function __wbg_get_imports() {
+    const imports = {};
+    imports.wbg = {};
+    imports.wbg.__wbg_arc_c0ea16371fccfef1 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4, arg5) {
+        arg0.arc(arg1, arg2, arg3, arg4, arg5);
+    }, arguments) };
+    imports.wbg.__wbg_beginPath_0198cb08b8521814 = function(arg0) {
+        arg0.beginPath();
+    };
+    imports.wbg.__wbg_bezierCurveTo_87b5a6bb2649767e = function(arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
+        arg0.bezierCurveTo(arg1, arg2, arg3, arg4, arg5, arg6);
+    };
+    imports.wbg.__wbg_call_672a4d21634d4a24 = function() { return handleError(function (arg0, arg1) {
+        const ret = arg0.call(arg1);
+        return ret;
+    }, arguments) };
+    imports.wbg.__wbg_closePath_936abd634768b284 = function(arg0) {
+        arg0.closePath();
+    };
+    imports.wbg.__wbg_document_d249400bd7bd996d = function(arg0) {
+        const ret = arg0.document;
+        return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+    };
+    imports.wbg.__wbg_ellipse_95f0fe1a522875d7 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+        arg0.ellipse(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    }, arguments) };
+    imports.wbg.__wbg_error_7534b8e9a36f1ab4 = function(arg0, arg1) {
+        let deferred0_0;
+        let deferred0_1;
+        try {
+            deferred0_0 = arg0;
+            deferred0_1 = arg1;
+            console.error(getStringFromWasm0(arg0, arg1));
+        } finally {
+            wasm.__wbindgen_free(deferred0_0, deferred0_1, 1);
         }
-        return false;
-    }
+    };
+    imports.wbg.__wbg_exec_3e2d2d0644c927df = function(arg0, arg1, arg2) {
+        const ret = arg0.exec(getStringFromWasm0(arg1, arg2));
+        return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+    };
+    imports.wbg.__wbg_fillRect_c38d5d56492a2368 = function(arg0, arg1, arg2, arg3, arg4) {
+        arg0.fillRect(arg1, arg2, arg3, arg4);
+    };
+    imports.wbg.__wbg_fillText_2a0055d8531355d1 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
+        arg0.fillText(getStringFromWasm0(arg1, arg2), arg3, arg4);
+    }, arguments) };
+    imports.wbg.__wbg_fill_34096e49d2aaa307 = function(arg0) {
+        arg0.fill();
+    };
+    imports.wbg.__wbg_from_2a5d3e218e67aa85 = function(arg0) {
+        const ret = Array.from(arg0);
+        return ret;
+    };
+    imports.wbg.__wbg_getContext_e9cf379449413580 = function() { return handleError(function (arg0, arg1, arg2) {
+        const ret = arg0.getContext(getStringFromWasm0(arg1, arg2));
+        return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+    }, arguments) };
+    imports.wbg.__wbg_getElementById_f827f0d6648718a8 = function(arg0, arg1, arg2) {
+        const ret = arg0.getElementById(getStringFromWasm0(arg1, arg2));
+        return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+    };
+    imports.wbg.__wbg_get_67b2ba62fc30de12 = function() { return handleError(function (arg0, arg1) {
+        const ret = Reflect.get(arg0, arg1);
+        return ret;
+    }, arguments) };
+    imports.wbg.__wbg_get_b9b93047fe3cf45b = function(arg0, arg1) {
+        const ret = arg0[arg1 >>> 0];
+        return ret;
+    };
+    imports.wbg.__wbg_instanceof_CanvasRenderingContext2d_df82a4d3437bf1cc = function(arg0) {
+        let result;
+        try {
+            result = arg0 instanceof CanvasRenderingContext2D;
+        } catch (_) {
+            result = false;
+        }
+        const ret = result;
+        return ret;
+    };
+    imports.wbg.__wbg_instanceof_HtmlCanvasElement_2ea67072a7624ac5 = function(arg0) {
+        let result;
+        try {
+            result = arg0 instanceof HTMLCanvasElement;
+        } catch (_) {
+            result = false;
+        }
+        const ret = result;
+        return ret;
+    };
+    imports.wbg.__wbg_instanceof_Window_def73ea0955fc569 = function(arg0) {
+        let result;
+        try {
+            result = arg0 instanceof Window;
+        } catch (_) {
+            result = false;
+        }
+        const ret = result;
+        return ret;
+    };
+    imports.wbg.__wbg_length_e2d2a49132c1b256 = function(arg0) {
+        const ret = arg0.length;
+        return ret;
+    };
+    imports.wbg.__wbg_lineTo_2fc468a0e2210784 = function(arg0, arg1, arg2) {
+        arg0.lineTo(arg1, arg2);
+    };
+    imports.wbg.__wbg_moveTo_123c5e7629da2e1e = function(arg0, arg1, arg2) {
+        arg0.moveTo(arg1, arg2);
+    };
+    imports.wbg.__wbg_new_63847613cde5d4bc = function(arg0, arg1, arg2, arg3) {
+        const ret = new RegExp(getStringFromWasm0(arg0, arg1), getStringFromWasm0(arg2, arg3));
+        return ret;
+    };
+    imports.wbg.__wbg_new_78feb108b6472713 = function() {
+        const ret = new Array();
+        return ret;
+    };
+    imports.wbg.__wbg_new_8a6f238a6ece86ea = function() {
+        const ret = new Error();
+        return ret;
+    };
+    imports.wbg.__wbg_newnoargs_105ed471475aaf50 = function(arg0, arg1) {
+        const ret = new Function(getStringFromWasm0(arg0, arg1));
+        return ret;
+    };
+    imports.wbg.__wbg_newwithu8clampedarrayandsh_7ea6ee082a25bc85 = function() { return handleError(function (arg0, arg1, arg2, arg3) {
+        const ret = new ImageData(getClampedArrayU8FromWasm0(arg0, arg1), arg2 >>> 0, arg3 >>> 0);
+        return ret;
+    }, arguments) };
+    imports.wbg.__wbg_now_807e54c39636c349 = function() {
+        const ret = Date.now();
+        return ret;
+    };
+    imports.wbg.__wbg_parse_def2e24ef1252aff = function() { return handleError(function (arg0, arg1) {
+        const ret = JSON.parse(getStringFromWasm0(arg0, arg1));
+        return ret;
+    }, arguments) };
+    imports.wbg.__wbg_push_737cfc8c1432c2c6 = function(arg0, arg1) {
+        const ret = arg0.push(arg1);
+        return ret;
+    };
+    imports.wbg.__wbg_putImageData_4c5aa10f3b3e4924 = function() { return handleError(function (arg0, arg1, arg2, arg3) {
+        arg0.putImageData(arg1, arg2, arg3);
+    }, arguments) };
+    imports.wbg.__wbg_random_3ad904d98382defe = function() {
+        const ret = Math.random();
+        return ret;
+    };
+    imports.wbg.__wbg_setLineDash_325e094206df53e9 = function() { return handleError(function (arg0, arg1) {
+        arg0.setLineDash(arg1);
+    }, arguments) };
+    imports.wbg.__wbg_setfillStyle_4f8f616d87dea4df = function(arg0, arg1) {
+        arg0.fillStyle = arg1;
+    };
+    imports.wbg.__wbg_setfont_42a163ef83420b93 = function(arg0, arg1, arg2) {
+        arg0.font = getStringFromWasm0(arg1, arg2);
+    };
+    imports.wbg.__wbg_setglobalAlpha_4673ca870e9d3439 = function(arg0, arg1) {
+        arg0.globalAlpha = arg1;
+    };
+    imports.wbg.__wbg_setheight_da683a33fa99843c = function(arg0, arg1) {
+        arg0.height = arg1 >>> 0;
+    };
+    imports.wbg.__wbg_setlineWidth_ec730c524f09baa9 = function(arg0, arg1) {
+        arg0.lineWidth = arg1;
+    };
+    imports.wbg.__wbg_setstrokeStyle_88eaacb0e9a0c645 = function(arg0, arg1) {
+        arg0.strokeStyle = arg1;
+    };
+    imports.wbg.__wbg_setwidth_c5fed9f5e7f0b406 = function(arg0, arg1) {
+        arg0.width = arg1 >>> 0;
+    };
+    imports.wbg.__wbg_stack_0ed75d68575b0f3c = function(arg0, arg1) {
+        const ret = arg1.stack;
+        const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+    };
+    imports.wbg.__wbg_static_accessor_GLOBAL_88a902d13a557d07 = function() {
+        const ret = typeof global === 'undefined' ? null : global;
+        return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+    };
+    imports.wbg.__wbg_static_accessor_GLOBAL_THIS_56578be7e9f832b0 = function() {
+        const ret = typeof globalThis === 'undefined' ? null : globalThis;
+        return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+    };
+    imports.wbg.__wbg_static_accessor_SELF_37c5d418e4bf5819 = function() {
+        const ret = typeof self === 'undefined' ? null : self;
+        return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+    };
+    imports.wbg.__wbg_static_accessor_WINDOW_5de37043a91a9c40 = function() {
+        const ret = typeof window === 'undefined' ? null : window;
+        return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+    };
+    imports.wbg.__wbg_strokeRect_bfa0a2d3cd838033 = function(arg0, arg1, arg2, arg3, arg4) {
+        arg0.strokeRect(arg1, arg2, arg3, arg4);
+    };
+    imports.wbg.__wbg_stroke_c8939d3873477ffa = function(arg0) {
+        arg0.stroke();
+    };
+    imports.wbg.__wbindgen_boolean_get = function(arg0) {
+        const v = arg0;
+        const ret = typeof(v) === 'boolean' ? (v ? 1 : 0) : 2;
+        return ret;
+    };
+    imports.wbg.__wbindgen_init_externref_table = function() {
+        const table = wasm.__wbindgen_export_2;
+        const offset = table.grow(4);
+        table.set(0, undefined);
+        table.set(offset + 0, undefined);
+        table.set(offset + 1, null);
+        table.set(offset + 2, true);
+        table.set(offset + 3, false);
+        ;
+    };
+    imports.wbg.__wbindgen_is_undefined = function(arg0) {
+        const ret = arg0 === undefined;
+        return ret;
+    };
+    imports.wbg.__wbindgen_number_get = function(arg0, arg1) {
+        const obj = arg1;
+        const ret = typeof(obj) === 'number' ? obj : undefined;
+        getDataViewMemory0().setFloat64(arg0 + 8 * 1, isLikeNone(ret) ? 0 : ret, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
+    };
+    imports.wbg.__wbindgen_number_new = function(arg0) {
+        const ret = arg0;
+        return ret;
+    };
+    imports.wbg.__wbindgen_string_get = function(arg0, arg1) {
+        const obj = arg1;
+        const ret = typeof(obj) === 'string' ? obj : undefined;
+        var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+    };
+    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
+        const ret = getStringFromWasm0(arg0, arg1);
+        return ret;
+    };
+    imports.wbg.__wbindgen_throw = function(arg0, arg1) {
+        throw new Error(getStringFromWasm0(arg0, arg1));
+    };
+
+    return imports;
+}
+
+function __wbg_init_memory(imports, memory) {
+
+}
+
+function __wbg_finalize_init(instance, module) {
+    wasm = instance.exports;
+    __wbg_init.__wbindgen_wasm_module = module;
+    cachedDataViewMemory0 = null;
+    cachedFloat32ArrayMemory0 = null;
+    cachedFloat64ArrayMemory0 = null;
+    cachedUint32ArrayMemory0 = null;
+    cachedUint8ArrayMemory0 = null;
+    cachedUint8ClampedArrayMemory0 = null;
+
+
+    wasm.__wbindgen_start();
+    return wasm;
 }
 
 function initSync(module) {
     if (wasm !== undefined) return wasm;
 
 
-    if (module !== undefined) {
+    if (typeof module !== 'undefined') {
         if (Object.getPrototypeOf(module) === Object.prototype) {
             ({module} = module)
         } else {
@@ -2577,10 +2627,15 @@ function initSync(module) {
     }
 
     const imports = __wbg_get_imports();
+
+    __wbg_init_memory(imports);
+
     if (!(module instanceof WebAssembly.Module)) {
         module = new WebAssembly.Module(module);
     }
+
     const instance = new WebAssembly.Instance(module, imports);
+
     return __wbg_finalize_init(instance, module);
 }
 
@@ -2588,7 +2643,7 @@ async function __wbg_init(module_or_path) {
     if (wasm !== undefined) return wasm;
 
 
-    if (module_or_path !== undefined) {
+    if (typeof module_or_path !== 'undefined') {
         if (Object.getPrototypeOf(module_or_path) === Object.prototype) {
             ({module_or_path} = module_or_path)
         } else {
@@ -2596,7 +2651,7 @@ async function __wbg_init(module_or_path) {
         }
     }
 
-    if (module_or_path === undefined) {
+    if (typeof module_or_path === 'undefined') {
         module_or_path = new URL('hydrated_widgets_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
@@ -2605,9 +2660,12 @@ async function __wbg_init(module_or_path) {
         module_or_path = fetch(module_or_path);
     }
 
+    __wbg_init_memory(imports);
+
     const { instance, module } = await __wbg_load(await module_or_path, imports);
 
     return __wbg_finalize_init(instance, module);
 }
 
-export { initSync, __wbg_init as default };
+export { initSync };
+export default __wbg_init;

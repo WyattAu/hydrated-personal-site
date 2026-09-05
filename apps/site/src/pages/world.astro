@@ -24,6 +24,7 @@ import KellyCalculator from '../components/solid/econometrics/KellyCalculator';
 import LiquidityMetrics from '../components/solid/econometrics/LiquidityMetrics';
 import RealizedVolDecomposition from '../components/solid/econometrics/RealizedVolDecomposition';
 import RegimeDetector from '../components/solid/econometrics/RegimeDetector';
+import WalkForwardBacktester from '../components/solid/quant/WalkForwardBacktester';
 import RiskRatios from '../components/solid/econometrics/RiskRatios';
 import RollingFactorExposure from '../components/solid/econometrics/RollingFactorExposure';
 import VolumeProfile from '../components/solid/econometrics/VolumeProfile';
@@ -113,6 +114,7 @@ import '../styles/base.css';
         <AssetSelector client:load />
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="p-4 border lg:col-span-2" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><WalkForwardBacktester client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><MonteCarloFan client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><VolatilityForecast client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RiskMetrics client:load /></AppErrorBoundary></div>
