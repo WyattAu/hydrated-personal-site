@@ -190,3 +190,9 @@ temp/
 
 # Fuzz corpus
 packages/widgets/fuzz/corpus/
+
+# Stray artifacts
+metrics.json
+post-crawl-findings.json
+apps/site/pnpm-lock.yaml
+apps/site/pnpm-workspace.yaml
