@@ -113,7 +113,7 @@ export default function BetaMatrix() {
     const rows = grid();
     if (!rows) return;
     const matrix: number[][] = rows.map((r) => r.cells);
-    renderPlychart('beta-matrix', 'update_heatmap', JSON.stringify(matrix), '');
+    renderPlychart('beta-matrix', 'update_heatmap_div', JSON.stringify(matrix), '0', '');
   }
 
   createEffect(() => {

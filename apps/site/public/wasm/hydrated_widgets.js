@@ -800,8 +800,9 @@ function passArray32ToWasm0(arg, malloc) {
     return ptr;
 }
 /**
- * Walk-forward SMA-crossover backtest with slippage + commission.
+ * Walk-forward strategy backtest with slippage + commission.
  * @param {Float64Array} closes
+ * @param {string} strategy
  * @param {Uint32Array} fasts
  * @param {Uint32Array} slows
  * @param {number} is_window
@@ -810,22 +811,24 @@ function passArray32ToWasm0(arg, malloc) {
  * @param {number} commission_bps
  * @returns {string}
  */
-export function quant_backtest(closes, fasts, slows, is_window, oos_window, slippage_bps, commission_bps) {
-    let deferred4_0;
-    let deferred4_1;
+export function quant_backtest(closes, strategy, fasts, slows, is_window, oos_window, slippage_bps, commission_bps) {
+    let deferred5_0;
+    let deferred5_1;
     try {
         const ptr0 = passArrayF64ToWasm0(closes, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passArray32ToWasm0(fasts, wasm.__wbindgen_malloc);
+        const ptr1 = passStringToWasm0(strategy, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passArray32ToWasm0(slows, wasm.__wbindgen_malloc);
+        const ptr2 = passArray32ToWasm0(fasts, wasm.__wbindgen_malloc);
         const len2 = WASM_VECTOR_LEN;
-        const ret = wasm.quant_backtest(ptr0, len0, ptr1, len1, ptr2, len2, is_window, oos_window, slippage_bps, commission_bps);
-        deferred4_0 = ret[0];
-        deferred4_1 = ret[1];
+        const ptr3 = passArray32ToWasm0(slows, wasm.__wbindgen_malloc);
+        const len3 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_backtest(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, is_window, oos_window, slippage_bps, commission_bps);
+        deferred5_0 = ret[0];
+        deferred5_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
     } finally {
-        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
+        wasm.__wbindgen_free(deferred5_0, deferred5_1, 1);
     }
 }
 

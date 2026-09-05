@@ -101,10 +101,11 @@ export default function GlobalStressGauge() {
     if (!d) return;
     renderPlychart(
       'stress-gauge',
-      'update_gauge',
+      'update_gauge_zoned',
       String(d.total),
       '100',
       stressColor(d.total),
+      JSON.stringify([30, 60, 80]),
       '',
     );
   }

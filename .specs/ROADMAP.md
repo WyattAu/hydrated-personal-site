@@ -1,137 +1,91 @@
 # Hydrated Personal Site — Roadmap & Quality Audit
 
+Last updated: 2026-09-05. Supersedes the pre-plychart roadmap entirely.
+
 ## Executive Summary
 
-This document provides a formal roadmap for the hydrated personal site (wyattau.com) and a comprehensive code audit against FAANG, HFT, ECN, and defense sector engineering standards.
+Personal quant dashboard at wyattau.com (Astro 5 + SolidJS + Rust/WASM), with
+QuestHive as a sibling consumer of the same charting stack.
 
-**Current State:**
-- 29 WASM quant functions across 24 Rust modules
-- 68+ SolidJS components across 5 pages
-- 18 real-algorithm showcase widgets
-- SEO audit page, multi-platform deployment (Cloudflare + GitHub + Netlify)
-- 60 passing Rust tests, 11 TypeScript test files
+**Current architecture:**
+- **plychart** (github.com/WyattAu/plychart) — Canvas2D charting in Rust/WASM.
+  17 chart types, 26 WASM exports, 269 tests. wasm-bindgen unpinned (0.2.127
+  works post `mod wasm` fix). Export-count guard in build script. npm packaging
+  templates staged (`@wyattau/plychart`), not published.
+- **plycompute** — canonical quant computation crate (29 modules) living in the
+  plychart repo. Export bodies in macro-free `json.rs`; downstream cdylibs
+  (hydrated-widgets) wrap them without wasm-bindgen symbol collisions.
+- **hydrated_personal_site** — 47/54 components render via plychart WASM
+  (auto-resize + hover tooltips via `plychart-render.ts`). 5 charts custom
+  Canvas by design: CorrelationNetwork (physics), OptionsPayoff (P&L shading),
+  EtfConcentrationGauge (bespoke gauge), SolarWindPanel (multi-panel),
+  FourierDemo (rAF-driven).
+- **Cache busting is automated**: `scripts/sync-plychart.sh` hashes the binary
+  into `plychart-version.ts`; widgets use `WASM_VERSION` (v1.1.0).
 
-**Audit Result:** 0 CRITICAL, 5 HIGH, 16 MEDIUM, 10 LOW issues identified.
+**Recent milestones:**
+- Walk-forward backtester live on /world (SMA-cross, momentum, mean-reversion;
+  slippage + commission; SPY benchmark; per-window params table; no look-ahead)
+- Fixed the widgets WASM build (broken since the plycompute dependency landed)
+- Root-caused chart "overlap on date change": accumulating `ctx.scale` DPR
+  transform — now `set_transform` + retina backing store
+- CARTO basemap API key (raster tiles now require keys)
 
 ---
 
 ## Roadmap
 
-### Phase 1: Foundation Hardening (Week 1-2)
+### Immediate (this cycle)
 
 | Priority | Task | Impact | Status |
 |----------|------|--------|--------|
-| **HIGH** | Fix `static mut` in pendulum.rs → `thread_local!` | Rust safety violation | Pending |
-| **HIGH** | Add error logging to 57 silent `catch {}` blocks | Observability for debugging | Pending |
-| **HIGH** | Add structured audit logging (FINRA/defense requirement) | Regulatory compliance | Pending |
-| **HIGH** | Publish GitHub repo publicly | DA/DR boost from github.io backlinks | Pending |
-| **HIGH** | Fix CORS: restrict to `wyattau.com` and `*.github.io` | Security hardening | Pending |
-| **MEDIUM** | Add `lang="en"` to HTML (crawlkit false positive check) | SEO accessibility | Verified present |
-| **MEDIUM** | Add input validation for lat/lon/symbol parameters | Injection prevention | Pending |
-| **MEDIUM** | Fix Boids/K-Means disappearing (check console for WASM errors) | UX reliability | Pending |
-| **MEDIUM** | Add ResizeObserver to all canvas WASM widgets | Window resize handling | Pending |
-| **LOW** | Remove `unsafe-inline` from CSP (if possible) | CSP strength | Deferred |
+| **HIGH** | User click-through of all migrated charts; fix what looks wrong | UX regression sweep | Pending (user) |
+| **HIGH** | Refresh plychart `examples/demo` to 17 types + tooltip exports | Demo parity | Pending |
+| **MEDIUM** | Repair broken global `npm` — DIAGNOSED: `/usr/lib/node_modules/npm` incomplete (missing `nopt` et al, partial system upgrade); fix needs sudo or install npm per-project via `bun add npm` (verified working, v12.0.2). Builds run via bun regardless | Dev env | Diagnosed |
+| **LOW** | `npm publish @wyattau/plychart` (needs npm token; packaging ready) | Ecosystem | Blocked (token) |
 
-### Phase 2: Core Feature Expansion (Week 3-4)
+### Next features (ranked)
 
-| Priority | Task | Impact | Data Required |
-|----------|------|--------|---------------|
-| **HIGH** | Walk-forward backtester with slippage/commission | Transforms dashboard → research platform | Yahoo OHLCV |
-| **HIGH** | Blog section with technical articles | DA/DR boost (content marketing) | None |
-| **HIGH** | Fix canvas resize for all 18 showcase widgets | UX polish | None |
-| **HIGH** | Publish GitHub repo publicly | DA/DR from github.io backlinks | None |
-| **MEDIUM** | SVI volatility surface fitting from Deribit data | Professional quant credibility | Deribit API (existing) |
-| **MEDIUM** | Black-Litterman interactive views UI | Portfolio optimization UX | None |
-| **MEDIUM** | Walk-forward optimization for strategy parameters | Backtesting completeness | Yahoo OHLCV |
-| **MEDIUM** | Fama-French factor returns data source | Factor regression accuracy | Ken French website (free) |
-| **LOW** | CrUX/Core Web Vitals integration | Real user performance data | Chrome UX Report API |
+| Priority | Task | Impact | Effort |
+|----------|------|--------|--------|
+| **HIGH** | Backtester v3: position sizing, multi-asset portfolios, CSV export | Research platform | 2–3 d |
+| **HIGH** | Blog/build-log (3–5 posts: plychart story, SIMD kernels, walk-forward engine). NOTE: wyattsnotes already covers domain authority — blog is for *developer audience*, not DA | Credibility | 1–2 d |
+| **MEDIUM** | WebSocket live prices (Cloudflare Durable Objects) | Live terminal | 4–5 d |
+| **MEDIUM** | SVI volatility surface from Deribit (plycompute + `update_heatmap_div`) | Vol credibility | 2 d |
+| **MEDIUM** | L2 order book depth (depends on WebSocket) | HFT microstructure | 2 d |
+| **LOW** | Google Search Console + scheduled crawlkit re-crawl (Cron Trigger) | SEO plumbing | 2 h |
 
-### Phase 3: Advanced Features (Week 5-8)
+### Deferred / decided-against
 
-| Priority | Task | Impact | Complexity |
-|----------|------|--------|-----------|
-| **HIGH** | Real-time WebSocket streaming for live prices | True live data | High — Cloudflare Durable Objects needed |
-| **HIGH** | Walk-forward strategy backtester | Strategy validation | High — event-driven architecture |
-| **HIGH** | L2 Order Book depth visualization | True HFT microstructure | High — WebSocket from crypto exchanges |
-| **MEDIUM** | News sentiment analysis (NLP) | Market intelligence | Medium — WASM-compiled transformer |
-| **MEDIUM** | Kalman filter beta tracker | Adaptive hedging | Medium — state-space model |
-| **MEDIUM** | SVI/SABR volatility surface | Professional vol surface | Medium — numerical optimization |
-| **MEDIUM** | Executive search/replace (crawlkit) | SEO automation | Low — existing crawlkit |
-| **LOW** | Multi-currency normalization | Cross-asset comparison | Low — FX rate API exists |
-| **LOW** | Credit spread analysis | Fixed income intelligence | Low — Treasury data exists |
-
-### Phase 4: Enterprise Features (Month 3+)
-
-| Priority | Task | Impact | Complexity |
-|----------|------|--------|-----------|
-| **MEDIUM** | Structured audit logging (FINRA 17a-4) | Regulatory compliance | Medium |
-| **MEDIUM** | Real-time alerts (threshold monitoring) | Trading signals | Medium — Cloudflare Workers |
-| **MEDIUM** | Historical scenario replay (2008, 2020, 2022) | Stress testing | Low — data exists |
-| **LOW** | OMS integration (IBKR/Alpaca API) | Order execution | High — broker API complexity |
-| **LOW** | Multi-tenant access control | Enterprise feature | Medium |
+- Blog as generic DA play — wyattsnotes sits on the same apex domain and
+  already contributes domain-level authority; a duplicate surface adds little
+- Git-dependency wiring for plychart consumers — path deps + CI clone step
+  work; revisit if a third consumer appears
+- `npm` dependency for plychart until Fork decided (see above)
 
 ---
 
-## Code Quality Audit Summary
+## Known technical debt
 
-### FAANG/HFT/Defense Standards Compliance
+| # | Debt | Impact | Priority |
+|---|------|--------|----------|
+| 1 | plychart `examples/demo` shows 13/17 chart types | Demo staleness | LOW |
+| 2 | plychart README docs lag (16 types listed vs 17; no tooltip docs) | DX | LOW |
+| 3 | `ChartTheme` parse in `wasm.rs` matches presets by string, not arbitrary colors | Theme flexibility | LOW |
+| 4 | Forgejo runner on same host as dev box — starves under parallel builds | CI reliability | MEDIUM |
+| 5 | `index_to_x` in multiline assumes uniform spacing (index-based, not time-based) | Chart accuracy | LOW |
+| 6 | Remaining ~22 `any` types in WASM module references across components | Type safety | LOW |
 
-| Category | Score | Status |
-|----------|-------|--------|
-| **Algorithm Correctness** | 9/10 | All core quant algorithms verified correct |
-| **Rust Safety** | 8/10 | One `static mut` issue in pendulum.rs |
-| **Test Coverage (Quant)** | 9/10 | 21/21 modules have unit tests |
-| **Test Coverage (Non-Quant)** | 3/10 | 0 tests for showcase/science/finance widgets |
-| **Error Handling** | 6/10 | 57 silent catch blocks need logging |
-| **Security Headers** | 9/10 | CSP, HSTS, X-Frame-Options all present |
-| **API Design** | 8/10 | RESTful, rate-limited, CORS configured |
-| **Input Validation** | 7/10 | Guestbook good, but lat/lon/symbol lack validation |
-| **Memory Management** | 9/10 | All intervals, observers, listeners properly cleaned up |
-| **Documentation** | 7/10 | Quant modules well-documented; showcase modules undocumented |
+## WASM versions
 
-### Items Fixed This Session
+- `plychart_bg.wasm` — auto-hashed (`?v=p<sha8>` via `plychart-version.ts`)
+- `hydrated_widgets_bg.wasm` — `WASM_VERSION = 'v1.1.0'` (bump on rebuild)
+- `seo_wasm_bg.wasm` — unversioned (low churn)
 
-| # | Issue | Fix |
-|---|-------|-----|
-| 1 | OG image rendering as `[object Object]` | Changed astro-seo to use string format |
-| 2 | Missing og:image dimensions | Added meta tags |
-| 3 | Short meta descriptions | Expanded all to 120-188 chars |
-| 4 | Missing alt text on hero images | Added descriptive alt text |
-| 5 | World page missing AssetSelector | Rebuilt entire page with all components |
-| 6 | Quant widgets not using activeAsset | Fixed all 16 single-asset components |
-| 7 | MonteCarlo/GARCH/VaR using wrong API | Changed from binance-klines to stock-chart |
-| 8 | GreeksDashboard hardcoded to BTC | Now fetches actual spot price for any asset |
-| 9 | Guestbook lazy loading | Added pagination, sorted by date, 5s cache |
-| 10 | Protein folding widget added | HP model with Monte Carlo simulated annealing |
-| 11 | Cross-asset ticker events | Added asset-changed CustomEvent dispatch |
-| 12 | Duplicate const declarations in WASM calls | Renamed variables to avoid conflicts |
-| 13 | Missing forecastHorizon signal in GARCH | Added createSignal for the control |
-
----
-
-## Technical Debt Registry
-
-| # | Debt | Impact | Priority | Effort |
-|---|------|--------|----------|--------|
-| 1 | `static mut` in pendulum.rs | Rust safety | HIGH | 30 min |
-| 2 | 57 silent catch blocks | Debugging | HIGH | 2 hours |
-| 3 | Gauss-Jordan matrix inverse duplicated 3x | Maintenance | LOW | 30 min |
-| 4 | 35+ showcase widgets with 0 test coverage | Reliability | MEDIUM | 1 week |
-| 5 | `any` types in WASM module references | Type safety | MEDIUM | 2 hours |
-| 6 | CORS `*` — overly permissive | Security | MEDIUM | 15 min |
-| 7 | Missing lat/lon validation | Injection risk | MEDIUM | 30 min |
-| 8 | In-memory cache not shared across workers | Performance | LOW | N/A (serverless) |
-
----
-
-## Deployment Pipeline
+## Deployment
 
 | Platform | Status | Purpose |
 |----------|--------|---------|
-| **Cloudflare Pages** | ✅ Live | Production at wyattau.com |
-| **GitHub Pages** | ⏳ Pending (enable in settings) | Backup + DA/DR |
-| **Netlify** | ⏳ Pending (auth token needed) | Backup + DA |
-| **Forgejo CI** | ✅ Active | Primary dev pipeline |
-| **GitHub Actions** | ✅ Active | GitHub Pages + Netlify deploy |
-
-### WASM Version: v=j44 (29 exported functions, 60 tests passing)
+| Cloudflare Pages (`ssr-temp`) | Live | Production at wyattau.com |
+| Forgejo CI | Active | Primary dev pipeline |
+| GitHub Actions | Active | Mirror + plychart CI |

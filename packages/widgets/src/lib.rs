@@ -289,10 +289,11 @@ pub fn quant_black_litterman(
     plycompute::json::quant_black_litterman(returns, n_assets, n_periods, views, picking, n_views, risk_free, tau)
 }
 
-/// Walk-forward SMA-crossover backtest with slippage + commission.
+/// Walk-forward strategy backtest with slippage + commission.
 #[wasm_bindgen]
 pub fn quant_backtest(
     closes: &[f64],
+    strategy: &str,
     fasts: &[usize],
     slows: &[usize],
     is_window: usize,
@@ -300,5 +301,5 @@ pub fn quant_backtest(
     slippage_bps: f64,
     commission_bps: f64,
 ) -> String {
-    plycompute::json::quant_backtest(closes, fasts, slows, is_window, oos_window, slippage_bps, commission_bps)
+    plycompute::json::quant_backtest(closes, strategy, fasts, slows, is_window, oos_window, slippage_bps, commission_bps)
 }

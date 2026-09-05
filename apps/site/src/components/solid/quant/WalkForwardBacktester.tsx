@@ -16,6 +16,7 @@ interface WindowParam {
 }
 
 interface BacktestResult {
+  strategy: string;
   equity: number[];
   buyhold: number[];
   drawdown: number[];
@@ -31,8 +32,25 @@ interface BacktestResult {
   error?: string;
 }
 
-const FASTS = [5, 10, 20];
-const SLOWS = [20, 50, 100, 150, 200];
+type Strategy = 'sma_cross' | 'momentum' | 'mean_reversion';
+
+const STRATEGIES: { id: Strategy; label: string }[] = [
+  { id: 'sma_cross', label: 'SMA CROSS' },
+  { id: 'momentum', label: 'MOMENTUM' },
+  { id: 'mean_reversion', label: 'MEAN REV' },
+];
+
+const FASTS_BY: Record<Strategy, number[]> = {
+  sma_cross: [5, 10, 20],
+  momentum: [10, 20, 30, 60],
+  mean_reversion: [10, 20, 30],
+};
+
+const SLOWS_BY: Record<Strategy, number[]> = {
+  sma_cross: [20, 50, 100, 150, 200],
+  momentum: [],
+  mean_reversion: [],
+};
 
 function pct(v: number): string {
   return `${(v * 100).toFixed(1)}%`;
@@ -40,8 +58,10 @@ function pct(v: number): string {
 
 export default function WalkForwardBacktester() {
   const [result, setResult] = createSignal<BacktestResult | null>(null);
+  const [spyCloses, setSpyCloses] = createSignal<number[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
+  const [strategy, setStrategy] = createSignal<Strategy>('sma_cross');
 
   const [isWindow, setIsWindow] = createSignal(120);
   const [oosWindow, setOosWindow] = createSignal(40);
@@ -53,9 +73,12 @@ export default function WalkForwardBacktester() {
     setErr(null);
     try {
       const symbol = activeAsset();
-      const res = await fetch(
-        `${apiBase()}/api/stock-chart?symbol=${encodeURIComponent(symbol)}&range=2y&interval=1d`,
-      );
+      const [res, spyRes] = await Promise.all([
+        fetch(
+          `${apiBase()}/api/stock-chart?symbol=${encodeURIComponent(symbol)}&range=2y&interval=1d`,
+        ),
+        fetch(`${apiBase()}/api/stock-chart?symbol=%5EGSPC&range=2y&interval=1d`),
+      ]);
       if (!res.ok) throw new Error(`API ${res.status}`);
       const json = await res.json();
       const quote = json?.chart?.result?.[0]?.indicators?.quote?.[0];
@@ -66,12 +89,22 @@ export default function WalkForwardBacktester() {
         throw new Error(`need ${isWindow() + oosWindow() + 2}+ closes, got ${closes.length}`);
       }
 
+      // SPY benchmark (normalized in renderChart).
+      let spy: number[] = [];
+      if (spyRes.ok) {
+        const spyJson = await spyRes.json();
+        const spyQuote = spyJson?.chart?.result?.[0]?.indicators?.quote?.[0];
+        spy = (spyQuote?.close ?? []).filter((c: number | null): c is number => c != null);
+      }
+      setSpyCloses(spy);
+
       const wasm = await getWasmMod();
       const out: BacktestResult = JSON.parse(
         wasm.quant_backtest(
           new Float64Array(closes),
-          new Uint32Array(FASTS),
-          new Uint32Array(SLOWS),
+          strategy(),
+          new Uint32Array(FASTS_BY[strategy()]),
+          new Uint32Array(SLOWS_BY[strategy()]),
           isWindow(),
           oosWindow(),
           slippageBps(),
@@ -92,21 +125,32 @@ export default function WalkForwardBacktester() {
   function renderChart() {
     const r = result();
     if (!r) return;
-    const toSeries = (vals: number[], time0: number) =>
-      vals.map((v, i) => ({ time: i, open: 0, high: 0, low: 0, close: v, volume: 0 }));
-    renderPlychart(
-      'wf-backtest',
-      'update_line',
-      JSON.stringify([
-        { color: '#00e5ff', data: toSeries(r.equity, 0) },
-        { color: '#666666', data: toSeries(r.buyhold, 0) },
-      ]),
-      '',
-    );
+    const toSeries = (vals: number[], norm: boolean) => {
+      const v0 = norm ? vals[0] || 1 : 1;
+      return vals.map((v, i) => ({
+        time: i,
+        open: 0,
+        high: 0,
+        low: 0,
+        close: norm ? v / v0 : v,
+        volume: 0,
+      }));
+    };
+    const series = [
+      { color: '#00e5ff', data: toSeries(r.equity, false) },
+      { color: '#666666', data: toSeries(r.buyhold, false) },
+    ];
+    const spy = spyCloses();
+    if (spy.length > 1) {
+      series.push({ color: '#eab308', data: toSeries(spy, true) });
+    }
+    renderPlychart('wf-backtest', 'update_line', JSON.stringify(series), '');
   }
 
   createEffect(() => {
     result();
+    strategy();
+    spyCloses();
     renderChart();
   });
 
@@ -116,6 +160,12 @@ export default function WalkForwardBacktester() {
   onAssetChanged(() => loadData());
 
   const r = () => result();
+  const curFasts = () => FASTS_BY[strategy()];
+  const curSlows = () => SLOWS_BY[strategy()];
+  const gridLabel = () =>
+    strategy() === 'sma_cross'
+      ? `SMA ${curFasts()[0]}-${curSlows()[curSlows().length - 1]} grid`
+      : `lookback ${curFasts()[0]}-${curFasts()[curFasts().length - 1]}d`;
 
   return (
     <div>
@@ -125,9 +175,35 @@ export default function WalkForwardBacktester() {
         </p>
         <Show when={!loading() && r()}>
           <span class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-            {r()!.windows.length} windows | SMA {FASTS[0]}-{SLOWS[SLOWS.length - 1]} grid
+            {r()!.windows.length} windows | {gridLabel()}
           </span>
         </Show>
+      </div>
+
+      <div class="flex gap-2 mb-3 flex-wrap">
+        {STRATEGIES.map((s) => (
+          <button
+            type="button"
+            class="font-mono text-[10px] px-3 py-1.5 border cursor-pointer"
+            style={{
+              'border-color': strategy() === s.id ? 'var(--accent)' : 'var(--border)',
+              color: strategy() === s.id ? 'var(--bg-primary)' : 'var(--accent)',
+              background: strategy() === s.id ? 'var(--accent)' : 'var(--bg-secondary)',
+            }}
+            onClick={() => {
+              setStrategy(s.id);
+              loadData();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setStrategy(s.id);
+                loadData();
+              }
+            }}
+          >
+            {s.label}
+          </button>
+        ))}
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
@@ -307,11 +383,62 @@ export default function WalkForwardBacktester() {
             </p>
           </div>
         </div>
+        <Show when={r() && r()!.windows.length > 0}>
+          <div class="mt-3 overflow-x-auto">
+            <table
+              class="w-full border-collapse font-mono text-[9px]"
+              style={{ 'min-width': '360px' }}
+            >
+              <thead>
+                <tr style={{ color: 'var(--accent)' }}>
+                  <th class="text-left p-1 border-b" style={{ 'border-color': 'var(--border)' }}>
+                    WINDOW
+                  </th>
+                  <th class="text-left p-1 border-b" style={{ 'border-color': 'var(--border)' }}>
+                    PARAMS
+                  </th>
+                  <th class="text-right p-1 border-b" style={{ 'border-color': 'var(--border)' }}>
+                    IS SHARPE
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {r()!
+                  .windows.slice(-12)
+                  .map((w) => (
+                    <tr style={{ color: 'var(--text-secondary)' }}>
+                      <td class="p-1">
+                        {w.start}-{w.end}
+                      </td>
+                      <td class="p-1">
+                        {strategy() === 'sma_cross' ? `${w.fast}/${w.slow}` : `${w.fast}d`}
+                      </td>
+                      <td
+                        class="p-1 text-right"
+                        style={{ color: w.is_sharpe > 0 ? '#4caf50' : '#ff5252' }}
+                      >
+                        {w.is_sharpe.toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            <Show when={r()!.windows.length > 12}>
+              <p class="font-mono text-[9px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+                +{r()!.windows.length - 12} earlier windows
+              </p>
+            </Show>
+          </div>
+        </Show>
         <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
           <span style={{ color: '#00e5ff' }}>-</span> strategy (net of{' '}
           {slippageBps() + commissionBps()}bps/flip) vs <span style={{ color: '#666' }}>-</span>{' '}
-          buy-and-hold | params fit on trailing {isWindow()}d, traded {oosWindow()}d ahead | no
-          look-ahead
+          buy-and-hold
+          <Show when={spyCloses().length > 1}>
+            {' '}
+            vs <span style={{ color: '#eab308' }}>-</span> SPY
+          </Show>{' '}
+          | params fit on trailing {isWindow()}d, traded {oosWindow()}d ahead | no look-ahead
         </p>
       </Show>
     </div>

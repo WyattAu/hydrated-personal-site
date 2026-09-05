@@ -224,6 +224,30 @@ export function update_gauge(canvas_id, value, max, color, theme_json) {
 }
 
 /**
+ * Update chart with a gauge plus threshold zone ticks (zones in [0, max]).
+ * @param {string} canvas_id
+ * @param {number} value
+ * @param {number} max
+ * @param {string} color
+ * @param {string} zones_json
+ * @param {string} theme_json
+ */
+export function update_gauge_zoned(canvas_id, value, max, color, zones_json, theme_json) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(color, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(zones_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len2 = WASM_VECTOR_LEN;
+    const ptr3 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len3 = WASM_VECTOR_LEN;
+    const ret = wasm.update_gauge_zoned(ptr0, len0, value, max, ptr1, len1, ptr2, len2, ptr3, len3);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
  * Update chart with heatmap matrix data.
  * @param {string} canvas_id
  * @param {string} data_json
@@ -237,6 +261,26 @@ export function update_heatmap(canvas_id, data_json, theme_json) {
     const ptr2 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len2 = WASM_VECTOR_LEN;
     const ret = wasm.update_heatmap(ptr0, len0, ptr1, len1, ptr2, len2);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Update chart with a diverging heatmap (red below `center`, accent above).
+ * @param {string} canvas_id
+ * @param {string} data_json
+ * @param {number} center
+ * @param {string} theme_json
+ */
+export function update_heatmap_div(canvas_id, data_json, center, theme_json) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len2 = WASM_VECTOR_LEN;
+    const ret = wasm.update_heatmap_div(ptr0, len0, ptr1, len1, center, ptr2, len2);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -258,6 +302,26 @@ export function update_histogram(canvas_id, data_json, bin_count, theme_json) {
     const ptr2 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len2 = WASM_VECTOR_LEN;
     const ret = wasm.update_histogram(ptr0, len0, ptr1, len1, bin_count, ptr2, len2);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Update chart with a log-scale histogram (rare tail bins stay visible).
+ * @param {string} canvas_id
+ * @param {string} data_json
+ * @param {number} bin_count
+ * @param {string} theme_json
+ */
+export function update_histogram_log(canvas_id, data_json, bin_count, theme_json) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(theme_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len2 = WASM_VECTOR_LEN;
+    const ret = wasm.update_histogram_log(ptr0, len0, ptr1, len1, bin_count, ptr2, len2);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }

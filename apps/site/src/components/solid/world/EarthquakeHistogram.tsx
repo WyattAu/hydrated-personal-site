@@ -51,13 +51,12 @@ export default function EarthquakeHistogram() {
     const dataMags = mags();
     const c = counts();
     if (!c) return;
-    // plychart histogram handles linear Y only (original was log scale Gutenberg-Richter).
-    // Use raw magnitudes with 7 bins for linear histogram.
+    // Log-scale histogram (Gutenberg-Richter): rare tail bins stay visible.
     // Fallback to counts if mags empty (e.g. API gave no mags)
     const dataJson = dataMags.length > 0 ? JSON.stringify(dataMags) : JSON.stringify(c);
     const binCount = 7;
-    // update_histogram(canvas_id, data_json, bin_count, theme_json)
-    renderPlychart('quake-hist', 'update_histogram', dataJson, String(binCount), '');
+    // update_histogram_log(canvas_id, data_json, bin_count, theme_json)
+    renderPlychart('quake-hist', 'update_histogram_log', dataJson, String(binCount), '');
   }
 
   createEffect(() => {

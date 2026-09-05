@@ -132,9 +132,9 @@ export function quant_full_overlap(tickers_a: string, weights_a: Float64Array, t
  */
 export function quant_rolling_factor(y: Float64Array, x: Float64Array, n_factors: number, window: number, step: number): string;
 /**
- * Walk-forward SMA-crossover backtest with slippage + commission.
+ * Walk-forward strategy backtest with slippage + commission.
  */
-export function quant_backtest(closes: Float64Array, fasts: Uint32Array, slows: Uint32Array, is_window: number, oos_window: number, slippage_bps: number, commission_bps: number): string;
+export function quant_backtest(closes: Float64Array, strategy: string, fasts: Uint32Array, slows: Uint32Array, is_window: number, oos_window: number, slippage_bps: number, commission_bps: number): string;
 /**
  * Factor exposure regression (OLS).
  * Returns JSON: { alpha, betas, r_squared, adj_r_squared, f_statistic, t_stats }
@@ -357,7 +357,7 @@ export interface InitOutput {
   readonly nbodysimulation_set_dt: (a: number, b: number) => void;
   readonly nbodysimulation_set_gravity: (a: number, b: number) => void;
   readonly nbodysimulation_step: (a: number) => void;
-  readonly quant_backtest: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => [number, number];
+  readonly quant_backtest: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => [number, number];
   readonly quant_black_litterman: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => [number, number];
   readonly quant_cointegration: (a: number, b: number, c: number, d: number) => [number, number];
   readonly quant_component_var: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
