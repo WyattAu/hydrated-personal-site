@@ -303,3 +303,22 @@ pub fn quant_backtest(
 ) -> String {
     plycompute::json::quant_backtest(closes, strategy, fasts, slows, is_window, oos_window, slippage_bps, commission_bps)
 }
+
+/// Fit SVI volatility surface from option quotes.
+#[wasm_bindgen]
+pub fn quant_svi_surface(slices_json: &str, k_points: usize) -> String {
+    plycompute::json::quant_svi_surface(slices_json, k_points)
+}
+
+/// Multi-asset portfolio backtest with periodic rebalancing.
+#[wasm_bindgen]
+pub fn quant_portfolio_backtest(
+    closes: &[f64],
+    n_assets: usize,
+    n_periods: usize,
+    mode: &str,
+    rebalance_every: usize,
+    cost_bps: f64,
+) -> String {
+    plycompute::json::quant_portfolio_backtest(closes, n_assets, n_periods, mode, rebalance_every, cost_bps)
+}

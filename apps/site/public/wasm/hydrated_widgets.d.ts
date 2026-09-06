@@ -97,6 +97,10 @@ export function quant_efficient_frontier(returns: Float64Array, n_assets: number
  */
 export function quant_black_litterman(returns: Float64Array, n_assets: number, n_periods: number, views: Float64Array, picking: Float64Array, n_views: number, risk_free: number, tau: number): string;
 /**
+ * Multi-asset portfolio backtest with periodic rebalancing.
+ */
+export function quant_portfolio_backtest(closes: Float64Array, n_assets: number, n_periods: number, mode: string, rebalance_every: number, cost_bps: number): string;
+/**
  * Hierarchical Risk Parity allocation.
  */
 export function quant_hrp(returns: Float64Array, n_assets: number, n_periods: number): string;
@@ -123,6 +127,10 @@ export function quant_implied_vol(market_price: number, spot: number, strike: nu
  * Returns JSON: { states_tail, transition, means, variances, probs_tail, current_regime, regime_label }
  */
 export function quant_regime(returns: Float64Array): string;
+/**
+ * Fit SVI volatility surface from option quotes.
+ */
+export function quant_svi_surface(slices_json: string, k_points: number): string;
 /**
  * Full weighted ETF holdings overlap analysis.
  */
@@ -377,12 +385,14 @@ export interface InitOutput {
   readonly quant_liquidity: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
   readonly quant_montecarlo: (a: number, b: number, c: number, d: number, e: number) => [number, number];
   readonly quant_pairs_signal: (a: number, b: number, c: number, d: number) => [number, number];
+  readonly quant_portfolio_backtest: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
   readonly quant_realized_vol: (a: number, b: number) => [number, number];
   readonly quant_regime: (a: number, b: number) => [number, number];
   readonly quant_risk_ratios: (a: number, b: number, c: number, d: number) => [number, number];
   readonly quant_rolling_factor: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
   readonly quant_seed: (a: number, b: number) => void;
   readonly quant_stress_test: (a: number, b: number, c: number, d: number) => [number, number];
+  readonly quant_svi_surface: (a: number, b: number, c: number) => [number, number];
   readonly quant_tail_dependence: (a: number, b: number, c: number, d: number) => [number, number];
   readonly quant_tail_matrix: (a: number, b: number, c: number, d: number) => [number, number];
   readonly quant_var: (a: number, b: number, c: number) => [number, number];

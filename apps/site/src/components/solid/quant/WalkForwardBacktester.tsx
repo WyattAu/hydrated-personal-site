@@ -159,6 +159,24 @@ export default function WalkForwardBacktester() {
   onMount(() => loadData());
   onAssetChanged(() => loadData());
 
+  function exportCsv() {
+    const res = r();
+    if (!res) return;
+    const rows = ['day,strategy_equity,buyhold_equity,drawdown'];
+    res.equity.forEach((e, i) => {
+      rows.push(
+        `${i},${e.toFixed(6)},${(res.buyhold[i] ?? 0).toFixed(6)},${(res.drawdown[i] ?? 0).toFixed(6)}`,
+      );
+    });
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `walkforward-${strategy()}-${activeAsset().replace(/[^A-Za-z0-9]/g, '')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const r = () => result();
   const curFasts = () => FASTS_BY[strategy()];
   const curSlows = () => SLOWS_BY[strategy()];
@@ -257,21 +275,40 @@ export default function WalkForwardBacktester() {
         </label>
       </div>
 
-      <button
-        type="button"
-        class="font-mono text-[10px] px-3 py-1.5 border mb-3 cursor-pointer"
-        style={{
-          'border-color': 'var(--border)',
-          color: 'var(--accent)',
-          background: 'var(--bg-secondary)',
-        }}
-        onClick={() => loadData()}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') loadData();
-        }}
-      >
-        RUN BACKTEST
-      </button>
+      <div class="flex gap-2 mb-3">
+        <button
+          type="button"
+          class="font-mono text-[10px] px-3 py-1.5 border cursor-pointer"
+          style={{
+            'border-color': 'var(--border)',
+            color: 'var(--accent)',
+            background: 'var(--bg-secondary)',
+          }}
+          onClick={() => loadData()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') loadData();
+          }}
+        >
+          RUN BACKTEST
+        </button>
+        <Show when={r()}>
+          <button
+            type="button"
+            class="font-mono text-[10px] px-3 py-1.5 border cursor-pointer"
+            style={{
+              'border-color': 'var(--border)',
+              color: 'var(--text-secondary)',
+              background: 'var(--bg-secondary)',
+            }}
+            onClick={exportCsv}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') exportCsv();
+            }}
+          >
+            CSV
+          </button>
+        </Show>
+      </div>
 
       <Show when={loading()}>
         <p class="font-mono text-xs p-4" style={{ color: 'var(--text-secondary)' }}>

@@ -615,6 +615,33 @@ export function quant_black_litterman(returns, n_assets, n_periods, views, picki
 }
 
 /**
+ * Multi-asset portfolio backtest with periodic rebalancing.
+ * @param {Float64Array} closes
+ * @param {number} n_assets
+ * @param {number} n_periods
+ * @param {string} mode
+ * @param {number} rebalance_every
+ * @param {number} cost_bps
+ * @returns {string}
+ */
+export function quant_portfolio_backtest(closes, n_assets, n_periods, mode, rebalance_every, cost_bps) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passArrayF64ToWasm0(closes, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(mode, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_portfolio_backtest(ptr0, len0, n_assets, n_periods, ptr1, len1, rebalance_every, cost_bps);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
  * Hierarchical Risk Parity allocation.
  * @param {Float64Array} returns
  * @param {number} n_assets
@@ -721,6 +748,27 @@ export function quant_regime(returns) {
         const ptr0 = passArrayF64ToWasm0(returns, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.quant_regime(ptr0, len0);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Fit SVI volatility surface from option quotes.
+ * @param {string} slices_json
+ * @param {number} k_points
+ * @returns {string}
+ */
+export function quant_svi_surface(slices_json, k_points) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passStringToWasm0(slices_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.quant_svi_surface(ptr0, len0, k_points);
         deferred2_0 = ret[0];
         deferred2_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
