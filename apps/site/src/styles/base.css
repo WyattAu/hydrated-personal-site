@@ -489,3 +489,23 @@ section.border-t {
     transform: none;
   }
 }
+
+/* Visible focus indicators for keyboard navigation (a11y).
+   The design system is dark/terminal-styled, so the outline uses the
+   accent color with an offset ring that reads on both light/dark cards. */
+:focus-visible {
+  outline: 2px solid var(--accent, #00e5ff);
+  outline-offset: 2px;
+  border-radius: 1px;
+}
+
+/* Suppress the default focus ring only where :focus-visible already
+   provides the visible indicator (mouse clicks on buttons/links). */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+[tabindex]:focus:not(:focus-visible) {
+  outline: none;
+}
