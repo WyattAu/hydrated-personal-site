@@ -1,8 +1,20 @@
-import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
-import { activeAsset } from '../../../lib/asset-store';
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 300;
+const HIST_ROWS = 40;
+const LEVELS = 15;
+
+const PAIRS = [
+  'BTCUSDT',
+  'ETHUSDT',
+  'SOLUSDT',
+  'BNBUSDT',
+  'XRPUSDT',
+  'ADAUSDT',
+  'DOGEUSDT',
+  'LINKUSDT',
+];
 
 interface DepthFrame {
   lastUpdateId: number;
@@ -21,6 +33,8 @@ function toBinancePair(asset: string): string {
 
 export default function OrderBookDepth() {
   const [book, setBook] = createSignal<DepthFrame | null>(null);
+  // Rolling history of cumulative depth profiles (row per snapshot).
+  const [hist, setHist] = createSignal<number[][]>([]);
   const [pair, setPair] = createSignal('btcusdt');
   const [connected, setConnected] = createSignal(false);
   const [err, setErr] = createSignal<string | null>(null);
@@ -46,7 +60,22 @@ export default function OrderBookDepth() {
     ws.onmessage = (ev) => {
       try {
         const frame = JSON.parse(ev.data as string) as DepthFrame;
-        if (frame.bids && frame.asks) setBook(frame);
+        if (frame.bids && frame.asks) {
+          setBook(frame);
+          // Depth profile: cumulative notional from mid outward, normalized.
+          const levels = Math.min(LEVELS, frame.bids.length, frame.asks.length);
+          const profile: number[] = [];
+          let bidCum = 0;
+          let askCum = 0;
+          for (let i = 0; i < levels; i++) {
+            bidCum += Number(frame.bids[i][1]) * Number(frame.bids[i][0]);
+            askCum += Number(frame.asks[i][1]) * Number(frame.asks[i][0]);
+            profile.push((bidCum + askCum) / (i + 1));
+          }
+          const maxP = Math.max(...profile) || 1;
+          const row = profile.map((v) => Math.round((v / maxP) * 100) / 100);
+          setHist((prev) => [row, ...prev].slice(0, HIST_ROWS));
+        }
       } catch {
         /* malformed */
       }
@@ -77,6 +106,7 @@ export default function OrderBookDepth() {
     const p = toBinancePair(asset);
     setPair(p);
     setBook(null);
+    setHist([]);
     attempts = 0;
     if (reconnectTimer) clearTimeout(reconnectTimer);
     connect(p);
@@ -102,6 +132,17 @@ export default function OrderBookDepth() {
   });
   usePlychartAuto(() => 'l2-depth', renderChart);
 
+  function renderHist() {
+    const h = hist();
+    if (h.length < 2) return;
+    renderPlychart('l2-hist', 'update_heatmap', JSON.stringify(h), '');
+  }
+  createEffect(() => {
+    hist();
+    renderHist();
+  });
+  usePlychartAuto(() => 'l2-hist', renderHist);
+
   const best = () => {
     const b = book();
     if (!b || !b.bids.length || !b.asks.length) return null;
@@ -126,6 +167,24 @@ export default function OrderBookDepth() {
           />
           {connected() ? 'LIVE @100ms' : 'RECONNECTING'}
         </span>
+      </div>
+
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <label class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+          PAIR
+          <select
+            class="font-mono text-[10px] px-2 py-1 border ml-1 cursor-pointer"
+            style={{
+              'border-color': 'var(--border)',
+              color: 'var(--text-primary)',
+              background: 'var(--bg-secondary)',
+            }}
+            value={pair().toUpperCase()}
+            onChange={(e) => switchPair(e.currentTarget.value)}
+          >
+            <For each={PAIRS}>{(p) => <option value={p}>{p}</option>}</For>
+          </select>
+        </label>
       </div>
 
       <Show when={err()}>
@@ -174,6 +233,15 @@ export default function OrderBookDepth() {
         </div>
         <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
           partial depth20 @ 100ms | green = bids, red = asks | spread in basis points
+        </p>
+
+        <p class="label mt-4 mb-2" style={{ color: 'var(--accent)' }}>
+          DEPTH PROFILE OVER TIME
+        </p>
+        <canvas id="l2-hist" class="w-full" style={{ height: '220px' }} />
+        <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
+          rows = snapshots (newest first), cols = depth levels (near→far from mid) |
+          brighter = deeper liquidity at that level
         </p>
       </Show>
     </div>
