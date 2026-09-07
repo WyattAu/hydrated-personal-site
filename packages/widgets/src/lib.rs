@@ -322,3 +322,16 @@ pub fn quant_portfolio_backtest(
 ) -> String {
     plycompute::json::quant_portfolio_backtest(closes, n_assets, n_periods, mode, rebalance_every, cost_bps)
 }
+
+/// Portfolio backtest v2 with min-variance mode.
+#[wasm_bindgen]
+pub fn quant_portfolio_backtest_v2(
+    closes: &[f64],
+    n_assets: usize,
+    n_periods: usize,
+    mode: &str,
+    rebalance_every: usize,
+    cost_bps: f64,
+) -> String {
+    plycompute::json::quant_portfolio_backtest_v2(closes, n_assets, n_periods, mode, rebalance_every, cost_bps)
+}

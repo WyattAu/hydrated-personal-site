@@ -24,14 +24,16 @@ import KellyCalculator from '../components/solid/econometrics/KellyCalculator';
 import LiquidityMetrics from '../components/solid/econometrics/LiquidityMetrics';
 import RealizedVolDecomposition from '../components/solid/econometrics/RealizedVolDecomposition';
 import RegimeDetector from '../components/solid/econometrics/RegimeDetector';
-import WalkForwardBacktester from '../components/solid/quant/WalkForwardBacktester';
-import PortfolioBacktest from '../components/solid/quant/PortfolioBacktest';
-import VolSurface from '../components/solid/quant/VolSurface';
 import RiskRatios from '../components/solid/econometrics/RiskRatios';
 import RollingFactorExposure from '../components/solid/econometrics/RollingFactorExposure';
 import VolumeProfile from '../components/solid/econometrics/VolumeProfile';
 import VwapTracker from '../components/solid/econometrics/VwapTracker';
 import WeekRange52 from '../components/solid/econometrics/WeekRange52';
+import LiveTicker from '../components/solid/quant/LiveTicker';
+import OrderBookDepth from '../components/solid/quant/OrderBookDepth';
+import PortfolioBacktest from '../components/solid/quant/PortfolioBacktest';
+import VolSurface from '../components/solid/quant/VolSurface';
+import WalkForwardBacktester from '../components/solid/quant/WalkForwardBacktester';
 
 import BlackLitterman from '../components/solid/econometrics/BlackLitterman';
 import ComponentVaR from '../components/solid/econometrics/ComponentVaR';
@@ -94,6 +96,7 @@ import '../styles/base.css';
     </section>
 
     <section class="w-full border-y" style="border-color: var(--border); height: 50vh; min-height: 360px;">
+      <div class="p-4 border mb-4" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><LiveTicker client:load /></AppErrorBoundary></div>
       <AppErrorBoundary client:load><WorldMap client:load /></AppErrorBoundary>
     </section>
 
@@ -123,6 +126,7 @@ import '../styles/base.css';
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><VolatilityForecast client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RiskMetrics client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><GreeksDashboard client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><OrderBookDepth client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><LiquidityMetrics client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RegimeDetector client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RealizedVolDecomposition client:load /></AppErrorBoundary></div>

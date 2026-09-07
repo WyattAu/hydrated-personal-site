@@ -90,6 +90,7 @@ export const quant_liquidity: (a: number, b: number, c: number, d: number, e: nu
 export const quant_montecarlo: (a: number, b: number, c: number, d: number, e: number) => [number, number];
 export const quant_pairs_signal: (a: number, b: number, c: number, d: number) => [number, number];
 export const quant_portfolio_backtest: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
+export const quant_portfolio_backtest_v2: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];
 export const quant_realized_vol: (a: number, b: number) => [number, number];
 export const quant_regime: (a: number, b: number) => [number, number];
 export const quant_risk_ratios: (a: number, b: number, c: number, d: number) => [number, number];

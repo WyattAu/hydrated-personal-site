@@ -71,12 +71,12 @@ export function get_click_data(canvas_id, x, y, data_len, chart_type) {
  * Returns JSON: `{index, time, open, high, low, close, volume}` or `{}` if no data.
  * @param {string} canvas_id
  * @param {number} x
- * @param {number} y
+ * @param {number} _y
  * @param {string} data_json
  * @param {number} series_index
  * @returns {string}
  */
-export function get_tooltip_data(canvas_id, x, y, data_json, series_index) {
+export function get_tooltip_data(canvas_id, x, _y, data_json, series_index) {
     let deferred4_0;
     let deferred4_1;
     try {
@@ -84,7 +84,7 @@ export function get_tooltip_data(canvas_id, x, y, data_json, series_index) {
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passStringToWasm0(data_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        const ret = wasm.get_tooltip_data(ptr0, len0, x, y, ptr1, len1, series_index);
+        const ret = wasm.get_tooltip_data(ptr0, len0, x, _y, ptr1, len1, series_index);
         var ptr3 = ret[0];
         var len3 = ret[1];
         if (ret[3]) {
@@ -668,8 +668,11 @@ function __wbg_get_imports() {
         __wbg_setTransform_af9c1fdc090e1259: function() { return handleError(function (arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
             arg0.setTransform(arg1, arg2, arg3, arg4, arg5, arg6);
         }, arguments); },
-        __wbg_set_fillStyle_feb3e40099a010e6: function(arg0, arg1) {
+        __wbg_set_fillStyle_392607276a67e12a: function(arg0, arg1) {
             arg0.fillStyle = arg1;
+        },
+        __wbg_set_fillStyle_52e75a25be60a3ff: function(arg0, arg1, arg2) {
+            arg0.fillStyle = getStringFromWasm0(arg1, arg2);
         },
         __wbg_set_font_63f9cc44d4c6f102: function(arg0, arg1, arg2) {
             arg0.font = getStringFromWasm0(arg1, arg2);
@@ -683,8 +686,8 @@ function __wbg_get_imports() {
         __wbg_set_lineWidth_5f9aefcc32e60287: function(arg0, arg1) {
             arg0.lineWidth = arg1;
         },
-        __wbg_set_strokeStyle_14c001d4c5439909: function(arg0, arg1) {
-            arg0.strokeStyle = arg1;
+        __wbg_set_strokeStyle_cce50c69cecc2df7: function(arg0, arg1, arg2) {
+            arg0.strokeStyle = getStringFromWasm0(arg1, arg2);
         },
         __wbg_set_textAlign_9ee229a431a30197: function(arg0, arg1, arg2) {
             arg0.textAlign = getStringFromWasm0(arg1, arg2);

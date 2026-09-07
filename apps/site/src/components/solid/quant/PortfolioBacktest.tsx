@@ -41,7 +41,7 @@ export default function PortfolioBacktest() {
   const [labels, setLabels] = createSignal<string[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [mode, setMode] = createSignal<'equal' | 'inv_vol'>('inv_vol');
+  const [mode, setMode] = createSignal<'equal' | 'inv_vol' | 'min_var'>('inv_vol');
   const [rebalanceEvery, setRebalanceEvery] = createSignal(20);
 
   async function loadData() {
@@ -70,7 +70,7 @@ export default function PortfolioBacktest() {
 
       const wasm = await getWasmMod();
       const out: PortfolioResult = JSON.parse(
-        wasm.quant_portfolio_backtest(flat, nAssets, n, mode(), rebalanceEvery(), 2.0),
+        wasm.quant_portfolio_backtest_v2(flat, nAssets, n, mode(), rebalanceEvery(), 2.0),
       );
       if (out.error) throw new Error(out.error);
       setResult(out);
@@ -141,6 +141,27 @@ export default function PortfolioBacktest() {
       </div>
 
       <div class="flex gap-2 mb-3 items-center flex-wrap">
+        <button
+          type="button"
+          class="font-mono text-[10px] px-3 py-1.5 border cursor-pointer"
+          style={{
+            'border-color': mode() === 'min_var' ? 'var(--accent)' : 'var(--border)',
+            color: mode() === 'min_var' ? 'var(--bg-primary)' : 'var(--accent)',
+            background: mode() === 'min_var' ? 'var(--accent)' : 'var(--bg-secondary)',
+          }}
+          onClick={() => {
+            setMode('min_var');
+            loadData();
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              setMode('min_var');
+              loadData();
+            }
+          }}
+        >
+          MIN VARIANCE
+        </button>
         <button
           type="button"
           class="font-mono text-[10px] px-3 py-1.5 border cursor-pointer"

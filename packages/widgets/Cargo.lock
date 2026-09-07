@@ -407,7 +407,7 @@ dependencies = [
 
 [[package]]
 name = "plychart"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "console_error_panic_hook",
  "js-sys",
@@ -420,7 +420,7 @@ dependencies = [
 
 [[package]]
 name = "plycompute"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "plycore",
  "serde",
@@ -430,7 +430,7 @@ dependencies = [
 
 [[package]]
 name = "plycore"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "serde",
  "serde_json",
