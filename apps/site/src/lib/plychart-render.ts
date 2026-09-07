@@ -13,6 +13,155 @@ import { getPlychart } from './plychart-loader';
 
 const sizeCache = new WeakMap<Element, string>();
 
+/** Per-canvas render context for zoom/pan re-slicing. */
+interface RenderCtx {
+  updateFn: string;
+  dataJson: string;
+  extraArgs: string[];
+}
+
+const renderCtx = new WeakMap<Element, RenderCtx>();
+const zoomWired = new WeakSet<Element>();
+
+/** Update fns whose data is a time-series slice (zoom/pan eligible). */
+const PANABLE = new Set(['update_line', 'update_area', 'update_candles', 'update_bar']);
+
+/** Slice a data JSON string to [start, start+count). Handles single-series
+ *  arrays and multi-series `{color, data}` envelopes. */
+function sliceDataJson(dataJson: string, start: number, count: number): string {
+  try {
+    const parsed = JSON.parse(dataJson);
+    if (Array.isArray(parsed)) {
+      // Single series of points, or multi-series envelope?
+      if (parsed.length > 0 && Array.isArray(parsed[0])) return dataJson; // pairs — leave
+      if (
+        parsed.length > 0 &&
+        typeof parsed[0] === 'object' &&
+        parsed[0] !== null &&
+        'data' in parsed[0]
+      ) {
+        // Multi-series envelope
+        return JSON.stringify(
+          parsed.map((s: { color: string; data: unknown[] }) => ({
+            ...s,
+            data: s.data.slice(start, start + count),
+          })),
+        );
+      }
+      return JSON.stringify(parsed.slice(start, start + count));
+    }
+  } catch {
+    /* fall through */
+  }
+  return dataJson;
+}
+
+/** Auto-attach wheel-zoom + drag-pan to a pannable canvas (once). */
+function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
+  if (zoomWired.has(el) || !PANABLE.has(ctx.updateFn)) return;
+  zoomWired.add(el);
+
+  let dragging = false;
+  let lastX = 0;
+
+  const viewCall = async (
+    fn: string,
+    ...args: unknown[]
+  ): Promise<{ start: number; count: number } | null> => {
+    try {
+      const p = await getPlychart();
+      const f = (p as Record<string, (...a: unknown[]) => string>)[fn];
+      if (typeof f !== 'function') return null;
+      return JSON.parse(f(canvasIdOf(el), ...args));
+    } catch {
+      return null;
+    }
+  };
+
+  const reupdate = async (start: number, count: number) => {
+    const p = await getPlychart();
+    const fn = (p as Record<string, (...a: unknown[]) => void>)[ctx.updateFn];
+    if (typeof fn === 'function') {
+      fn(canvasIdOf(el), sliceDataJson(ctx.dataJson, start, count), ...ctx.extraArgs);
+    }
+  };
+
+  el.addEventListener(
+    'wheel',
+    (e) => {
+      const c = renderCtx.get(el);
+      if (!c) return;
+      e.preventDefault();
+      const len = dataLen(c.dataJson);
+      if (len < 20) return;
+      void viewCall('view_zoom', canvasIdOf(el), e.deltaY, len).then((vp) => {
+        if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
+      });
+    },
+    { passive: false },
+  );
+
+  el.addEventListener('mousedown', (e) => {
+    const c = renderCtx.get(el);
+    if (!c) return;
+    dragging = true;
+    lastX = e.clientX;
+    const len = dataLen(c.dataJson);
+    void viewCall('view_pan_start', canvasIdOf(el), e.offsetX, e.offsetY, len);
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const c = renderCtx.get(el);
+    if (!c) return;
+    const len = dataLen(c.dataJson);
+    void viewCall('view_pan_move', canvasIdOf(el), e.clientX - lastX, len).then((vp) => {
+      if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
+    });
+    lastX = e.clientX;
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    void viewCall('view_pan_end', canvasIdOf(el));
+  });
+
+  el.addEventListener('dblclick', () => {
+    const c = renderCtx.get(el);
+    if (!c) return;
+    const len = dataLen(c.dataJson);
+    void viewCall('view_reset', canvasIdOf(el), len).then((vp) => {
+      if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
+    });
+  });
+}
+
+function canvasIdOf(el: HTMLElement): string {
+  return el.id;
+}
+
+function dataLen(dataJson: string): number {
+  try {
+    const parsed = JSON.parse(dataJson);
+    if (Array.isArray(parsed)) {
+      if (
+        parsed.length > 0 &&
+        typeof parsed[0] === 'object' &&
+        parsed[0] !== null &&
+        'data' in parsed[0]
+      ) {
+        const first = parsed[0] as { data: unknown[] };
+        return first.data.length;
+      }
+      return parsed.length;
+    }
+  } catch {
+    /* fall through */
+  }
+  return 0;
+}
+
 /**
  * Render a plychart chart into `canvasId`, sized to its current CSS box.
  * Safe to call on every data change: the backing store is only reset when
@@ -36,6 +185,9 @@ export async function renderPlychart(
     p.create_chart(canvasId, w, h);
     sizeCache.set(el, key);
   }
+  // Store render context + auto-wire zoom/pan once per canvas.
+  renderCtx.set(el, { updateFn, dataJson, extraArgs });
+  wireZoomPan(el, renderCtx.get(el)!);
   const fn = (p as Record<string, (...a: unknown[]) => void>)[updateFn];
   if (typeof fn === 'function') {
     fn(canvasId, dataJson, ...extraArgs);

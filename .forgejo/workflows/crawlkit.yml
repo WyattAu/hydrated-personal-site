@@ -135,3 +135,76 @@ jobs:
             echo "### Report" >> "$GITHUB_STEP_SUMMARY"
             cat ./crawl-data/REPORT.md >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Generate SEO dashboard data
+        if: always()
+        run: |
+          python3 << 'INNER'
+          import json, sqlite3, os
+          from collections import Counter
+
+          db_path = './crawl-data/crawlkit.db'
+          if not os.path.exists(db_path):
+              print('crawlkit.db not found, skipping SEO data generation')
+              exit(0)
+
+          db = sqlite3.connect(db_path)
+          cur = db.cursor()
+
+          # Per-page stats
+          pages = cur.execute(
+              "SELECT url, status_code, LENGTH(title), LENGTH(description), "
+              "word_count, load_time_ms FROM pages ORDER BY url"
+          ).fetchall()
+          # Findings per page
+          findings = cur.execute(
+              "SELECT p.url, COUNT(*), SUM(f.severity = 'critical'), SUM(f.severity = 'warning') "
+              "FROM findings f JOIN pages p ON f.page_id = p.id GROUP BY p.url"
+          ).fetchall()
+          find_map = {row[0]: row for row in findings}
+
+          page_data = []
+          for url, status, tlen, dlen, wc, ms in pages:
+              f = find_map.get(url, (url, 0, 0, 0))
+              page_data.append({
+                  'url': url, 'status': status or 0,
+                  'titleLength': tlen or 0, 'descriptionLength': dlen or 0,
+                  'h1Count': 0, 'wordCount': wc or 0,
+                  'fetchTimeMs': ms or 0, 'issues': f[1] or 0,
+              })
+
+          # Findings grouped by category
+          cat_counts = Counter()
+          recommendations = []
+          for cat, code, title, desc, sev in cur.execute(
+              "SELECT category, code, title, description, severity FROM findings "
+              "WHERE severity IN ('critical', 'error', 'warning') ORDER BY severity, code"
+          ):
+              cat_counts[cat] += 1
+              recommendations.append({
+                  'code': code, 'title': title, 'description': desc,
+                  'severity': sev, 'category': cat,
+              })
+
+          total = sum(cat_counts.values())
+          result = {
+              'pagesCrawled': len(page_data),
+              'totalIssues': total,
+              'categories': [{'category': k, 'count': v} for k, v in cat_counts.most_common()],
+              'recommendations': recommendations[:200],
+              'pages': page_data,
+              'crawlDate': __import__('datetime').datetime.utcnow().strftime('%Y-%m-%d'),
+          }
+          os.makedirs('./crawl-data/seo-dashboard', exist_ok=True)
+          with open('./crawl-data/seo-dashboard/seo-audit.json', 'w') as f:
+              json.dump(result, f, indent=2)
+          print(f'Generated SEO dashboard data: {total} findings across {len(page_data)} pages')
+          INNER
+
+      - name: Upload SEO dashboard data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-dashboard-data
+          path: ./crawl-data/seo-dashboard/seo-audit.json
+          retention-days: 90

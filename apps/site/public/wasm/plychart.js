@@ -558,6 +558,122 @@ export function update_waterfall(canvas_id, data_json, theme_json) {
         throw takeFromExternrefTable0(ret[0]);
     }
 }
+
+/**
+ * Drop the interaction state for a canvas (call from destroy_chart path).
+ * @param {string} canvas_id
+ */
+export function view_drop(canvas_id) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    wasm.view_drop(ptr0, len0);
+}
+
+/**
+ * End a pan drag.
+ * @param {string} canvas_id
+ */
+export function view_pan_end(canvas_id) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    wasm.view_pan_end(ptr0, len0);
+}
+
+/**
+ * Continue a pan drag; returns the updated viewport JSON `{start, count}`.
+ * @param {string} canvas_id
+ * @param {number} x
+ * @param {number} total
+ * @returns {string}
+ */
+export function view_pan_move(canvas_id, x, total) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.view_pan_move(ptr0, len0, x, total);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Begin a pan drag at mouse position (x, y).
+ * @param {string} canvas_id
+ * @param {number} x
+ * @param {number} y
+ * @param {number} total
+ */
+export function view_pan_start(canvas_id, x, y, total) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    wasm.view_pan_start(ptr0, len0, x, y, total);
+}
+
+/**
+ * Reset the viewport to show all data. Returns the viewport JSON.
+ * @param {string} canvas_id
+ * @param {number} total
+ * @returns {string}
+ */
+export function view_reset(canvas_id, total) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.view_reset(ptr0, len0, total);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * Wheel-zoom the viewport for a canvas. Returns JSON `{start, count}`.
+ * @param {string} canvas_id
+ * @param {number} delta_y
+ * @param {number} total
+ * @returns {string}
+ */
+export function view_zoom(canvas_id, delta_y, total) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.view_zoom(ptr0, len0, delta_y, total);
+        var ptr2 = ret[0];
+        var len2 = ret[1];
+        if (ret[3]) {
+            ptr2 = 0; len2 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred3_0 = ptr2;
+        deferred3_1 = len2;
+        return getStringFromWasm0(ptr2, len2);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
@@ -673,6 +789,9 @@ function __wbg_get_imports() {
         },
         __wbg_set_fillStyle_52e75a25be60a3ff: function(arg0, arg1, arg2) {
             arg0.fillStyle = getStringFromWasm0(arg1, arg2);
+        },
+        __wbg_set_fillStyle_feb3e40099a010e6: function(arg0, arg1) {
+            arg0.fillStyle = arg1;
         },
         __wbg_set_font_63f9cc44d4c6f102: function(arg0, arg1, arg2) {
             arg0.font = getStringFromWasm0(arg1, arg2);

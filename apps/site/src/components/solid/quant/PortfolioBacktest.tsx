@@ -114,6 +114,23 @@ export default function PortfolioBacktest() {
 
   usePlychartAuto(() => 'portfolio-backtest', renderChart);
 
+  function renderWeights() {
+    const r = result();
+    if (!r || !r.windows || r.windows.length < 2) return;
+    // Build a matrix: rows = rebalance windows, cols = assets, val = weight*100
+    const nAssets = r.windows[0]?.weights.length ?? 0;
+    if (nAssets === 0) return;
+    const matrix = r.windows.map((w) => w.weights.map((x) => Math.round(x * 1000) / 10));
+    renderPlychart('portfolio-weights', 'update_heatmap', JSON.stringify(matrix), '');
+  }
+
+  createEffect(() => {
+    result();
+    renderWeights();
+  });
+
+  usePlychartAuto(() => 'portfolio-weights', renderWeights);
+
   onMount(() => loadData());
   onTickersChanged(() => loadData());
 
@@ -272,6 +289,10 @@ export default function PortfolioBacktest() {
 
       <Show when={!loading() && r()}>
         <canvas id="portfolio-backtest" class="w-full" style={{ height: `${H}px` }} />
+        <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
+          WEIGHT SHIFT OVER TIME (per-rebalance fitted weights, %)
+        </p>
+        <canvas id="portfolio-weights" class="w-full" style={{ height: '160px' }} />
         <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-3">
           <div
             class="p-2 border text-center"
