@@ -116,7 +116,10 @@ export default function TradeTape() {
         <p class="label" style={{ color: 'var(--accent)' }}>
           TRADE TAPE: {pair().toUpperCase()}
         </p>
-        <span class="font-mono text-[10px] flex items-center gap-1.5" style={{ color: 'var(--text-secondary)' }}>
+        <span
+          class="font-mono text-[10px] flex items-center gap-1.5"
+          style={{ color: 'var(--text-secondary)' }}
+        >
           <span
             class="inline-block w-1.5 h-1.5 rounded-full"
             style={{ background: connected() ? '#4caf50' : '#ff9800' }}
@@ -127,11 +130,19 @@ export default function TradeTape() {
       <div class="max-h-[340px] overflow-y-auto border" style={{ 'border-color': 'var(--border)' }}>
         <table class="w-full font-mono text-[10px]">
           <thead>
-            <tr style={{ color: 'var(--text-secondary)' }} class="sticky top-0" >
-              <th class="text-left p-1.5" style={{ background: 'var(--bg-card)' }}>TIME</th>
-              <th class="text-right p-1.5" style={{ background: 'var(--bg-card)' }}>PRICE</th>
-              <th class="text-right p-1.5" style={{ background: 'var(--bg-card)' }}>QTY</th>
-              <th class="text-right p-1.5" style={{ background: 'var(--bg-card)' }}>SIDE</th>
+            <tr style={{ color: 'var(--text-secondary)' }} class="sticky top-0">
+              <th class="text-left p-1.5" style={{ background: 'var(--bg-card)' }}>
+                TIME
+              </th>
+              <th class="text-right p-1.5" style={{ background: 'var(--bg-card)' }}>
+                PRICE
+              </th>
+              <th class="text-right p-1.5" style={{ background: 'var(--bg-card)' }}>
+                QTY
+              </th>
+              <th class="text-right p-1.5" style={{ background: 'var(--bg-card)' }}>
+                SIDE
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -143,7 +154,9 @@ export default function TradeTape() {
                     background: t.isBuyerMaker ? 'rgba(255,82,82,0.04)' : 'rgba(76,175,80,0.04)',
                   }}
                 >
-                  <td class="p-1.5" style={{ color: 'var(--text-secondary)' }}>{fmtTime(t.time)}</td>
+                  <td class="p-1.5" style={{ color: 'var(--text-secondary)' }}>
+                    {fmtTime(t.time)}
+                  </td>
                   <td class="p-1.5 text-right">{fmt(t.price)}</td>
                   <td class="p-1.5 text-right">{t.qty.toFixed(4)}</td>
                   <td class="p-1.5 text-right">{t.isBuyerMaker ? 'SELL' : 'BUY'}</td>

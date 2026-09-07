@@ -1,5 +1,4 @@
 import { For, Show, createSignal, onCleanup, onMount } from 'solid-js';
-import { activeAsset } from '../../../lib/asset-store';
 import { createNotification } from '../../../lib/notifications';
 
 interface Alert {

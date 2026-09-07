@@ -240,8 +240,8 @@ export default function OrderBookDepth() {
         </p>
         <canvas id="l2-hist" class="w-full" style={{ height: '220px' }} />
         <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-          rows = snapshots (newest first), cols = depth levels (near→far from mid) |
-          brighter = deeper liquidity at that level
+          rows = snapshots (newest first), cols = depth levels (near→far from mid) | brighter =
+          deeper liquidity at that level
         </p>
       </Show>
     </div>

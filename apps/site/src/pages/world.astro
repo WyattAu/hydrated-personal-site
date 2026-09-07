@@ -32,6 +32,8 @@ import WeekRange52 from '../components/solid/econometrics/WeekRange52';
 import LiveTicker from '../components/solid/quant/LiveTicker';
 import OrderBookDepth from '../components/solid/quant/OrderBookDepth';
 import PortfolioBacktest from '../components/solid/quant/PortfolioBacktest';
+import PriceAlerts from '../components/solid/quant/PriceAlerts';
+import TradeTape from '../components/solid/quant/TradeTape';
 import VolSurface from '../components/solid/quant/VolSurface';
 import WalkForwardBacktester from '../components/solid/quant/WalkForwardBacktester';
 
@@ -127,6 +129,8 @@ import '../styles/base.css';
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RiskMetrics client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><GreeksDashboard client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><OrderBookDepth client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><TradeTape client:load /></AppErrorBoundary></div>
+        <div class="p-4 border lg:col-span-2" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><PriceAlerts client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><LiquidityMetrics client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RegimeDetector client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><RealizedVolDecomposition client:load /></AppErrorBoundary></div>

@@ -8,12 +8,20 @@ import { getWasmMod } from '../../../lib/wasm-loader';
 const H = 280;
 const SERIES_COLORS = ['#00e5ff', '#ff4081', '#4caf50', '#ff9800', '#7c4dff', '#eab308'];
 
+interface PortfolioWindow {
+  start: number;
+  end: number;
+  ret: number;
+  weights: number[];
+}
+
 interface PortfolioResult {
   mode: string;
   equity: number[];
   drawdown: number[];
   asset_equity: number[][];
   rebalances: Array<[number, number[]]>;
+  windows?: PortfolioWindow[];
   cagr: number;
   sharpe: number;
   max_drawdown: number;
@@ -324,6 +332,52 @@ export default function PortfolioBacktest() {
             </p>
           </div>
         </div>
+        <Show when={r() && r()!.windows && r()!.windows!.length > 0}>
+          <div class="mt-3 overflow-x-auto">
+            <table
+              class="w-full border-collapse font-mono text-[9px]"
+              style={{ 'min-width': '420px' }}
+            >
+              <thead>
+                <tr style={{ color: 'var(--accent)' }}>
+                  <th class="text-left p-1 border-b" style={{ 'border-color': 'var(--border)' }}>
+                    WINDOW
+                  </th>
+                  <th class="text-left p-1 border-b" style={{ 'border-color': 'var(--border)' }}>
+                    WEIGHTS
+                  </th>
+                  <th class="text-right p-1 border-b" style={{ 'border-color': 'var(--border)' }}>
+                    RETURN
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {r()!
+                  .windows!.slice(-12)
+                  .map((w) => (
+                    <tr style={{ color: 'var(--text-secondary)' }}>
+                      <td class="p-1">
+                        {w.start}-{w.end}
+                      </td>
+                      <td class="p-1">{w.weights.map((x) => (x * 100).toFixed(0)).join('/')}</td>
+                      <td
+                        class="p-1 text-right"
+                        style={{ color: w.ret >= 0 ? '#4caf50' : '#ff5252' }}
+                      >
+                        {w.ret >= 0 ? '+' : ''}
+                        {(w.ret * 100).toFixed(2)}%
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            <Show when={r()!.windows!.length > 12}>
+              <p class="font-mono text-[9px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+                +{r()!.windows!.length - 12} earlier windows
+              </p>
+            </Show>
+          </div>
+        </Show>
         <div class="flex flex-wrap gap-x-3 gap-y-1 mt-2">
           <span class="font-mono text-[9px]" style={{ color: '#00e5ff' }}>
             - portfolio ({r()?.mode})
