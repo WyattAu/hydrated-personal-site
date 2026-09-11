@@ -6,8 +6,8 @@ technologies:
   - SolidJS
   - Cloudflare Workers
 url: https://questhive.io
-featured: true
-order: 3
+featured: false
+order: 7
 ---
 
 QuestHive is a structured knowledge engine designed to make infrastructure documentation and operational knowledge interconnected and actionable. It transforms static documentation into a living, searchable knowledge graph.

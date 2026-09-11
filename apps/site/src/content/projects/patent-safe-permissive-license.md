@@ -4,8 +4,8 @@ description: An open-source software license derived from Apache-2.0 with more e
 technologies:
   - Python
 url: https://github.com/WyattAu/PatentSafePermissiveLicense
-featured: true
-order: 7
+featured: false
+order: 11
 ---
 
 A permissive open-source license derived from Apache-2.0, redesigned for improved readability and enhanced patent protections. Features explicit clause declarations that are accessible to non-lawyers while maintaining legal robustness.

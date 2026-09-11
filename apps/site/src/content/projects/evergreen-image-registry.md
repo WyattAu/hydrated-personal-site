@@ -6,8 +6,8 @@ technologies:
   - Bash
   - Distroless
 url: https://github.com/WyattAu/EvergreenImageRegistry
-featured: true
-order: 6
+featured: false
+order: 10
 ---
 
 Evergreen Image Registry provides community-maintained long-term support Docker base images. These images are designed for production container deployments with reproducible builds, auditable layers, and automated security patching.

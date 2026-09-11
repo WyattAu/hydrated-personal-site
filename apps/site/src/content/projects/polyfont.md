@@ -4,8 +4,8 @@ description: VSCode and editor plugin enabling dynamic font switching for monosp
 technologies:
   - Rust
 url: https://github.com/WyattAu/polyfont
-featured: true
-order: 8
+featured: false
+order: 12
 ---
 
 Polyfont is an editor plugin that enables dynamic font switching for monospace code blocks. Map different programming languages to different monospace fonts for a personalized coding experience.

@@ -79,11 +79,24 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
   };
 
   const reupdate = async (start: number, count: number) => {
+    // Read the context fresh: renderPlychart replaces it on every data
+    // change, but this closure was created at first-wire time.
+    const c = renderCtx.get(el);
+    if (!c) return;
     const p = await getPlychart();
-    const fn = (p as Record<string, (...a: unknown[]) => void>)[ctx.updateFn];
+    const fn = (p as Record<string, (...a: unknown[]) => void>)[c.updateFn];
     if (typeof fn === 'function') {
-      fn(canvasIdOf(el), sliceDataJson(ctx.dataJson, start, count), ...ctx.extraArgs);
+      fn(canvasIdOf(el), sliceDataJson(c.dataJson, start, count), ...c.extraArgs);
     }
+  };
+
+  const zoomStep = async (deltaY: number) => {
+    const c = renderCtx.get(el);
+    if (!c) return;
+    const len = dataLen(c.dataJson);
+    if (len < 20) return;
+    const vp = await viewCall('view_zoom', canvasIdOf(el), deltaY, len);
+    if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
   };
 
   el.addEventListener(
@@ -92,11 +105,9 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
       const c = renderCtx.get(el);
       if (!c) return;
       e.preventDefault();
-      const len = dataLen(c.dataJson);
-      if (len < 20) return;
-      void viewCall('view_zoom', canvasIdOf(el), e.deltaY, len).then((vp) => {
-        if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
-      });
+      // Firefox reports wheel deltas in lines; normalize to pixels.
+      const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      void zoomStep(dy);
     },
     { passive: false },
   );
@@ -135,6 +146,94 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
       if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
     });
   });
+
+  attachZoomControls(el);
+}
+
+/**
+ * Explicit + / - / reset overlay for pannable charts. Wheel zoom depends
+ * on trackpad/mouse settings and is undiscoverable; the buttons call the
+ * same view_zoom/view_reset path so behavior is identical.
+ */
+function attachZoomControls(el: HTMLElement): void {
+  const parent = el.parentElement;
+  if (!parent || parent.querySelector('[data-plychart-zoom]')) return;
+  if (getComputedStyle(parent).position === 'static') {
+    parent.style.position = 'relative';
+  }
+  const bar = document.createElement('div');
+  bar.setAttribute('data-plychart-zoom', '1');
+  bar.style.cssText =
+    'position:absolute;top:6px;right:6px;display:flex;gap:4px;z-index:5;opacity:0.9;';
+  const mk = (label: string, title: string, onPress: () => void): HTMLButtonElement => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    b.title = title;
+    b.setAttribute('aria-label', title);
+    b.style.cssText =
+      'font-family:monospace;font-size:11px;line-height:1;padding:3px 8px;cursor:pointer;' +
+      'background:var(--bg-secondary);color:var(--accent);border:1px solid var(--border);';
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      onPress();
+    });
+    bar.appendChild(b);
+    return b;
+  };
+  const step = (deltaY: number): void => {
+    const c = renderCtx.get(el);
+    if (!c) return;
+    const len = dataLen(c.dataJson);
+    if (len < 20) return;
+    getPlychart()
+      .then((p) => {
+        const f = (p as Record<string, (...a: unknown[]) => string>).view_zoom;
+        if (typeof f !== 'function') return null;
+        return JSON.parse(f(canvasIdOf(el), deltaY, len)) as {
+          start: number;
+          count: number;
+        };
+      })
+      .then((vp) => {
+        if (!vp || vp.count <= 0) return;
+        const c2 = renderCtx.get(el);
+        if (!c2) return;
+        return getPlychart().then((p) => {
+          const fn = (p as Record<string, (...a: unknown[]) => void>)[c2.updateFn];
+          if (typeof fn === 'function') {
+            fn(canvasIdOf(el), sliceDataJson(c2.dataJson, vp.start, vp.count), ...c2.extraArgs);
+          }
+        });
+      })
+      .catch(() => {});
+  };
+  mk('+', 'Zoom in', () => step(-120));
+  mk('\u2212', 'Zoom out', () => step(120));
+  mk('\u27F2', 'Reset view (also: double-click)', () => {
+    const c = renderCtx.get(el);
+    if (!c) return;
+    const len = dataLen(c.dataJson);
+    getPlychart()
+      .then((p) => {
+        const f = (p as Record<string, (...a: unknown[]) => string>).view_reset;
+        if (typeof f !== 'function') return null;
+        return JSON.parse(f(canvasIdOf(el), len)) as { start: number; count: number };
+      })
+      .then((vp) => {
+        if (!vp || vp.count <= 0) return;
+        const c2 = renderCtx.get(el);
+        if (!c2) return;
+        return getPlychart().then((p) => {
+          const fn = (p as Record<string, (...a: unknown[]) => void>)[c2.updateFn];
+          if (typeof fn === 'function') {
+            fn(canvasIdOf(el), sliceDataJson(c2.dataJson, vp.start, vp.count), ...c2.extraArgs);
+          }
+        });
+      })
+      .catch(() => {});
+  });
+  parent.appendChild(bar);
 }
 
 function canvasIdOf(el: HTMLElement): string {

@@ -7,7 +7,7 @@ technologies:
   - Lua
 url: https://github.com/WyattAu/aileron
 featured: true
-order: 1
+order: 5
 ---
 
 Aileron is a keyboard-driven web environment built in Rust on top of the Servo rendering engine. It replaces the Electron-based browser paradigm with a native, performant alternative that prioritizes keyboard interaction and developer workflows.

@@ -59,6 +59,7 @@ export const create_tsne: (a: number, b: number, c: number, d: number) => [numbe
 export const create_vol_surface: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_voronoi: (a: number, b: number, c: number, d: number) => [number, number];
 export const create_wave: (a: number, b: number, c: number, d: number) => [number, number];
+export const fourier_stats: (a: number, b: number, c: number) => [number, number];
 export const main: () => void;
 export const nbodysimulation_add_body: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
 export const nbodysimulation_body_count: (a: number) => number;
@@ -123,6 +124,8 @@ export const update_colorblind: (a: number, b: number, c: number, d: number, e: 
 export const update_correlation: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
 export const update_double_pendulum: (a: number, b: number, c: number, d: number, e: number) => [number, number];
 export const update_fluids: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+export const update_fourier_freq: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+export const update_fourier_time: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
 export const update_fourier_viz: (a: number, b: number, c: number, d: number, e: number) => [number, number];
 export const update_fourier_viz_full: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
 export const update_generative: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];

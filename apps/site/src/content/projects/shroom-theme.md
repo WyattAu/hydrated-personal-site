@@ -4,8 +4,8 @@ description: VSCode theme based on the Monaspace font family. Provides dynamic f
 technologies:
   - C++
 url: https://github.com/WyattAu/shroom-theme
-featured: true
-order: 9
+featured: false
+order: 13
 ---
 
 Shroom is a VSCode theme built around the Monaspace font family, providing dynamic font switching for monospace code. Supports multiple Monaspace variants for a fully customizable editor typography experience.

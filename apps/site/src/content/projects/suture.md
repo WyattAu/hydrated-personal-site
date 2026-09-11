@@ -4,8 +4,8 @@ description: A Rust library providing composable primitives for programmatic cod
 technologies:
   - Rust
 url: https://github.com/WyattAu/suture
-featured: true
-order: 5
+featured: false
+order: 9
 ---
 
 Suture is a Rust library providing composable primitives for programmatic code analysis, AST manipulation, and source code transformation. It enables surgical precision in code refactoring and automated code stitching operations.

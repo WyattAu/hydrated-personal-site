@@ -166,7 +166,29 @@ export function create_nbody_simulation(canvas_id: string, width: number, height
 export function update_climate(canvas_id: string, width: number, height: number, csv_data: string): void;
 export function create_climate(canvas_id: string, width: number, height: number): void;
 export function update_fourier_viz(canvas_id: string, width: number, height: number, time: number): void;
+/**
+ * Time-domain panel: ideal waveform (dashed gray) vs partial sum S_N (cyan).
+ * `width`/`height` are device pixels (caller passes DPR-scaled dimensions and
+ * sizes the canvas element with CSS); text/line widths scale with the device
+ * pixel ratio read from the window so output stays crisp on HiDPI screens.
+ */
+export function update_fourier_time(canvas_id: string, width: number, height: number, time: number, harmonics: number, wave_type: number): void;
+/**
+ * Frequency-domain panel: continuous analytic magnitude envelope A(f) sampled
+ * finely (amber curve) plus discrete stem markers + dots at integer n.
+ */
+export function update_fourier_freq(canvas_id: string, width: number, height: number, harmonics: number, wave_type: number): void;
 export function update_fourier_viz_full(canvas_id: string, width: number, height: number, time: number, harmonics: number, wave_type: number): void;
+/**
+ * JSON stats for the coefficient readout: RMS (L2) error of the partial sum
+ * vs the ideal wave over 512 samples, the first min(harmonics, 12)
+ * (n, amp, phase) triples, and the closed-form series string.
+ *
+ * Both the ideal wave and the partial sum are evaluated at the same shifted
+ * argument (t + time) so the animation phase does not inflate the error;
+ * for sine with N >= 1 the error is therefore ~0.
+ */
+export function fourier_stats(time: number, harmonics: number, wave_type: number): string;
 /**
  * wave_type: 0=sine, 1=square, 2=triangle, 3=sawtooth, 4=pulse
  */
@@ -359,6 +381,7 @@ export interface InitOutput {
   readonly create_vol_surface: (a: number, b: number, c: number, d: number) => [number, number];
   readonly create_voronoi: (a: number, b: number, c: number, d: number) => [number, number];
   readonly create_wave: (a: number, b: number, c: number, d: number) => [number, number];
+  readonly fourier_stats: (a: number, b: number, c: number) => [number, number];
   readonly main: () => void;
   readonly nbodysimulation_add_body: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
   readonly nbodysimulation_body_count: (a: number) => number;
@@ -423,6 +446,8 @@ export interface InitOutput {
   readonly update_correlation: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
   readonly update_double_pendulum: (a: number, b: number, c: number, d: number, e: number) => [number, number];
   readonly update_fluids: (a: number, b: number, c: number, d: number, e: number) => [number, number];
+  readonly update_fourier_freq: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number];
+  readonly update_fourier_time: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
   readonly update_fourier_viz: (a: number, b: number, c: number, d: number, e: number) => [number, number];
   readonly update_fourier_viz_full: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
   readonly update_generative: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number];

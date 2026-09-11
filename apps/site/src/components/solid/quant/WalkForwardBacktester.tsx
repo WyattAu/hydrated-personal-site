@@ -67,8 +67,10 @@ export default function WalkForwardBacktester() {
   const [oosWindow, setOosWindow] = createSignal(40);
   const [slippageBps, setSlippageBps] = createSignal(5);
   const [commissionBps, setCommissionBps] = createSignal(5);
+  let runId = 0;
 
   async function loadData() {
+    const myRun = ++runId;
     setLoading(true);
     setErr(null);
     try {
@@ -79,6 +81,7 @@ export default function WalkForwardBacktester() {
         ),
         fetch(`${apiBase()}/api/stock-chart?symbol=%5EGSPC&range=2y&interval=1d`),
       ]);
+      if (myRun !== runId) return; // superseded by a newer run
       if (!res.ok) throw new Error(`API ${res.status}`);
       const json = await res.json();
       const quote = json?.chart?.result?.[0]?.indicators?.quote?.[0];
@@ -99,6 +102,10 @@ export default function WalkForwardBacktester() {
       setSpyCloses(spy);
 
       const wasm = await getWasmMod();
+      if (myRun !== runId) return; // superseded by a newer run
+      if (typeof wasm.quant_backtest !== 'function') {
+        throw new Error('stale WASM bundle: quant_backtest missing');
+      }
       const out: BacktestResult = JSON.parse(
         wasm.quant_backtest(
           new Float64Array(closes),
@@ -112,39 +119,51 @@ export default function WalkForwardBacktester() {
         ),
       );
       if (out.error) throw new Error(out.error);
+      if (!Array.isArray(out.equity) || out.equity.length < 2) {
+        throw new Error(`bad result shape for strategy=${strategy()}: equity missing`);
+      }
+      if (!Array.isArray(out.buyhold)) out.buyhold = [];
+      if (!Array.isArray(out.windows)) out.windows = [];
+      if (myRun !== runId) return; // superseded by a newer run
       setResult(out);
     } catch (e) {
+      if (myRun !== runId) return; // a newer run owns the UI now
       console.error('[WalkForwardBacktester]', e);
       setErr(e instanceof Error ? e.message : 'Failed');
       setResult(null);
     } finally {
-      setLoading(false);
+      if (myRun === runId) setLoading(false);
     }
   }
 
   function renderChart() {
     const r = result();
     if (!r) return;
-    const toSeries = (vals: number[], norm: boolean) => {
-      const v0 = norm ? vals[0] || 1 : 1;
-      return vals.map((v, i) => ({
-        time: i,
-        open: 0,
-        high: 0,
-        low: 0,
-        close: norm ? v / v0 : v,
-        volume: 0,
-      }));
-    };
-    const series = [
-      { color: '#00e5ff', data: toSeries(r.equity, false) },
-      { color: '#666666', data: toSeries(r.buyhold, false) },
-    ];
-    const spy = spyCloses();
-    if (spy.length > 1) {
-      series.push({ color: '#eab308', data: toSeries(spy, true) });
+    try {
+      const toSeries = (vals: number[], norm: boolean) => {
+        const v0 = norm ? vals[0] || 1 : 1;
+        return vals.map((v, i) => ({
+          time: i,
+          open: 0,
+          high: 0,
+          low: 0,
+          close: norm ? v / v0 : v,
+          volume: 0,
+        }));
+      };
+      const series = [
+        { color: '#00e5ff', data: toSeries(r.equity, false) },
+        { color: '#666666', data: toSeries(r.buyhold, false) },
+      ];
+      const spy = spyCloses();
+      if (spy.length > 1) {
+        series.push({ color: '#eab308', data: toSeries(spy, true) });
+      }
+      renderPlychart('wf-backtest', 'update_line', JSON.stringify(series), '');
+    } catch (e) {
+      console.error('[WalkForwardBacktester] render failed', e);
+      setErr(e instanceof Error ? `render: ${e.message}` : 'render failed');
     }
-    renderPlychart('wf-backtest', 'update_line', JSON.stringify(series), '');
   }
 
   createEffect(() => {

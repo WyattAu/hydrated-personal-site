@@ -1,22 +1,23 @@
 ---
-title: SSR Personal Site
-description: Brutalist-premium personal portfolio built with Leptos 0.8 and Rust WASM, deployed to Cloudflare Pages. Features a real-time world intelligence monitor tracking 19+ data sources including crypto markets, macroeconomic indicators, stock movers, earthquakes, weather, and LLM benchmarks.
+title: Hydrated Personal Site
+description: This site. Astro 5 with SolidJS islands and Rust/WASM compute — a live trading terminal, quant lab, world intelligence monitor, ETF database and WASM showcase, all rendered client-side and deployed to Cloudflare Pages.
 technologies:
+  - Astro
+  - SolidJS
   - Rust
-  - Leptos
   - WASM
+  - TypeScript
   - Cloudflare Pages
-  - Leaflet
-url: https://github.com/WyattAu/SSR_personal_site
-featured: true
-order: 4
+url: https://forgejo.wyattau.com/wyatt/hydrated_personal_site
+featured: false
+order: 8
 ---
 
-A personal portfolio site rebuilt as a performance-focused Leptos WASM application deployed to Cloudflare Pages. Features a real-time world intelligence monitor, ETF database, and interactive WASM showcase widgets.
+The personal site, rebuilt as an islands-architecture Astro application with heavy computation pushed into Rust/WASM modules running in the browser.
 
 ## Key Features
 
-- **World Intelligence Monitor** — Real-time tracking of earthquakes, crypto, macro indicators, and LLM benchmarks
-- **ETF Database** — 89 ETFs with allocation analysis, correlation matrices, and performance metrics
-- **WASM Widgets** — 13 interactive showcase widgets including Fourier transforms, generative art, and physics simulations
-- **6 Theme System** — Midnight Navy, Tokyo Night, Arctic Dawn, Solaris, and Light themes
+- **Trading terminal** — Live Binance streams, order-book depth, trade tape, funding rates and technical overlays
+- **Quant lab** — Walk-forward backtests, portfolio optimizers, options Greeks, SVI vol surfaces and Monte Carlo fan charts
+- **World monitor** — Crypto, macro, equities, earthquakes, weather and LLM benchmarks on one live dashboard
+- **WASM showcase** — Fourier analysis, fractals, physics sims and generative art, all computed client-side

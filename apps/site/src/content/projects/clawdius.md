@@ -7,7 +7,7 @@ technologies:
   - Bubblewrap
 url: https://github.com/WyattAu/clawdius
 featured: true
-order: 2
+order: 6
 ---
 
 Clawdius is a remote agentic coding environment that leverages WASM-based sandbox isolation for safe code execution. It uses Linux bubblewrap for read-only system access with full filesystem isolation, offering significant performance advantages over traditional Docker-containerized approaches.

@@ -1158,6 +1158,45 @@ export function update_fourier_viz(canvas_id, width, height, time) {
 }
 
 /**
+ * Time-domain panel: ideal waveform (dashed gray) vs partial sum S_N (cyan).
+ * `width`/`height` are device pixels (caller passes DPR-scaled dimensions and
+ * sizes the canvas element with CSS); text/line widths scale with the device
+ * pixel ratio read from the window so output stays crisp on HiDPI screens.
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ * @param {number} time
+ * @param {number} harmonics
+ * @param {number} wave_type
+ */
+export function update_fourier_time(canvas_id, width, height, time, harmonics, wave_type) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_fourier_time(ptr0, len0, width, height, time, harmonics, wave_type);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * Frequency-domain panel: continuous analytic magnitude envelope A(f) sampled
+ * finely (amber curve) plus discrete stem markers + dots at integer n.
+ * @param {string} canvas_id
+ * @param {number} width
+ * @param {number} height
+ * @param {number} harmonics
+ * @param {number} wave_type
+ */
+export function update_fourier_freq(canvas_id, width, height, harmonics, wave_type) {
+    const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.update_fourier_freq(ptr0, len0, width, height, harmonics, wave_type);
+    if (ret[1]) {
+        throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
  * @param {string} canvas_id
  * @param {number} width
  * @param {number} height
@@ -1171,6 +1210,32 @@ export function update_fourier_viz_full(canvas_id, width, height, time, harmonic
     const ret = wasm.update_fourier_viz_full(ptr0, len0, width, height, time, harmonics, wave_type);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
+    }
+}
+
+/**
+ * JSON stats for the coefficient readout: RMS (L2) error of the partial sum
+ * vs the ideal wave over 512 samples, the first min(harmonics, 12)
+ * (n, amp, phase) triples, and the closed-form series string.
+ *
+ * Both the ideal wave and the partial sum are evaluated at the same shifted
+ * argument (t + time) so the animation phase does not inflate the error;
+ * for sine with N >= 1 the error is therefore ~0.
+ * @param {number} time
+ * @param {number} harmonics
+ * @param {number} wave_type
+ * @returns {string}
+ */
+export function fourier_stats(time, harmonics, wave_type) {
+    let deferred1_0;
+    let deferred1_1;
+    try {
+        const ret = wasm.fourier_stats(time, harmonics, wave_type);
+        deferred1_0 = ret[0];
+        deferred1_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
     }
 }
 
@@ -2441,6 +2506,10 @@ function __wbg_get_imports() {
     }, arguments) };
     imports.wbg.__wbg_closePath_936abd634768b284 = function(arg0) {
         arg0.closePath();
+    };
+    imports.wbg.__wbg_devicePixelRatio_68c391265f05d093 = function(arg0) {
+        const ret = arg0.devicePixelRatio;
+        return ret;
     };
     imports.wbg.__wbg_document_d249400bd7bd996d = function(arg0) {
         const ret = arg0.document;
