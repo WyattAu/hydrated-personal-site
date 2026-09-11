@@ -1,1 +1,1 @@
-export const WASM_VERSION = 'v1.4.0';
+export const WASM_VERSION = 'v1.5.0';

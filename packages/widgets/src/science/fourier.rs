@@ -365,10 +365,12 @@ fn envelope_amplitude(f: f64, wave_type: u32) -> f64 {
     let f = f.max(1e-6);
     let odd_mask = (PI * (f - 1.0) / 2.0).cos().powi(2);
     match wave_type {
-        0 => 1.0 / f,
-        1 => odd_mask / f,
-        2 => odd_mask / (f * f),
-        3 => 1.0 / f,
+        // Pure sine: all energy at n=1. Drawn as a narrow bump so the
+        // continuous curve reads as a delta spike sitting on the zero line.
+        0 => ((f - 1.0) * (f - 1.0) / 0.01).exp(),
+        1 => 4.0 * odd_mask / (PI * f),
+        2 => 8.0 * odd_mask / (PI * PI * f * f),
+        3 => 2.0 / (PI * f),
         4 => 1.0 / f.sqrt(),
         _ => 1.0 / f,
     }
@@ -377,30 +379,34 @@ fn envelope_amplitude(f: f64, wave_type: u32) -> f64 {
 fn harmonic_amplitude(harmonic: f64, wave_type: u32) -> f64 {
     match wave_type {
         0 => {
-            // Sine: amplitude decays as 1/h
-            1.0 / harmonic
+            // Pure sine: single line at n=1, all other coefficients zero.
+            if harmonic == 1.0 {
+                1.0
+            } else {
+                0.0
+            }
         }
         1 => {
-            // Square wave: odd harmonics only, amplitude 1/h
+            // Square wave: (4/pi) * (1/h) for odd h, 0 for even h.
             if (harmonic as u64) % 2 == 1 {
-                1.0 / harmonic
+                4.0 / (PI * harmonic)
             } else {
                 0.0
             }
         }
         2 => {
-            // Triangle wave: odd harmonics only, amplitude 1/h^2, alternating sign
+            // Triangle wave: (8/pi^2) * sign/h^2 for odd h, alternating sign.
             if (harmonic as u64) % 2 == 1 {
                 let sign = if ((harmonic as u64 - 1) / 2) % 2 == 0 { 1.0 } else { -1.0 };
-                sign / (harmonic * harmonic)
+                8.0 * sign / (PI * PI * harmonic * harmonic)
             } else {
                 0.0
             }
         }
         3 => {
-            // Sawtooth wave: all harmonics, amplitude 1/h, alternating sign
+            // Sawtooth wave: (2/pi) * sign/h for all h, alternating sign.
             let sign = if (harmonic as u64) % 2 == 1 { 1.0 } else { -1.0 };
-            sign / harmonic
+            2.0 * sign / (PI * harmonic)
         }
         4 => {
             // Pulse wave: amplitude 1/sqrt(h) for wider spectrum
