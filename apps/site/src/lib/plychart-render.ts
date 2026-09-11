@@ -23,6 +23,13 @@ interface RenderCtx {
 const renderCtx = new WeakMap<Element, RenderCtx>();
 const zoomWired = new WeakSet<Element>();
 
+/** Last applied viewport window per canvas. Persisted across data
+ *  re-renders: live updates call renderPlychart with the FULL dataset,
+ *  which would otherwise wipe the zoomed view between wheel events
+ *  (zoom-out then looked like a no-op — the chart had already sprung
+ *  back to full range). */
+const viewports = new WeakMap<Element, { start: number; count: number }>();
+
 /** Update fns whose data is a time-series slice (zoom/pan eligible). */
 const PANABLE = new Set(['update_line', 'update_area', 'update_candles', 'update_bar']);
 
@@ -83,6 +90,7 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
     // change, but this closure was created at first-wire time.
     const c = renderCtx.get(el);
     if (!c) return;
+    viewports.set(el, { start, count });
     const p = await getPlychart();
     const fn = (p as Record<string, (...a: unknown[]) => void>)[c.updateFn];
     if (typeof fn === 'function') {
@@ -143,6 +151,7 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
     if (!c) return;
     const len = dataLen(c.dataJson);
     void viewCall('view_reset', canvasIdOf(el), len).then((vp) => {
+      viewports.delete(el);
       if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
     });
   });
@@ -221,6 +230,7 @@ function attachZoomControls(el: HTMLElement): void {
         return JSON.parse(f(canvasIdOf(el), len)) as { start: number; count: number };
       })
       .then((vp) => {
+        viewports.delete(el);
         if (!vp || vp.count <= 0) return;
         const c2 = renderCtx.get(el);
         if (!c2) return;
@@ -274,8 +284,18 @@ export async function renderPlychart(
 ): Promise<void> {
   const el = document.getElementById(canvasId);
   if (!el) return;
-  const w = Math.round(el.clientWidth);
-  const h = Math.round(el.clientHeight);
+  let w = Math.round(el.clientWidth);
+  let h = Math.round(el.clientHeight);
+  // The canvas may be mid-remount (Show gates toggle it) and briefly report
+  // a zero box — in Firefox the first layout-dependent read often lands
+  // before style/layout settle. Previously we bailed silently and the chart
+  // stayed blank until a resize that never came (the observer held the dead
+  // element). Retry across a few frames instead.
+  for (let i = 0; (w <= 0 || h <= 0) && i < 20; i++) {
+    await new Promise((r) => requestAnimationFrame(r));
+    w = Math.round(el.clientWidth);
+    h = Math.round(el.clientHeight);
+  }
   if (w <= 0 || h <= 0) return;
 
   const key = `${w}x${h}`;
@@ -289,7 +309,21 @@ export async function renderPlychart(
   wireZoomPan(el, renderCtx.get(el)!);
   const fn = (p as Record<string, (...a: unknown[]) => void>)[updateFn];
   if (typeof fn === 'function') {
-    fn(canvasId, dataJson, ...extraArgs);
+    // Re-apply the persisted viewport window: without this, a live data
+    // update re-renders the FULL dataset and silently undoes zoom/pan.
+    let json = dataJson;
+    if (PANABLE.has(updateFn)) {
+      const vp = viewports.get(el);
+      const len = dataLen(dataJson);
+      if (vp && len > 0 && vp.count > 0 && vp.count < len) {
+        if (vp.start >= len) {
+          viewports.delete(el);
+        } else {
+          json = sliceDataJson(dataJson, vp.start, Math.min(vp.count, len - vp.start));
+        }
+      }
+    }
+    fn(canvasId, json, ...extraArgs);
   }
 }
 
@@ -300,22 +334,24 @@ export async function renderPlychart(
  */
 export function usePlychartAuto(canvasId: () => string, render: () => void) {
   let observer: ResizeObserver | undefined;
+  let observedEl: Element | null = null;
 
   onMount(() => {
     if (typeof ResizeObserver === 'undefined') return;
-    let tries = 0;
-    // Canvas may be conditionally rendered (Show when=data) — poll briefly.
+    // Canvas may be conditionally rendered (Show when=data) and REPLACED
+    // on every loading toggle. Keep a slow poll alive: (re)observe the
+    // current element whenever it changes, drop the dead one.
     const timer = setInterval(() => {
-      tries += 1;
       const el = document.getElementById(canvasId());
-      if (el) {
-        clearInterval(timer);
-        observer = new ResizeObserver(() => render());
-        observer.observe(el);
-      } else if (tries > 30) {
-        clearInterval(timer);
+      if (el !== observedEl) {
+        observer?.disconnect();
+        observedEl = el;
+        if (el) {
+          observer = new ResizeObserver(() => render());
+          observer.observe(el);
+        }
       }
-    }, 100);
+    }, 500);
     onCleanup(() => {
       clearInterval(timer);
       observer?.disconnect();
