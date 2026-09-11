@@ -109,10 +109,18 @@ export default function PortfolioBacktest() {
 
   createEffect(() => {
     result();
+    mode();
     renderChart();
   });
 
   usePlychartAuto(() => 'portfolio-backtest', renderChart);
+
+  // Force re-render when mode changes even if result is still loading
+  createEffect(() => {
+    mode();
+    // Re-render existing chart with new mode after data loads
+    if (result()) renderChart();
+  });
 
   function renderWeights() {
     const r = result();

@@ -3,4 +3,4 @@
  * Content hash of plychart_bg.wasm; consumed by plychart-loader.ts
  * to bust Cloudflare's immutable /wasm/* cache.
  */
-export const PLYCHART_VERSION = 'pc6c24201';
+export const PLYCHART_VERSION = 'p2b77bd1b';

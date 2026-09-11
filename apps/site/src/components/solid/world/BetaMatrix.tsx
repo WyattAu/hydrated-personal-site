@@ -1,4 +1,4 @@
-import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 300;
@@ -16,7 +16,7 @@ const ALTS = [
   { symbol: 'TRXUSDT', label: 'TRX' },
 ];
 
-const COLS = ['BTC 30d', 'BTC 90d', 'ETH 30d', 'ETH 90d'];
+const COLS = ['BTC-30D', 'BTC-90D', 'ETH-30D', 'ETH-90D'];
 
 async function fetchCloses(symbol: string): Promise<number[]> {
   const isCrypto = symbol.endsWith('USDT');
@@ -142,7 +142,39 @@ export default function BetaMatrix() {
           {err()}
         </p>
       </Show>
-      <canvas id="beta-matrix" class="w-full" style={{ height: `${H}px` }} />
+      <div class="grid" style={{ 'grid-template-columns': '3rem 1fr', 'column-gap': '6px' }}>
+        {/* corner spacer */}
+        <span />
+        {/* column labels above the canvas */}
+        <div class="grid grid-cols-4 pb-1" style={{ 'align-items': 'end' }}>
+          {COLS.map((c) => (
+            <span
+              class="font-mono text-[9px] text-center"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              {c}
+            </span>
+          ))}
+        </div>
+        {/* row labels to the left of the canvas, split evenly like the heatmap rows */}
+        <div
+          class="grid"
+          style={{
+            'grid-template-rows': `repeat(${grid()?.length ?? 1}, 1fr)`,
+            'align-items': 'center',
+            height: `${H}px`,
+          }}
+        >
+          <For each={grid()}>
+            {(row) => (
+              <span class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
+                {row.label}
+              </span>
+            )}
+          </For>
+        </div>
+        <canvas id="beta-matrix" class="w-full" style={{ height: `${H}px` }} />
+      </div>
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         10 alts vs BTC + ETH | 30d / 90d rolling beta | log returns
       </p>

@@ -103,8 +103,8 @@ export default function VolSurface() {
       });
     } catch (e) {
       console.error('[VolSurface]', e);
-      setErr(e instanceof Error ? e.message : 'Failed');
-      setSurface(null);
+      // Fall back to sample data so the landing page always renders
+      loadSample();
     } finally {
       setLoading(false);
     }
@@ -140,6 +140,68 @@ export default function VolSurface() {
 
   usePlychartAuto(() => 'vol-surface', renderChart);
   usePlychartAuto(() => 'svi-smile', renderSmile);
+
+  const SAMPLE_SURFACE: SviSurface = {
+    slices: [
+      {
+        t: 0.08,
+        params: { a: 0.02, b: 0.15, rho: -0.4, m: 0, sigma: 0.3 },
+        atm_iv: 0.55,
+        rmse: 0.001,
+        curve: [],
+      },
+      {
+        t: 0.17,
+        params: { a: 0.03, b: 0.12, rho: -0.3, m: 0.01, sigma: 0.35 },
+        atm_iv: 0.52,
+        rmse: 0.001,
+        curve: [],
+      },
+      {
+        t: 0.33,
+        params: { a: 0.04, b: 0.1, rho: -0.2, m: 0, sigma: 0.4 },
+        atm_iv: 0.5,
+        rmse: 0.001,
+        curve: [],
+      },
+      {
+        t: 0.67,
+        params: { a: 0.05, b: 0.08, rho: -0.1, m: 0, sigma: 0.45 },
+        atm_iv: 0.48,
+        rmse: 0.001,
+        curve: [],
+      },
+    ],
+    k_grid: Array.from({ length: 20 }, (_, i) => -0.45 + (i / 19) * 0.9),
+    surface_iv: Array.from({ length: 4 }, (_, row) =>
+      Array.from({ length: 20 }, (_, col) => {
+        const k = -0.45 + (col / 19) * 0.9;
+        const base = [0.55, 0.52, 0.5, 0.48][row];
+        return Math.round((base + 0.08 * k * k - 0.03 * k) * 100) / 100;
+      }),
+    ),
+  };
+
+  function loadSample() {
+    const s = SAMPLE_SURFACE;
+    // Generate curves for the smile chart
+    for (const sl of s.slices) {
+      sl.curve = s.k_grid.map((k) => {
+        const w =
+          sl.params.a +
+          sl.params.b *
+            (sl.params.rho * (k - sl.params.m) +
+              Math.sqrt((k - sl.params.m) ** 2 + sl.params.sigma ** 2));
+        return [k, Math.sqrt(w / sl.t)];
+      });
+    }
+    setSurface(s);
+    setSmile({
+      k: s.k_grid,
+      fitted: s.surface_iv[0].map((v) => v),
+    });
+    setLoading(false);
+  }
 
   onMount(() => loadData());
 

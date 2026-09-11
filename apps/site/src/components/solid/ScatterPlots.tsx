@@ -10,6 +10,43 @@ interface Point {
 
 const SCATTER_H = 320;
 
+const PROVIDER_COLORS: Record<string, string> = {
+  OpenAI: '#10a37f',
+  GPT: '#10a37f',
+  Anthropic: '#d97706',
+  Claude: '#d97706',
+  Google: '#4285f4',
+  Gemini: '#4285f4',
+  Gemma: '#4285f4',
+  Meta: '#0668E1',
+  Llama: '#0668E1',
+  Mistral: '#f97316',
+  Mixtral: '#f97316',
+  DeepSeek: '#6366f1',
+};
+
+const DEFAULT_PROVIDER_COLOR = '#94a3b8';
+
+function providerColor(model: string): string {
+  const lower = model.toLowerCase();
+  for (const [key, color] of Object.entries(PROVIDER_COLORS)) {
+    if (lower.includes(key.toLowerCase())) return color;
+  }
+  return DEFAULT_PROVIDER_COLOR;
+}
+
+/** Group points into colored series (update_scatter_multi format). */
+function groupByProvider(pts: Point[]): { color: string; points: number[][] }[] {
+  const groups = new Map<string, number[][]>();
+  for (const p of pts) {
+    const color = providerColor(p.label);
+    const bucket = groups.get(color) ?? [];
+    bucket.push([p.x, p.y]);
+    groups.set(color, bucket);
+  }
+  return [...groups.entries()].map(([color, points]) => ({ color, points }));
+}
+
 function ScatterCanvas(props: {
   id: string;
   points: () => Point[];
@@ -22,8 +59,7 @@ function ScatterCanvas(props: {
   function renderChart() {
     const pts = props.points();
     if (pts.length === 0) return;
-    const scatterData = pts.map((p) => [p.x, p.y]);
-    renderPlychart(props.id, 'update_scatter', JSON.stringify(scatterData), '');
+    renderPlychart(props.id, 'update_scatter_multi', JSON.stringify(groupByProvider(pts)), '');
   }
 
   createEffect(() => {

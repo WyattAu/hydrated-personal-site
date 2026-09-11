@@ -17,6 +17,10 @@ const WS_URL = `wss://stream.binance.com:9443/stream?streams=${SYMBOLS.map(
 ).join('/')}`;
 
 const POLL_INTERVAL = 10_000;
+/** Ticks older than this are dropped from the grid. */
+const REFRESH_STALE_MS = POLL_INTERVAL;
+/** Consecutive REST failures before declaring market data unavailable. */
+const REST_FAILURE_LIMIT = 3;
 /** If WS produces nothing within this window, fall back to REST polling. */
 const WS_FALLBACK_MS = 5_000;
 
@@ -38,6 +42,7 @@ export default function LiveTicker() {
   let pollTimer: ReturnType<typeof setInterval> | undefined;
   let wsFallbackTimer: ReturnType<typeof setTimeout> | undefined;
   let attempts = 0;
+  let restFailures = 0;
   let destroyed = false;
 
   // --- REST polling fallback ---
@@ -46,12 +51,13 @@ export default function LiveTicker() {
     if (destroyed) return;
     try {
       const res = await fetch(`${apiBase()}/api/crypto-ticker`);
-      if (!res.ok) return;
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const body = await res.json();
       const raw = body?.data ?? body;
       const items: Array<{
         symbol?: string;
         lastPrice?: string | number;
+        price?: string | number;
         priceChangePercent?: string | number;
         highPrice?: string | number;
         lowPrice?: string | number;
@@ -75,10 +81,14 @@ export default function LiveTicker() {
       }
       if (Object.keys(updates).length > 0) {
         setTicks((prev) => ({ ...prev, ...updates }));
+        restFailures = 0;
         setSource('rest');
       }
     } catch {
-      /* poll failed — retry next interval */
+      restFailures += 1;
+      if (restFailures >= REST_FAILURE_LIMIT && source() !== 'ws') {
+        setSource('error');
+      }
     }
   }
 
@@ -163,7 +173,12 @@ export default function LiveTicker() {
     }, delay);
   }
 
-  onMount(() => connect());
+  onMount(() => {
+    // Poll REST immediately; WS takes over (and stops polling) once it
+    // produces its first frame.
+    startPolling();
+    connect();
+  });
   onCleanup(() => {
     destroyed = true;
     stopPolling();
@@ -258,8 +273,8 @@ export default function LiveTicker() {
         <Show when={visible().length === 0}>
           <p class="font-mono text-xs p-4 col-span-full" style={{ color: 'var(--text-secondary)' }}>
             {source() === 'error'
-              ? 'Market data unavailable — retrying...'
-              : 'Connecting to market data...'}
+              ? 'Market data unavailable'
+              : `Connecting to market data — ${sourceLabel()}...`}
           </p>
         </Show>
       </div>
