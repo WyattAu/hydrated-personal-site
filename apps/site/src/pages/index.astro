@@ -8,6 +8,9 @@ import ThemeToggle from '../components/solid/ThemeToggle';
 import TickerBar from '../components/solid/TickerBar';
 import ToasterWrapper from '../components/solid/ToasterWrapper';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
+import LiveTicker from '../components/solid/quant/LiveTicker';
+import VolSurface from '../components/solid/quant/VolSurface';
+import PortfolioBacktest from '../components/solid/quant/PortfolioBacktest';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
 import '../styles/animations.css';
@@ -76,10 +79,17 @@ const employment = [
       </div>
       <div class="hero-overlay"></div>
 
-      <div class="max-w-4xl relative z-10">
-        <p class="label mb-4 cinematic-enter" style="color: var(--accent);">Backend Engineer &amp; Systems Architect</p>
+      <!-- Live ticker strip at hero bottom -->
+      <div class="ticker-strip">
+        <LiveTicker client:load />
+      </div>
 
-        <h1 class="hero-name mb-6 cinematic-enter cinematic-enter-delay-1">WYATT AU</h1>
+      <div class="max-w-4xl relative z-10">
+        <p class="label mb-4 cinematic-enter" style="color: var(--accent);">WYATT AU</p>
+
+        <h1 class="hero-name mb-4 cinematic-enter cinematic-enter-delay-1" style="font-family: var(--font-display, 'Fraunces', Georgia, serif); font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 600; letter-spacing: -0.02em;">
+          <span id="rotating-title">Full Stack Engineer</span><span class="type-cursor" aria-hidden="true">|</span>
+        </h1>
 
         <p class="text-lg md:text-xl mb-8 cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 640px;">
           Building deterministic infrastructure and high-performance systems.
@@ -139,6 +149,7 @@ const employment = [
         </span>
       </div>
     </section>
+
 
     <!-- Ticker Bar -->
     <section class="px-6 md:px-12 lg:px-24" style="border-top: 1px solid var(--border);">
@@ -211,21 +222,27 @@ const employment = [
       <p class="mb-8 reveal" style="color: var(--text-secondary); max-width: 640px;">
         Real-time, client-side computations powered by WebAssembly. No server round-trips.
       </p>
+      <!-- Live interactive showcase (glass cards) -->
+      <div class="glass-card mb-6 reveal">
+        <p class="section-label">LIVE — BINANCE WS</p>
+        <LiveTicker client:load />
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children reveal">
-        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
-          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Fourier Transform</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Real-time DFT visualization. Decompose signals into frequency components interactively.</p>
+        <div class="glass-card">
+          <p class="section-label">SVI VOL SURFACE</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Quasi-explicit SVI calibration from live Deribit option chains. Computed in WASM.</p>
+          <VolSurface client:load />
+        </div>
+        <div class="glass-card">
+          <p class="section-label">WALK-FORWARD BACKTEST</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Three strategies. Fitted per window. Net of slippage and commission. No look-ahead.</p>
+          <PortfolioBacktest client:load />
+        </div>
+        <div class="glass-card">
+          <p class="section-label">FOURIER TRANSFORM</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Real-time DFT visualization. Decompose signals into frequency components.</p>
           <WasmEmbed widget="fourier_viz" width={380} height={300} />
-        </div>
-        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
-          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Generative Art</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Procedural art generation using WASM-accelerated noise functions and color palettes.</p>
-          <WasmEmbed widget="generative" width={380} height={300} />
-        </div>
-        <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
-          <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Regex Playground</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Test and debug regular expressions with real-time matching and group extraction.</p>
-          <WasmEmbed widget="regex_playground" width={380} height={300} />
         </div>
       </div>
     </section>
@@ -335,6 +352,31 @@ const employment = [
   <CommandPalette client:load />
   <ToasterWrapper client:load />
 
+  <style>
+    .type-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      margin-left: 2px;
+      background: var(--accent);
+      animation: blink 0.8s step-end infinite;
+      vertical-align: baseline;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .ticker-strip {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border-top: 1px solid var(--glass-border, rgba(201,168,108,0.12));
+      background: var(--glass-bg, rgba(16,24,40,0.72));
+      backdrop-filter: blur(8px);
+      padding: 8px 24px;
+      overflow: hidden;
+      z-index: 20;
+    }
+  </style>
   <script>
     // Hero image pan animation — start after images load
     (function () {
@@ -380,5 +422,32 @@ const employment = [
     );
 
     document.querySelectorAll('.reveal, .stagger-children').forEach((el) => observer.observe(el));
-  </script>
-</BaseLayout>
+  
+    // Rotating hero titles
+    const titles = [
+      'Full Stack Engineer',
+      'DevOps Engineer',
+      'SEO Engineer',
+      'Systems Engineer',
+      'Data Analyst',
+    ];
+    const el = document.getElementById('rotating-title');
+    if (el) {
+      let ti = 0, ci = 0, deleting = false;
+      function type() {
+        const word = titles[ti];
+        if (!deleting) {
+          ci++;
+          el.textContent = word.slice(0, ci);
+          if (ci >= word.length) { deleting = true; setTimeout(type, 2000); return; }
+          setTimeout(type, 60);
+        } else {
+          ci--;
+          el.textContent = word.slice(0, ci);
+          if (ci <= 0) { deleting = false; ti = (ti + 1) % titles.length; setTimeout(type, 400); return; }
+          setTimeout(type, 30);
+        }
+      }
+      setTimeout(type, 800);
+    }
+    </script>

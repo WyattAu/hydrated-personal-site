@@ -47,6 +47,8 @@ export default function LiveTicker() {
     try {
       const res = await fetch(`${apiBase()}/api/crypto-ticker`);
       if (!res.ok) return;
+      const body = await res.json();
+      const raw = body?.data ?? body;
       const items: Array<{
         symbol?: string;
         lastPrice?: string | number;
@@ -54,9 +56,7 @@ export default function LiveTicker() {
         highPrice?: string | number;
         lowPrice?: string | number;
         quoteVolume?: string | number;
-      }> = Array.isArray(await res.json().then((d) => d?.data ?? d))
-        ? await res.json().then((d) => d?.data ?? d)
-        : [];
+      }> = Array.isArray(raw) ? raw : [];
       const now = Date.now();
       const updates: Record<string, Tick> = {};
       for (const item of items) {

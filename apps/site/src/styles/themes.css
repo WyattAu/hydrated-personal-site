@@ -5,30 +5,35 @@
 
 :root,
 [data-theme="midnight-navy"] {
-  --bg-primary: #050505;
-  --bg-secondary: #0a0a0a;
-  --bg-card: #0c0c0c;
-  --text-primary: #ffffff;
-  --text-secondary: #888888;
-  --accent: #00e5ff;
-  --accent-warm: #ff6b35;
-  --border: #1a1a1a;
-  --shadow-depth: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --bg-primary: #0a0e17;
+  --bg-secondary: #0e1520;
+  --bg-card: #101828;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --accent: #c9a86c;
+  --accent-warm: #94744a;
+  --border: #1e293b;
+  --shadow-depth: 0 4px 24px rgba(0, 0, 0, 0.4);
 
-  --amoeba-primary: #00e5ff;
-  --amoeba-secondary: #69f0ae;
-  --amoeba-tertiary: #b388ff;
-  --amoeba-gradient: linear-gradient(135deg, #00e5ff 0%, #69f0ae 50%, #b388ff 100%);
+  --amoeba-primary: #c9a86c;
+  --amoeba-secondary: #94a3b8;
+  --amoeba-tertiary: #60a5fa;
+  --amoeba-gradient: linear-gradient(135deg, #c9a86c 0%, #94a3b8 50%, #60a5fa 100%);
 
-  /* Derived accent utilities */
-  --accent-glow: rgba(0, 229, 255, 0.15);
-  --accent-text-shadow: rgba(0, 229, 255, 0.3);
-  --accent-tint: rgba(0, 229, 255, 0.1);
-  --nav-bg: rgba(5, 5, 5, 0.6);
-  --nav-bg-solid: rgba(5, 5, 5, 0.95);
-  --canvas-text: rgba(255, 255, 255, 0.7);
-  --canvas-grid: rgba(255, 255, 255, 0.1);
-  --bg-hover: #111111;
+  --accent-glow: rgba(201, 168, 108, 0.15);
+  --accent-text-shadow: rgba(201, 168, 108, 0.3);
+  --accent-tint: rgba(201, 168, 108, 0.08);
+  --nav-bg: rgba(10, 14, 23, 0.72);
+  --nav-bg-solid: rgba(10, 14, 23, 0.96);
+  --canvas-text: rgba(226, 232, 240, 0.7);
+  --canvas-grid: rgba(148, 163, 184, 0.1);
+  --bg-hover: #141d30;
+
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --glass-bg: rgba(16, 24, 40, 0.72);
+  --glass-border: rgba(201, 168, 108, 0.12);
+  --positive: #34d399;
+  --negative: #f87171;
 }
 
 [data-theme="tokyo-night"] {
