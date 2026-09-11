@@ -112,9 +112,13 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
     (e) => {
       const c = renderCtx.get(el);
       if (!c) return;
+      // Ignore horizontal-intent gestures entirely: trackpad scrolls drift
+      // diagonally, and deltaY=0 must never take the "zoom in" else-branch
+      // (this was the "both directions zoom in" bug on Firefox trackpads).
+      if (e.deltaY === 0 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
       e.preventDefault();
       // Firefox reports wheel deltas in lines; normalize to pixels.
-      const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * 400 : e.deltaY;
       void zoomStep(dy);
     },
     { passive: false },
