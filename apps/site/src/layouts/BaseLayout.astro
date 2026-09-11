@@ -1,5 +1,6 @@
 ---
 import { SEO } from 'astro-seo';
+import { BUILD_ID, BUILD_TIME } from '../lib/build-id';
 
 export interface Props {
   title?: string;
@@ -178,6 +179,15 @@ const webPageSchema = {
     <!-- Cinematic overlays -->
     <div class="vignette" aria-hidden="true"></div>
     <div class="film-grain" aria-hidden="true"></div>
+
+    <div
+      data-build-stamp
+      class="fixed bottom-1 right-2 font-mono text-[9px] select-none pointer-events-none opacity-40 z-50"
+      style="color: var(--text-secondary);"
+      title={BUILD_TIME}
+    >
+      {BUILD_ID}
+    </div>
   </body>
 </html>
 <!-- csp v4 -->
