@@ -30,6 +30,29 @@ const zoomWired = new WeakSet<Element>();
  *  back to full range). */
 const viewports = new WeakMap<Element, { start: number; count: number }>();
 
+/** ?zoomdebug=1 — visible event log overlay for diagnosing wheel zoom
+ *  reports (deltas as delivered by the browser + viewport responses). */
+let zoomDebugEnabled: boolean | null = null;
+function zoomDebug(msg: string): void {
+  if (zoomDebugEnabled === null) {
+    zoomDebugEnabled = typeof location !== 'undefined' && location.search.includes('zoomdebug');
+  }
+  if (!zoomDebugEnabled) return;
+  let box = document.getElementById('plychart-zoom-debug') as HTMLPreElement | null;
+  if (!box) {
+    box = document.createElement('pre');
+    box.id = 'plychart-zoom-debug';
+    box.style.cssText =
+      'position:fixed;bottom:8px;left:8px;z-index:9999;max-width:70vw;max-height:40vh;' +
+      'overflow:auto;background:rgba(0,0,0,0.85);color:#0f0;font:11px monospace;' +
+      'padding:8px;margin:0;pointer-events:none;white-space:pre-wrap;';
+    document.body.appendChild(box);
+  }
+  const line = `${new Date().toISOString().slice(11, 23)} ${msg}`;
+  box.appendChild(document.createTextNode(line + '\n'));
+  box.scrollTop = box.scrollHeight;
+}
+
 /** Update fns whose data is a time-series slice (zoom/pan eligible). */
 const PANABLE = new Set(['update_line', 'update_area', 'update_candles', 'update_bar']);
 
@@ -91,6 +114,7 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
     const c = renderCtx.get(el);
     if (!c) return;
     viewports.set(el, { start, count });
+    zoomDebug(`reapply id=${canvasIdOf(el)} start=${start} count=${count} fn=${c.updateFn}`);
     const p = await getPlychart();
     const fn = (p as Record<string, (...a: unknown[]) => void>)[c.updateFn];
     if (typeof fn === 'function') {
@@ -100,10 +124,20 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
 
   const zoomStep = async (deltaY: number) => {
     const c = renderCtx.get(el);
-    if (!c) return;
+    if (!c) {
+      zoomDebug(`zoomStep skip: no ctx id=${canvasIdOf(el)}`);
+      return;
+    }
     const len = dataLen(c.dataJson);
-    if (len < 20) return;
+    zoomDebug(
+      `wheel id=${canvasIdOf(el)} dy=${deltaY} len=${len} fn=${c.updateFn} vp=${JSON.stringify(viewports.get(el))}`,
+    );
+    if (len < 20) {
+      zoomDebug('zoomStep skip: len<20');
+      return;
+    }
     const vp = await viewCall('view_zoom', canvasIdOf(el), deltaY, len);
+    zoomDebug(`view_zoom -> ${JSON.stringify(vp)}`);
     if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
   };
 
@@ -115,10 +149,18 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
       // Ignore horizontal-intent gestures entirely: trackpad scrolls drift
       // diagonally, and deltaY=0 must never take the "zoom in" else-branch
       // (this was the "both directions zoom in" bug on Firefox trackpads).
-      if (e.deltaY === 0 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      if (e.deltaY === 0 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        zoomDebug(
+          `wheel gated id=${canvasIdOf(el)} dX=${e.deltaX} dY=${e.deltaY} mode=${e.deltaMode}`,
+        );
+        return;
+      }
       e.preventDefault();
       // Firefox reports wheel deltas in lines; normalize to pixels.
       const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * 400 : e.deltaY;
+      zoomDebug(
+        `wheel accepted id=${canvasIdOf(el)} dX=${e.deltaX} dY=${e.deltaY} mode=${e.deltaMode} dy=${dy}`,
+      );
       void zoomStep(dy);
     },
     { passive: false },
@@ -198,6 +240,7 @@ function attachZoomControls(el: HTMLElement): void {
     const c = renderCtx.get(el);
     if (!c) return;
     const len = dataLen(c.dataJson);
+    zoomDebug(`button id=${canvasIdOf(el)} dy=${deltaY} len=${len}`);
     if (len < 20) return;
     getPlychart()
       .then((p) => {
