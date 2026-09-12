@@ -581,97 +581,110 @@ export function view_pan_end(canvas_id) {
 
 /**
  * Continue a pan drag; returns the updated viewport JSON `{start, count}`.
+ * Params as JSON: `{"x":120,"total":501}`.
  * @param {string} canvas_id
- * @param {number} x
- * @param {number} total
+ * @param {string} params_json
  * @returns {string}
  */
-export function view_pan_move(canvas_id, x, total) {
-    let deferred3_0;
-    let deferred3_1;
+export function view_pan_move(canvas_id, params_json) {
+    let deferred4_0;
+    let deferred4_1;
     try {
         const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.view_pan_move(ptr0, len0, x, total);
-        var ptr2 = ret[0];
-        var len2 = ret[1];
+        const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.view_pan_move(ptr0, len0, ptr1, len1);
+        var ptr3 = ret[0];
+        var len3 = ret[1];
         if (ret[3]) {
-            ptr2 = 0; len2 = 0;
+            ptr3 = 0; len3 = 0;
             throw takeFromExternrefTable0(ret[2]);
         }
-        deferred3_0 = ptr2;
-        deferred3_1 = len2;
-        return getStringFromWasm0(ptr2, len2);
+        deferred4_0 = ptr3;
+        deferred4_1 = len3;
+        return getStringFromWasm0(ptr3, len3);
     } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
     }
 }
 
 /**
  * Begin a pan drag at mouse position (x, y).
+ * Params as JSON: `{"x":120,"y":80,"total":501}`.
  * @param {string} canvas_id
- * @param {number} x
- * @param {number} y
- * @param {number} total
+ * @param {string} params_json
  */
-export function view_pan_start(canvas_id, x, y, total) {
+export function view_pan_start(canvas_id, params_json) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    wasm.view_pan_start(ptr0, len0, x, y, total);
+    const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    wasm.view_pan_start(ptr0, len0, ptr1, len1);
 }
 
 /**
  * Reset the viewport to show all data. Returns the viewport JSON.
+ * Params as JSON: `{"total":501}`.
  * @param {string} canvas_id
- * @param {number} total
+ * @param {string} params_json
  * @returns {string}
  */
-export function view_reset(canvas_id, total) {
-    let deferred3_0;
-    let deferred3_1;
+export function view_reset(canvas_id, params_json) {
+    let deferred4_0;
+    let deferred4_1;
     try {
         const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.view_reset(ptr0, len0, total);
-        var ptr2 = ret[0];
-        var len2 = ret[1];
+        const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.view_reset(ptr0, len0, ptr1, len1);
+        var ptr3 = ret[0];
+        var len3 = ret[1];
         if (ret[3]) {
-            ptr2 = 0; len2 = 0;
+            ptr3 = 0; len3 = 0;
             throw takeFromExternrefTable0(ret[2]);
         }
-        deferred3_0 = ptr2;
-        deferred3_1 = len2;
-        return getStringFromWasm0(ptr2, len2);
+        deferred4_0 = ptr3;
+        deferred4_1 = len3;
+        return getStringFromWasm0(ptr3, len3);
     } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
     }
 }
 
 /**
  * Wheel-zoom the viewport for a canvas. Returns JSON `{start, count}`.
+ *
+ * All numeric parameters travel as ONE JSON string (`{"delta_y":-300,"total":501}`).
+ * The previous `(canvas_id, delta_y: f64, total: usize)` ABI was observed to
+ * desync in bundled consumers — the f64/i32 slots got crossed and `total`
+ * received the bit-wrapped delta, producing 2^32-scale viewports. A single
+ * string parameter cannot be mis-slotted.
  * @param {string} canvas_id
- * @param {number} delta_y
- * @param {number} total
+ * @param {string} params_json
  * @returns {string}
  */
-export function view_zoom(canvas_id, delta_y, total) {
-    let deferred3_0;
-    let deferred3_1;
+export function view_zoom(canvas_id, params_json) {
+    let deferred4_0;
+    let deferred4_1;
     try {
         const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.view_zoom(ptr0, len0, delta_y, total);
-        var ptr2 = ret[0];
-        var len2 = ret[1];
+        const ptr1 = passStringToWasm0(params_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.view_zoom(ptr0, len0, ptr1, len1);
+        var ptr3 = ret[0];
+        var len3 = ret[1];
         if (ret[3]) {
-            ptr2 = 0; len2 = 0;
+            ptr3 = 0; len3 = 0;
             throw takeFromExternrefTable0(ret[2]);
         }
-        deferred3_0 = ptr2;
-        deferred3_1 = len2;
-        return getStringFromWasm0(ptr2, len2);
+        deferred4_0 = ptr3;
+        deferred4_1 = len3;
+        return getStringFromWasm0(ptr3, len3);
     } finally {
-        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
     }
 }
 function __wbg_get_imports() {

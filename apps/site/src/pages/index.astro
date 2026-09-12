@@ -10,6 +10,7 @@ import ToasterWrapper from '../components/solid/ToasterWrapper';
 import LiveTicker from '../components/solid/quant/LiveTicker';
 import PortfolioBacktest from '../components/solid/quant/PortfolioBacktest';
 import VolSurface from '../components/solid/quant/VolSurface';
+import FourierDemo from '../components/solid/showcase/FourierDemo';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
@@ -239,10 +240,10 @@ const employment = [
           <p class="text-sm mb-4" style="color: var(--text-secondary);">Three strategies. Fitted per window. Net of slippage and commission. No look-ahead.</p>
           <PortfolioBacktest client:load />
         </div>
-        <div class="glass-card">
-          <p class="section-label">FOURIER TRANSFORM</p>
-          <p class="text-sm mb-4" style="color: var(--text-secondary);">Real-time DFT visualization. Decompose signals into frequency components.</p>
-          <WasmEmbed widget="fourier_viz" width={380} height={300} />
+        <div class="glass-card md:col-span-2 lg:col-span-3">
+          <p class="section-label">FOURIER SERIES — TIME VS FREQUENCY</p>
+          <p class="text-sm mb-4" style="color: var(--text-secondary);">Partial sums S_N(t) converge to the target waveform while the magnitude spectrum |c_n| traces a continuous analytic envelope. Drag the harmonic count and watch Gibbs overshoot persist at discontinuities.</p>
+          <FourierDemo client:visible />
         </div>
       </div>
     </section>

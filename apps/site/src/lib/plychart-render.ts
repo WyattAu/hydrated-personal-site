@@ -96,13 +96,13 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
 
   const viewCall = async (
     fn: string,
-    ...args: unknown[]
+    params: Record<string, number>,
   ): Promise<{ start: number; count: number } | null> => {
     try {
       const p = await getPlychart();
       const f = (p as Record<string, (...a: unknown[]) => string>)[fn];
       if (typeof f !== 'function') return null;
-      return JSON.parse(f(canvasIdOf(el), ...args));
+      return JSON.parse(f(canvasIdOf(el), JSON.stringify(params)));
     } catch {
       return null;
     }
@@ -136,7 +136,7 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
       zoomDebug('zoomStep skip: len<20');
       return;
     }
-    const vp = await viewCall('view_zoom', canvasIdOf(el), deltaY, len);
+    const vp = await viewCall('view_zoom', { delta_y: deltaY, total: len });
     zoomDebug(`view_zoom -> ${JSON.stringify(vp)}`);
     if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
   };
@@ -172,7 +172,7 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
     dragging = true;
     lastX = e.clientX;
     const len = dataLen(c.dataJson);
-    void viewCall('view_pan_start', canvasIdOf(el), e.offsetX, e.offsetY, len);
+    void viewCall('view_pan_start', { x: e.offsetX, y: e.offsetY, total: len });
   });
 
   window.addEventListener('mousemove', (e) => {
@@ -180,7 +180,7 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
     const c = renderCtx.get(el);
     if (!c) return;
     const len = dataLen(c.dataJson);
-    void viewCall('view_pan_move', canvasIdOf(el), e.clientX - lastX, len).then((vp) => {
+    void viewCall('view_pan_move', { x: e.clientX - lastX, total: len }).then((vp) => {
       if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
     });
     lastX = e.clientX;
@@ -196,7 +196,7 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
     const c = renderCtx.get(el);
     if (!c) return;
     const len = dataLen(c.dataJson);
-    void viewCall('view_reset', canvasIdOf(el), len).then((vp) => {
+    void viewCall('view_reset', { total: len }).then((vp) => {
       viewports.delete(el);
       if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
     });
@@ -246,7 +246,7 @@ function attachZoomControls(el: HTMLElement): void {
       .then((p) => {
         const f = (p as Record<string, (...a: unknown[]) => string>).view_zoom;
         if (typeof f !== 'function') return null;
-        return JSON.parse(f(canvasIdOf(el), deltaY, len)) as {
+        return JSON.parse(f(canvasIdOf(el), JSON.stringify({ delta_y: deltaY, total: len }))) as {
           start: number;
           count: number;
         };
@@ -274,7 +274,10 @@ function attachZoomControls(el: HTMLElement): void {
       .then((p) => {
         const f = (p as Record<string, (...a: unknown[]) => string>).view_reset;
         if (typeof f !== 'function') return null;
-        return JSON.parse(f(canvasIdOf(el), len)) as { start: number; count: number };
+        return JSON.parse(f(canvasIdOf(el), JSON.stringify({ total: len }))) as {
+          start: number;
+          count: number;
+        };
       })
       .then((vp) => {
         viewports.delete(el);
