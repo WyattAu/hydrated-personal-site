@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 const H = 200;
@@ -70,8 +71,12 @@ export default function SolarWindPanel() {
         },
         { label: 'Bz', value: last(bzs), max: 20, unit: 'nT', spark: bzs.slice(-60), signed: true },
       ]);
+      setChartMetaState('solar-wind', { freshAt: Date.now(), error: null });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
+      setChartMetaState('solar-wind', {
+        error: e instanceof Error ? e.message : 'Failed',
+      });
     } finally {
       setLoading(false);
     }
@@ -173,7 +178,13 @@ export default function SolarWindPanel() {
     }
   }
 
-  onMount(() => loadData());
+  onMount(() => {
+    attachChartMeta('solar-wind', {
+      source: 'NOAA SWPC',
+      detail: '1d plasma + mag',
+    });
+    loadData();
+  });
   createEffect(() => {
     const v = data();
     if (v) draw();
@@ -194,7 +205,7 @@ export default function SolarWindPanel() {
           {err()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: `${H}px` }} />
+      <canvas ref={canvasRef} id="solar-wind" class="w-full" style={{ height: `${H}px` }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         NOAA SWPC | 1-day plasma + mag | 1h sparkline
       </p>

@@ -1,12 +1,23 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import { onTickersChanged } from '../../../lib/ticker-events';
 import { activeTickers } from '../../../lib/ticker-universe';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
+/** sessionStorage is unavailable during SSR prerender — read safely. */
+function readSession(k: string): string | null {
+  try {
+    return sessionStorage.getItem(k);
+  } catch {
+    return null;
+  }
+}
+
 const H = 280;
-const SERIES_COLORS = ['#00e5ff', '#ff4081', '#4caf50', '#ff9800', '#7c4dff', '#eab308'];
+// Okabe-Ito colorblind-safe palette for multi-series equity lines.
+const SERIES_COLORS = ['#0072B2', '#D55E00', '#009E73', '#CC79A7', '#E69F00', '#56B4E9'];
 
 interface PortfolioWindow {
   start: number;
@@ -49,9 +60,17 @@ export default function PortfolioBacktest() {
   const [labels, setLabels] = createSignal<string[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
-  const [mode, setMode] = createSignal<'equal' | 'inv_vol' | 'min_var'>('inv_vol');
+  const [mode, setMode] = createSignal<'equal' | 'inv_vol' | 'min_var'>(
+    (readSession('pb-mode') as 'equal' | 'inv_vol' | 'min_var' | null) ?? 'inv_vol',
+  );
   const [rebalanceEvery, setRebalanceEvery] = createSignal(20);
   let runId = 0;
+
+  function setModePersist(m: 'equal' | 'inv_vol' | 'min_var') {
+    setMode(m);
+    sessionStorage.setItem('pb-mode', m);
+    loadData();
+  }
 
   async function loadData() {
     const myRun = ++runId;
@@ -93,6 +112,11 @@ export default function PortfolioBacktest() {
       }
       if (!Array.isArray(out.asset_equity)) out.asset_equity = [];
       if (myRun !== runId) return; // superseded by a newer run
+      setChartMetaState('portfolio-backtest', {
+        fallback: false,
+        error: null,
+        freshAt: Date.now(),
+      });
       setResult(out);
       setLabels(validIdx.map((i) => use[i].label));
     } catch (e) {
@@ -161,7 +185,13 @@ export default function PortfolioBacktest() {
 
   usePlychartAuto(() => 'portfolio-weights', renderWeights);
 
-  onMount(() => loadData());
+  onMount(() => {
+    attachChartMeta('portfolio-backtest', {
+      source: 'Yahoo Finance',
+      detail: '2y daily closes',
+    });
+    loadData();
+  });
   onTickersChanged(() => loadData());
 
   function exportCsv() {
@@ -205,14 +235,10 @@ export default function PortfolioBacktest() {
             background: mode() === 'min_var' ? 'var(--accent)' : 'var(--bg-secondary)',
           }}
           onClick={() => {
-            setMode('min_var');
-            loadData();
+            setModePersist('min_var');
           }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              setMode('min_var');
-              loadData();
-            }
+            if (e.key === 'Enter') setModePersist('min_var');
           }}
         >
           MIN VARIANCE
@@ -226,14 +252,10 @@ export default function PortfolioBacktest() {
             background: mode() === 'inv_vol' ? 'var(--accent)' : 'var(--bg-secondary)',
           }}
           onClick={() => {
-            setMode('inv_vol');
-            loadData();
+            setModePersist('inv_vol');
           }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              setMode('inv_vol');
-              loadData();
-            }
+            if (e.key === 'Enter') setModePersist('inv_vol');
           }}
         >
           INVERSE VOL
@@ -247,14 +269,10 @@ export default function PortfolioBacktest() {
             background: mode() === 'equal' ? 'var(--accent)' : 'var(--bg-secondary)',
           }}
           onClick={() => {
-            setMode('equal');
-            loadData();
+            setModePersist('equal');
           }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              setMode('equal');
-              loadData();
-            }
+            if (e.key === 'Enter') setModePersist('equal');
           }}
         >
           EQUAL WEIGHT

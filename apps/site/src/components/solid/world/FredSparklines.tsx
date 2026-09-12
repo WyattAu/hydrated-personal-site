@@ -1,5 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 interface Series {
@@ -32,6 +33,7 @@ export default function FredSparklines() {
   const [series, setSeries] = createSignal<Series[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [err, setErr] = createSignal<string | null>(null);
+  let loadedAt = 0;
 
   async function loadData() {
     setLoading(true);
@@ -43,8 +45,14 @@ export default function FredSparklines() {
       if (data.error) throw new Error(data.error);
       if (!Array.isArray(data) || data.length === 0) throw new Error('No FRED data');
       setSeries(data);
+      loadedAt = Date.now();
+      for (let i = 0; i < data.length; i++)
+        setChartMetaState(`fred-sparkline-${i}`, { freshAt: loadedAt, error: null });
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Failed');
+      const msg = e instanceof Error ? e.message : 'Failed';
+      setErr(msg);
+      for (let i = 0; i < SERIES.length; i++)
+        setChartMetaState(`fred-sparkline-${i}`, { error: msg });
     } finally {
       setLoading(false);
     }
@@ -57,6 +65,11 @@ export default function FredSparklines() {
       const s = list[i];
       const up = s.values[s.values.length - 1] >= s.values[0];
       const color = up ? '#22c55e' : '#ef4444';
+      // Canvases live behind <Show>, so attach here (post-DOM) — idempotent.
+      attachChartMeta(`fred-sparkline-${i}`, {
+        source: 'FRED',
+        detail: `${s.label} · ${s.code}`,
+      });
       renderPlychart(
         `fred-sparkline-${i}`,
         'update_sparkline',

@@ -1,5 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 240;
@@ -44,8 +45,12 @@ export default function WeatherStrip() {
         if (r.status === 'fulfilled' && r.value.daily.length > 0) ok.push(r.value);
       if (ok.length === 0) throw new Error('No weather');
       setData(ok);
+      setChartMetaState('weather-strip', { freshAt: Date.now(), error: null });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
+      setChartMetaState('weather-strip', {
+        error: e instanceof Error ? e.message : 'Failed',
+      });
     } finally {
       setLoading(false);
     }
@@ -67,6 +72,10 @@ export default function WeatherStrip() {
   usePlychartAuto(() => 'weather-strip', renderChart);
 
   onMount(() => {
+    attachChartMeta('weather-strip', {
+      source: 'Open-Meteo',
+      detail: '5 cities · 7d highs',
+    });
     loadData();
   });
 

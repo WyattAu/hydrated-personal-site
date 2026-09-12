@@ -30,6 +30,10 @@ const zoomWired = new WeakSet<Element>();
  *  back to full range). */
 const viewports = new WeakMap<Element, { start: number; count: number }>();
 
+/** The JSON actually rendered last (post-zoom slice) — tooltip lookups
+ *  must index into this, not the full dataset. */
+const lastRendered = new WeakMap<Element, string>();
+
 /** ?zoomdebug=1 — visible event log overlay for diagnosing wheel zoom
  *  reports (deltas as delivered by the browser + viewport responses). */
 let zoomDebugEnabled: boolean | null = null;
@@ -118,7 +122,9 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
     const p = await getPlychart();
     const fn = (p as Record<string, (...a: unknown[]) => void>)[c.updateFn];
     if (typeof fn === 'function') {
-      fn(canvasIdOf(el), sliceDataJson(c.dataJson, start, count), ...c.extraArgs);
+      const sliced = sliceDataJson(c.dataJson, start, count);
+      lastRendered.set(el, sliced);
+      fn(canvasIdOf(el), sliced, ...c.extraArgs);
     }
   };
 
@@ -201,6 +207,38 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
       if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
     });
   });
+
+  // Keyboard zoom: focus the canvas (Tab), then + / = in, - / _ out,
+  // 0 or R resets. Mirrors the wheel path.
+  if (el.getAttribute('tabindex') === null) el.setAttribute('tabindex', '0');
+  el.addEventListener('keydown', (e) => {
+    const c = renderCtx.get(el);
+    if (!c) return;
+    const len = dataLen(c.dataJson);
+    if (len < 20) return;
+    let dy: number | null = null;
+    if (e.key === '+' || e.key === '=') dy = -120;
+    else if (e.key === '-' || e.key === '_') dy = 120;
+    else if (e.key === '0' || e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      viewCall('view_reset', { total: len }).then((vp) => {
+        viewports.delete(el);
+        if (vp && vp.count > 0) void reupdate(vp.start, vp.count);
+      });
+      return;
+    }
+    if (dy === null) return;
+    e.preventDefault();
+    void zoomStep(dy);
+  });
+
+  // Hover tooltip on every pannable chart, indexing the last-rendered
+  // slice so values stay correct while zoomed/panned.
+  bindTooltip(
+    el,
+    canvasIdOf(el),
+    () => lastRendered.get(el) ?? renderCtx.get(el)?.dataJson ?? '[]',
+  );
 
   attachZoomControls(el);
 }
@@ -373,6 +411,7 @@ export async function renderPlychart(
         }
       }
     }
+    lastRendered.set(el, json);
     fn(canvasId, json, ...extraArgs);
   }
 }

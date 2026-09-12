@@ -1,5 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 280;
@@ -56,8 +57,12 @@ export default function CryptoDominancePie() {
       ].filter((s) => s.pct > 0.01);
       if (out.length === 0) throw new Error('No volume');
       setSlices(out);
+      setChartMetaState('crypto-pie', { freshAt: Date.now(), error: null });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
+      setChartMetaState('crypto-pie', {
+        error: e instanceof Error ? e.message : 'Failed',
+      });
     } finally {
       setLoading(false);
     }
@@ -78,6 +83,10 @@ export default function CryptoDominancePie() {
   usePlychartAuto(() => 'crypto-pie', renderChart);
 
   onMount(() => {
+    attachChartMeta('crypto-pie', {
+      source: 'OKX · Bybit',
+      detail: '24h quote volume',
+    });
     loadData();
   });
 

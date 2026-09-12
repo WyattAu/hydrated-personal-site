@@ -1,5 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 220;
@@ -40,8 +41,12 @@ export default function EarthquakeHistogram() {
           ).length,
       );
       setCounts(out);
+      setChartMetaState('quake-hist', { freshAt: Date.now(), error: null });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
+      setChartMetaState('quake-hist', {
+        error: e instanceof Error ? e.message : 'Failed',
+      });
     } finally {
       setLoading(false);
     }
@@ -68,6 +73,7 @@ export default function EarthquakeHistogram() {
   usePlychartAuto(() => 'quake-hist', renderChart);
 
   onMount(() => {
+    attachChartMeta('quake-hist', { source: 'USGS', detail: '24h feed' });
     loadData();
   });
 

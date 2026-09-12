@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 300;
@@ -75,8 +76,12 @@ export default function RealizedVolRanking() {
       if (ok.length === 0) throw new Error('No data');
       ok.sort((a, b) => b.vol - a.vol);
       setRows(ok);
+      setChartMetaState('realized-vol', { freshAt: Date.now(), error: null });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
+      setChartMetaState('realized-vol', {
+        error: e instanceof Error ? e.message : 'Failed',
+      });
     } finally {
       setLoading(false);
     }
@@ -97,6 +102,10 @@ export default function RealizedVolRanking() {
   usePlychartAuto(() => 'realized-vol', renderChart);
 
   onMount(() => {
+    attachChartMeta('realized-vol', {
+      source: 'OKX/Kraken + Yahoo Finance',
+      detail: '30d annualized',
+    });
     loadData();
   });
 

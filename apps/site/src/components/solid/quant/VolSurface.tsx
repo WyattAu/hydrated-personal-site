@@ -1,5 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
@@ -95,6 +96,7 @@ export default function VolSurface() {
       if (out.error) throw new Error(out.error);
       if (!out.slices || out.slices.length === 0) throw new Error('SVI fit failed');
       setSurface(out);
+      setChartMetaState(canvasId(), { fallback: false, error: null, freshAt: Date.now() });
 
       // Nearest-expiry fitted smile.
       setSmile({
@@ -103,7 +105,12 @@ export default function VolSurface() {
       });
     } catch (e) {
       console.error('[VolSurface]', e);
-      // Fall back to sample data so the landing page always renders
+      // Fall back to sample data so the landing page always renders —
+      // but DISCLOSE it inline instead of passing it off as live.
+      setChartMetaState(canvasId(), {
+        fallback: true,
+        error: e instanceof Error ? e.message : 'live feed unavailable',
+      });
       loadSample();
     } finally {
       setLoading(false);
@@ -203,7 +210,16 @@ export default function VolSurface() {
     setLoading(false);
   }
 
-  onMount(() => loadData());
+  const canvasId = () => 'vol-surface';
+
+  onMount(() => {
+    attachChartMeta('vol-surface', {
+      source: 'Deribit',
+      detail: 'BTC options · SVI fit',
+      fallbackLabel: 'sample data — live feed unavailable',
+    });
+    loadData();
+  });
 
   const s = () => surface();
   const kLabel = (k: number) => `${(k * 100).toFixed(0)}%`;

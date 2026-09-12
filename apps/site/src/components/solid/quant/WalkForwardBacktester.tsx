@@ -2,8 +2,18 @@ import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import { getWasmMod } from '../../../lib/wasm-loader';
+
+/** sessionStorage is unavailable during SSR prerender — read safely. */
+function readSession(k: string): string | null {
+  try {
+    return sessionStorage.getItem(k);
+  } catch {
+    return null;
+  }
+}
 
 const H = 300;
 
@@ -67,6 +77,10 @@ export default function WalkForwardBacktester() {
   const [oosWindow, setOosWindow] = createSignal(40);
   const [slippageBps, setSlippageBps] = createSignal(5);
   const [commissionBps, setCommissionBps] = createSignal(5);
+  const [range, setRange] = createSignal<'6m' | '1y' | '2y'>(
+    (readSession('wf-range') as '6m' | '1y' | '2y' | null) ?? '2y',
+  );
+  const [showSpy, setShowSpy] = createSignal(true);
   let runId = 0;
 
   async function loadData() {
@@ -77,9 +91,9 @@ export default function WalkForwardBacktester() {
       const symbol = activeAsset();
       const [res, spyRes] = await Promise.all([
         fetch(
-          `${apiBase()}/api/stock-chart?symbol=${encodeURIComponent(symbol)}&range=2y&interval=1d`,
+          `${apiBase()}/api/stock-chart?symbol=${encodeURIComponent(symbol)}&range=${range()}&interval=1d`,
         ),
-        fetch(`${apiBase()}/api/stock-chart?symbol=%5EGSPC&range=2y&interval=1d`),
+        fetch(`${apiBase()}/api/stock-chart?symbol=%5EGSPC&range=${range()}&interval=1d`),
       ]);
       if (myRun !== runId) return; // superseded by a newer run
       if (!res.ok) throw new Error(`API ${res.status}`);
@@ -125,6 +139,7 @@ export default function WalkForwardBacktester() {
       if (!Array.isArray(out.buyhold)) out.buyhold = [];
       if (!Array.isArray(out.windows)) out.windows = [];
       if (myRun !== runId) return; // superseded by a newer run
+      setChartMetaState('wf-backtest', { fallback: false, error: null, freshAt: Date.now() });
       setResult(out);
     } catch (e) {
       if (myRun !== runId) return; // a newer run owns the UI now
@@ -152,12 +167,12 @@ export default function WalkForwardBacktester() {
         }));
       };
       const series = [
-        { color: '#00e5ff', data: toSeries(r.equity, false) },
-        { color: '#666666', data: toSeries(r.buyhold, false) },
+        { color: '#0072B2', data: toSeries(r.equity, false) },
+        { color: '#7f7f7f', data: toSeries(r.buyhold, false) },
       ];
       const spy = spyCloses();
-      if (spy.length > 1) {
-        series.push({ color: '#eab308', data: toSeries(spy, true) });
+      if (showSpy() && spy.length > 1) {
+        series.push({ color: '#E69F00', data: toSeries(spy, true) });
       }
       renderPlychart('wf-backtest', 'update_line', JSON.stringify(series), '');
     } catch (e) {
@@ -175,7 +190,13 @@ export default function WalkForwardBacktester() {
 
   usePlychartAuto(() => 'wf-backtest', renderChart);
 
-  onMount(() => loadData());
+  onMount(() => {
+    attachChartMeta('wf-backtest', {
+      source: 'Yahoo Finance',
+      detail: '2y daily · walk-forward IS/OOS',
+    });
+    loadData();
+  });
   onAssetChanged(() => loadData());
 
   function exportCsv() {
@@ -241,6 +262,47 @@ export default function WalkForwardBacktester() {
             {s.label}
           </button>
         ))}
+        <span class="mx-2 border-l" style={{ 'border-color': 'var(--border)' }} />
+        {(['6m', '1y', '2y'] as const).map((r) => (
+          <button
+            type="button"
+            class="font-mono text-[10px] px-3 py-1.5 border cursor-pointer"
+            style={{
+              'border-color': range() === r ? 'var(--accent)' : 'var(--border)',
+              color: range() === r ? 'var(--bg-primary)' : 'var(--accent)',
+              background: range() === r ? 'var(--accent)' : 'var(--bg-secondary)',
+            }}
+            onClick={() => {
+              setRange(r);
+              sessionStorage.setItem('wf-range', r);
+              loadData();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setRange(r);
+                loadData();
+              }
+            }}
+          >
+            {r.toUpperCase()}
+          </button>
+        ))}
+        <span class="mx-2 border-l" style={{ 'border-color': 'var(--border)' }} />
+        <button
+          type="button"
+          class="font-mono text-[10px] px-3 py-1.5 border cursor-pointer"
+          style={{
+            'border-color': showSpy() ? 'var(--accent)' : 'var(--border)',
+            color: showSpy() ? 'var(--bg-primary)' : 'var(--accent)',
+            background: showSpy() ? 'var(--accent)' : 'var(--bg-secondary)',
+          }}
+          onClick={() => setShowSpy(!showSpy())}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') setShowSpy(!showSpy());
+          }}
+        >
+          SPY {showSpy() ? 'ON' : 'OFF'}
+        </button>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
@@ -487,12 +549,12 @@ export default function WalkForwardBacktester() {
           </div>
         </Show>
         <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-          <span style={{ color: '#00e5ff' }}>-</span> strategy (net of{' '}
+          <span style={{ color: '#0072B2' }}>-</span> strategy (net of{' '}
           {slippageBps() + commissionBps()}bps/flip) vs <span style={{ color: '#666' }}>-</span>{' '}
           buy-and-hold
-          <Show when={spyCloses().length > 1}>
+          <Show when={showSpy() && spyCloses().length > 1}>
             {' '}
-            vs <span style={{ color: '#eab308' }}>-</span> SPY
+            vs <span style={{ color: '#E69F00' }}>-</span> SPY
           </Show>{' '}
           | params fit on trailing {isWindow()}d, traded {oosWindow()}d ahead | no look-ahead
         </p>

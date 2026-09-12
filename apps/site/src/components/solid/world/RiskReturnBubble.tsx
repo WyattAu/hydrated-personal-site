@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import {
   attachPlychartTooltip,
   renderPlychart,
@@ -91,8 +92,12 @@ export default function RiskReturnBubble() {
       for (const r of settled) if (r.status === 'fulfilled' && r.value) ok.push(r.value);
       if (ok.length === 0) throw new Error('No data');
       setBubbles(ok);
+      setChartMetaState('risk-return-bubble', { freshAt: Date.now(), error: null });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
+      setChartMetaState('risk-return-bubble', {
+        error: e instanceof Error ? e.message : 'Failed',
+      });
     } finally {
       setLoading(false);
     }
@@ -132,6 +137,10 @@ export default function RiskReturnBubble() {
   onCleanup(attachPlychartTooltip('risk-return-bubble', () => JSON.stringify(buildSeries() ?? [])));
 
   onMount(() => {
+    attachChartMeta('risk-return-bubble', {
+      source: 'OKX/Kraken + Yahoo Finance',
+      detail: '1y daily · Sharpe rf 4%',
+    });
     loadData();
   });
 

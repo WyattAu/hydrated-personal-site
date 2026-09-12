@@ -65,9 +65,10 @@ pub fn update_fourier_time(
 ) -> Result<(), JsValue> {
     let (ctx, w, h) = canvas_ctx(canvas_id, width, height)?;
     let s = device_scale();
+    let t = FourierTheme::load();
     let n = harmonics.max(1).min(50);
 
-    ctx.set_fill_style(&"#0a0a0a".into());
+    ctx.set_fill_style(&t.bg.clone().into());
     ctx.fill_rect(0.0, 0.0, w, h);
 
     let pad_l = 46.0 * s;
@@ -91,7 +92,7 @@ pub fn update_fourier_time(
         ctx.move_to(pad_l, py);
         ctx.line_to(pad_l + pw, py);
         ctx.stroke();
-        ctx.set_fill_style(&"#6b7280".into());
+        ctx.set_fill_style(&t.text_muted.clone().into());
         ctx.set_font(&format!("{}px monospace", (10.0 * s) as u32));
         ctx.fill_text(&format!("{gy:.1}"), 6.0 * s, py + 3.5 * s)?;
     }
@@ -99,19 +100,19 @@ pub fn update_fourier_time(
     for (i, label) in tlabels.iter().enumerate() {
         let frac = i as f64 / 4.0;
         let px = x_of(frac);
-        ctx.set_stroke_style(&"#22242c".into());
+        ctx.set_stroke_style(&t.grid_strong.clone().into());
         ctx.begin_path();
         ctx.move_to(px, pad_t);
         ctx.line_to(px, pad_t + ph);
         ctx.stroke();
-        ctx.set_fill_style(&"#6b7280".into());
+        ctx.set_fill_style(&t.text_muted.clone().into());
         ctx.set_font(&format!("{}px monospace", (10.0 * s) as u32));
         ctx.fill_text(label, px - 8.0 * s, pad_t + ph + 15.0 * s)?;
     }
 
     // Ideal waveform, dashed gray.
     let samples = 512usize;
-    ctx.set_stroke_style(&"#8a8f98".into());
+    ctx.set_stroke_style(&t.ideal.clone().into());
     ctx.set_line_width(1.2 * s);
     let dash: Vec<f64> = vec![6.0 * s, 4.0 * s];
     ctx.set_line_dash(&dash_value(&dash))?;
@@ -130,7 +131,7 @@ pub fn update_fourier_time(
     ctx.set_line_dash(&dash_value(&[]))?;
 
     // Partial sum S_N, solid cyan.
-    ctx.set_stroke_style(&"#00e5ff".into());
+    ctx.set_stroke_style(&t.series.clone().into());
     ctx.set_line_width(2.0 * s);
     ctx.begin_path();
     for i in 0..=samples {
@@ -146,21 +147,21 @@ pub fn update_fourier_time(
     ctx.stroke();
 
     // Title + axis tags.
-    ctx.set_fill_style(&"#ffffff".into());
+    ctx.set_fill_style(&t.text.clone().into());
     ctx.set_font(&format!("{}px monospace", (12.0 * s) as u32));
     ctx.fill_text(
         &format!("Time domain - S_N(t), N={} - {}", n, wave_name(wave_type)),
         10.0 * s,
         18.0 * s,
     )?;
-    ctx.set_fill_style(&"#6b7280".into());
+    ctx.set_fill_style(&t.text_muted.clone().into());
     ctx.set_font(&format!("{}px monospace", (10.0 * s) as u32));
     ctx.fill_text("t", pad_l + pw - 6.0 * s, pad_t + ph + 15.0 * s)?;
     ctx.fill_text("x", 8.0 * s, pad_t - 6.0 * s)?;
 
     // Gibbs annotation for discontinuous targets.
     if wave_type == 1 || wave_type == 3 {
-        ctx.set_fill_style(&"#ffb454".into());
+        ctx.set_fill_style(&"#f5a623".into());
         ctx.set_font(&format!("{}px monospace", (10.0 * s) as u32));
         ctx.fill_text(
             "Gibbs overshoot ~8.9% near jumps",
@@ -184,10 +185,11 @@ pub fn update_fourier_freq(
 ) -> Result<(), JsValue> {
     let (ctx, w, h) = canvas_ctx(canvas_id, width, height)?;
     let s = device_scale();
+    let t = FourierTheme::load();
     let n = harmonics.max(1).min(50);
     let hmax = n as f64;
 
-    ctx.set_fill_style(&"#0a0a0a".into());
+    ctx.set_fill_style(&t.bg.clone().into());
     ctx.fill_rect(0.0, 0.0, w, h);
 
     let pad_l = 46.0 * s;
@@ -219,12 +221,12 @@ pub fn update_fourier_freq(
     for gi in 0..=3 {
         let v = ymax * gi as f64 / 3.0;
         let py = y_of(v);
-        ctx.set_stroke_style(&"#22242c".into());
+        ctx.set_stroke_style(&t.grid_strong.clone().into());
         ctx.begin_path();
         ctx.move_to(pad_l, py);
         ctx.line_to(pad_l + pw, py);
         ctx.stroke();
-        ctx.set_fill_style(&"#6b7280".into());
+        ctx.set_fill_style(&t.text_muted.clone().into());
         ctx.fill_text(&format!("{v:.2}"), 4.0 * s, py + 3.5 * s)?;
     }
 
@@ -232,12 +234,12 @@ pub fn update_fourier_freq(
     let step = ((hmax / 12.0).ceil() as u32).max(1);
     for k in (1..=n).step_by(step as usize) {
         let px = x_of(k as f64);
-        ctx.set_stroke_style(&"#1b1d23".into());
+        ctx.set_stroke_style(&t.grid.clone().into());
         ctx.begin_path();
         ctx.move_to(px, pad_t);
         ctx.line_to(px, base);
         ctx.stroke();
-        ctx.set_fill_style(&"#6b7280".into());
+        ctx.set_fill_style(&t.text_muted.clone().into());
         ctx.fill_text(&k.to_string(), px - 4.0 * s, base + 15.0 * s)?;
     }
 
@@ -262,7 +264,7 @@ pub fn update_fourier_freq(
         let amp = harmonic_amplitude(k as f64, wave_type).abs();
         let px = x_of(k as f64);
         let py = y_of(amp);
-        ctx.set_stroke_style(&"#00e5ff".into());
+        ctx.set_stroke_style(&t.series.clone().into());
         ctx.set_line_width((1.5 * s).max(1.0));
         ctx.begin_path();
         ctx.move_to(px, base);
@@ -275,14 +277,14 @@ pub fn update_fourier_freq(
     }
 
     // Title + axis labels.
-    ctx.set_fill_style(&"#ffffff".into());
+    ctx.set_fill_style(&t.text.clone().into());
     ctx.set_font(&format!("{}px monospace", (12.0 * s) as u32));
     ctx.fill_text(
         &format!("Frequency domain - |c_n| vs n - {}", wave_name(wave_type)),
         10.0 * s,
         18.0 * s,
     )?;
-    ctx.set_fill_style(&"#6b7280".into());
+    ctx.set_fill_style(&t.text_muted.clone().into());
     ctx.set_font(&format!("{}px monospace", (10.0 * s) as u32));
     ctx.fill_text("|c_n|", 8.0 * s, pad_t - 6.0 * s)?;
     ctx.fill_text("n", pad_l + pw - 6.0 * s, base + 15.0 * s)?;
@@ -460,6 +462,61 @@ fn device_scale() -> f64 {
         .clamp(1.0, 3.0)
 }
 
+/// Resolve a CSS custom property from the document element so canvas
+/// drawings follow the active site theme (6 themes, light + dark).
+/// Falls back to `fallback` when the var is missing or empty.
+fn css_var(name: &str, fallback: &str) -> String {
+    let Some(win) = web_sys::window() else {
+        return fallback.to_string();
+    };
+    let Some(doc) = win.document() else {
+        return fallback.to_string();
+    };
+    let Some(el) = doc.document_element() else {
+        return fallback.to_string();
+    };
+    let Ok(Some(style)) = win.get_computed_style(&el) else {
+        return fallback.to_string();
+    };
+    let Ok(val) = style.get_property_value(name) else {
+        return fallback.to_string();
+    };
+    let t = val.trim().to_string();
+    if t.is_empty() {
+        fallback.to_string()
+    } else {
+        t
+    }
+}
+
+use web_sys::wasm_bindgen::JsCast;
+
+/// Theme-resolved palette for the Fourier panels (re-read per draw call so
+/// theme switches take effect on the next animation frame).
+struct FourierTheme {
+    bg: String,
+    grid: String,
+    grid_strong: String,
+    text_muted: String,
+    text: String,
+    series: String,
+    ideal: String,
+}
+
+impl FourierTheme {
+    fn load() -> Self {
+        Self {
+            bg: css_var("--bg-primary", "#0a0a0a"),
+            grid: css_var("--border", "#1b1d23"),
+            grid_strong: css_var("--border", "#22242c"),
+            text_muted: css_var("--text-secondary", "#6b7280"),
+            text: css_var("--text-primary", "#ffffff"),
+            series: css_var("--accent", "#00e5ff"),
+            ideal: css_var("--text-secondary", "#9ca3af"),
+        }
+    }
+}
+
 fn canvas_ctx(
     canvas_id: &str,
     width: u32,
@@ -501,7 +558,8 @@ fn draw_fourier_viz(
     let h = height as f64;
     let half_h = h / 2.0;
 
-    ctx.set_fill_style(&"#0a0a0a".into());
+    let th = FourierTheme::load();
+    ctx.set_fill_style(&th.bg.clone().into());
     ctx.fill_rect(0.0, 0.0, w, h);
 
     let mut signal = vec![0.0f64; sample_count];
@@ -526,7 +584,7 @@ fn draw_fourier_viz(
     let scale = if max_val > 0.0 { (half_h - 20.0) / max_val } else { 1.0 };
 
     // Draw time-domain waveform
-    ctx.set_stroke_style(&"#00e5ff".into());
+    ctx.set_stroke_style(&th.series.clone().into());
     ctx.set_line_width(1.5);
     ctx.begin_path();
     for (i, &val) in signal.iter().enumerate() {
@@ -551,7 +609,7 @@ fn draw_fourier_viz(
     ctx.set_fill_style(&"#1a1a2e".into());
     ctx.fill_rect(spectrum_x - 10.0, 20.0, spectrum_width + 20.0, spectrum_h + 40.0);
 
-    ctx.set_fill_style(&"#ffffff".into());
+    ctx.set_fill_style(&th.text.clone().into());
     ctx.set_font("12px monospace");
     ctx.fill_text("Frequency Spectrum", spectrum_x, 35.0)?;
 
@@ -571,7 +629,7 @@ fn draw_fourier_viz(
     let wave_names = ["Sine", "Square", "Triangle", "Sawtooth", "Pulse"];
     let wave_name = wave_names.get(wave_type as usize).unwrap_or(&"Sine");
 
-    ctx.set_fill_style(&"#ffffff".into());
+    ctx.set_fill_style(&th.text.clone().into());
     ctx.set_font("11px monospace");
     ctx.fill_text("Time Domain", 10.0, 20.0)?;
     ctx.fill_text(&format!("Wave: {} | Harmonics: {}", wave_name, harmonics), 10.0, h - 10.0)?;

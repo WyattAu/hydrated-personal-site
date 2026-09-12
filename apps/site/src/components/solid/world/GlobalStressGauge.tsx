@@ -1,5 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 260;
@@ -89,8 +90,12 @@ export default function GlobalStressGauge() {
         vixStress,
         total: quakeStress + kpStress + fearStress + vixStress,
       });
+      setChartMetaState('stress-gauge', { freshAt: Date.now(), error: null });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
+      setChartMetaState('stress-gauge', {
+        error: e instanceof Error ? e.message : 'Failed',
+      });
     } finally {
       setLoading(false);
     }
@@ -118,6 +123,10 @@ export default function GlobalStressGauge() {
   usePlychartAuto(() => 'stress-gauge', renderChart);
 
   onMount(() => {
+    attachChartMeta('stress-gauge', {
+      source: 'USGS · NOAA SWPC · Yahoo · Alt.me',
+      detail: 'composite 0-100',
+    });
     loadData();
   });
 

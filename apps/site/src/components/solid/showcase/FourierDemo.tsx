@@ -1,4 +1,5 @@
 import { For, Show, createSignal, onCleanup, onMount } from 'solid-js';
+import { attachChartMeta } from '../../../lib/chart-meta';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
 const WAVE_TYPES = ['Sine', 'Square', 'Triangle', 'Sawtooth', 'Pulse'];
@@ -103,6 +104,10 @@ export default function FourierDemo() {
   }
 
   onMount(async () => {
+    attachChartMeta('fourier-time-canvas', {
+      source: 'synthetic',
+      detail: 'analytic Fourier series — no external data',
+    });
     try {
       wasmMod = await getWasmMod();
     } catch (err) {

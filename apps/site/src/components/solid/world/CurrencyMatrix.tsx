@@ -1,5 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 340;
@@ -37,8 +38,12 @@ export default function CurrencyMatrix() {
         grid.push(row);
       }
       setMatrix({ grid, rates });
+      setChartMetaState('currency-matrix', { freshAt: Date.now(), error: null });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
+      setChartMetaState('currency-matrix', {
+        error: e instanceof Error ? e.message : 'Failed',
+      });
     } finally {
       setLoading(false);
     }
@@ -67,6 +72,10 @@ export default function CurrencyMatrix() {
   usePlychartAuto(() => 'currency-matrix', renderChart);
 
   onMount(() => {
+    attachChartMeta('currency-matrix', {
+      source: 'ExchangeRate-API',
+      detail: 'spot · 8 currencies',
+    });
     loadData();
   });
 

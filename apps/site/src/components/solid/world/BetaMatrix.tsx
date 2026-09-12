@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 300;
@@ -102,8 +103,12 @@ export default function BetaMatrix() {
       }
       if (rows.length === 0) throw new Error('No data');
       setGrid(rows);
+      setChartMetaState('beta-matrix', { freshAt: Date.now(), error: null });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
+      setChartMetaState('beta-matrix', {
+        error: e instanceof Error ? e.message : 'Failed',
+      });
     } finally {
       setLoading(false);
     }
@@ -124,6 +129,10 @@ export default function BetaMatrix() {
   usePlychartAuto(() => 'beta-matrix', renderChart);
 
   onMount(() => {
+    attachChartMeta('beta-matrix', {
+      source: 'OKX/Kraken + Yahoo Finance',
+      detail: '30d/90d rolling beta',
+    });
     loadData();
   });
 

@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import {
   attachPlychartTooltip,
   renderPlychart,
@@ -96,8 +97,12 @@ export default function MultiDrawdown() {
       for (const r of settled) if (r.status === 'fulfilled') ok.push(r.value);
       if (ok.length === 0) throw new Error('No data');
       setCurves(ok);
+      setChartMetaState('multi-drawdown', { freshAt: Date.now(), error: null });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed');
+      setChartMetaState('multi-drawdown', {
+        error: e instanceof Error ? e.message : 'Failed',
+      });
     } finally {
       setLoading(false);
     }
@@ -133,6 +138,10 @@ export default function MultiDrawdown() {
   );
 
   onMount(() => {
+    attachChartMeta('multi-drawdown', {
+      source: 'OKX/Kraken + Yahoo Finance',
+      detail: '1y daily',
+    });
     loadData();
   });
   createEffect(() => {
