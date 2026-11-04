@@ -1,5 +1,6 @@
-import { For, createEffect, createSignal } from 'solid-js';
-import { renderPlychart, usePlychartAuto } from '../../lib/plychart-render';
+import { For, createEffect, createSignal, onMount } from 'solid-js';
+import { attachChartMeta } from '../../lib/chart-meta';
+import { renderPlychart, setChartLabels, usePlychartAuto } from '../../lib/plychart-render';
 import { getThemeColors } from '../../lib/theme-colors';
 import type { EtfEntry } from '../../lib/types';
 
@@ -57,6 +58,12 @@ export default function EtfDetail(props: EtfDetailProps) {
     props.etf;
     setPrice((Math.random() * 400 + 50).toFixed(2));
     setChange(((Math.random() - 0.45) * 6).toFixed(2));
+  });
+
+  onMount(() => {
+    attachChartMeta(BARS_ID, { source: 'ETF database', detail: 'static JSON · sectors' });
+    attachChartMeta(DONUT_ID, { source: 'ETF database', detail: 'static JSON · regions' });
+    setChartLabels(BARS_ID, { yUnit: 'alloc %' });
   });
 
   const accentColor = () => {

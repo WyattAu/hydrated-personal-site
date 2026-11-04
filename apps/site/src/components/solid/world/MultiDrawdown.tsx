@@ -3,6 +3,7 @@ import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import {
   attachPlychartTooltip,
   renderPlychart,
+  setChartLabels,
   usePlychartAuto,
 } from '../../../lib/plychart-render';
 
@@ -138,6 +139,7 @@ export default function MultiDrawdown() {
   );
 
   onMount(() => {
+    setChartLabels('multi-drawdown', { yUnit: 'drawdown %' });
     attachChartMeta('multi-drawdown', {
       source: 'OKX/Kraken + Yahoo Finance',
       detail: '1y daily',

@@ -1,5 +1,6 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { drawGrid, getChartTheme, setupCanvas } from '../../../lib/chart-utils';
 import { activeTicker } from '../../../lib/etf-store';
 import { WASM_VERSION } from '../../../lib/wasm-version';
@@ -56,7 +57,9 @@ export default function EtfVaR() {
       }
       const out = wasmMod.quant_var(returns, 0.05);
       setData(JSON.parse(out));
+      setChartMetaState('etf-var', { freshAt: Date.now(), error: null });
     } catch (e) {
+      setChartMetaState('etf-var', { error: e instanceof Error ? e.message : 'VaR failed' });
       setError(e instanceof Error ? e.message : 'Failed to load');
     } finally {
       setLoading(false);
@@ -136,6 +139,10 @@ export default function EtfVaR() {
   }
 
   onMount(() => {
+    attachChartMeta('etf-var', {
+      source: 'Yahoo Finance',
+      detail: '1y daily log returns · 95% HS/param',
+    });
     loadData();
   });
 
@@ -159,7 +166,7 @@ export default function EtfVaR() {
           {error()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: '260px' }} />
+      <canvas ref={canvasRef} id="etf-var" class="w-full" style={{ height: '260px' }} />
       <Show when={data()} keyed>
         {(d) => (
           <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>

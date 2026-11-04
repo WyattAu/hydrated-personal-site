@@ -1,6 +1,7 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
+import { setChartLabels } from '../../../lib/plychart-render';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import { onTickersChanged } from '../../../lib/ticker-events';
 import { activeTickers } from '../../../lib/ticker-universe';
@@ -190,6 +191,7 @@ export default function PortfolioBacktest() {
       source: 'Yahoo Finance',
       detail: '2y daily closes',
     });
+    setChartLabels('portfolio-backtest', { yUnit: 'equity (x initial)' });
     loadData();
   });
   onTickersChanged(() => loadData());

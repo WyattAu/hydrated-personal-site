@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../lib/chart-meta';
 import { renderPlychart, usePlychartAuto } from '../../lib/plychart-render';
 import type { EtfEntry } from '../../lib/types';
 
@@ -76,6 +77,12 @@ export default function CorrelationMatrix(props: CorrelationMatrixProps) {
   usePlychartAuto(() => 'corr-matrix', renderChart);
 
   onMount(() => {
+    attachChartMeta('corr-matrix', {
+      source: 'synthetic',
+      detail: 'seeded demo matrix',
+      fallbackLabel: 'NOT LIVE DATA',
+    });
+    setChartMetaState('corr-matrix', { fallback: true });
     const tickers = selectedTickers();
     setMatrix(generateCorrelation(tickers));
   });

@@ -1,9 +1,11 @@
 import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { activeTicker } from '../../../lib/etf-store';
 import {
   attachPlychartTooltip,
   renderPlychart,
+  setChartLabels,
   usePlychartAuto,
 } from '../../../lib/plychart-render';
 import { WASM_VERSION } from '../../../lib/wasm-version';
@@ -44,7 +46,9 @@ export default function EtfDrawdownChart() {
       }
       const out = sharedWasm.quant_drawdown(Float64Array.from(closes), 252);
       setResult(JSON.parse(out));
-    } catch {
+      setChartMetaState('etf-drawdown', { freshAt: Date.now(), error: null });
+    } catch (e) {
+      setChartMetaState('etf-drawdown', { error: e instanceof Error ? e.message : 'load failed' });
       setResult(null);
     }
     setLoading(false);
@@ -76,6 +80,8 @@ export default function EtfDrawdownChart() {
   usePlychartAuto(() => 'etf-drawdown', renderChart);
 
   onMount(() => {
+    attachChartMeta('etf-drawdown', { source: 'Yahoo Finance', detail: '1y daily' });
+    setChartLabels('etf-drawdown', { yUnit: 'drawdown %' });
     loadData();
     const disposeTip = attachPlychartTooltip('etf-drawdown', () => JSON.stringify(tipData));
     onCleanup(disposeTip);

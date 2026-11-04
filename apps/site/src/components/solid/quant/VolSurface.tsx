@@ -11,6 +11,7 @@ interface OptionEntry {
   strike: number;
   iv: number;
   underlying_price: number;
+  error?: unknown;
 }
 
 interface SviParams {

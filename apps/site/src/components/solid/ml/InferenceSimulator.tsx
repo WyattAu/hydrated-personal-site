@@ -1,4 +1,6 @@
 import { createEffect, createMemo, createSignal } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
+import { setChartLabels } from '../../../lib/plychart-render';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const QUANTS = [
@@ -40,6 +42,12 @@ export default function InferenceSimulator() {
   });
 
   function renderChart() {
+    attachChartMeta('inference-bars', {
+      source: 'synthetic',
+      detail: 'tokens/s by quant · no external data',
+    });
+    setChartLabels('inference-bars', { yUnit: 'tok/s' });
+    setChartMetaState('inference-bars', { freshAt: Date.now() });
     const p = params();
     const bw = bandwidth();
     const vals = QUANTS.map((q) => bw / (2 * p * q.bytes));
@@ -151,6 +159,7 @@ export default function InferenceSimulator() {
             onChange={(e) => setQuant(e.currentTarget.value)}
           >
             {QUANTS.map((q) => (
+              // biome-ignore lint/correctness/useJsxKeyInIterable: SolidJS has no key reconciliation; QUANTS is a static list
               <option value={q.key}>
                 {q.key} ({q.bytes} byte{q.bytes === 1 ? '' : 's'})
               </option>

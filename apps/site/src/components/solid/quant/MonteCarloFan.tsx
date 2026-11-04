@@ -20,6 +20,17 @@ interface MCResult {
   p95: number[];
 }
 
+type QuantWasmModule = {
+  default: () => Promise<void>;
+  quant_seed: (a: number, b: number) => void;
+  quant_montecarlo: (
+    data: Float64Array,
+    tradingDays: number,
+    horizon: number,
+    paths: number,
+  ) => string;
+};
+
 export default function MonteCarloFan(props: { symbol?: string }) {
   const symbol = () => activeAsset();
   const [result, setResult] = createSignal<MCResult | null>(null);
@@ -27,16 +38,7 @@ export default function MonteCarloFan(props: { symbol?: string }) {
   const [loading, setLoading] = createSignal(true);
   const [horizon, setHorizon] = createSignal(90);
   const [error, setError] = createSignal<string | null>(null);
-  let wasmMod: {
-    default: () => Promise<void>;
-    quant_seed: (a: number, b: number) => void;
-    quant_montecarlo: (
-      data: Float64Array,
-      tradingDays: number,
-      horizon: number,
-      paths: number,
-    ) => string;
-  } | null = null;
+  let wasmMod: QuantWasmModule | null = null;
 
   async function loadData() {
     setLoading(true);
@@ -54,14 +56,17 @@ export default function MonteCarloFan(props: { symbol?: string }) {
       if (closes.length < 30) throw new Error('insufficient data');
       setHistorical(closes);
 
-      if (!wasmMod) {
+      let mod = wasmMod;
+      if (!mod) {
         const _w = `/wasm/hydrated_widgets.js?${WASM_VERSION}`;
-        wasmMod = await import(_w);
-        await wasmMod.default();
-        wasmMod.quant_seed(Math.random() * 1e18, Math.random() * 1e18);
+        const imported = (await import(_w)) as QuantWasmModule;
+        await imported.default();
+        imported.quant_seed(Math.random() * 1e18, Math.random() * 1e18);
+        wasmMod = imported;
+        mod = imported;
       }
 
-      const mcJson = wasmMod.quant_montecarlo(new Float64Array(closes), 252, horizon(), 1000);
+      const mcJson = mod.quant_montecarlo(new Float64Array(closes), 252, horizon(), 1000);
       setResult(JSON.parse(mcJson));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load');

@@ -7,6 +7,9 @@ import { getWasmMod } from '../../../lib/wasm-loader';
 const EQ_ID = 'bl-equilibrium';
 const POST_ID = 'bl-posterior';
 const WGT_ID = 'bl-weights';
+const EQ_H = 220;
+const POST_H = 220;
+const WGT_H = 180;
 
 function toBar(v: number) {
   return { time: 0, open: 0, high: 0, low: 0, close: v, volume: 0 };

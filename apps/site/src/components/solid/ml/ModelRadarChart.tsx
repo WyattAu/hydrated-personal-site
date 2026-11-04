@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createMemo } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { useLlmData } from '../../../lib/llm-data';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import type { LLMBenchmarkModel } from '../../../lib/types';
@@ -40,6 +41,11 @@ export default function ModelRadarChart() {
     const models = top5();
     const ax = axes();
     if (models.length === 0 || ax.length < 3) return;
+    attachChartMeta('model-radar', {
+      source: 'LLM benchmark feed',
+      detail: 'top-5 by avg score · 0-100',
+    });
+    setChartMetaState('model-radar', { freshAt: Date.now() });
 
     const labels = ax.map((a) => a.label);
     const series = models.map((m, mi) => ({

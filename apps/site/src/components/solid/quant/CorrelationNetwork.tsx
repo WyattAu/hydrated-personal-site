@@ -1,4 +1,5 @@
 import { Show, createSignal, onMount } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { getThemeColors } from '../../../lib/theme-colors';
 
 export default function CorrelationNetwork() {
@@ -117,9 +118,12 @@ export default function CorrelationNetwork() {
       }));
 
       setLoading(false);
+      setChartMetaState('corr-network', { freshAt: Date.now(), error: null });
       animate();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed');
+      const msg = e instanceof Error ? e.message : 'Failed';
+      setError(msg);
+      setChartMetaState('corr-network', { error: msg });
       setLoading(false);
     }
   }
@@ -220,6 +224,7 @@ export default function CorrelationNetwork() {
   }
 
   onMount(() => {
+    attachChartMeta('corr-network', { source: 'Binance', detail: '60d daily returns' });
     loadData();
     onMount(() => cancelAnimationFrame(rafId));
   });
@@ -246,7 +251,7 @@ export default function CorrelationNetwork() {
           {error()}
         </p>
       </Show>
-      <canvas ref={canvasRef} class="w-full" style={{ height: '340px' }} />
+      <canvas ref={canvasRef} id="corr-network" class="w-full" style={{ height: '340px' }} />
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         60d daily returns | green = positive corr | red = negative corr | size = volatility
       </p>

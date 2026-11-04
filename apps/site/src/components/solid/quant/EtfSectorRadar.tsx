@@ -1,4 +1,5 @@
 import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { activeTicker } from '../../../lib/etf-store';
 import { getPlychart } from '../../../lib/plychart-loader';
 
@@ -50,8 +51,12 @@ export default function EtfSectorRadar() {
       const etf = data.find((e) => e.ticker === activeTicker());
       if (etf?.sector_allocation) {
         setAllocations(etf.sector_allocation);
+        setChartMetaState('sector-radar', { freshAt: Date.now(), error: null });
+      } else {
+        throw new Error('no sector data');
       }
-    } catch {
+    } catch (e) {
+      setChartMetaState('sector-radar', { error: e instanceof Error ? e.message : 'load failed' });
       // keep previous data
     }
     setLoading(false);
@@ -88,6 +93,10 @@ export default function EtfSectorRadar() {
   });
 
   onMount(() => {
+    attachChartMeta('sector-radar', {
+      source: 'etf-database.json',
+      detail: 'GICS sector allocation %',
+    });
     initWasm();
     loadData();
   });

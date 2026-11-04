@@ -1,4 +1,5 @@
 import { createEffect, createSignal } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../lib/chart-meta';
 import { useLlmData } from '../../lib/llm-data';
 import { renderPlychart, usePlychartAuto } from '../../lib/plychart-render';
 
@@ -59,6 +60,8 @@ function ScatterCanvas(props: {
   function renderChart() {
     const pts = props.points();
     if (pts.length === 0) return;
+    attachChartMeta(props.id, { source: 'LLM benchmark feed', detail: props.title });
+    setChartMetaState(props.id, { freshAt: Date.now() });
     renderPlychart(props.id, 'update_scatter_multi', JSON.stringify(groupByProvider(pts)), '');
   }
 

@@ -1,4 +1,5 @@
-import { Show, createEffect, createSignal } from 'solid-js';
+import { Show, createEffect, createSignal, onMount } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import { getThemeColors } from '../../../lib/theme-colors';
 import { WASM_VERSION } from '../../../lib/wasm-version';
 
@@ -42,8 +43,11 @@ export default function EtfConcentrationGauge(props: { holdings: Holding[] }) {
       }
       const out = wasmMod.quant_concentration(weights);
       setResult(JSON.parse(out));
+      setChartMetaState('etf-concentration', { freshAt: Date.now(), error: null });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed');
+      const msg = e instanceof Error ? e.message : 'Failed';
+      setError(msg);
+      setChartMetaState('etf-concentration', { error: msg });
     }
   }
 
@@ -169,6 +173,13 @@ export default function EtfConcentrationGauge(props: { holdings: Holding[] }) {
     if (v) draw();
   });
 
+  onMount(() => {
+    attachChartMeta('etf-concentration', {
+      source: 'holdings weights (props)',
+      detail: 'WASM quant_concentration · HHI',
+    });
+  });
+
   return (
     <div>
       <p class="label mb-3" style={{ color: 'var(--accent)' }}>
@@ -179,7 +190,7 @@ export default function EtfConcentrationGauge(props: { holdings: Holding[] }) {
           {error()}
         </p>
       )}
-      <canvas ref={canvasRef} class="w-full" style={{ height: '200px' }} />
+      <canvas ref={canvasRef} id="etf-concentration" class="w-full" style={{ height: '200px' }} />
       <Show when={result()} keyed>
         {(r) => (
           <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>

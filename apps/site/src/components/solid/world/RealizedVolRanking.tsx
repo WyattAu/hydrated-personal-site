@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createSignal, onMount } from 'solid-js';
 import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
-import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
+import { renderPlychart, setChartLabels, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 300;
 
@@ -102,6 +102,7 @@ export default function RealizedVolRanking() {
   usePlychartAuto(() => 'realized-vol', renderChart);
 
   onMount(() => {
+    setChartLabels('realized-vol', { yUnit: 'ann. vol %' });
     attachChartMeta('realized-vol', {
       source: 'OKX/Kraken + Yahoo Finance',
       detail: '30d annualized',

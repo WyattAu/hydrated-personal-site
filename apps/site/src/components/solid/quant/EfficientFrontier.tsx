@@ -1,7 +1,9 @@
 import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import {
   attachPlychartTooltip,
   renderPlychart,
+  setChartLabels,
   usePlychartAuto,
 } from '../../../lib/plychart-render';
 
@@ -106,8 +108,11 @@ export default function EfficientFrontier() {
         }
       }
       setFrontier(eff);
+      setChartMetaState('efficient-frontier', { freshAt: Date.now(), error: null });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed');
+      const msg = e instanceof Error ? e.message : 'Failed';
+      setError(msg);
+      setChartMetaState('efficient-frontier', { error: msg });
     } finally {
       setLoading(false);
     }
@@ -145,6 +150,11 @@ export default function EfficientFrontier() {
   };
 
   onMount(() => {
+    attachChartMeta('efficient-frontier', {
+      source: 'Binance',
+      detail: '90d daily · 5000 random portfolios',
+    });
+    setChartLabels('efficient-frontier', { xUnit: 'vol %', yUnit: 'return %' });
     loadData();
     const disposeTip = attachPlychartTooltip('efficient-frontier', () => JSON.stringify(tipData));
     onCleanup(disposeTip);

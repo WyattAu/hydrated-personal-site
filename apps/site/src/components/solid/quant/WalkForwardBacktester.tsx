@@ -3,6 +3,7 @@ import { apiBase } from '../../../lib/api-base';
 import { onAssetChanged } from '../../../lib/asset-events';
 import { activeAsset } from '../../../lib/asset-store';
 import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
+import { setChartLabels } from '../../../lib/plychart-render';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 import { getWasmMod } from '../../../lib/wasm-loader';
 
@@ -195,6 +196,7 @@ export default function WalkForwardBacktester() {
       source: 'Yahoo Finance',
       detail: '2y daily · walk-forward IS/OOS',
     });
+    setChartLabels('wf-backtest', { yUnit: 'equity (x initial)' });
     loadData();
   });
   onAssetChanged(() => loadData());

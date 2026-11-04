@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
+import { activeTicker } from '../../../lib/etf-store';
 import { renderPlychart, usePlychartAuto } from '../../../lib/plychart-render';
 
 const H = 300;
@@ -112,7 +113,7 @@ export default function OrderBookDepth() {
     connect(p);
   }
 
-  onMount(() => switchPair(activeAsset()));
+  onMount(() => switchPair(activeTicker()));
   onCleanup(() => {
     if (reconnectTimer) clearTimeout(reconnectTimer);
     ws?.close();

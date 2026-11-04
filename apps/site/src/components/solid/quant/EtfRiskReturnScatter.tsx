@@ -1,8 +1,10 @@
 import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
+import { attachChartMeta, setChartMetaState } from '../../../lib/chart-meta';
 import {
   attachPlychartTooltip,
   renderPlychart,
+  setChartLabels,
   usePlychartAuto,
 } from '../../../lib/plychart-render';
 
@@ -65,7 +67,11 @@ export default function EtfRiskReturnScatter() {
       // Rank by volume, take top N for clarity.
       fetched.sort((a, b) => b.volume - a.volume);
       setPoints(fetched.slice(0, PLOT_TOP_N));
+      setChartMetaState('risk-return-scatter', { freshAt: Date.now(), error: null });
     } catch (e) {
+      setChartMetaState('risk-return-scatter', {
+        error: e instanceof Error ? e.message : 'load failed',
+      });
       setError(e instanceof Error ? e.message : 'Failed');
     } finally {
       setLoading(false);
@@ -121,6 +127,11 @@ export default function EtfRiskReturnScatter() {
   usePlychartAuto(() => 'risk-return-scatter', renderChart);
 
   onMount(() => {
+    attachChartMeta('risk-return-scatter', {
+      source: 'etf-database + Yahoo 1y',
+      detail: 'top-N by volume · Sharpe rf 4%',
+    });
+    setChartLabels('risk-return-scatter', { xUnit: 'vol %', yUnit: 'return %' });
     loadData();
     const disposeTip = attachPlychartTooltip('risk-return-scatter', () => JSON.stringify(tipData));
     onCleanup(disposeTip);

@@ -34,6 +34,59 @@ const viewports = new WeakMap<Element, { start: number; count: number }>();
  *  must index into this, not the full dataset. */
 const lastRendered = new WeakMap<Element, string>();
 
+/** Per-canvas axis labels, consumed by the theme JSON at render time. */
+const chartLabels = new Map<string, { title?: string; y_unit?: string; x_unit?: string }>();
+
+/** Declare axis labels / title for a chart (rendered by plychart). */
+export function setChartLabels(
+  canvasId: string,
+  labels: { title?: string; yUnit?: string; xUnit?: string },
+): void {
+  chartLabels.set(canvasId, {
+    title: labels.title,
+    y_unit: labels.yUnit,
+    x_unit: labels.xUnit,
+  });
+}
+
+/** Read a CSS custom property off the document element (theme-aware). */
+function cssVar(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return v || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+let themeCache: Record<string, string> | null = null;
+let themeCacheAt = 0;
+
+/** Theme colors from the active site theme, cached for 5s. */
+function cssTheme(): Record<string, string> {
+  const now = Date.now();
+  if (themeCache && now - themeCacheAt < 5000) return themeCache;
+  themeCache = {
+    bg: cssVar('--bg-primary', '#0a0a0a'),
+    text: cssVar('--text-primary', '#e0e0e0'),
+    text_muted: cssVar('--text-secondary', '#666666'),
+    grid: cssVar('--border', '#1a1a1a'),
+    accent: cssVar('--accent', '#00e5ff'),
+  };
+  themeCacheAt = now;
+  return themeCache;
+}
+
+/** Build the theme JSON passed to plychart update fns: theme colors plus
+ *  any registered labels. Empty-string themes become theme-aware. */
+function buildThemeJson(canvasId: string, currentThemeArg: string): string {
+  const labels = chartLabels.get(canvasId);
+  if (!currentThemeArg && !labels) return currentThemeArg;
+  const base = currentThemeArg ? (JSON.parse(currentThemeArg) as Record<string, unknown>) : {};
+  return JSON.stringify({ ...cssTheme(), ...base, ...(labels ?? {}) });
+}
+
 /** ?zoomdebug=1 — visible event log overlay for diagnosing wheel zoom
  *  reports (deltas as delivered by the browser + viewport responses). */
 let zoomDebugEnabled: boolean | null = null;
@@ -53,7 +106,7 @@ function zoomDebug(msg: string): void {
     document.body.appendChild(box);
   }
   const line = `${new Date().toISOString().slice(11, 23)} ${msg}`;
-  box.appendChild(document.createTextNode(line + '\n'));
+  box.appendChild(document.createTextNode(`${line}\n`));
   box.scrollTop = box.scrollHeight;
 }
 
@@ -195,7 +248,7 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
   window.addEventListener('mouseup', () => {
     if (!dragging) return;
     dragging = false;
-    void viewCall('view_pan_end', canvasIdOf(el));
+    void viewCall('view_pan_end', {});
   });
 
   el.addEventListener('dblclick', () => {
@@ -238,6 +291,7 @@ function wireZoomPan(el: HTMLElement, ctx: RenderCtx): void {
     el,
     canvasIdOf(el),
     () => lastRendered.get(el) ?? renderCtx.get(el)?.dataJson ?? '[]',
+    {},
   );
 
   attachZoomControls(el);
@@ -393,8 +447,16 @@ export async function renderPlychart(
     sizeCache.set(el, key);
   }
   // Store render context + auto-wire zoom/pan once per canvas.
-  renderCtx.set(el, { updateFn, dataJson, extraArgs });
-  wireZoomPan(el, renderCtx.get(el)!);
+  // PANABLE update fns take (id, data, theme): swap an empty theme arg for
+  // the CSS-var-derived theme + registered axis labels so every chart
+  // follows the active site theme and carries its declared units.
+  let effArgs = extraArgs;
+  if (PANABLE.has(updateFn) && effArgs.length > 0 && effArgs[0] === '') {
+    effArgs = [buildThemeJson(canvasId, effArgs[0]), ...effArgs.slice(1)];
+  }
+  const ctx = { updateFn, dataJson, extraArgs: effArgs };
+  renderCtx.set(el, ctx);
+  wireZoomPan(el, ctx);
   const fn = (p as Record<string, (...a: unknown[]) => void>)[updateFn];
   if (typeof fn === 'function') {
     // Re-apply the persisted viewport window: without this, a live data
@@ -412,7 +474,7 @@ export async function renderPlychart(
       }
     }
     lastRendered.set(el, json);
-    fn(canvasId, json, ...extraArgs);
+    fn(canvasId, json, ...effArgs);
   }
 }
 
