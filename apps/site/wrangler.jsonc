@@ -1,11 +1,19 @@
 {
-  "name": "ssr-temp",
+  // Cloudflare Pages project config — applied by `wrangler pages deploy`
+  // run from this directory (CI: deploy.yml deploy-pages job).
+  // SSR site + Functions share dist/ (mode: server output).
+  "name": "hydrated-site",
+  "pages_build_output_dir": "dist",
   "compatibility_date": "2024-01-01",
   "compatibility_flags": ["nodejs_compat"],
   "kv_namespaces": [
     {
       "binding": "GUESTBOOK",
       "id": "111b1428d9a3457d9dbff2ec93c509ea"
+    },
+    {
+      "binding": "SESSION",
+      "id": "69b9c156428342daa8ec9492cb46eb80"
     }
   ]
 }

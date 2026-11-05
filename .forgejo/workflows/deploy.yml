@@ -186,9 +186,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: site-dist
-          path: dist
+          path: apps/site/dist
       - name: Deploy with Wrangler
-        run: bunx wrangler@3 pages deploy dist --project-name=hydrated-site --branch=main
+        run: bunx wrangler@3 pages deploy
+        working-directory: apps/site
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
