@@ -122,6 +122,9 @@
   font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1;
+  /* The hero sits on a photo + dark scrim in every theme — the text
+     must stay light or it washes out (found on-device, light theme). */
+  color: #f3f6fa;
   text-shadow: 0 0 40px var(--accent-text-shadow);
 }
 
@@ -216,6 +219,13 @@
     opacity: 1;
     filter: blur(0) brightness(1);
   }
+}
+
+.hero-cta {
+  /* Sits on the photo — same light-text rule as .hero-name (on-device
+     finding: --text-secondary washed out over the bright waterfront). */
+  color: rgba(238, 242, 247, 0.92);
+  border-color: rgba(238, 242, 247, 0.55);
 }
 
 /* Letterboxing on ultra-wide screens - subtle edge darkening only */
