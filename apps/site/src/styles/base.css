@@ -114,6 +114,10 @@
   font-weight: 500;
   letter-spacing: 0.15em;
   text-transform: uppercase;
+  /* Touch target: 10px text alone renders ~17px tall (below the 24px
+     WCAG 2.5.8 floor on mobile). Padding brings the link to ~33px. */
+  display: inline-block;
+  padding: 8px 6px;
 }
 
 .hero-name {
