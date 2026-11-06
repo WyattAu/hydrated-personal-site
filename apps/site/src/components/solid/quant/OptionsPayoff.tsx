@@ -149,7 +149,7 @@ export default function OptionsPayoff() {
             {leg.action} {leg.qty}x {leg.type} K={formatNum(leg.strike)} @ {formatNum(leg.premium)}
             <button
               type="button"
-              class="ml-2 opacity-50 hover:opacity-100"
+              class="ml-2 inline-flex items-center justify-center min-w-6 min-h-6 opacity-50 hover:opacity-100"
               onClick={() => {
                 setLegs(legs().filter((_, idx) => idx !== i));
                 setTimeout(draw, 10);

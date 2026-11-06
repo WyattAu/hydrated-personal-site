@@ -584,7 +584,7 @@ export default function PriceChart(props: { symbol?: string; title?: string }) {
               {sym}
               <button
                 type="button"
-                class="ml-0.5 opacity-60 hover:opacity-100"
+                class="ml-0.5 inline-flex items-center justify-center min-w-6 min-h-6 opacity-60 hover:opacity-100"
                 onClick={() => removeSymbol(sym)}
                 aria-label={`Remove ${sym}`}
               >

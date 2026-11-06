@@ -116,7 +116,7 @@ export default function VolatilityForecast(props: { symbol?: string }) {
           {[7, 30, 90].map((h) => (
             <button
               type="button"
-              class="font-mono text-[9px] px-2 py-0.5 border transition-colors"
+              class="font-mono text-[10px] px-2 py-1.5 border transition-colors"
               style={{
                 'border-color': forecastHorizon() === h ? 'var(--accent)' : 'var(--border)',
                 color: forecastHorizon() === h ? 'var(--accent)' : 'var(--text-secondary)',

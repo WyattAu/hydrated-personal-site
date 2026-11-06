@@ -163,7 +163,7 @@ export default function MonteCarloFan(props: { symbol?: string }) {
               <button
                 data-key={h}
                 type="button"
-                class="font-mono text-[9px] px-2 py-0.5 border transition-colors"
+                class="font-mono text-[10px] px-2 py-1.5 border transition-colors"
                 style={{
                   'border-color': horizon() === h ? 'var(--accent)' : 'var(--border)',
                   color: horizon() === h ? 'var(--accent)' : 'var(--text-secondary)',

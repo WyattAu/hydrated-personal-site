@@ -96,7 +96,7 @@ export default function PriceAlerts() {
         <Show when={permission() !== 'granted'}>
           <button
             type="button"
-            class="font-mono text-[9px] px-2 py-0.5 border cursor-pointer"
+            class="font-mono text-[10px] px-2 py-1.5 border cursor-pointer"
             style={{
               'border-color': 'var(--border)',
               color: 'var(--accent)',
@@ -150,7 +150,7 @@ export default function PriceAlerts() {
         />
         <button
           type="button"
-          class="font-mono text-[10px] px-3 py-1 border cursor-pointer"
+          class="font-mono text-[10px] px-3 py-1.5 border cursor-pointer"
           style={{
             'border-color': 'var(--accent)',
             color: 'var(--accent)',
@@ -191,7 +191,7 @@ export default function PriceAlerts() {
         </div>
         <button
           type="button"
-          class="font-mono text-[9px] px-2 py-0.5 border cursor-pointer mt-2"
+          class="font-mono text-[10px] px-2 py-1.5 border cursor-pointer mt-2"
           style={{
             'border-color': 'var(--border)',
             color: 'var(--text-secondary)',

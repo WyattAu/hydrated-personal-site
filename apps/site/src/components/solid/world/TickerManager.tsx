@@ -68,7 +68,7 @@ export default function TickerManager() {
               {t.label}
               <button
                 type="button"
-                class="opacity-40 hover:opacity-100"
+                class="inline-flex items-center justify-center min-w-6 min-h-6 opacity-40 hover:opacity-100"
                 style={{ color: '#ff5252' }}
                 onClick={() => removeTicker(t.symbol)}
               >
@@ -79,7 +79,7 @@ export default function TickerManager() {
         </For>
         <button
           type="button"
-          class="font-mono text-[10px] px-2 py-0.5 border"
+          class="font-mono text-[10px] px-2 py-1.5 border"
           style={{ 'border-color': 'var(--accent)', color: 'var(--accent)' }}
           onClick={() => setOpen(!open())}
         >
@@ -87,7 +87,7 @@ export default function TickerManager() {
         </button>
         <button
           type="button"
-          class="font-mono text-[10px] px-2 py-0.5 border"
+          class="font-mono text-[10px] px-2 py-1.5 border"
           style={{ 'border-color': 'var(--border)', color: 'var(--text-secondary)' }}
           onClick={() => setShowPresets(!showPresets())}
         >
@@ -102,7 +102,7 @@ export default function TickerManager() {
             {(preset) => (
               <button
                 type="button"
-                class="font-mono text-[9px] px-2 py-1 border"
+                class="font-mono text-[10px] px-2 py-1.5 border"
                 style={{ 'border-color': 'var(--border)', color: 'var(--text-secondary)' }}
                 onClick={() => {
                   loadPreset(preset.name);
