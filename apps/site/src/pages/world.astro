@@ -103,9 +103,9 @@ import '../styles/base.css';
       <p class="text-sm" style="color: var(--text-secondary);">Multi-asset market data, client-side quantitative analysis, and global signals.</p>
     </section>
 
-    <section class="w-full border-y overflow-hidden relative" style="border-color: var(--border); height: 50vh; min-height: 360px; isolation: isolate; z-index: 1;">
-      <div class="p-4 border mb-4" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><LiveTicker client:load /></AppErrorBoundary></div>
-      <div class="w-full overflow-hidden" style="height: calc(100% - 80px); position: relative; isolation: isolate;"><AppErrorBoundary client:load><WorldMap client:load /></AppErrorBoundary></div>
+    <section class="w-full border-y overflow-hidden relative flex flex-col h-auto md:h-[50vh] min-h-[420px] md:min-h-[360px]" style="border-color: var(--border); isolation: isolate; z-index: 1;">
+      <div class="p-4 border mb-4 shrink-0" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><LiveTicker client:load /></AppErrorBoundary></div>
+      <div class="w-full overflow-hidden relative shrink-0 h-[380px] md:h-auto md:flex-1 md:min-h-0" style="position: relative; isolation: isolate;"><AppErrorBoundary client:load><WorldMap client:load /></AppErrorBoundary></div>
     </section>
 
     <section class="px-6 md:px-12 lg:px-24 py-4">

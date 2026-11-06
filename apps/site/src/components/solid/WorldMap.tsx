@@ -321,6 +321,8 @@ export default function WorldMap() {
 
   let mapRef: HTMLDivElement | undefined;
   let map: MapInstance | undefined;
+  let invalidate: () => void = () => {};
+  let invalidateTimer: ReturnType<typeof setTimeout> | undefined;
   const markers: Marker[] = [];
   const earthquakeMarkers: Marker[] = [];
   let tileLayer: TileLayer | undefined;
@@ -743,6 +745,17 @@ export default function WorldMap() {
         worldCopyJump: true,
       });
 
+      // Leaflet sizes its pane once at init — if the container was collapsed
+      // or clipped at that moment (mobile ticker wrap inside a fixed-height
+      // section), the pane stays 0x0 and the map renders as a sliver.
+      // Re-measure after layout settles and on every viewport change.
+      leafletMap.invalidateSize();
+      invalidate = (): void => {
+        leafletMap.invalidateSize();
+      };
+      invalidateTimer = setTimeout(invalidate, 300);
+      window.addEventListener('resize', invalidate);
+
       tileLayer = L.tileLayer(
         'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png?key=cb1_2nfr_1_0b48dbccee090ed43078445f',
         {
@@ -817,6 +830,12 @@ export default function WorldMap() {
   });
 
   onCleanup(() => {
+    // invalidateTimer is only assigned inside onMount (client-side), so this
+    // guard also keeps SSR prerender disposal away from browser globals.
+    if (invalidateTimer !== undefined) {
+      clearTimeout(invalidateTimer);
+      window.removeEventListener('resize', invalidate);
+    }
     for (const m of markers) m.remove();
     for (const m of earthquakeMarkers) m.remove();
     geojsonLayer?.remove();
