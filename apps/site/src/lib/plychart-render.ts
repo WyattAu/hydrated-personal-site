@@ -319,8 +319,9 @@ function attachZoomControls(el: HTMLElement): void {
     b.title = title;
     b.setAttribute('aria-label', title);
     b.style.cssText =
-      'font-family:monospace;font-size:11px;line-height:1;padding:3px 8px;cursor:pointer;' +
-      'background:var(--bg-secondary);color:var(--accent);border:1px solid var(--border);';
+      'font-family:monospace;font-size:11px;line-height:1;padding:10px 12px;cursor:pointer;' +
+      'touch-action:manipulation;background:var(--bg-secondary);color:var(--accent);' +
+      'border:1px solid var(--border);';
     b.addEventListener('click', (e) => {
       e.stopPropagation();
       onPress();
