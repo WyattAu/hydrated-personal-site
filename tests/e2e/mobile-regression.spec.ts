@@ -21,6 +21,7 @@ test.use({
 
 test.describe('Mobile regression: world map', () => {
   test('leaflet map fills its section (no sliver collapse)', async ({ page }) => {
+    test.setTimeout(90000); // dev-server on-demand compile of /world is slow on first hit
     await page.goto('/world');
     // leaflet init + the 300ms invalidateSize re-measure
     await page.waitForTimeout(6000);

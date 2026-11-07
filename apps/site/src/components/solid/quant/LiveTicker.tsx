@@ -207,15 +207,17 @@ export default function LiveTicker() {
   };
 
   const sourceColor = () => {
+    // follows theme tokens: connected = positive, polling = warm accent,
+    // error = negative, idle = secondary
     switch (source()) {
       case 'ws':
-        return '#4caf50';
+        return 'var(--positive, #34d399)';
       case 'rest':
-        return '#ff9800';
+        return 'var(--accent-warm, #ff9800)';
       case 'error':
-        return '#ff5252';
+        return 'var(--negative, #f87171)';
       default:
-        return '#666';
+        return 'var(--text-secondary, #666)';
     }
   };
 
@@ -255,11 +257,14 @@ export default function LiveTicker() {
                 </p>
                 <p
                   class="font-mono text-lg font-bold"
-                  style={{ color: up() ? '#4caf50' : '#ff5252' }}
+                  style={{ color: up() ? 'var(--positive, #34d399)' : 'var(--negative, #f87171)' }}
                 >
                   {fmt(t().price)}
                 </p>
-                <p class="font-mono text-[10px]" style={{ color: up() ? '#4caf50' : '#ff5252' }}>
+                <p
+                  class="font-mono text-[10px]"
+                  style={{ color: up() ? 'var(--positive, #34d399)' : 'var(--negative, #f87171)' }}
+                >
                   {up() ? '+' : ''}
                   {delta().toFixed(2)}%
                 </p>

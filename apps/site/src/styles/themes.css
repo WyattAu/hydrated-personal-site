@@ -46,6 +46,11 @@
   --accent-warm: #ff9e64;
   --border: #292e42;
   --shadow-depth: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(31, 35, 53, 0.72);
+  --glass-border: rgba(122, 162, 247, 0.14);
+  --positive: #9ece6a;
+  --negative: #f7768e;
+  --font-display: 'Fraunces', 'Georgia', serif;
 
   --amoeba-primary: #7aa2f7;
   --amoeba-secondary: #9ece6a;
@@ -72,6 +77,11 @@
   --accent-warm: #ea580c;
   --border: #cbd5e1;
   --shadow-depth: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(0, 85, 238, 0.14);
+  --positive: #059669;
+  --negative: #dc2626;
+  --font-display: 'Fraunces', 'Georgia', serif;
 
   --amoeba-primary: #0055ee;
   --amoeba-secondary: #06b6d4;
@@ -98,6 +108,11 @@
   --accent-warm: #f85149;
   --border: #30363d;
   --shadow-depth: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(28, 33, 40, 0.72);
+  --glass-border: rgba(240, 136, 62, 0.14);
+  --positive: #3fb950;
+  --negative: #f85149;
+  --font-display: 'Fraunces', 'Georgia', serif;
 
   --amoeba-primary: #f0883e;
   --amoeba-secondary: #f85149;
@@ -124,6 +139,11 @@
   --accent-warm: #e65100;
   --border: #e0e0e0;
   --shadow-depth: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(0, 131, 143, 0.14);
+  --positive: #2e7d32;
+  --negative: #c62828;
+  --font-display: 'Fraunces', 'Georgia', serif;
 
   --amoeba-primary: #00838f;
   --amoeba-secondary: #2e7d32;

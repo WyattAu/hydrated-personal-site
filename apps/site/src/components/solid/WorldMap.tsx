@@ -34,6 +34,7 @@ interface MapInstance {
 
 interface TileLayer {
   remove: () => void;
+  setUrl: (url: string) => void;
 }
 
 interface Marker {
@@ -323,6 +324,7 @@ export default function WorldMap() {
   let map: MapInstance | undefined;
   let invalidate: () => void = () => {};
   let invalidateTimer: ReturnType<typeof setTimeout> | undefined;
+  let themeObserver: MutationObserver | undefined;
   const markers: Marker[] = [];
   const earthquakeMarkers: Marker[] = [];
   let tileLayer: TileLayer | undefined;
@@ -756,8 +758,16 @@ export default function WorldMap() {
       invalidateTimer = setTimeout(invalidate, 300);
       window.addEventListener('resize', invalidate);
 
+      // Basemap follows the active theme: dark CARTO styles for dark themes,
+      // light styles for light ones (arctic-dawn / light). Re-swapped on
+      // data-theme changes via the observer below.
+      const themeName = document.documentElement.getAttribute('data-theme') || 'midnight-navy';
+      const light = themeName === 'arctic-dawn' || themeName === 'light';
+      const basemap = light ? 'light_nolabels' : 'dark_nolabels';
+      const labels = light ? 'light_only_labels' : 'dark_only_labels';
+
       tileLayer = L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png?key=cb1_2nfr_1_0b48dbccee090ed43078445f',
+        `https://{s}.basemaps.cartocdn.com/${basemap}/{z}/{x}/{y}{r}.png?key=cb1_2nfr_1_0b48dbccee090ed43078445f`,
         {
           attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
@@ -767,13 +777,35 @@ export default function WorldMap() {
       ).addTo(leafletMap);
 
       L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png?key=cb1_2nfr_1_0b48dbccee090ed43078445f',
+        `https://{s}.basemaps.cartocdn.com/${labels}/{z}/{x}/{y}{r}.png?key=cb1_2nfr_1_0b48dbccee090ed43078445f`,
         {
           subdomains: 'abcd',
           maxZoom: 19,
           pane: 'overlayPane',
         },
       ).addTo(leafletMap);
+
+      const labelLayer = L.tileLayer(
+        `https://{s}.basemaps.cartocdn.com/${labels}/{z}/{x}/{y}{r}.png?key=cb1_2nfr_1_0b48dbccee090ed43078445f`,
+        { subdomains: 'abcd', maxZoom: 19, pane: 'overlayPane' },
+      );
+      const syncBasemap = (): void => {
+        const t = document.documentElement.getAttribute('data-theme') || 'midnight-navy';
+        const nowLight = t === 'arctic-dawn' || t === 'light';
+        const nextBase = nowLight ? 'light_nolabels' : 'dark_nolabels';
+        const nextLabels = nowLight ? 'light_only_labels' : 'dark_only_labels';
+        tileLayer?.setUrl(
+          `https://{s}.basemaps.cartocdn.com/${nextBase}/{z}/{x}/{y}{r}.png?key=cb1_2nfr_1_0b48dbccee090ed43078445f`,
+        );
+        labelLayer?.setUrl(
+          `https://{s}.basemaps.cartocdn.com/${nextLabels}/{z}/{x}/{y}{r}.png?key=cb1_2nfr_1_0b48dbccee090ed43078445f`,
+        );
+      };
+      const themeObserver = new MutationObserver(syncBasemap);
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+      });
 
       for (const cap of CAPITALS) {
         const m = L.circleMarker([cap.lat, cap.lon], {
