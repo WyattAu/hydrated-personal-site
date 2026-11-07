@@ -1,0 +1,47 @@
+name: Deploy to GitHub Pages
+
+# Dormant by design: production runs on Cloudflare Pages; the GitHub Pages
+# mirror is fed by the Forgejo deploy.yml deploy-github job pushing dist to
+# the gh-pages branch. Flip Pages to "GitHub Actions" mode and re-enable the
+# push trigger only if the mirror becomes primary.
+on:
+  workflow_dispatch:
+
+# The wyattau.com canonical lives on Cloudflare Pages; this deployment is the
+# public GitHub mirror (wyattau.github.io/hydrated-site). Every page ships a
+# rel=canonical pointing at wyattau.com, so search consolidates there.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+        working-directory: apps/site
+      - name: Build Astro site
+        run: bunx astro build
+        working-directory: apps/site
+      - name: Verify build output
+        run: |
+          test -f apps/site/dist/index.html
+          test -f apps/site/dist/llms.txt
+          test -f apps/site/dist/robots.txt
+      - name: Upload build report
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist-gh
+          path: apps/site/dist/
+          retention-days: 3

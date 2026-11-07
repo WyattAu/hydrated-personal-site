@@ -237,6 +237,37 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
+  deploy-github:
+    name: Deploy GitHub Pages mirror
+    runs-on: ubuntu-latest
+    needs: [build-site]
+    # Mirrors the static build to WyattAu/hydrated-site (GitHub Pages,
+    # branch mode: gh-pages). Every page carries rel=canonical pointing at
+    # wyattau.com, so search consolidates on the primary. Skipped until the
+    # GH_PAGES_TOKEN secret is configured.
+    continue-on-error: true
+    steps:
+      - name: Download site build
+        uses: actions/download-artifact@v4
+        with:
+          name: site-dist
+          path: dist
+      - name: Add .nojekyll (serve underscore dirs)
+        run: touch dist/.nojekyll
+      - name: Push to gh-pages
+        run: |
+          cd dist
+          git init -q
+          git config user.name "hydrated-ci"
+          git config user.email "ci@wyattau.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -qm "deploy: ${GITHUB_SHA:-manual}"
+          git push -q --force "https://x-access-token:${GH_PAGES_TOKEN}@github.com/WyattAu/hydrated-site.git" gh-pages:gh-pages
+        env:
+          GH_PAGES_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
+          GITHUB_SHA: ${{ github.sha }}
+
   smoke-test:
     name: Post-Deploy Smoke Test
     runs-on: ubuntu-latest

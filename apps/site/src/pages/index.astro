@@ -7,6 +7,8 @@ import AppErrorBoundary from '../components/solid/ErrorBoundary';
 import ThemeToggle from '../components/solid/ThemeToggle';
 import TickerBar from '../components/solid/TickerBar';
 import ToasterWrapper from '../components/solid/ToasterWrapper';
+import ThemeDotField from '../components/solid/fx/ThemeDotField';
+import ThemeElectricBorder from '../components/solid/fx/ThemeElectricBorder';
 import LiveTicker from '../components/solid/quant/LiveTicker';
 import PortfolioBacktest from '../components/solid/quant/PortfolioBacktest';
 import VolSurface from '../components/solid/quant/VolSurface';
@@ -79,6 +81,7 @@ const employment = [
         </picture>
       </div>
       <div class="hero-overlay"></div>
+      <ThemeDotField client:load class="absolute inset-0 z-[2] pointer-events-none opacity-60" />
 
       <!-- Live ticker strip at hero bottom -->
       <div class="ticker-strip">
@@ -101,7 +104,13 @@ const employment = [
           United Kingdom // <a href="mailto:wyatt_au@protonmail.com" class="hover:underline" style="color: var(--accent);">wyatt_au@protonmail.com</a>
         </p>
 
-        <div class="flex gap-4 cinematic-enter cinematic-enter-delay-4 flex-wrap">
+        <ThemeElectricBorder
+          client:load
+          desktopOnly
+          class="inline-block p-4 cinematic-enter cinematic-enter-delay-4"
+          borderRadius={12}
+        >
+        <div class="flex gap-4 flex-wrap">
           <a
             href="https://github.com/WyattAu"
             target="_blank"
@@ -135,6 +144,7 @@ const employment = [
             CV
           </a>
         </div>
+        </ThemeElectricBorder>
       </div>
 
       <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">

@@ -5,6 +5,7 @@ import GuestbookForm from '../components/solid/GuestbookForm';
 import GuestbookList from '../components/solid/GuestbookList';
 import ThemeToggle from '../components/solid/ThemeToggle';
 import ToasterWrapper from '../components/solid/ToasterWrapper';
+import ThemeElectricBorder from '../components/solid/fx/ThemeElectricBorder';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
 import '../styles/animations.css';
@@ -33,7 +34,9 @@ import '../styles/animations.css';
             <p class="text-sm mb-6" style="color: var(--text-secondary);">
               Leave your mark. Messages are public and rate-limited to 5 per 10 minutes.
             </p>
-            <GuestbookForm client:load />
+            <ThemeElectricBorder client:load class="p-4" borderRadius={10}>
+              <GuestbookForm client:load />
+            </ThemeElectricBorder>
           </div>
         </div>
 
