@@ -1,6 +1,7 @@
 import { For, createSignal, onCleanup, onMount } from 'solid-js';
 import { apiBase } from '../../lib/api-base';
 import { recordFetch } from './StaleIndicator';
+import CountUp from './fx/CountUp';
 
 // ─── Data Hooks ─────────────────────────────────────────────────────
 
@@ -236,6 +237,9 @@ function MetricCard(props: {
   value: string;
   sublabel?: string;
   color?: string;
+  /** When set, the value rolls up from 0 via solid-fx CountUp instead of
+   *  rendering the static string (props.value still feeds aria-label). */
+  animate?: { to: number; decimals?: number; prefix?: string; suffix?: string };
 }) {
   return (
     <output
@@ -253,7 +257,19 @@ function MetricCard(props: {
         class="font-mono text-lg font-bold"
         style={{ color: props.color || 'var(--text-primary)' }}
       >
-        {props.value}
+        {props.animate ? (
+          <CountUp
+            to={props.animate.to}
+            decimals={props.animate.decimals ?? 2}
+            prefix={props.animate.prefix}
+            suffix={props.animate.suffix}
+            mode="roll"
+            trigger="load"
+            class="tabular-nums"
+          />
+        ) : (
+          props.value
+        )}
       </p>
       {props.sublabel && (
         <p class="font-mono text-[10px] mt-0.5" style="color: var(--text-secondary)">
@@ -310,21 +326,35 @@ export default function MetricCards() {
             <MetricCard
               label="VIX"
               value={macro()['^VIX'] ? fmt(macro()['^VIX'].price) : 'N/A'}
+              animate={macro()['^VIX'] ? { to: macro()['^VIX'].price, decimals: 2 } : undefined}
               sublabel="CBOE"
             />
             <MetricCard
               label="DXY"
               value={macro()['DX-Y.NYB'] ? fmt(macro()['DX-Y.NYB'].price, 3) : 'N/A'}
+              animate={
+                macro()['DX-Y.NYB'] ? { to: macro()['DX-Y.NYB'].price, decimals: 3 } : undefined
+              }
               sublabel="US DOLLAR INDEX"
             />
             <MetricCard
               label="10Y YIELD"
               value={macro()['^TNX'] ? `${fmt(macro()['^TNX'].price, 3)}%` : 'N/A'}
+              animate={
+                macro()['^TNX']
+                  ? { to: macro()['^TNX'].price, decimals: 3, suffix: '%' }
+                  : undefined
+              }
               sublabel="US TREASURY"
             />
             <MetricCard
               label="GOLD"
               value={macro()['GC=F'] ? `$${fmt(macro()['GC=F'].price)}` : 'N/A'}
+              animate={
+                macro()['GC=F']
+                  ? { to: macro()['GC=F'].price, decimals: 2, prefix: '$' }
+                  : undefined
+              }
               sublabel="COMEX"
               color="var(--accent)"
             />

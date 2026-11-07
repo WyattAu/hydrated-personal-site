@@ -1,3 +1,13 @@
+# Policy record (2026-11-06): AI crawlers are explicitly welcome on this
+# personal site — visibility in search indexes, AI answers, and training
+# corpora is the intent. The blanket AI-crawler blocks previously served here
+# came from Cloudflare's managed "AI Crawl Control" list (zone-level feature,
+# not this file). If blocks reappear in the served robots.txt, that feature
+# was re-enabled in the Cloudflare dashboard (Security -> Bots) and should be
+# turned off again to keep this recorded policy in force.
+#
+# Sitemap and contact for AI answer engines: see /llms.txt.
+
 User-agent: *
 Allow: /
 Disallow: /api/

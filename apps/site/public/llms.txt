@@ -1,0 +1,32 @@
+# Wyatt Au — Backend Engineer & Systems Architect
+
+> Personal site and intelligence dashboard of Wyatt Au: deterministic
+> infrastructure, high-performance systems, and client-side quantitative
+> analysis. Includes live market data (ETFs, crypto, macro indicators),
+> 16 interactive Rust/WASM widgets, and an ML benchmark explorer. All
+> computation runs client-side in the browser.
+
+## Pages
+
+- [Home](https://wyattau.com/): overview of Wyatt Au — backend engineering, systems architecture, and current work bootstrapping QuestHive.
+- [World Monitor](https://wyattau.com/world): real-time intelligence dashboard — crypto prices via Binance WebSocket, market map, macro rates (VIX, DXY, yields), earthquakes, and solar-wind data.
+- [ETF Intelligence](https://wyattau.com/etf): database of 89 ETFs with allocation analysis, correlation matrix, Monte Carlo simulation, VaR, portfolio backtesting, and walk-forward analysis.
+- [ML Benchmarks](https://wyattau.com/ml): LLM benchmark leaderboards, model comparison radar charts, GPU requirement calculator, and inference throughput simulator.
+- [World Data](https://wyattau.com/data): reference datasets powering the dashboards.
+- [Docs](https://wyattau.com/docs): technical notes, architecture decisions, and infrastructure documentation.
+- [Dossier](https://wyattau.com/dossier): detailed biography and timeline.
+- [Projects](https://wyattau.com/projects): selected engineering projects.
+- [Guestbook](https://wyattau.com/guestbook): visitor messages, persisted in Cloudflare KV.
+
+## Highlights
+
+- All client-side computation is Rust compiled to WebAssembly (lock-free ring buffers, binary serialization, SIMD-optimized numerics) — roughly 140 KB across 16 widgets.
+- Charts render via [plychart](https://github.com/WyattAu/plychart), a custom Rust/WASM charting library with pan and zoom.
+- The stack is Astro 5 + SolidJS 1.9 + Tailwind CSS 4, deployed on Cloudflare Pages and Workers.
+
+## Contact
+
+- Email: [wyatt_au@protonmail.com](mailto:wyatt_au@protonmail.com)
+- GitHub: [WyattAu](https://github.com/WyattAu)
+- Forgejo: [forgejo.wyattau.com/wyatt](https://forgejo.wyattau.com/wyatt)
+- X: [@_WyattAu_](https://x.com/_WyattAu_)
