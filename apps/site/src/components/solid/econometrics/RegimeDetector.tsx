@@ -71,7 +71,7 @@ export default function RegimeDetector() {
       close: v,
       volume: 0,
     }));
-    const series = [{ color: '#00e5ff', data: chartData }];
+    const series = [{ color: 'var(--accent, #00e5ff)', data: chartData }];
     tipData = chartData;
     renderPlychart('regime-detector', 'update_line', JSON.stringify(series), '');
   }
@@ -127,8 +127,9 @@ export default function RegimeDetector() {
             style={{ 'border-color': 'var(--border)' }}
           >
             {(() => {
-              const d = data()!;
+              const d = data();
               const rets = returns();
+              if (!d) return null;
               const win = 120;
               const start = Math.max(0, rets.length - win);
               const n = rets.length - start;
@@ -136,6 +137,7 @@ export default function RegimeDetector() {
               return Array.from({ length: n }, (_, i) => {
                 const st = states[start + i] ?? 0;
                 return (
+                  // biome-ignore lint/correctness/useJsxKeyInIterable: SolidJS static regime band, identity stable
                   <div
                     class="flex-1"
                     style={{
@@ -175,7 +177,10 @@ export default function RegimeDetector() {
                 style={{
                   'border-color': 'var(--border)',
                   background: 'var(--bg-secondary)',
-                  color: d.current_regime === 0 ? '#4caf50' : '#ff5252',
+                  color:
+                    d.current_regime === 0
+                      ? 'var(--positive, #4caf50)'
+                      : 'var(--negative, #ff5252)',
                 }}
               >
                 {label}

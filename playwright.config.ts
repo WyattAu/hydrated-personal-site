@@ -18,10 +18,13 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'bun run dev',
+    // The cloudflare adapter has no `astro preview`; serve the built dist
+    // statically instead — identical to what Pages ships. Run `bun run build`
+    // in apps/site first when dist is stale.
+    command: 'python3 -m http.server 4321 --directory apps/site/dist',
     port: 4321,
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 30000,
   },
   reporter: process.env.CI
     ? [['html', { open: 'never' }], ['github']]

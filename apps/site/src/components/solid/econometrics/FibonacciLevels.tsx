@@ -78,7 +78,7 @@ export default function FibonacciLevels() {
       close: v,
       volume: 0,
     }));
-    const series = [{ color: '#00e5ff', data }];
+    const series = [{ color: 'var(--accent, #00e5ff)', data }];
     tipData = data;
     renderPlychart('fib-levels', 'update_line', JSON.stringify(series), '');
   }
@@ -134,9 +134,14 @@ export default function FibonacciLevels() {
                 <div class="flex flex-wrap gap-1.5">
                   {s.levels.map((lv) => {
                     const isSupport = lv.price < s.current;
-                    const color = lv.golden ? '#ffc107' : isSupport ? '#4caf50' : '#ff5252';
+                    const color = lv.golden
+                      ? '#ffc107'
+                      : isSupport
+                        ? 'var(--positive, #4caf50)'
+                        : 'var(--negative, #ff5252)';
                     const borderStyle = lv.golden ? 'solid' : 'dashed';
                     return (
+                      // biome-ignore lint/correctness/useJsxKeyInIterable: SolidJS static list, identity stable
                       <div
                         class="font-mono text-[9px] px-2 py-1 border flex items-center gap-1.5"
                         style={{

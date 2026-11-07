@@ -243,7 +243,7 @@ function MetricCard(props: {
 }) {
   return (
     <output
-      class="p-3 border block"
+      class="metric-card p-3 border block"
       style="border-color: var(--border); background: var(--bg-card);"
       aria-label={`${props.label}: ${props.value}`}
     >

@@ -205,7 +205,7 @@ export default function OrderBookDepth() {
             <p class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
               BEST BID
             </p>
-            <p class="font-mono text-sm font-bold" style={{ color: '#4caf50' }}>
+            <p class="font-mono text-sm font-bold" style={{ color: 'var(--positive, #4caf50)' }}>
               {best()!.bid}
             </p>
           </div>
@@ -227,7 +227,7 @@ export default function OrderBookDepth() {
             <p class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
               BEST ASK
             </p>
-            <p class="font-mono text-sm font-bold" style={{ color: '#ff5252' }}>
+            <p class="font-mono text-sm font-bold" style={{ color: 'var(--negative, #ff5252)' }}>
               {best()!.ask}
             </p>
           </div>

@@ -84,8 +84,9 @@ export default function StressTestPanel() {
               const pnl = sc.portfolio_pnl ?? 0;
               const isOpen = () => expanded() === i();
               return (
-                <div
-                  class="border p-2 cursor-pointer"
+                <button
+                  type="button"
+                  class="border p-2 cursor-pointer w-full text-left"
                   style={{ 'border-color': 'var(--border)', background: 'var(--bg-secondary)' }}
                   onClick={() => setExpanded(isOpen() ? null : i())}
                 >
@@ -98,7 +99,9 @@ export default function StressTestPanel() {
                     </span>
                     <span
                       class="font-mono text-sm font-bold"
-                      style={{ color: pnl >= 0 ? '#4caf50' : '#ff5252' }}
+                      style={{
+                        color: pnl >= 0 ? 'var(--positive, #4caf50)' : 'var(--negative, #ff5252)',
+                      }}
                     >
                       {pnl >= 0 ? '+' : ''}
                       {pnl.toFixed(1)}%
@@ -128,7 +131,12 @@ export default function StressTestPanel() {
                               </span>
                             </span>
                             <span
-                              style={{ color: (a.contribution ?? 0) >= 0 ? '#4caf50' : '#ff5252' }}
+                              style={{
+                                color:
+                                  (a.contribution ?? 0) >= 0
+                                    ? 'var(--positive, #4caf50)'
+                                    : 'var(--negative, #ff5252)',
+                              }}
                             >
                               {(a.shock_pct ?? 0) >= 0 ? '+' : ''}
                               {(a.shock_pct ?? 0).toFixed(1)}% →{' '}
@@ -140,7 +148,7 @@ export default function StressTestPanel() {
                       </For>
                     </div>
                   </Show>
-                </div>
+                </button>
               );
             }}
           </For>

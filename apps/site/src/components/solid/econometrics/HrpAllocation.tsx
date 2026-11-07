@@ -148,7 +148,9 @@ export default function HrpAllocation() {
             {(row) => (
               <div class="flex items-center justify-between py-0.5">
                 <span style={{ color: 'var(--text-secondary)' }}>{row.label}</span>
-                <span style={{ color: '#4caf50' }}>{(row.w * 100).toFixed(1)}%</span>
+                <span style={{ color: 'var(--positive, #4caf50)' }}>
+                  {(row.w * 100).toFixed(1)}%
+                </span>
               </div>
             )}
           </For>

@@ -70,7 +70,7 @@ function stats(closes: number[], volume: number, label: string): Bubble | null {
 const VOLUME_BUCKETS = [
   { color: '#546e7a', label: 'LOW VOL' },
   { color: '#42a5f5', label: 'MED VOL' },
-  { color: '#00e5ff', label: 'HIGH VOL' },
+  { color: 'var(--accent, #00e5ff)', label: 'HIGH VOL' },
 ];
 
 export default function RiskReturnBubble() {

@@ -32,7 +32,7 @@ async function fetchReturns(symbol: string, range: string): Promise<number[]> {
 const LINES: Array<{ key: keyof BetaPoint; color: string; label: string }> = [
   { key: 'mkt', color: '#42a5f5', label: 'MARKET' },
   { key: 'size', color: '#ffa726', label: 'SIZE' },
-  { key: 'value', color: '#4caf50', label: 'VALUE' },
+  { key: 'value', color: 'var(--positive, #4caf50)', label: 'VALUE' },
 ];
 
 export default function RollingMultiFactor() {

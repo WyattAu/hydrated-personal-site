@@ -127,7 +127,7 @@ export default function EfficientFrontier() {
     const series = [
       { color: '#666666', points: pts.map((p) => [p.risk, p.ret]) },
       {
-        color: '#00e5ff',
+        color: 'var(--accent, #00e5ff)',
         points: frontier().map((p) => [p.risk, p.ret]),
       },
     ];
@@ -195,8 +195,8 @@ export default function EfficientFrontier() {
       </Show>
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         <span style={{ color: '#666666' }}>■</span> random portfolios{' '}
-        <span style={{ color: '#00e5ff' }}>■</span> efficient frontier | 5000 portfolios | 8 assets
-        | 90d daily returns | risk-free 4%
+        <span style={{ color: 'var(--accent, #00e5ff)' }}>■</span> efficient frontier | 5000
+        portfolios | 8 assets | 90d daily returns | risk-free 4%
       </p>
     </div>
   );

@@ -80,7 +80,7 @@ export default function VolatilityForecast(props: { symbol?: string }) {
     const fcData = fcVol.map((v, i) => toCandle(v, histVol.length + i));
 
     const series = [
-      { color: '#00e5ff', data: garchData },
+      { color: 'var(--accent, #00e5ff)', data: garchData },
       { color: '#7c4dff', data: ewmaData },
       { color: '#f0883e', data: fcData },
     ];

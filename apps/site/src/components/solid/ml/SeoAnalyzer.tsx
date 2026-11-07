@@ -162,7 +162,12 @@ export default function SeoAnalyzer() {
                 </p>
                 <p
                   class="font-mono text-sm"
-                  style={{ color: r().title_length >= 30 ? '#4caf50' : '#ff5252' }}
+                  style={{
+                    color:
+                      r().title_length >= 30
+                        ? 'var(--positive, #4caf50)'
+                        : 'var(--negative, #ff5252)',
+                  }}
                 >
                   {r().title_length} chars
                 </p>
@@ -179,7 +184,12 @@ export default function SeoAnalyzer() {
                 </p>
                 <p
                   class="font-mono text-sm"
-                  style={{ color: r().description_length >= 120 ? '#4caf50' : '#ff5252' }}
+                  style={{
+                    color:
+                      r().description_length >= 120
+                        ? 'var(--positive, #4caf50)'
+                        : 'var(--negative, #ff5252)',
+                  }}
                 >
                   {r().description_length} chars
                 </p>
@@ -231,7 +241,9 @@ export default function SeoAnalyzer() {
                 </p>
                 <p
                   class="font-mono text-sm font-bold"
-                  style={{ color: r().has_lang ? '#4caf50' : '#ff5252' }}
+                  style={{
+                    color: r().has_lang ? 'var(--positive, #4caf50)' : 'var(--negative, #ff5252)',
+                  }}
                 >
                   {r().has_lang ? r().lang || 'Yes' : 'MISSING'}
                 </p>
@@ -248,7 +260,10 @@ export default function SeoAnalyzer() {
                 </p>
                 <p
                   class="font-mono text-sm font-bold"
-                  style={{ color: r().h1_count === 1 ? '#4caf50' : '#ff5252' }}
+                  style={{
+                    color:
+                      r().h1_count === 1 ? 'var(--positive, #4caf50)' : 'var(--negative, #ff5252)',
+                  }}
                 >
                   {r().h1_count} / {r().h2_count}
                 </p>
@@ -282,7 +297,12 @@ export default function SeoAnalyzer() {
                 </p>
                 <p
                   class="font-mono text-sm font-bold"
-                  style={{ color: r().images_missing_alt > 0 ? '#ff5252' : '#4caf50' }}
+                  style={{
+                    color:
+                      r().images_missing_alt > 0
+                        ? 'var(--negative, #ff5252)'
+                        : 'var(--positive, #4caf50)',
+                  }}
                 >
                   {r().image_count} ({r().images_missing_alt} missing alt)
                 </p>

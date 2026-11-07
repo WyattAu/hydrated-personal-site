@@ -126,8 +126,8 @@ export default function WeekRange52() {
 
                 {/* Low / High labels */}
                 <div class="flex justify-between mt-1 font-mono text-[9px]">
-                  <span style={{ color: '#ff5252' }}>{d.wLow.toFixed(2)}</span>
-                  <span style={{ color: '#4caf50' }}>{d.wHigh.toFixed(2)}</span>
+                  <span style={{ color: 'var(--negative, #ff5252)' }}>{d.wLow.toFixed(2)}</span>
+                  <span style={{ color: 'var(--positive, #4caf50)' }}>{d.wHigh.toFixed(2)}</span>
                 </div>
               </div>
             </div>

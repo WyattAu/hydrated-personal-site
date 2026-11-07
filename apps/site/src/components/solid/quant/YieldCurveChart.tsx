@@ -82,7 +82,7 @@ export default function YieldCurveChart() {
       fittedData.push({ time: i, open: 0, high: 0, low: 0, close: y, volume: 0 });
     }
 
-    const series = [{ color: '#00e5ff', data: fittedData }];
+    const series = [{ color: 'var(--accent, #00e5ff)', data: fittedData }];
     tipData = fittedData;
 
     renderPlychart('yield-curve', 'update_line', JSON.stringify(series), '');

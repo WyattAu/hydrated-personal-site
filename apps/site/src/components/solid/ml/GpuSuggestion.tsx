@@ -258,130 +258,144 @@ export default function GpuSuggestion() {
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
         <div>
           <label
+            for="gpu-params"
             class="font-mono text-[9px] uppercase tracking-wider block mb-1"
             style={{ color: 'var(--text-secondary)' }}
           >
             Parameters (B)
+            <input
+              id="gpu-params"
+              type="number"
+              min="0.5"
+              step="0.5"
+              value={params()}
+              onInput={(e) => setParams(Math.max(0.5, Number(e.currentTarget.value) || 7))}
+              class="font-mono text-xs px-2 py-1 border w-full"
+              style={{
+                'border-color': 'var(--border)',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+              }}
+            />
           </label>
-          <input
-            type="number"
-            min="0.5"
-            step="0.5"
-            value={params()}
-            onInput={(e) => setParams(Math.max(0.5, Number(e.currentTarget.value) || 7))}
-            class="font-mono text-xs px-2 py-1 border w-full"
-            style={{
-              'border-color': 'var(--border)',
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-            }}
-          />
         </div>
         <div>
           <label
+            for="gpu-quant"
             class="font-mono text-[9px] uppercase tracking-wider block mb-1"
             style={{ color: 'var(--text-secondary)' }}
           >
             Quantization
+            <select
+              id="gpu-quant"
+              class="font-mono text-xs px-2 py-1 border w-full"
+              style={{
+                'border-color': 'var(--border)',
+                background: 'var(--bg-card)',
+                color: 'var(--accent)',
+              }}
+              value={quant()}
+              onChange={(e) => setQuant(e.currentTarget.value)}
+            >
+              <For each={Object.keys(QUANTIZATION_BYTES)}>
+                {(q) => <option value={q}>{q}</option>}
+              </For>
+            </select>
           </label>
-          <select
-            class="font-mono text-xs px-2 py-1 border w-full"
-            style={{
-              'border-color': 'var(--border)',
-              background: 'var(--bg-card)',
-              color: 'var(--accent)',
-            }}
-            value={quant()}
-            onChange={(e) => setQuant(e.currentTarget.value)}
-          >
-            <For each={Object.keys(QUANTIZATION_BYTES)}>
-              {(q) => <option value={q}>{q}</option>}
-            </For>
-          </select>
         </div>
         <div>
           <label
+            for="gpu-engine"
             class="font-mono text-[9px] uppercase tracking-wider block mb-1"
             style={{ color: 'var(--text-secondary)' }}
           >
             Serving Engine
+            <select
+              id="gpu-engine"
+              class="font-mono text-xs px-2 py-1 border w-full"
+              style={{
+                'border-color': 'var(--border)',
+                background: 'var(--bg-card)',
+                color: 'var(--accent)',
+              }}
+              value={engine()}
+              onChange={(e) => setEngine(e.currentTarget.value)}
+            >
+              <For each={Object.keys(ENGINE_EFFICIENCY)}>
+                {(e) => <option value={e}>{e}</option>}
+              </For>
+            </select>
           </label>
-          <select
-            class="font-mono text-xs px-2 py-1 border w-full"
-            style={{
-              'border-color': 'var(--border)',
-              background: 'var(--bg-card)',
-              color: 'var(--accent)',
-            }}
-            value={engine()}
-            onChange={(e) => setEngine(e.currentTarget.value)}
-          >
-            <For each={Object.keys(ENGINE_EFFICIENCY)}>{(e) => <option value={e}>{e}</option>}</For>
-          </select>
         </div>
         <div>
           <label
+            for="gpu-batch"
             class="font-mono text-[9px] uppercase tracking-wider block mb-1"
             style={{ color: 'var(--text-secondary)' }}
           >
             Batch Size
+            <input
+              id="gpu-batch"
+              type="number"
+              min="1"
+              step="1"
+              value={batchSize()}
+              onInput={(e) => setBatchSize(Math.max(1, Number(e.currentTarget.value) || 1))}
+              class="font-mono text-xs px-2 py-1 border w-full"
+              style={{
+                'border-color': 'var(--border)',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+              }}
+            />
           </label>
-          <input
-            type="number"
-            min="1"
-            step="1"
-            value={batchSize()}
-            onInput={(e) => setBatchSize(Math.max(1, Number(e.currentTarget.value) || 1))}
-            class="font-mono text-xs px-2 py-1 border w-full"
-            style={{
-              'border-color': 'var(--border)',
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-            }}
-          />
         </div>
         <div>
           <label
+            for="gpu-ctx"
             class="font-mono text-[9px] uppercase tracking-wider block mb-1"
             style={{ color: 'var(--text-secondary)' }}
           >
             Context Length
+            <input
+              id="gpu-ctx"
+              type="number"
+              min="512"
+              step="512"
+              value={contextLen()}
+              onInput={(e) => setContextLen(Math.max(512, Number(e.currentTarget.value) || 4096))}
+              class="font-mono text-xs px-2 py-1 border w-full"
+              style={{
+                'border-color': 'var(--border)',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+              }}
+            />
           </label>
-          <input
-            type="number"
-            min="512"
-            step="512"
-            value={contextLen()}
-            onInput={(e) => setContextLen(Math.max(512, Number(e.currentTarget.value) || 4096))}
-            class="font-mono text-xs px-2 py-1 border w-full"
-            style={{
-              'border-color': 'var(--border)',
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-            }}
-          />
         </div>
         <div>
           <label
+            for="gpu-budget"
             class="font-mono text-[9px] uppercase tracking-wider block mb-1"
             style={{ color: 'var(--text-secondary)' }}
           >
             Max Budget ($)
+            <input
+              id="gpu-budget"
+              type="number"
+              min="0"
+              step="500"
+              placeholder="0 = no limit"
+              value={maxBudget() || ''}
+              onInput={(e) => setMaxBudget(Math.max(0, Number(e.currentTarget.value) || 0))}
+              class="font-mono text-xs px-2 py-1 border w-full"
+              style={{
+                'border-color': 'var(--border)',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+              }}
+            />
           </label>
-          <input
-            type="number"
-            min="0"
-            step="500"
-            placeholder="0 = no limit"
-            value={maxBudget() || ''}
-            onInput={(e) => setMaxBudget(Math.max(0, Number(e.currentTarget.value) || 0))}
-            class="font-mono text-xs px-2 py-1 border w-full"
-            style={{
-              'border-color': 'var(--border)',
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-            }}
-          />
         </div>
       </div>
 
@@ -416,7 +430,7 @@ export default function GpuSuggestion() {
           >
             Total Required
           </p>
-          <p class="font-mono text-sm font-bold" style={{ color: '#ff5252' }}>
+          <p class="font-mono text-sm font-bold" style={{ color: 'var(--negative, #ff5252)' }}>
             {formatBytes(totalVram())}
           </p>
         </div>

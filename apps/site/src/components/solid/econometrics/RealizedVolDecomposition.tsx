@@ -86,7 +86,7 @@ export default function RealizedVolDecomposition() {
     }));
 
     const series = [
-      { color: '#00e5ff', data: contData },
+      { color: 'var(--accent, #00e5ff)', data: contData },
       { color: '#ff6b35', data: jumpData },
     ];
     tipData = contData;
@@ -149,7 +149,7 @@ export default function RealizedVolDecomposition() {
             <span class="inline-block w-2 h-2" style={{ background: '#ff6b35' }} /> JUMP
           </span>
           <Show when={(data()?.jump_days?.filter(Boolean).length ?? 0) > 0}>
-            <span style={{ color: '#ff5252' }}>
+            <span style={{ color: 'var(--negative, #ff5252)' }}>
               {data()?.jump_days?.filter(Boolean).length} jump days detected
             </span>
           </Show>

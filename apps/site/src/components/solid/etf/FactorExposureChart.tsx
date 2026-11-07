@@ -145,7 +145,7 @@ export default function FactorExposureChart() {
     const hmlData = pts.map((p, i) => toCandle(p.t / 10, i));
 
     const series = [
-      { color: '#00e5ff', data: marketData },
+      { color: 'var(--accent, #00e5ff)', data: marketData },
       { color: '#ff6b35', data: alphaData },
       { color: '#7c4dff', data: smbData },
       { color: '#69f0ae', data: hmlData },

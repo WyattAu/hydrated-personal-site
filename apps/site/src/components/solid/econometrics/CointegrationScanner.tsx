@@ -234,7 +234,13 @@ export default function CointegrationScanner() {
                       {row.z_score.toFixed(2)}
                     </td>
                     <td class="font-mono text-[9px] px-2 py-1 text-center font-bold">
-                      <span style={{ color: row.is_cointegrated ? '#4caf50' : '#ff5252' }}>
+                      <span
+                        style={{
+                          color: row.is_cointegrated
+                            ? 'var(--positive, #4caf50)'
+                            : 'var(--negative, #ff5252)',
+                        }}
+                      >
                         {row.is_cointegrated ? 'COINTEGRATED' : 'NOT'}
                       </span>
                     </td>

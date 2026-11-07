@@ -142,18 +142,26 @@ export default function CommodityTermStructure() {
       <Show when={!loading() && prices().length > 0}>
         <canvas id="commodity-bars" class="w-full" style={{ height: '280px' }} />
         <div class="flex items-center justify-between mt-2 font-mono text-[10px]">
-          <span style={{ color: contango() ? '#ff5252' : '#4caf50', 'font-weight': 'bold' }}>
+          <span
+            style={{
+              color: contango() ? 'var(--negative, #ff5252)' : 'var(--positive, #4caf50)',
+              'font-weight': 'bold',
+            }}
+          >
             {contango() ? 'CONTANGO (normal carry)' : 'BACKWARDATION (supply stress)'}
           </span>
           <Show when={spread() !== null}>
             <span style={{ color: 'var(--text-secondary)' }}>
-              M2−M1: {spread()! >= 0 ? '+' : ''}
-              {spread()!.toFixed(3)}
+              M2−M1: {(spread() ?? 0) >= 0 ? '+' : ''}
+              {(spread() ?? 0).toFixed(3)}
             </span>
           </Show>
         </div>
         <p class="font-mono text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
-          M1 / M2 / M3 bars via plychart | {prices().map((v) => v.toFixed(2)).join(' / ')}
+          M1 / M2 / M3 bars via plychart |{' '}
+          {prices()
+            .map((v) => v.toFixed(2))
+            .join(' / ')}
         </p>
       </Show>
     </div>

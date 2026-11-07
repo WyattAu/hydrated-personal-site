@@ -116,7 +116,11 @@ export default function SectorRotation() {
             {(row) => (
               <div class="flex items-center justify-between py-0.5">
                 <span style={{ color: 'var(--text-secondary)' }}>{row.label}</span>
-                <span style={{ color: row.rs >= 0 ? '#4caf50' : '#ff5252' }}>
+                <span
+                  style={{
+                    color: row.rs >= 0 ? 'var(--positive, #4caf50)' : 'var(--negative, #ff5252)',
+                  }}
+                >
                   {row.rs >= 0 ? '+' : ''}
                   {row.rs.toFixed(2)}%
                 </span>

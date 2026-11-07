@@ -113,7 +113,7 @@ export default function VwapTracker() {
       volume: 0,
     }));
     const series = [
-      { color: '#00e5ff', data: vwapData },
+      { color: 'var(--accent, #00e5ff)', data: vwapData },
       { color: '#ff4081', data: priceData },
     ];
     tipData = vwapData;
@@ -137,7 +137,11 @@ export default function VwapTracker() {
 
   const spreadColor = () => {
     const s = state();
-    return s ? (s.spread >= 0 ? '#4caf50' : '#ff5252') : 'var(--text-secondary)';
+    return s
+      ? s.spread >= 0
+        ? 'var(--positive, #4caf50)'
+        : 'var(--negative, #ff5252)'
+      : 'var(--text-secondary)';
   };
 
   return (

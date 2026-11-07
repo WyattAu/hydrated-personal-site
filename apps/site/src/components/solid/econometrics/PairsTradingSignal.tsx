@@ -113,10 +113,10 @@ export default function PairsTradingSignal() {
   function signalStyle(signal: string): { color: string; label: string } {
     const s = signal.toUpperCase();
     if (s === 'LONG_SPREAD' || s === 'SHORT_SPREAD')
-      return { color: '#4caf50', label: s.replace('_', ' ') };
+      return { color: 'var(--positive, #4caf50)', label: s.replace('_', ' ') };
     if (s === 'HOLD' || s === 'EXIT_OR_FLAT')
       return { color: '#ffc107', label: s.replace('_', ' ') };
-    return { color: '#ff5252', label: s.replace('_', ' ') };
+    return { color: 'var(--negative, #ff5252)', label: s.replace('_', ' ') };
   }
 
   let tipData: object[] = [];
@@ -134,7 +134,7 @@ export default function PairsTradingSignal() {
       close: v,
       volume: 0,
     }));
-    const series = [{ color: '#00e5ff', data: seriesData }];
+    const series = [{ color: 'var(--accent, #00e5ff)', data: seriesData }];
     tipData = seriesData;
     renderPlychart('pairs-signal', 'update_line', JSON.stringify(series), '');
   }
@@ -229,20 +229,32 @@ export default function PairsTradingSignal() {
               <div class="mt-2 flex flex-wrap gap-1.5 font-mono text-[9px]">
                 <div
                   class="px-2 py-1 border border-dashed flex items-center gap-1.5"
-                  style={{ 'border-color': '#ff5252', background: '#ff525214', color: '#ff5252' }}
+                  style={{
+                    'border-color': '#ff5252',
+                    background: '#ff525214',
+                    color: 'var(--negative, #ff5252)',
+                  }}
                 >
                   <span class="inline-block w-2 h-0.5" style={{ background: '#ff5252' }} /> ±2 ENTRY
                 </div>
                 <div
                   class="px-2 py-1 border border-dashed flex items-center gap-1.5"
-                  style={{ 'border-color': '#4caf50', background: '#4caf5014', color: '#4caf50' }}
+                  style={{
+                    'border-color': '#4caf50',
+                    background: '#4caf5014',
+                    color: 'var(--positive, #4caf50)',
+                  }}
                 >
                   <span class="inline-block w-2 h-0.5" style={{ background: '#4caf50' }} /> ±0.5
                   EXIT
                 </div>
                 <div
                   class="px-2 py-1 border border-dashed flex items-center gap-1.5"
-                  style={{ 'border-color': '#ff9800', background: '#ff980014', color: '#ff9800' }}
+                  style={{
+                    'border-color': '#ff9800',
+                    background: '#ff980014',
+                    color: 'var(--accent-warm, #ff9800)',
+                  }}
                 >
                   <span class="inline-block w-2 h-0.5" style={{ background: '#ff9800' }} /> ±3.5
                   STOP

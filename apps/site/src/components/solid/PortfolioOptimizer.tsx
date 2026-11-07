@@ -129,7 +129,7 @@ function ResultCard(props: { result: OptimizationResult; tickers: string[]; idx:
           <p class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
             VOLATILITY
           </p>
-          <p class="font-mono text-sm font-bold" style={{ color: '#ff9800' }}>
+          <p class="font-mono text-sm font-bold" style={{ color: 'var(--accent-warm, #ff9800)' }}>
             {(props.result.volatility * 100).toFixed(1)}%
           </p>
         </div>

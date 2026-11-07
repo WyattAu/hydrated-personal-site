@@ -150,7 +150,7 @@ export default function TradeTape() {
               {(t) => (
                 <tr
                   style={{
-                    color: t.isBuyerMaker ? '#ff5252' : '#4caf50',
+                    color: t.isBuyerMaker ? 'var(--negative, #ff5252)' : 'var(--positive, #4caf50)',
                     background: t.isBuyerMaker ? 'rgba(255,82,82,0.04)' : 'rgba(76,175,80,0.04)',
                   }}
                 >
@@ -174,7 +174,11 @@ export default function TradeTape() {
       <Show when={netFlow()}>
         <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
           TAPE FLOW:{' '}
-          <span style={{ color: netFlow()!.pct >= 0 ? '#4caf50' : '#ff5252' }}>
+          <span
+            style={{
+              color: netFlow()!.pct >= 0 ? 'var(--positive, #4caf50)' : 'var(--negative, #ff5252)',
+            }}
+          >
             {netFlow()!.pct >= 0 ? '+' : ''}
             {netFlow()!.pct.toFixed(1)}% buy
           </span>{' '}

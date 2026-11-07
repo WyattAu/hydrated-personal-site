@@ -33,7 +33,7 @@ function freshnessClass(
   const age = Date.now() - timestamp;
   if (age < ttlMs * 0.5) return { color: '#69f0ae', label: 'FRESH' };
   if (age < ttlMs) return { color: '#ffff00', label: 'AGING' };
-  if (age < ttlMs * 2) return { color: '#ff9800', label: 'STALE' };
+  if (age < ttlMs * 2) return { color: 'var(--accent-warm, #ff9800)', label: 'STALE' };
   return { color: '#f44336', label: 'DEAD' };
 }
 

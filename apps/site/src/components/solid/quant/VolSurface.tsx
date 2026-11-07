@@ -130,7 +130,7 @@ export default function VolSurface() {
     // Fitted smile across its k grid (x = moneyness, uniform spacing).
     const series = [
       {
-        color: '#00e5ff',
+        color: 'var(--accent, #00e5ff)',
         data: sm.fitted.map((v) => ({ time: 0, open: 0, high: 0, low: 0, close: v, volume: 0 })),
       },
     ];

@@ -78,7 +78,7 @@ export default function RiskRatios() {
         label: 'ANNUALIZED RETURN',
         value: d.ann_return ?? 0,
         fmt: pct,
-        color: (d.ann_return ?? 0) >= 0 ? '#4caf50' : '#ff5252',
+        color: (d.ann_return ?? 0) >= 0 ? 'var(--positive, #4caf50)' : 'var(--negative, #ff5252)',
       },
       {
         label: 'ANNUALIZED VOLATILITY',
@@ -90,13 +90,13 @@ export default function RiskRatios() {
         label: 'MAX DRAWDOWN',
         value: d.max_drawdown ?? 0,
         fmt: pct,
-        color: '#ff5252',
+        color: 'var(--negative, #ff5252)',
       },
       {
         label: 'CURRENT DRAWDOWN',
         value: d.current_drawdown ?? 0,
         fmt: pct,
-        color: '#ff5252',
+        color: 'var(--negative, #ff5252)',
       },
     ];
   }
@@ -130,6 +130,7 @@ export default function RiskRatios() {
         {(d) => (
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
             {cards(d).map((card) => (
+              // biome-ignore lint/correctness/useJsxKeyInIterable: SolidJS static list, identity stable
               <div
                 class="border p-3 flex flex-col gap-1"
                 style={{ 'border-color': 'var(--border)', background: 'var(--bg-secondary)' }}

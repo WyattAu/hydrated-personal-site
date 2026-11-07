@@ -137,7 +137,7 @@ export default function PortfolioBacktest() {
       const toSeries = (vals: number[]) =>
         vals.map((v, i) => ({ time: i, open: 0, high: 0, low: 0, close: v, volume: 0 }));
       const series = [
-        { color: '#00e5ff', data: toSeries(r.equity) },
+        { color: 'var(--accent, #00e5ff)', data: toSeries(r.equity) },
         ...(Array.isArray(r.asset_equity) ? r.asset_equity : []).map((eq, i) => ({
           color: SERIES_COLORS[(i + 1) % SERIES_COLORS.length],
           data: toSeries(eq),
@@ -353,7 +353,10 @@ export default function PortfolioBacktest() {
             </p>
             <p
               class="font-mono text-sm font-bold"
-              style={{ color: (r()?.cagr ?? 0) >= 0 ? '#4caf50' : '#ff5252' }}
+              style={{
+                color:
+                  (r()?.cagr ?? 0) >= 0 ? 'var(--positive, #4caf50)' : 'var(--negative, #ff5252)',
+              }}
             >
               {pct(r()?.cagr ?? 0)}
             </p>
@@ -376,7 +379,7 @@ export default function PortfolioBacktest() {
             <p class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
               MAX DD
             </p>
-            <p class="font-mono text-sm font-bold" style={{ color: '#ff5252' }}>
+            <p class="font-mono text-sm font-bold" style={{ color: 'var(--negative, #ff5252)' }}>
               {pct(r()?.max_drawdown ?? 0)}
             </p>
           </div>
@@ -433,7 +436,10 @@ export default function PortfolioBacktest() {
                       <td class="p-1">{w.weights.map((x) => (x * 100).toFixed(0)).join('/')}</td>
                       <td
                         class="p-1 text-right"
-                        style={{ color: w.ret >= 0 ? '#4caf50' : '#ff5252' }}
+                        style={{
+                          color:
+                            w.ret >= 0 ? 'var(--positive, #4caf50)' : 'var(--negative, #ff5252)',
+                        }}
                       >
                         {w.ret >= 0 ? '+' : ''}
                         {(w.ret * 100).toFixed(2)}%
@@ -450,7 +456,7 @@ export default function PortfolioBacktest() {
           </div>
         </Show>
         <div class="flex flex-wrap gap-x-3 gap-y-1 mt-2">
-          <span class="font-mono text-[9px]" style={{ color: '#00e5ff' }}>
+          <span class="font-mono text-[9px]" style={{ color: 'var(--accent, #00e5ff)' }}>
             - portfolio ({r()?.mode})
           </span>
           <For each={labels()}>

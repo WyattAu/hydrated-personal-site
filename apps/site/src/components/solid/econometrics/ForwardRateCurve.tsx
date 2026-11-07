@@ -144,8 +144,9 @@ export default function ForwardRateCurve() {
       <canvas id="forward-curve" class="w-full" style={{ height: '280px' }} />
 
       <p class="font-mono text-[10px] mt-2" style={{ color: 'var(--text-secondary)' }}>
-        Spot vs forward rates | <span style={{ color: '#4caf50' }}>Green</span> = market expects
-        rate hikes | <span style={{ color: '#ff5252' }}>Red</span> = expects cuts
+        Spot vs forward rates | <span style={{ color: 'var(--positive, #4caf50)' }}>Green</span> =
+        market expects rate hikes | <span style={{ color: 'var(--negative, #ff5252)' }}>Red</span> =
+        expects cuts
       </p>
     </div>
   );

@@ -810,7 +810,7 @@ export default function WorldMap() {
       for (const cap of CAPITALS) {
         const m = L.circleMarker([cap.lat, cap.lon], {
           radius: 4,
-          color: '#00e5ff',
+          color: 'var(--accent, #00e5ff)',
           fillColor: '#00e5ff',
           fillOpacity: 0.8,
           weight: 1,

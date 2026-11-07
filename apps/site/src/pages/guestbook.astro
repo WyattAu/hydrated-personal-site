@@ -5,6 +5,7 @@ import GuestbookForm from '../components/solid/GuestbookForm';
 import GuestbookList from '../components/solid/GuestbookList';
 import ThemeToggle from '../components/solid/ThemeToggle';
 import ToasterWrapper from '../components/solid/ToasterWrapper';
+import SpotlightCard from '../components/solid/fx/SpotlightCard';
 import ThemeElectricBorder from '../components/solid/fx/ThemeElectricBorder';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
@@ -57,18 +58,33 @@ import '../styles/animations.css';
           Guidelines
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          <SpotlightCard
+            client:load
+            class="p-4 rounded-lg"
+            style={{ background: 'var(--bg-card)', 'border-radius': '10px' }}
+            spotlightColor="var(--accent)"
+          >
             <p class="font-mono text-xs font-bold mb-1" style="color: var(--text-primary);">Keep it friendly</p>
             <p class="text-sm" style="color: var(--text-secondary);">Be respectful. No spam, no offensive content.</p>
-          </div>
-          <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          </SpotlightCard>
+          <SpotlightCard
+            client:load
+            class="p-4 rounded-lg"
+            style={{ background: 'var(--bg-card)', 'border-radius': '10px' }}
+            spotlightColor="var(--accent-warm)"
+          >
             <p class="font-mono text-xs font-bold mb-1" style="color: var(--text-primary);">Rate limited</p>
             <p class="text-sm" style="color: var(--text-secondary);">5 messages per IP per 10 minutes to prevent abuse.</p>
-          </div>
-          <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+          </SpotlightCard>
+          <SpotlightCard
+            client:load
+            class="p-4 rounded-lg"
+            style={{ background: 'var(--bg-card)', 'border-radius': '10px' }}
+            spotlightColor="var(--positive, var(--accent))"
+          >
             <p class="font-mono text-xs font-bold mb-1" style="color: var(--text-primary);">Public by default</p>
             <p class="text-sm" style="color: var(--text-secondary);">All messages are visible to other visitors.</p>
-          </div>
+          </SpotlightCard>
           <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
             <p class="font-mono text-xs font-bold mb-1" style="color: var(--text-primary);">No account needed</p>
             <p class="text-sm" style="color: var(--text-secondary);">Just enter your name and message. No sign-up required.</p>

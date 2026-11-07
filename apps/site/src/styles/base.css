@@ -549,6 +549,20 @@ h1, h2, h3 {
   transition: border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
 }
 
+/* Metric/spotlight cards: subtle accent border + glow on hover
+   (desktop hover devices only — touch ignores :hover gracefully). */
+.metric-card {
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.metric-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent),
+    0 8px 32px -12px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
 .glass-card:hover {
   border-color: rgba(201, 168, 108, 0.3);
   transform: translateY(-2px);

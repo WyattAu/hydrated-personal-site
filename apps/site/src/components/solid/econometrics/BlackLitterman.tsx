@@ -335,7 +335,12 @@ export default function BlackLitterman() {
                   </p>
                   <p
                     class="font-mono text-base font-bold"
-                    style={{ color: r.portfolio_return >= 0 ? '#4caf50' : '#ff5252' }}
+                    style={{
+                      color:
+                        r.portfolio_return >= 0
+                          ? 'var(--positive, #4caf50)'
+                          : 'var(--negative, #ff5252)',
+                    }}
                   >
                     {(r.portfolio_return * 100).toFixed(2)}%
                   </p>

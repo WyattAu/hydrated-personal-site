@@ -417,7 +417,10 @@ export default function WalkForwardBacktester() {
             </p>
             <p
               class="font-mono text-sm font-bold"
-              style={{ color: (r()?.cagr ?? 0) >= 0 ? '#4caf50' : '#ff5252' }}
+              style={{
+                color:
+                  (r()?.cagr ?? 0) >= 0 ? 'var(--positive, #4caf50)' : 'var(--negative, #ff5252)',
+              }}
             >
               {pct(r()?.cagr ?? 0)}
             </p>
@@ -451,7 +454,7 @@ export default function WalkForwardBacktester() {
             <p class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
               MAX DD
             </p>
-            <p class="font-mono text-sm font-bold" style={{ color: '#ff5252' }}>
+            <p class="font-mono text-sm font-bold" style={{ color: 'var(--negative, #ff5252)' }}>
               {pct(r()?.max_drawdown ?? 0)}
             </p>
           </div>
@@ -486,7 +489,12 @@ export default function WalkForwardBacktester() {
             </p>
             <p
               class="font-mono text-sm font-bold"
-              style={{ color: (r()?.bh_cagr ?? 0) >= 0 ? '#4caf50' : '#ff5252' }}
+              style={{
+                color:
+                  (r()?.bh_cagr ?? 0) >= 0
+                    ? 'var(--positive, #4caf50)'
+                    : 'var(--negative, #ff5252)',
+              }}
             >
               {pct(r()?.bh_cagr ?? 0)}
             </p>
@@ -498,7 +506,7 @@ export default function WalkForwardBacktester() {
             <p class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
               BH MAX DD
             </p>
-            <p class="font-mono text-sm font-bold" style={{ color: '#ff5252' }}>
+            <p class="font-mono text-sm font-bold" style={{ color: 'var(--negative, #ff5252)' }}>
               {pct(r()?.bh_max_drawdown ?? 0)}
             </p>
           </div>
@@ -535,7 +543,12 @@ export default function WalkForwardBacktester() {
                       </td>
                       <td
                         class="p-1 text-right"
-                        style={{ color: w.is_sharpe > 0 ? '#4caf50' : '#ff5252' }}
+                        style={{
+                          color:
+                            w.is_sharpe > 0
+                              ? 'var(--positive, #4caf50)'
+                              : 'var(--negative, #ff5252)',
+                        }}
                       >
                         {w.is_sharpe.toFixed(2)}
                       </td>

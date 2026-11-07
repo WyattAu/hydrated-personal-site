@@ -69,7 +69,7 @@ export default function TickerManager() {
               <button
                 type="button"
                 class="inline-flex items-center justify-center min-w-6 min-h-6 opacity-40 hover:opacity-100"
-                style={{ color: '#ff5252' }}
+                style={{ color: 'var(--negative, #ff5252)' }}
                 onClick={() => removeTicker(t.symbol)}
               >
                 x
