@@ -1,0 +1,58 @@
+{
+  "name": "Wyatt Au — Intelligence Dashboard",
+  "version": "1.0.0",
+  "description": "Personal intelligence dashboard and portfolio site for Wyatt Au: real-time market data (crypto, macro, equities), earthquake and space-weather OSINT feeds, 16 Rust/WASM interactive quantitative widgets, and an upcoming-launch tracker. All computation is client-side WebAssembly; public data APIs are keyless and edge-cached.",
+  "url": "https://wyattau.com",
+  "preferredTransport": "HTTP+JSON",
+  "protocolProvider": {
+    "organization": "Wyatt Au",
+    "url": "https://wyattau.com"
+  },
+  "documentationUrl": "https://wyattau.com/llms.txt",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "defaultInputModes": ["application/json", "text/plain"],
+  "defaultOutputModes": ["application/json", "text/plain"],
+  "skills": [
+    {
+      "id": "market-prices",
+      "name": "Live crypto prices",
+      "description": "24-hour Binance USDT mini-ticker snapshot for major pairs (BTC, ETH, SOL, BNB, XRP, ADA) with open/high/low and percent change. GET /api/crypto-ticker",
+      "tags": ["market-data", "crypto", "binance", "real-time"]
+    },
+    {
+      "id": "macro-rates",
+      "name": "Macro rates and risk assets",
+      "description": "VIX, DXY, 10Y yield, gold, silver, copper, oil spreads and Fear & Greed index from Yahoo Finance and alternative.me. GET /api/stock-quote, /api/fear-greed",
+      "tags": ["market-data", "macro", "equities"]
+    },
+    {
+      "id": "earthquakes",
+      "name": "Earthquake feed",
+      "description": "USGS all-day earthquake feed as GeoJSON with magnitude, location, and depth. GET /api/earthquakes",
+      "tags": ["osint", "earthquakes", "usgs", "geojson"]
+    },
+    {
+      "id": "space-weather",
+      "name": "Space weather and launches",
+      "description": "NOAA planetary K-index, solar-wind telemetry context, and upcoming orbital launches from Launch Library 2 with provider, rocket, pad, and T-minus. GET /api/kp-index, /api/space-launches",
+      "tags": ["osint", "noaa", "space", "launches"]
+    },
+    {
+      "id": "wasm-quant-widgets",
+      "name": "Interactive WASM quant widgets",
+      "description": "16 client-side Rust/WASM demonstrations: Monte Carlo simulation, SVI vol surface, walk-forward backtesting, Fourier analysis, cellular automata, physics sandbox, and more. Interactive in any browser.",
+      "tags": ["wasm", "rust", "quant", "interactive"]
+    },
+    {
+      "id": "guestbook",
+      "name": "Guestbook",
+      "description": "Public visitor messages persisted in Cloudflare KV. Read-only for agents; writes are interactive-only, rate-limited.",
+      "tags": ["guestbook", "kv"]
+    }
+  ],
+  "securityRequirements": "none — all agent-facing endpoints are public read-only; see /auth.md"
+}

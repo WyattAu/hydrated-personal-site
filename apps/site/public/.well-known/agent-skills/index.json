@@ -1,0 +1,20 @@
+{
+  "schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "updated": "2026-11-08T11:48:41Z",
+  "skills": [
+    {
+      "name": "market-data",
+      "type": "skill-md",
+      "description": "Keyless market-data JSON APIs: Binance crypto tickers, macro risk rates (VIX/DXY/yields/gold), Fear & Greed index. Edge-cached GET, no auth.",
+      "url": "https://wyattau.com/skills/market-data/SKILL.md",
+      "digest": "sha256:b67d861accd6736f596e5bfcf2f24f9eac321b1b457ae005d5f99fa5a2b85e73"
+    },
+    {
+      "name": "osint-feeds",
+      "type": "skill-md",
+      "description": "OSINT JSON feeds: USGS earthquakes GeoJSON, NOAA planetary K-index, Launch Library 2 upcoming launches, Bitcoin mempool fees. Edge-cached GET, no auth.",
+      "url": "https://wyattau.com/skills/osint-feeds/SKILL.md",
+      "digest": "sha256:01048e433b578ba3e4e0c1d87de5712699b010a1070a7234c643e3ad4a3b3b58"
+    }
+  ]
+}

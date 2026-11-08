@@ -1,0 +1,44 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://wyattau.com",
+      "link": [
+        {
+          "href": "https://wyattau.com/.well-known/api-catalog",
+          "rel": "api-catalog",
+          "type": "application/linkset+json"
+        },
+        {
+          "href": "https://wyattau.com/llms.txt",
+          "rel": "describedby",
+          "type": "text/plain"
+        },
+        {
+          "href": "https://wyattau.com/auth.md",
+          "rel": "service-doc",
+          "type": "text/markdown"
+        },
+        {
+          "href": "https://wyattau.com/.well-known/agent-card.json",
+          "rel": "service-desc",
+          "type": "application/json"
+        },
+        {
+          "href": "https://wyattau.com/.well-known/agent-skills/index.json",
+          "rel": "status",
+          "type": "application/json"
+        }
+      ]
+    },
+    {
+      "anchor": "https://wyattau.com/api/health",
+      "link": [
+        {
+          "href": "https://wyattau.com/api/health",
+          "rel": "status",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}

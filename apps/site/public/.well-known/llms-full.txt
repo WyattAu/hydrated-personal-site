@@ -1,0 +1,14 @@
+# Wyatt Au — site intelligence
+
+Personal intelligence dashboard and portfolio site of Wyatt Au: real-time
+market data, OSINT feeds (earthquakes, space weather, launches), 16
+Rust/WASM quantitative widgets, and an interactive guestbook. All
+computation is client-side WebAssembly; public data APIs are keyless and
+edge-cached.
+
+Key pages: [World Monitor](https://wyattau.com/world),
+[ETF Intelligence](https://wyattau.com/etf),
+[ML Benchmarks](https://wyattau.com/ml),
+[Docs](https://wyattau.com/docs).
+
+Contact: wyatt_au@protonmail.com
