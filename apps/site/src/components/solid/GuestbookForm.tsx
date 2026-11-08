@@ -1,12 +1,15 @@
 import { createSignal } from 'solid-js';
 import { toast } from 'solid-sonner';
 import { apiBase } from '../../lib/api-base';
+import ClickSpark from './fx/ClickSpark';
+import { useFxTheme } from './fx/theme';
 
 export default function GuestbookForm() {
   const [name, setName] = createSignal('');
   const [message, setMessage] = createSignal('');
   const [website, setWebsite] = createSignal('');
   const [loading, setLoading] = createSignal(false);
+  const themeColors = useFxTheme();
 
   const maxLength = 500;
 
@@ -118,14 +121,21 @@ export default function GuestbookForm() {
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={loading()}
-        class="amoeba-hover px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider transition-opacity disabled:opacity-50"
-        style="background: var(--accent); color: var(--bg-primary);"
+      <ClickSpark
+        sparkColor={themeColors.colors().accent}
+        sparkSize={12}
+        sparkCount={10}
+        class="inline-block"
       >
-        {loading() ? 'Submitting...' : 'Sign'}
-      </button>
+        <button
+          type="submit"
+          disabled={loading()}
+          class="amoeba-hover px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider transition-opacity disabled:opacity-50"
+          style="background: var(--accent); color: var(--bg-primary);"
+        >
+          {loading() ? 'Submitting...' : 'Sign'}
+        </button>
+      </ClickSpark>
     </form>
   );
 }

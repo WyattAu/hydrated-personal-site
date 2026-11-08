@@ -89,8 +89,15 @@ export default function GuestbookList() {
 
       <div ref={listRef}>
         <For each={entries()}>
-          {(entry) => (
-            <div class="py-3 border-b" style="border-color: var(--border);">
+          {(entry, i) => (
+            <div
+              class="py-3 border-b cinematic-enter"
+              style={{
+                'border-color': 'var(--border)',
+                'animation-delay': `${Math.min(i() * 70, 700)}ms`,
+                'animation-fill-mode': 'both',
+              }}
+            >
               <div class="flex items-baseline justify-between mb-1 gap-2">
                 <span class="font-mono text-sm font-bold" style="color: var(--text-primary);">
                   {entry.name}
