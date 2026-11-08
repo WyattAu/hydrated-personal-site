@@ -18,9 +18,13 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
-# RFC 9727 api-catalog: linkset+json content type
+# RFC 9727 api-catalog: linkset+json content type; extensionless well-known
+# files need explicit content types (default is octet-stream, which scanners
+# reject)
 /.well-known/api-catalog
   Content-Type: application/linkset+json
+/.well-known/oauth-protected-resource
+  Content-Type: application/json
 /.well-known/agent-card.json
   Content-Type: application/json
 /.well-known/agent-skills/index.json
@@ -30,7 +34,7 @@
 
 # RFC 8288 Link headers: agent discovery surfaces (sitewide)
 /*
-  Link: </.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="describedby", </auth.md>; rel="service-doc", </.well-known/agent-card.json>; rel="service-desc", </markdown/index.md>; rel="alternate"; type="text/markdown"
+  Link: </.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="describedby", </auth.md>; rel="service-doc", </.well-known/agent-card.json>; rel="service-desc", </.well-known/oauth-protected-resource>; rel="oauth-protected-resource", </markdown/index.md>; rel="alternate"; type="text/markdown", </markdown/index.md>; rel="alternate"; type="text/markdown"
 
 /markdown/*
   Content-Type: text/markdown; charset=utf-8
