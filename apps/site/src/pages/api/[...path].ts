@@ -248,9 +248,15 @@ export const GET: APIRoute = async (ctx) => {
   if (path === 'space-launches') {
     const c = getCached('sl');
     if (c) return J(c);
+    // LL2 anonymous tier is IP-limited (15/h) — Pages Function egress IPs are
+    // shared, so a free LL2_API_KEY secret is required for reliable access.
+    const runtime = (ctx.locals as { runtime?: { env?: Record<string, string> } }).runtime;
+    const ll2Key = runtime?.env?.LL2_API_KEY;
+    const headers: Record<string, string> = ll2Key ? { Authorization: `Token ${ll2Key}` } : {};
     const d = await safeFetch(
       'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=4&mode=list&hide_recent_previous=true',
       'sl',
+      { headers },
     );
     if (d) {
       const results = ((d as { results?: Array<Record<string, unknown>> }).results ?? []).map(
@@ -263,7 +269,7 @@ export const GET: APIRoute = async (ctx) => {
           pad: l.pad,
         }),
       );
-      setCache('sl', results, 1800000);
+      setCache('sl', results, 21600000);
       return J(results);
     }
     return J(getCached('sl') || { error: 'unavailable' });
