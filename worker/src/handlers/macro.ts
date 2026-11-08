@@ -68,3 +68,29 @@ export async function handleMempool(): Promise<Response> {
     return error('Upstream Mempool API unavailable', 502);
   }
 }
+
+export async function handleSpaceLaunches(): Promise<Response> {
+  const cached = getCached('space-launches');
+  if (cached) return json(cached);
+
+  try {
+    const data = await fetchJson(
+      'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=4&mode=list&hide_recent_previous=true',
+      'space-launches',
+    );
+    const results = (data as { results?: unknown[] }).results ?? [];
+    const slim = (results as Array<Record<string, unknown>>).map((l) => ({
+      name: l.name,
+      net: l.net,
+      status: l.status,
+      launch_service_provider: l.launch_service_provider,
+      rocket: l.rocket,
+      pad: l.pad,
+    }));
+    setCache('space-launches', slim, 30 * 60 * 1000);
+    return json(slim);
+  } catch (e) {
+    log('error', 'space-launches fetch failed', { error: String(e) });
+    return error('Upstream Launch Library 2 unavailable', 502);
+  }
+}

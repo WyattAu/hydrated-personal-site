@@ -21,6 +21,7 @@ import {
   handleMetrics,
   handleRestCountries,
   handleSocialSentiment,
+  handleSpaceLaunches,
   handleStockChart,
   handleStockQuote,
   handleVersions,
@@ -89,6 +90,8 @@ export default {
         response = await handleFearGreed();
       } else if (routePath === '/api/kp-index') {
         response = await handleKpIndex();
+      } else if (routePath === '/api/space-launches') {
+        response = await handleSpaceLaunches();
       } else if (routePath === '/api/mempool') {
         response = await handleMempool();
       } else if (routePath === '/api/binance-klines') {

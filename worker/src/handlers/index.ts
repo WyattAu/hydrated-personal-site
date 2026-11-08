@@ -1,6 +1,12 @@
 export { handleWeather, handleStockChart } from './weather';
 export { handleCryptoTicker, handleCoinGeckoGlobal, handleBinanceKlines } from './crypto';
-export { handleEarthquakes, handleFearGreed, handleKpIndex, handleMempool } from './macro';
+export {
+  handleEarthquakes,
+  handleFearGreed,
+  handleKpIndex,
+  handleSpaceLaunches,
+  handleMempool,
+} from './macro';
 export { handleHackerNews, handleGithubTrending, handleSocialSentiment } from './social';
 export {
   handleExchangeRates,
