@@ -325,6 +325,8 @@ export default function WorldMap() {
   let invalidate: () => void = () => {};
   let invalidateTimer: ReturnType<typeof setTimeout> | undefined;
   let themeObserver: MutationObserver | undefined;
+  let issTimer: ReturnType<typeof setInterval> | undefined;
+  let issAbort: AbortController | undefined;
   const markers: Marker[] = [];
   const earthquakeMarkers: Marker[] = [];
   let tileLayer: TileLayer | undefined;
@@ -853,6 +855,45 @@ export default function WorldMap() {
       // Country click handled by GeoJSON layer
       loadCountryBorders(L, leafletMap);
 
+      // ── ISS live tracker (OSINT) ──
+      // Position polls wheretheiss.at every 5s; marker + telemetry readout.
+      const ISS_API = 'https://api.wheretheiss.at/v1/satellites/25544';
+      const issMarker = L.circleMarker([0, 0], {
+        radius: 6,
+        color: '#f59e0b',
+        fillColor: '#fbbf24',
+        fillOpacity: 0.95,
+        weight: 2,
+      })
+        .bindTooltip('ISS', { permanent: false, direction: 'top' })
+        .addTo(leafletMap);
+      const issMetaEl = document.createElement('div');
+      issMetaEl.style.cssText =
+        'position:absolute;left:6px;bottom:24px;z-index:800;font-family:monospace;font-size:9px;' +
+        'padding:2px 6px;background:rgba(0,0,0,0.55);color:var(--text-secondary,#9aa);' +
+        'border-radius:2px;white-space:nowrap;';
+      issMetaEl.textContent = 'ISS — acquiring';
+      leafletMap.getContainer().appendChild(issMetaEl);
+      const issTick = async (): Promise<void> => {
+        issAbort = new AbortController();
+        try {
+          const res = await fetch(ISS_API, { signal: issAbort.signal });
+          if (!res.ok) throw new Error(String(res.status));
+          const d = (await res.json()) as {
+            latitude: number;
+            longitude: number;
+            altitude: number;
+            velocity: number;
+          };
+          issMarker.setLatLng([d.latitude, d.longitude]);
+          issMetaEl.textContent = `ISS ${d.altitude.toFixed(0)}km · ${Math.round(d.velocity).toLocaleString('en-US')}km/h · ${d.latitude.toFixed(1)},${d.longitude.toFixed(1)}`;
+        } catch {
+          /* transient network errors: keep last position */
+        }
+      };
+      void issTick();
+      issTimer = setInterval(issTick, 5000);
+
       map = leafletMap;
       setLoading(false);
     } catch (e) {
@@ -862,6 +903,9 @@ export default function WorldMap() {
   });
 
   onCleanup(() => {
+    clearInterval(issTimer);
+    issAbort?.abort();
+    themeObserver?.disconnect();
     // invalidateTimer is only assigned inside onMount (client-side), so this
     // guard also keeps SSR prerender disposal away from browser globals.
     if (invalidateTimer !== undefined) {
