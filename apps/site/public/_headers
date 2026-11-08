@@ -21,9 +21,13 @@
 # RFC 9727 api-catalog: linkset+json content type; extensionless well-known
 # files need explicit content types (default is octet-stream, which scanners
 # reject)
-/.well-known/api-catalog
+# RFC 9727 api-catalog + RFC 9728 PRM: extensionless well-known URIs are
+# 200-rewritten (public/_redirects) to .json siblings so the content-type
+# is application/json (CF Pages forces octet-stream on extensionless files
+# regardless of _headers rules).
+/.well-known/api-catalog.json
   Content-Type: application/linkset+json
-/.well-known/oauth-protected-resource
+/.well-known/oauth-protected-resource.json
   Content-Type: application/json
 /.well-known/agent-card.json
   Content-Type: application/json
