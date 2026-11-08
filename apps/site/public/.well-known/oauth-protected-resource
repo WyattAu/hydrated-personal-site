@@ -1,0 +1,7 @@
+{
+  "resource": "https://wyattau.com",
+  "resource_documentation": "https://wyattau.com/auth.md",
+  "authorization_servers": [],
+  "scopes_supported": [],
+  "bearer_methods_supported": []
+}

@@ -1,5 +1,5 @@
 {
-  "name": "Wyatt Au — Intelligence Dashboard",
+  "name": "Wyatt Au \u2014 Intelligence Dashboard",
   "version": "1.0.0",
   "description": "Personal intelligence dashboard and portfolio site for Wyatt Au: real-time market data (crypto, macro, equities), earthquake and space-weather OSINT feeds, 16 Rust/WASM interactive quantitative widgets, and an upcoming-launch tracker. All computation is client-side WebAssembly; public data APIs are keyless and edge-cached.",
   "url": "https://wyattau.com",
@@ -54,5 +54,12 @@
       "tags": ["guestbook", "kv"]
     }
   ],
-  "securityRequirements": "none — all agent-facing endpoints are public read-only; see /auth.md"
+  "securityRequirements": "none \u2014 all agent-facing endpoints are public read-only; see /auth.md",
+  "supportedInterfaces": [
+    {
+      "url": "https://wyattau.com",
+      "transport": "HTTP+JSON",
+      "protocolBinding": "HTTP+JSON"
+    }
+  ]
 }
