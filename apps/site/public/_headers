@@ -30,4 +30,8 @@
 
 # RFC 8288 Link headers: agent discovery surfaces (sitewide)
 /*
-  Link: </.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="describedby", </auth.md>; rel="service-doc", </.well-known/agent-card.json>; rel="service-desc"
+  Link: </.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="describedby", </auth.md>; rel="service-doc", </.well-known/agent-card.json>; rel="service-desc", </markdown/index.md>; rel="alternate"; type="text/markdown"
+
+/markdown/*
+  Content-Type: text/markdown; charset=utf-8
+  Cache-Control: public, max-age=3600
