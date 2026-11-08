@@ -245,6 +245,29 @@ export const GET: APIRoute = async (ctx) => {
     }
     return J(getCached('kp') || { error: 'unavailable' });
   }
+  if (path === 'space-launches') {
+    const c = getCached('sl');
+    if (c) return J(c);
+    const d = await safeFetch(
+      'https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=4&mode=list&hide_recent_previous=true',
+      'sl',
+    );
+    if (d) {
+      const results = ((d as { results?: Array<Record<string, unknown>> }).results ?? []).map(
+        (l) => ({
+          name: l.name,
+          net: l.net,
+          status: l.status,
+          launch_service_provider: l.launch_service_provider,
+          rocket: l.rocket,
+          pad: l.pad,
+        }),
+      );
+      setCache('sl', results, 1800000);
+      return J(results);
+    }
+    return J(getCached('sl') || { error: 'unavailable' });
+  }
   if (path === 'mempool') {
     const c = getCached('mp');
     if (c) return J(c);
