@@ -9,6 +9,8 @@ export interface Props {
   canonical?: string;
   type?: string;
   noindex?: boolean;
+  /** FAQPage JSON-LD entries (answer-first citability). */
+  faq?: { q: string; a: string }[];
 }
 
 const {
@@ -18,10 +20,49 @@ const {
   canonical = Astro.url.href,
   type = 'website',
   noindex = false,
+  faq,
 } = Astro.props;
 
 const siteName = 'wyatt_au';
 const siteUrl = 'https://wyattau.com';
+
+// BreadcrumbList: auto-derived from the request path (Home > Page).
+const PAGE_NAMES: Record<string, string> = {
+  world: 'World Monitor',
+  etf: 'ETF Intelligence',
+  ml: 'ML Benchmarks',
+  data: 'World Data',
+  docs: 'Docs',
+  dossier: 'Dossier',
+  projects: 'Projects',
+  guestbook: 'Guestbook',
+  uses: 'Uses',
+  showcase: 'Showcase',
+};
+const pathSegment = Astro.url.pathname.split('/').filter(Boolean)[0] ?? '';
+const pageName = PAGE_NAMES[pathSegment];
+const breadcrumbSchema =
+  pageName && pathSegment
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/` },
+          { '@type': 'ListItem', position: 2, name: pageName, item: `${siteUrl}/${pathSegment}` },
+        ],
+      }
+    : null;
+const faqSchema = faq?.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faq.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    }
+  : null;
 
 // JSON-LD Schemas
 const personSchema = {
@@ -125,7 +166,7 @@ const webPageSchema = {
     <meta name="author" content="Wyatt Au" />
 
     <!-- Content Security Policy (meta tag for prerendered pages) -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://plausible.io https://www.okx.com https://api.kraken.com https://api.bybit.com https://api.mempool.space https://api.alternative.me https://query2.finance.yahoo.com https://hydrated-worker.wyatt-au.workers.dev https://challenges.cloudflare.com https://raw.githubusercontent.com https://api.worldbank.org https://restcountries.com https://api.github.com https://fred.stlouisfed.org https://services.swpc.noaa.gov wss://stream.binance.com:9443 https://api.binance.com https://www.deribit.com; base-uri 'self'; form-action 'self'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://plausible.io https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://plausible.io https://www.okx.com https://api.kraken.com https://api.bybit.com https://api.mempool.space https://api.alternative.me https://query2.finance.yahoo.com https://hydrated-worker.wyatt-au.workers.dev https://challenges.cloudflare.com https://raw.githubusercontent.com https://api.worldbank.org https://restcountries.com https://api.github.com https://fred.stlouisfed.org https://services.swpc.noaa.gov https://api.wheretheiss.at wss://stream.binance.com:9443 https://api.binance.com https://www.deribit.com; base-uri 'self'; form-action 'self'" />
 
     <!-- Fonts: Inter + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -139,6 +180,8 @@ const webPageSchema = {
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(webPageSchema)} />
+    {breadcrumbSchema && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />}
+    {faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}
 
     <!-- Theme init (prevent flash) -->
     <script is:inline>

@@ -9,7 +9,7 @@
 ## Pages
 
 - [Home](https://wyattau.com/): overview of Wyatt Au — backend engineering, systems architecture, and current work bootstrapping QuestHive.
-- [World Monitor](https://wyattau.com/world): real-time intelligence dashboard — crypto prices via Binance WebSocket, market map, macro rates (VIX, DXY, yields), earthquakes, and solar-wind data.
+- [World Monitor](https://wyattau.com/world): real-time intelligence dashboard — crypto prices via Binance WebSocket, world map with live ISS position, macro rates (VIX, DXY, yields), earthquakes, GOES X-ray solar activity, planetary K-index with 3-day geomagnetic forecast, Bitcoin fee market, and upcoming orbital launches.
 - [ETF Intelligence](https://wyattau.com/etf): database of 89 ETFs with allocation analysis, correlation matrix, Monte Carlo simulation, VaR, portfolio backtesting, and walk-forward analysis.
 - [ML Benchmarks](https://wyattau.com/ml): LLM benchmark leaderboards, model comparison radar charts, GPU requirement calculator, and inference throughput simulator.
 - [World Data](https://wyattau.com/data): reference datasets powering the dashboards.
@@ -23,6 +23,12 @@
 - All client-side computation is Rust compiled to WebAssembly (lock-free ring buffers, binary serialization, SIMD-optimized numerics) — roughly 140 KB across 16 widgets.
 - Charts render via [plychart](https://github.com/WyattAu/plychart), a custom Rust/WASM charting library with pan and zoom.
 - The stack is Astro 5 + SolidJS 1.9 + Tailwind CSS 4, deployed on Cloudflare Pages and Workers.
+
+## Machine-readable access
+
+- Markdown variants of key pages (for AI citation): [/markdown/index.md](https://wyattau.com/markdown/index.md), [/markdown/world.md](https://wyattau.com/markdown/world.md), [/markdown/etf.md](https://wyattau.com/markdown/etf.md), [/markdown/ml.md](https://wyattau.com/markdown/ml.md), [/markdown/dossier.md](https://wyattau.com/markdown/dossier.md), [/markdown/projects.md](https://wyattau.com/markdown/projects.md) — advertised per-page via `Link: ...; rel="alternate"; type="text/markdown"` headers.
+- Agent discovery: [/.well-known/api-catalog](https://wyattau.com/.well-known/api-catalog) (RFC 9727), [/.well-known/agent-card.json](https://wyattau.com/.well-known/agent-card.json) (A2A), [/.well-known/agent-skills/index.json](https://wyattau.com/.well-known/agent-skills/index.json), [/auth.md](https://wyattau.com/auth.md), [/.well-known/oauth-protected-resource](https://wyattau.com/.well-known/oauth-protected-resource) (RFC 9728; no auth required).
+- Keyless JSON APIs (edge-cached, GET, no auth): `/api/crypto-ticker`, `/api/earthquakes`, `/api/kp-index`, `/api/space-launches`, `/api/fear-greed`, `/api/stock-quote`, `/api/mempool`, `/api/health`. See [/auth.md](https://wyattau.com/auth.md) for etiquette.
 
 ## Contact
 

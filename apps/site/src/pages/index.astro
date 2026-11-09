@@ -10,6 +10,7 @@ import ToasterWrapper from '../components/solid/ToasterWrapper';
 import DecryptedText from '../components/solid/fx/DecryptedText';
 import SpotlightCard from '../components/solid/fx/SpotlightCard';
 import StarBorder from '../components/solid/fx/StarBorder';
+import ThemeAurora from '../components/solid/fx/ThemeAurora';
 import ThemeDotField from '../components/solid/fx/ThemeDotField';
 import ThemeElectricBorder from '../components/solid/fx/ThemeElectricBorder';
 import LiveTicker from '../components/solid/quant/LiveTicker';
@@ -84,6 +85,7 @@ const employment = [
         </picture>
       </div>
       <div class="hero-overlay"></div>
+      <ThemeAurora client:load class="absolute inset-x-0 top-0 z-[1] pointer-events-none opacity-70" />
       <ThemeDotField client:load class="absolute inset-0 z-[2] pointer-events-none opacity-60" />
 
       <div class="max-w-4xl relative z-10">

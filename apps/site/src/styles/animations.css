@@ -363,3 +363,10 @@
     transform: none;
   }
 }
+
+/* OSINT feed stagger (SpaceLaunches) — disabled under reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .launch-stagger {
+    animation: none !important;
+  }
+}

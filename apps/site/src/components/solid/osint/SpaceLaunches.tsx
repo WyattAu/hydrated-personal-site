@@ -77,12 +77,21 @@ export default function SpaceLaunches() {
         </p>
       )}
       <Show when={launches() !== null}>
+        <style>
+          {
+            '@keyframes launch-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }'
+          }
+        </style>
         <div class="space-y-2">
           <For each={launches()}>
-            {(l) => (
+            {(l, i) => (
               <div
-                class="border p-2 font-mono text-[10px]"
-                style={{ 'border-color': 'var(--border)', background: 'var(--bg-secondary)' }}
+                class="border p-2 font-mono text-[10px] launch-stagger"
+                style={{
+                  'border-color': 'var(--border)',
+                  background: 'var(--bg-secondary)',
+                  animation: `launch-in 0.35s ease ${(i() * 70).toString()}ms both`,
+                }}
               >
                 <div class="flex items-center justify-between gap-2">
                   <span class="truncate" style={{ color: 'var(--text-primary)' }}>

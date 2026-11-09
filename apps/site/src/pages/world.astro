@@ -65,7 +65,10 @@ import FundingRateHeatmap from '../components/solid/quant/FundingRateHeatmap';
 // Macro & rates
 import YieldCurveChart from '../components/solid/quant/YieldCurveChart';
 
+import KpHistorySparkline from '../components/solid/osint/KpHistorySparkline';
+import MempoolFeeGauge from '../components/solid/osint/MempoolFeeGauge';
 import SpaceWeatherConsole from '../components/solid/osint/SpaceWeatherConsole';
+import SwpcForecast from '../components/solid/osint/SwpcForecast';
 import CurrencyMatrix from '../components/solid/world/CurrencyMatrix';
 import EarthquakeHistogram from '../components/solid/world/EarthquakeHistogram';
 import FredSparklines from '../components/solid/world/FredSparklines';
@@ -88,6 +91,20 @@ import '../styles/base.css';
 <BaseLayout
   title="World Monitor — Wyatt Au"
   description="Multi-asset intelligence dashboard: stocks, ETFs, forex, commodities, crypto. All quantitative analysis runs client-side in Rust/WASM."
+  faq={[
+    {
+      q: 'What data does World Monitor show?',
+      a: 'Live crypto prices from Binance WebSocket, a world map with ISS live position, macro rates (VIX, DXY, 10Y yield, gold), earthquakes, GOES X-ray solar activity, NOAA Kp index with 3-day geomagnetic forecast, and upcoming orbital launches.',
+    },
+    {
+      q: 'Where does the data come from?',
+      a: 'Keyless public APIs — Binance, Yahoo Finance, USGS, NOAA SWPC, Launch Library 2, wheretheiss.at, mempool.space — fetched client-side and edge-cached by the site Workers API. No API keys, no authentication.',
+    },
+    {
+      q: 'Is the data real-time?',
+      a: 'Crypto prices stream live over Binance WebSocket; ISS position polls every 5 seconds; other feeds poll on 60 s–30 min edge-cache windows.',
+    },
+  ]}
 >
   <!-- WASM preload: start fetching binaries before components mount -->
   <link rel="preload" href="/wasm/hydrated_widgets_bg.wasm?v=v1.3.0" as="fetch" crossorigin />
@@ -214,11 +231,13 @@ import '../styles/base.css';
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
       <p class="label" style="color: var(--accent);">GEOPHYSICAL</p>
       <h2 class="text-xl md:text-2xl font-bold mb-4">Global Signals</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><EarthquakeHistogram client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><SolarWindPanel client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><SpaceWeatherConsole client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><WeatherStrip client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><KpHistorySparkline client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><SwpcForecast client:load /></AppErrorBoundary></div>
       </div>
     </section>
 
@@ -226,10 +245,11 @@ import '../styles/base.css';
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
       <p class="label" style="color: var(--accent);">CRYPTO MARKETS</p>
       <h2 class="text-xl md:text-2xl font-bold mb-4">Digital Asset Monitor</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><CryptoDominancePie client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><FundingRateHeatmap client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><TreemapWidget client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><MempoolFeeGauge client:load /></AppErrorBoundary></div>
       </div>
       <div class="mt-4"><AppErrorBoundary client:load><DataPanels client:load /></AppErrorBoundary></div>
     </section>

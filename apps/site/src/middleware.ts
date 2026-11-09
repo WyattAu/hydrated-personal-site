@@ -1,6 +1,9 @@
 import { defineMiddleware } from 'astro:middleware';
+import dossierMd from './markdown/dossier.md?raw';
 import etfMd from './markdown/etf.md?raw';
 import indexMd from './markdown/index.md?raw';
+import mlMd from './markdown/ml.md?raw';
+import projectsMd from './markdown/projects.md?raw';
 import worldMd from './markdown/world.md?raw';
 
 /** Markdown variants for agent content negotiation (Accept: text/markdown). */
@@ -13,6 +16,15 @@ const MD_VARIANTS: Record<string, string> = {
   '/etf': etfMd,
   '/etf/': etfMd,
   '/etf/index.html': etfMd,
+  '/ml': mlMd,
+  '/ml/': mlMd,
+  '/ml/index.html': mlMd,
+  '/dossier': dossierMd,
+  '/dossier/': dossierMd,
+  '/dossier/index.html': dossierMd,
+  '/projects': projectsMd,
+  '/projects/': projectsMd,
+  '/projects/index.html': projectsMd,
 };
 
 const CSP = [
