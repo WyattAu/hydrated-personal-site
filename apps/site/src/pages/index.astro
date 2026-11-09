@@ -7,9 +7,11 @@ import AppErrorBoundary from '../components/solid/ErrorBoundary';
 import ThemeToggle from '../components/solid/ThemeToggle';
 import TickerBar from '../components/solid/TickerBar';
 import ToasterWrapper from '../components/solid/ToasterWrapper';
+import Counter from '../components/solid/fx/Counter';
 import DecryptedText from '../components/solid/fx/DecryptedText';
 import SpotlightCard from '../components/solid/fx/SpotlightCard';
 import StarBorder from '../components/solid/fx/StarBorder';
+import TechLoop from '../components/solid/fx/TechLoop';
 import ThemeAurora from '../components/solid/fx/ThemeAurora';
 import ThemeDotField from '../components/solid/fx/ThemeDotField';
 import ThemeElectricBorder from '../components/solid/fx/ThemeElectricBorder';
@@ -161,6 +163,29 @@ const employment = [
     <!-- Ticker Bar -->
     <section class="px-6 md:px-12 lg:px-24" style="border-top: 1px solid var(--border);">
       <TickerBar client:load />
+    </section>
+
+    <!-- Sys metrics + built-with marquee (retention band) -->
+    <section class="py-10 px-6 md:px-12 lg:px-24 border-t reveal" style="border-color: var(--border);">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="border p-4" style="border-color: var(--border); background: var(--bg-card);">
+          <Counter client:visible value={16} duration={1400} class="font-mono text-2xl font-bold" style={{ color: 'var(--accent)' }} />
+          <p class="label mt-1" style="color: var(--text-secondary);">WASM WIDGETS</p>
+        </div>
+        <div class="border p-4" style="border-color: var(--border); background: var(--bg-card);">
+          <Counter client:visible value={89} duration={1400} class="font-mono text-2xl font-bold" style={{ color: 'var(--accent)' }} />
+          <p class="label mt-1" style="color: var(--text-secondary);">ETF DATABASE</p>
+        </div>
+        <div class="border p-4" style="border-color: var(--border); background: var(--bg-card);">
+          <Counter client:visible value={8} duration={1400} class="font-mono text-2xl font-bold" style={{ color: 'var(--accent)' }} />
+          <p class="label mt-1" style="color: var(--text-secondary);">LIVE DATA FEEDS</p>
+        </div>
+        <div class="border p-4" style="border-color: var(--border); background: var(--bg-card);">
+          <Counter client:visible value={5} duration={1400} class="font-mono text-2xl font-bold" style={{ color: 'var(--accent)' }} />
+          <p class="label mt-1" style="color: var(--text-secondary);">SITE THEMES</p>
+        </div>
+      </div>
+      <TechLoop client:visible />
     </section>
 
     <!-- About -->

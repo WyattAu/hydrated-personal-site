@@ -7,7 +7,7 @@ const ROUTES = [
     path: '/',
     name: 'home',
     sections: [
-      'WYATT_AU',
+      'WYATT AU',
       'SCROLL',
       'ABOUT',
       'PROJECTS',
@@ -59,9 +59,11 @@ test.describe('GUI Traversal: DOM & Screenshot Audit', () => {
       // Wait for any dynamic content to settle.
       await page.waitForTimeout(1000);
 
-      // Verify critical sections are present.
+      // Verify critical sections are present. Unquoted text engine =
+      // case-insensitive substring: robust to hydration-doubled labels
+      // (DecryptedText renders two nodes) and decorative suffixes.
       for (const section of route.sections) {
-        const el = page.locator(`text="${section}"`).first();
+        const el = page.locator(`text=${section}`).first();
         await expect(el).toBeVisible({ timeout: 5000 });
       }
 
