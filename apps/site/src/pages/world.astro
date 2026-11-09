@@ -65,6 +65,7 @@ import FundingRateHeatmap from '../components/solid/quant/FundingRateHeatmap';
 // Macro & rates
 import YieldCurveChart from '../components/solid/quant/YieldCurveChart';
 
+import SpaceWeatherConsole from '../components/solid/osint/SpaceWeatherConsole';
 import CurrencyMatrix from '../components/solid/world/CurrencyMatrix';
 import EarthquakeHistogram from '../components/solid/world/EarthquakeHistogram';
 import FredSparklines from '../components/solid/world/FredSparklines';
@@ -213,9 +214,10 @@ import '../styles/base.css';
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
       <p class="label" style="color: var(--accent);">GEOPHYSICAL</p>
       <h2 class="text-xl md:text-2xl font-bold mb-4">Global Signals</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><EarthquakeHistogram client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><SolarWindPanel client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><SpaceWeatherConsole client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><WeatherStrip client:load /></AppErrorBoundary></div>
       </div>
     </section>

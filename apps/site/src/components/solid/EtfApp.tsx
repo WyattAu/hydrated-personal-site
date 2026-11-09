@@ -9,6 +9,7 @@ import PerformanceMetrics from './PerformanceMetrics';
 import PortfolioComparison from './PortfolioComparison';
 import PortfolioOptimizer from './PortfolioOptimizer';
 import SearchBar from './SearchBar';
+import SpotlightCard from './fx/SpotlightCard';
 
 export default function EtfApp() {
   const [database, setDatabase] = createSignal<EtfEntry[]>([]);
@@ -173,31 +174,39 @@ export default function EtfApp() {
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
             <For each={database().slice(0, 12)}>
               {(etf) => (
-                <button
-                  type="button"
-                  class="border px-3 py-3 text-left transition-colors"
-                  style={{
-                    'border-color': 'var(--border)',
-                    background: 'var(--bg-card)',
-                  }}
-                  onClick={() => setSelectedEtf(etf)}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = accentColor();
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
-                  }}
+                <SpotlightCard
+                  class="p-0 rounded-md"
+                  style={{ background: 'transparent' }}
+                  spotlightColor="var(--accent)"
+                  spotlightSize={160}
+                  softness={0.6}
                 >
-                  <div class="font-mono text-sm font-bold" style={{ color: accentColor() }}>
-                    {etf.ticker}
-                  </div>
-                  <div class="text-xs mt-1 truncate" style={{ color: 'var(--text-secondary)' }}>
-                    {etf.name}
-                  </div>
-                  <div class="font-mono text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-                    {etf.category}
-                  </div>
-                </button>
+                  <button
+                    type="button"
+                    class="border px-3 py-3 text-left transition-colors"
+                    style={{
+                      'border-color': 'var(--border)',
+                      background: 'var(--bg-card)',
+                    }}
+                    onClick={() => setSelectedEtf(etf)}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.borderColor = accentColor();
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
+                    }}
+                  >
+                    <div class="font-mono text-sm font-bold" style={{ color: accentColor() }}>
+                      {etf.ticker}
+                    </div>
+                    <div class="text-xs mt-1 truncate" style={{ color: 'var(--text-secondary)' }}>
+                      {etf.name}
+                    </div>
+                    <div class="font-mono text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                      {etf.category}
+                    </div>
+                  </button>
+                </SpotlightCard>
               )}
             </For>
           </div>
