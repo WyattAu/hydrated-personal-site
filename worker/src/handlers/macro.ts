@@ -94,3 +94,71 @@ export async function handleSpaceLaunches(): Promise<Response> {
     return error('Upstream Launch Library 2 unavailable', 502);
   }
 }
+
+/**
+ * Aurora visibility — NOAA OVATION model (ovation_aurora_latest.json).
+ * The upstream grid is ~65k cells [lon, lat, aurora 0-100]; we cache the
+ * parsed grid and return only cells near the requested coordinate so the
+ * client payload stays under 1 KB.
+ */
+interface AuroraCell {
+  longitude: number;
+  latitude: number;
+  aurora: number;
+}
+
+export async function handleAurora(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+  const lat = Number(url.searchParams.get('lat') ?? '51.5');
+  const lon = Number(url.searchParams.get('lon') ?? '-0.12');
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+    return error('lat/lon out of range', 400);
+  }
+
+  // Round to whole degrees for the cache key — a handful of variants max.
+  const rLat = Math.round(lat);
+  const rLon = Math.round(lon);
+  const key = `aurora:${rLat}:${rLon}`;
+  const cached = getCached(key);
+  if (cached) return json(cached);
+
+  try {
+    const grid = (await fetchJson(
+      'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json',
+      'aurora-grid',
+    )) as {
+      'Observation Time'?: string;
+      'Forecast Time'?: string;
+      coordinates?: Array<[number, number, number]>;
+    };
+
+    const HALF_WIDTH = 4; // ±4° box (~450 km at mid-latitudes)
+    let best: AuroraCell | null = null;
+    let matched = 0;
+    const cells: AuroraCell[] = [];
+    for (const [gLon, gLat, gAurora] of grid.coordinates ?? []) {
+      if (Math.abs(gLat - rLat) <= HALF_WIDTH && Math.abs(gLon - rLon) <= HALF_WIDTH) {
+        matched += 1;
+        cells.push({ longitude: gLon, latitude: gLat, aurora: gAurora });
+        if (!best || gAurora > best.aurora) best = cells[cells.length - 1];
+      }
+    }
+
+    const payload = {
+      latitude: rLat,
+      longitude: rLon,
+      probability: best?.aurora ?? 0,
+      peak_cell: best,
+      matched_cells: matched,
+      observation_time: grid['Observation Time'] ?? '',
+      forecast_time: grid['Forecast Time'] ?? '',
+      source: 'NOAA SWPC OVATION',
+      generated_at: new Date().toISOString(),
+    };
+    setCache(key, payload, 10 * 60 * 1000);
+    return json(payload);
+  } catch (e) {
+    log('error', 'aurora fetch failed', { error: String(e) });
+    return error('Upstream NOAA OVATION API unavailable', 502);
+  }
+}

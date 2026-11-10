@@ -4,6 +4,7 @@ export {
   handleEarthquakes,
   handleFearGreed,
   handleKpIndex,
+  handleAurora,
   handleSpaceLaunches,
   handleMempool,
 } from './macro';

@@ -1,6 +1,7 @@
 import {
   addDeprecationHeaders,
   addVersionHeaders,
+  handleAurora,
   handleBinanceKlines,
   handleCoinGeckoGlobal,
   handleCryptoTicker,
@@ -90,6 +91,8 @@ export default {
         response = await handleFearGreed();
       } else if (routePath === '/api/kp-index') {
         response = await handleKpIndex();
+      } else if (routePath === '/api/aurora') {
+        response = await handleAurora(request);
       } else if (routePath === '/api/space-launches') {
         response = await handleSpaceLaunches();
       } else if (routePath === '/api/mempool') {

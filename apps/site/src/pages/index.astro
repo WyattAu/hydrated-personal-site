@@ -9,6 +9,7 @@ import TickerBar from '../components/solid/TickerBar';
 import ToasterWrapper from '../components/solid/ToasterWrapper';
 import Counter from '../components/solid/fx/Counter';
 import DecryptedText from '../components/solid/fx/DecryptedText';
+import Magnet from '../components/solid/fx/Magnet';
 import SpotlightCard from '../components/solid/fx/SpotlightCard';
 import StarBorder from '../components/solid/fx/StarBorder';
 import TechLoop from '../components/solid/fx/TechLoop';
@@ -113,6 +114,7 @@ const employment = [
           borderRadius={12}
         >
         <div class="flex gap-4 flex-wrap">
+          <Magnet magnetStrength={2} maxOffset={6} padding={16}>
           <a
             href="https://github.com/WyattAu"
             target="_blank"
@@ -121,6 +123,8 @@ const employment = [
           >
             GitHub
           </a>
+          </Magnet>
+          <Magnet magnetStrength={2} maxOffset={6} padding={16}>
           <a
             href="https://forgejo.wyattau.com/wyatt_admin"
             target="_blank"
@@ -129,6 +133,8 @@ const employment = [
           >
             Forgejo
           </a>
+          </Magnet>
+          <Magnet magnetStrength={2} maxOffset={6} padding={16}>
           <a
             href="https://x.com/_WyattAu_"
             target="_blank"
@@ -137,6 +143,7 @@ const employment = [
           >
             X / Twitter
           </a>
+          </Magnet>
           <a
             href="https://ocis.wyattau.com/s/RvJsRemvgLYnuIh"
             target="_blank"

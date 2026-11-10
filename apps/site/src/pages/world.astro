@@ -66,6 +66,7 @@ import FundingRateHeatmap from '../components/solid/quant/FundingRateHeatmap';
 // Macro & rates
 import YieldCurveChart from '../components/solid/quant/YieldCurveChart';
 
+import AuroraVisibility from '../components/solid/osint/AuroraVisibility';
 import KpHistorySparkline from '../components/solid/osint/KpHistorySparkline';
 import MempoolFeeGauge from '../components/solid/osint/MempoolFeeGauge';
 import SpaceWeatherConsole from '../components/solid/osint/SpaceWeatherConsole';
@@ -235,13 +236,14 @@ import '../styles/base.css';
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
       <p class="label" style="color: var(--accent);">GEOPHYSICAL</p>
       <h2 class="text-xl md:text-2xl font-bold mb-4">Global Signals</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><EarthquakeHistogram client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><SolarWindPanel client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><SpaceWeatherConsole client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><WeatherStrip client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><KpHistorySparkline client:load /></AppErrorBoundary></div>
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><SwpcForecast client:load /></AppErrorBoundary></div>
+        <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><AuroraVisibility client:load /></AppErrorBoundary></div>
       </div>
     </section>
 
