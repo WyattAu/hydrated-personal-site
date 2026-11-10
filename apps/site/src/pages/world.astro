@@ -68,6 +68,7 @@ import YieldCurveChart from '../components/solid/quant/YieldCurveChart';
 
 import AuroraVisibility from '../components/solid/osint/AuroraVisibility';
 import KpHistorySparkline from '../components/solid/osint/KpHistorySparkline';
+import LaunchCountdown from '../components/solid/osint/LaunchCountdown';
 import MempoolFeeGauge from '../components/solid/osint/MempoolFeeGauge';
 import SpaceWeatherConsole from '../components/solid/osint/SpaceWeatherConsole';
 import SwpcForecast from '../components/solid/osint/SwpcForecast';
@@ -137,7 +138,10 @@ import '../styles/base.css';
       <MetricCards client:load />
     </section>
 
-    <section class="px-6 md:px-12 lg:px-24 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <section class="px-6 md:px-12 lg:px-24 py-4 space-y-4">
+      <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
+        <AppErrorBoundary client:load><LaunchCountdown client:load /></AppErrorBoundary>
+      </div>
       <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);">
         <AppErrorBoundary client:load><SpaceLaunches client:load /></AppErrorBoundary>
       </div>

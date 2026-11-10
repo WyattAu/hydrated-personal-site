@@ -33,6 +33,7 @@ function level(prob: number): { label: string; color: string } {
 export default function AuroraVisibility() {
   const [place, setPlace] = createSignal(PLACES[1]); // Edinburgh default — highest UK odds
   const [data, setData] = createSignal<AuroraPayload | null>(null);
+  const [kp, setKp] = createSignal<number | null>(null);
   const [error, setError] = createSignal('');
   const [loading, setLoading] = createSignal(false);
 
@@ -50,8 +51,18 @@ export default function AuroraVisibility() {
     }
   };
 
-  onMount(() => {
+  onMount(async () => {
     void load();
+    // Kp context: geomagnetic activity drives how far south aurora reaches.
+    try {
+      const res = await fetch(`${apiBase()}/api/kp-index`);
+      if (res.ok) {
+        const d = (await res.json()) as { Kp: number }[];
+        if (Array.isArray(d) && d.length > 0) setKp(d[d.length - 1].Kp);
+      }
+    } catch {
+      /* Kp chip is best-effort */
+    }
   });
 
   const lv = () => level(data()?.probability ?? 0);
@@ -84,6 +95,16 @@ export default function AuroraVisibility() {
           {data()?.probability ? lv().label : '—'} · {place().label}
         </span>
       </div>
+      {kp() !== null && (
+        <p class="font-mono text-[9px] mb-2" style={{ color: 'var(--text-secondary)' }}>
+          KP {kp()?.toFixed(2)} ·{' '}
+          {(kp() ?? 0) >= 5
+            ? 'storm levels — visible far south of usual'
+            : (kp() ?? 0) >= 4
+              ? 'elevated — high-latitudes only'
+              : 'quiet — high-latitudes only'}
+        </p>
+      )}
       <div class="grid grid-cols-4 gap-1 mb-2">
         <For each={PLACES}>
           {(p) => (
