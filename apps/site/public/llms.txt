@@ -12,7 +12,7 @@
 - [World Monitor](https://wyattau.com/world): real-time intelligence dashboard — crypto prices via Binance WebSocket, world map with live ISS position, macro rates (VIX, DXY, yields), earthquakes, GOES X-ray solar activity, planetary K-index with 3-day geomagnetic forecast, Bitcoin fee market, and upcoming orbital launches.
 - [ETF Intelligence](https://wyattau.com/etf): database of 89 ETFs with allocation analysis, correlation matrix, Monte Carlo simulation, VaR, portfolio backtesting, and walk-forward analysis.
 - [ML Benchmarks](https://wyattau.com/ml): LLM benchmark leaderboards, model comparison radar charts, GPU requirement calculator, and inference throughput simulator.
-- [World Data](https://wyattau.com/data): reference datasets powering the dashboards.
+- [World Data](https://wyattau.com/data/etf-database.json): reference datasets powering the dashboards — JSON under `/data/` (etf-database, seo-audit, seo-pages).
 - [Docs](https://wyattau.com/docs): technical notes, architecture decisions, and infrastructure documentation.
 - [Dossier](https://wyattau.com/dossier): detailed biography and timeline.
 - [Projects](https://wyattau.com/projects): selected engineering projects.

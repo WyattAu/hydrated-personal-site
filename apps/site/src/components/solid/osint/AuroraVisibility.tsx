@@ -30,6 +30,30 @@ function level(prob: number): { label: string; color: string } {
   return { label: 'UNLIKELY', color: 'var(--text-secondary)' };
 }
 
+/**
+ * Moon phase from synodic-month math (deterministic, no API).
+ * Epoch: known new moon 2000-01-06 18:14 UTC. Illumination uses the
+ * sine approximation — good to a few percent, fine for a darkness verdict.
+ */
+const SYNODIC = 29.530588853;
+const NEW_MOON_EPOCH = Date.UTC(2000, 0, 6, 18, 14); // ms
+
+function moonState(now: number): { illumination: number; phase: string; dark: boolean } {
+  const age = ((now - NEW_MOON_EPOCH) / 86400000) % SYNODIC;
+  const fraction = age / SYNODIC; // 0 new, 0.5 full, 1 new
+  const illumination = Math.round(((1 - Math.cos(2 * Math.PI * fraction)) / 2) * 100);
+  let phase: string;
+  if (fraction < 0.03 || fraction > 0.97) phase = 'new';
+  else if (fraction < 0.22) phase = 'waxing crescent';
+  else if (fraction < 0.28) phase = 'first quarter';
+  else if (fraction < 0.47) phase = 'waxing gibbous';
+  else if (fraction < 0.53) phase = 'full';
+  else if (fraction < 0.72) phase = 'waning gibbous';
+  else if (fraction < 0.78) phase = 'last quarter';
+  else phase = 'waning crescent';
+  return { illumination, phase, dark: illumination <= 25 };
+}
+
 export default function AuroraVisibility() {
   const [place, setPlace] = createSignal(PLACES[1]); // Edinburgh default — highest UK odds
   const [data, setData] = createSignal<AuroraPayload | null>(null);
@@ -68,6 +92,7 @@ export default function AuroraVisibility() {
   const lv = () => level(data()?.probability ?? 0);
   const obs = () => `${(data()?.observation_time ?? '').slice(11, 16)}Z`;
   const fct = () => `${(data()?.forecast_time ?? '').slice(11, 16)}Z`;
+  const moon = moonState(Date.now());
 
   return (
     <div>
@@ -105,6 +130,14 @@ export default function AuroraVisibility() {
               : 'quiet — high-latitudes only'}
         </p>
       )}
+      <p class="font-mono text-[9px] mb-2" style={{ color: 'var(--text-secondary)' }}>
+        MOON {moon.illumination}% {moon.phase} ·{' '}
+        <span
+          style={{ color: moon.dark ? 'var(--positive, #34d399)' : 'var(--accent-warm, #ff9800)' }}
+        >
+          {moon.dark ? 'dark skies favor visibility' : 'bright skies — poor contrast'}
+        </span>
+      </p>
       <div class="grid grid-cols-4 gap-1 mb-2">
         <For each={PLACES}>
           {(p) => (
