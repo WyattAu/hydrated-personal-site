@@ -162,3 +162,43 @@ export async function handleAurora(request: Request): Promise<Response> {
     return error('Upstream NOAA OVATION API unavailable', 502);
   }
 }
+
+/**
+ * SWPC space-weather alerts — NOAA public alert products
+ * (/products/alerts.json). Slimmed to the newest 6 with a first-line
+ * summary; 10-minute cache.
+ */
+export async function handleSwpcAlerts(): Promise<Response> {
+  const cached = getCached('swpc-alerts');
+  if (cached) return json(cached);
+
+  try {
+    const data = await fetchJson(
+      'https://services.swpc.noaa.gov/products/alerts.json',
+      'swpc-alerts',
+    );
+    const list = (Array.isArray(data) ? data : []) as Array<{
+      product_id?: string;
+      issue_datetime?: string;
+      message?: string;
+    }>;
+    const slim = list.slice(0, 6).map((a) => {
+      const lines = (a.message ?? '').split(/\r?\n/).filter((l) => l.length > 0);
+      const summary =
+        lines.find((l) => /^(ALERT|CONTINUED ALERT|WARNING|SUMMARY|WATCH)/i.test(l)) ??
+        lines[2] ??
+        lines[0] ??
+        '';
+      return {
+        product_id: a.product_id ?? '',
+        issued: a.issue_datetime ?? '',
+        summary: summary.slice(0, 140),
+      };
+    });
+    setCache('swpc-alerts', slim, 10 * 60 * 1000);
+    return json(slim);
+  } catch (e) {
+    log('error', 'swpc-alerts fetch failed', { error: String(e) });
+    return error('Upstream NOAA alerts unavailable', 502);
+  }
+}

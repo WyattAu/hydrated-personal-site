@@ -25,6 +25,7 @@ import {
   handleSpaceLaunches,
   handleStockChart,
   handleStockQuote,
+  handleSwpcAlerts,
   handleVersions,
   handleWeather,
   handleWorldBank,
@@ -91,6 +92,8 @@ export default {
         response = await handleFearGreed();
       } else if (routePath === '/api/kp-index') {
         response = await handleKpIndex();
+      } else if (routePath === '/api/swpc-alerts') {
+        response = await handleSwpcAlerts();
       } else if (routePath === '/api/aurora') {
         response = await handleAurora(request);
       } else if (routePath === '/api/space-launches') {

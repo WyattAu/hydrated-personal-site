@@ -5,6 +5,7 @@ export {
   handleFearGreed,
   handleKpIndex,
   handleAurora,
+  handleSwpcAlerts,
   handleSpaceLaunches,
   handleMempool,
 } from './macro';

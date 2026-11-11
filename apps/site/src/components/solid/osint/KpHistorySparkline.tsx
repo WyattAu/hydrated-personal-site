@@ -1,4 +1,4 @@
-import { createSignal, onMount } from 'solid-js';
+import { For, createSignal, onMount } from 'solid-js';
 import { apiBase } from '../../../lib/api-base';
 
 /**
@@ -50,6 +50,24 @@ export default function KpHistorySparkline() {
 
   const stormY = () => H - (5 / K_MAX) * (H - 8) - 4;
 
+  // contiguous [x0,x1] spans where Kp >= 4, for storm-band shading
+  const stormBands = (): { x0: number; x1: number }[] => {
+    const rs = readings();
+    if (rs.length < 2) return [];
+    const bands: { x0: number; x1: number }[] = [];
+    let start: number | null = null;
+    for (let i = 0; i < rs.length; i++) {
+      const x = (i / (rs.length - 1)) * W;
+      const inStorm = rs[i].Kp >= 4;
+      if (inStorm && start === null) start = x;
+      if ((!inStorm || i === rs.length - 1) && start !== null) {
+        bands.push({ x0: start, x1: inStorm && i === rs.length - 1 ? x : x });
+        start = null;
+      }
+    }
+    return bands;
+  };
+
   return (
     <div>
       <div class="flex items-center justify-between mb-3">
@@ -82,6 +100,19 @@ export default function KpHistorySparkline() {
         role="img"
         aria-label="Planetary K-index history sparkline"
       >
+        {/* storm bands: shade vertical spans where Kp >= 4 */}
+        <For each={stormBands()}>
+          {(band) => (
+            <rect
+              x={band.x0}
+              y={0}
+              width={Math.max(2, band.x1 - band.x0)}
+              height={H}
+              fill="var(--negative, #ef4444)"
+              opacity="0.12"
+            />
+          )}
+        </For>
         <line
           x1="0"
           y1={stormY()}
