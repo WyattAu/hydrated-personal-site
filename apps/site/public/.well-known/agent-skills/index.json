@@ -1,6 +1,6 @@
 {
   "schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
-  "updated": "2026-11-12T03:37:45Z",
+  "updated": "2026-11-12T13:43:11Z",
   "skills": [
     {
       "name": "market-data",
@@ -15,6 +15,13 @@
       "description": "OSINT JSON feeds: USGS earthquakes GeoJSON, NOAA planetary K-index, OVATION aurora probability by coordinate, SWPC space-weather alerts, Launch Library 2 upcoming launches, Bitcoin mempool fees. Edge-cached GET, no auth.",
       "url": "https://wyattau.com/skills/osint-feeds/SKILL.md",
       "digest": "sha256:4af09685b702651a31ccc3260351e9f4fed9ec22e94c5e98717a514f0f813ee9"
+    },
+    {
+      "name": "space-weather",
+      "type": "skill-md",
+      "description": "Keyless space-weather JSON: OVATION aurora probability by coordinate, aurora activity-index history, newest NOAA SWPC alerts, planetary K-index. Edge-cached GET, no auth.",
+      "url": "https://wyattau.com/skills/space-weather/SKILL.md",
+      "digest": "sha256:d6616db0acfc8369a8d5186a305c49217e6bdaba2c88d0442a014dec45c34eb3"
     }
   ]
 }
