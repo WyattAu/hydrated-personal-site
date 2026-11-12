@@ -2,6 +2,7 @@ import {
   addDeprecationHeaders,
   addVersionHeaders,
   handleAurora,
+  handleAuroraHistory,
   handleBinanceKlines,
   handleCoinGeckoGlobal,
   handleCryptoTicker,
@@ -94,8 +95,10 @@ export default {
         response = await handleKpIndex();
       } else if (routePath === '/api/swpc-alerts') {
         response = await handleSwpcAlerts();
+      } else if (routePath === '/api/aurora-history') {
+        response = await handleAuroraHistory(env);
       } else if (routePath === '/api/aurora') {
-        response = await handleAurora(request);
+        response = await handleAurora(request, env);
       } else if (routePath === '/api/space-launches') {
         response = await handleSpaceLaunches();
       } else if (routePath === '/api/mempool') {

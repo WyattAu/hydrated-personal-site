@@ -28,7 +28,7 @@
 
 - Markdown variants of key pages (for AI citation): [/markdown/index.md](https://wyattau.com/markdown/index.md), [/markdown/world.md](https://wyattau.com/markdown/world.md), [/markdown/etf.md](https://wyattau.com/markdown/etf.md), [/markdown/ml.md](https://wyattau.com/markdown/ml.md), [/markdown/dossier.md](https://wyattau.com/markdown/dossier.md), [/markdown/projects.md](https://wyattau.com/markdown/projects.md) — advertised per-page via `Link: ...; rel="alternate"; type="text/markdown"` headers.
 - Agent discovery: [/.well-known/api-catalog](https://wyattau.com/.well-known/api-catalog) (RFC 9727), [/.well-known/agent-card.json](https://wyattau.com/.well-known/agent-card.json) (A2A), [/.well-known/agent-skills/index.json](https://wyattau.com/.well-known/agent-skills/index.json), [/auth.md](https://wyattau.com/auth.md), [/.well-known/oauth-protected-resource](https://wyattau.com/.well-known/oauth-protected-resource) (RFC 9728; no auth required).
-- Keyless JSON APIs (edge-cached, GET, no auth): `/api/crypto-ticker`, `/api/earthquakes`, `/api/kp-index`, `/api/space-launches`, `/api/fear-greed`, `/api/stock-quote`, `/api/mempool`, `/api/health`. See [/auth.md](https://wyattau.com/auth.md) for etiquette.
+- Keyless JSON APIs (edge-cached, GET, no auth): `/api/crypto-ticker`, `/api/earthquakes`, `/api/kp-index`, `/api/aurora?lat=&lon=`, `/api/aurora-history`, `/api/swpc-alerts`, `/api/space-launches`, `/api/fear-greed`, `/api/stock-quote`, `/api/mempool`, `/api/health`, plus market/FX/reference endpoints. See [/auth.md](https://wyattau.com/auth.md) for the full list and etiquette.
 
 ## Contact
 

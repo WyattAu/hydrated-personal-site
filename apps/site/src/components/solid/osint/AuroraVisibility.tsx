@@ -16,6 +16,11 @@ interface AuroraPayload {
   forecast_time: string;
 }
 
+interface HistoryPoint {
+  ts: number;
+  prob: number;
+}
+
 const PLACES: { label: string; lat: number; lon: number }[] = [
   { label: 'LONDON', lat: 51.5, lon: -0.12 },
   { label: 'EDINBURGH', lat: 55.95, lon: -3.19 },
@@ -58,6 +63,7 @@ export default function AuroraVisibility() {
   const [place, setPlace] = createSignal(PLACES[1]); // Edinburgh default — highest UK odds
   const [data, setData] = createSignal<AuroraPayload | null>(null);
   const [kp, setKp] = createSignal<number | null>(null);
+  const [history, setHistory] = createSignal<HistoryPoint[]>([]);
   const [error, setError] = createSignal('');
   const [loading, setLoading] = createSignal(false);
 
@@ -86,6 +92,16 @@ export default function AuroraVisibility() {
       }
     } catch {
       /* Kp chip is best-effort */
+    }
+    // Activity-index history (30-min KV snapshots, best-effort).
+    try {
+      const res = await fetch(`${apiBase()}/api/aurora-history`);
+      if (res.ok) {
+        const d = (await res.json()) as { history?: HistoryPoint[] };
+        if (Array.isArray(d.history) && d.history.length >= 2) setHistory(d.history.slice(-48));
+      }
+    } catch {
+      /* history sparkline is best-effort */
     }
   });
 
@@ -138,6 +154,27 @@ export default function AuroraVisibility() {
           {moon.dark ? 'dark skies favor visibility' : 'bright skies — poor contrast'}
         </span>
       </p>
+      {history().length >= 2 && (
+        <svg
+          viewBox="0 0 300 36"
+          class="w-full mb-2"
+          role="img"
+          aria-label="Aurora activity index history (max probability 55-65N, 30-minute snapshots)"
+        >
+          <polyline
+            points={history()
+              .map((p, i) => {
+                const x = (i / (history().length - 1)) * 300;
+                const y = 34 - (Math.min(p.prob, 100) / 100) * 30;
+                return `${x.toFixed(1)},${y.toFixed(1)}`;
+              })
+              .join(' ')}
+            fill="none"
+            stroke="var(--accent)"
+            stroke-width="1.5"
+          />
+        </svg>
+      )}
       <div class="grid grid-cols-4 gap-1 mb-2">
         <For each={PLACES}>
           {(p) => (

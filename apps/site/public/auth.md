@@ -19,7 +19,19 @@ model.
 - `GET /api/space-launches` — upcoming orbital launches (Launch Library 2).
 - `GET /api/weather` — Open-Meteo forecast proxy.
 - `GET /api/fear-greed` — crypto Fear & Greed index.
-- `GET /api/mempool` — Bitcoin mempool fees.
+- `GET /api/mempool` — Bitcoin mempool fees + difficulty-adjustment estimate.
+- `GET /api/aurora?lat=&lon=` — NOAA OVATION aurora probability near a coordinate (grid-filtered).
+- `GET /api/aurora-history` — aurora activity-index history (30-min snapshots, 55-65N).
+- `GET /api/swpc-alerts` — newest NOAA SWPC space-weather alert products.
+- `GET /api/stock-quote?symbols=` — Yahoo Finance quotes.
+- `GET /api/stock-chart` — Yahoo Finance OHLC series.
+- `GET /api/binance-klines` — Binance candlestick data.
+- `GET /api/exchange-rates` — reference FX rates.
+- `GET /api/restcountries?code=` — country metadata.
+- `GET /api/world-bank` — World Bank indicators.
+- `GET /api/github-trending` — trending repositories.
+- `GET /api/hacker-news` — Hacker News front page digest.
+- `GET /api/llm-benchmarks` — LLM benchmark leaderboard data.
 
 ## Rate limits and etiquette
 

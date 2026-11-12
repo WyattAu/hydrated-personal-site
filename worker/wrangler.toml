@@ -9,6 +9,13 @@ ENVIRONMENT = "production"
 # KV namespace for guestbook (configure after first deploy)
 # [[kv_namespaces]]
 # binding = "GUESTBOOK"
+
+[[kv_namespaces]]
+binding = "AURORA_HISTORY"
+id = "0b46da33092a4d598f7a19054c7d636e"
+
+# [[kv_namespaces]]
+# binding = "GUESTBOOK"
 # id = "xxx"
 
 # Durable Object for WebSocket price streaming

@@ -2,6 +2,7 @@ import { getCached, setCache } from '../cache';
 import { fetchJson } from '../fetch';
 import { log } from '../logger';
 import { error, json } from '../security';
+import type { Env } from '../types';
 
 export async function handleEarthquakes(): Promise<Response> {
   const cached = getCached('earthquakes');
@@ -56,11 +57,12 @@ export async function handleMempool(): Promise<Response> {
   if (cached) return json(cached);
 
   try {
-    const [fees, stats] = await Promise.all([
+    const [fees, stats, difficulty] = await Promise.all([
       fetchJson('https://mempool.space/api/v1/fees/recommended', 'mempool-fees'),
       fetchJson('https://mempool.space/api/mempool', 'mempool-stats'),
+      fetchJson('https://mempool.space/api/v1/difficulty-adjustment', 'mempool-difficulty'),
     ]);
-    const data = { fees, mempool: stats };
+    const data = { fees, mempool: stats, difficulty };
     setCache('mempool', data, 60 * 1000);
     return json(data);
   } catch (e) {
@@ -107,7 +109,7 @@ interface AuroraCell {
   aurora: number;
 }
 
-export async function handleAurora(request: Request): Promise<Response> {
+export async function handleAurora(request: Request, env?: Env): Promise<Response> {
   const url = new URL(request.url);
   const lat = Number(url.searchParams.get('lat') ?? '51.5');
   const lon = Number(url.searchParams.get('lon') ?? '-0.12');
@@ -156,6 +158,26 @@ export async function handleAurora(request: Request): Promise<Response> {
       generated_at: new Date().toISOString(),
     };
     setCache(key, payload, 10 * 60 * 1000);
+
+    // Persist a city-independent activity index (max probability over the
+    // 55-65N band) every 30-minute OVATION bucket for the history sparkline.
+    if (env?.AURORA_HISTORY) {
+      try {
+        let bandMax = 0;
+        for (const c of cells) {
+          if (c.latitude >= 55 && c.latitude <= 65 && c.aurora > bandMax) bandMax = c.aurora;
+        }
+        const bucket = Math.floor(Date.now() / 1800000); // 30-min dedup
+        await env.AURORA_HISTORY.put(
+          `hist:${bucket}`,
+          JSON.stringify({ ts: Date.now(), prob: bandMax }),
+          { expirationTtl: 14 * 24 * 3600 },
+        );
+      } catch (kvErr) {
+        log('error', 'aurora history write failed', { error: String(kvErr) });
+      }
+    }
+
     return json(payload);
   } catch (e) {
     log('error', 'aurora fetch failed', { error: String(e) });
@@ -200,5 +222,32 @@ export async function handleSwpcAlerts(): Promise<Response> {
   } catch (e) {
     log('error', 'swpc-alerts fetch failed', { error: String(e) });
     return error('Upstream NOAA alerts unavailable', 502);
+  }
+}
+
+/**
+ * Aurora activity-index history — reads the 30-minute KV snapshots
+ * (max probability over 55-65N). Empty array when KV is not bound.
+ */
+export async function handleAuroraHistory(env?: Env): Promise<Response> {
+  if (!env?.AURORA_HISTORY) return json({ history: [] });
+  try {
+    const list = await env.AURORA_HISTORY.list({ prefix: 'hist:' });
+    const out: Array<{ ts: number; prob: number }> = [];
+    for (const key of list.keys.slice(-48)) {
+      const raw = await env.AURORA_HISTORY.get(key.name);
+      if (raw) {
+        try {
+          out.push(JSON.parse(raw) as { ts: number; prob: number });
+        } catch {
+          /* skip malformed snapshot */
+        }
+      }
+    }
+    out.sort((a, b) => a.ts - b.ts);
+    return json({ history: out });
+  } catch (e) {
+    log('error', 'aurora history read failed', { error: String(e) });
+    return error('Aurora history unavailable', 502);
   }
 }

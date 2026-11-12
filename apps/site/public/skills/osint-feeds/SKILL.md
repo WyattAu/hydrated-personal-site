@@ -19,6 +19,8 @@ Library 2 (provider, rocket, pad, T-minus), and Bitcoin mempool fees.
 - `https://wyattau.com/api/kp-index`
 - `https://wyattau.com/api/space-launches`
 - `https://wyattau.com/api/mempool`
+- `https://wyattau.com/api/aurora?lat=&lon=` — NOAA OVATION aurora probability near a coordinate
+- `https://wyattau.com/api/swpc-alerts` — newest NOAA space-weather alerts
 
 ## Etiquette
 

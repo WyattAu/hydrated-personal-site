@@ -5,6 +5,7 @@ export {
   handleFearGreed,
   handleKpIndex,
   handleAurora,
+  handleAuroraHistory,
   handleSwpcAlerts,
   handleSpaceLaunches,
   handleMempool,

@@ -18,6 +18,12 @@ interface MempoolPayload {
     count: number;
     vsize: number;
   };
+  difficulty?: {
+    progressPercent?: number;
+    difficultyChange?: number;
+    estimatedRetargetDate?: number;
+    remainingEpoch?: number;
+  };
 }
 
 export default function MempoolFeeGauge() {
@@ -102,6 +108,24 @@ export default function MempoolFeeGauge() {
       </div>
       <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
         next-block fees ≥20 sat/vB flagged as congestion
+        {data()?.difficulty && typeof data()?.difficulty?.difficultyChange === 'number' && (
+          <>
+            {' '}
+            · difficulty Δ{' '}
+            <span
+              style={{
+                color:
+                  (data()?.difficulty?.difficultyChange ?? 0) >= 0
+                    ? 'var(--positive, #34d399)'
+                    : 'var(--negative, #ef4444)',
+              }}
+            >
+              {(data()?.difficulty?.difficultyChange ?? 0) >= 0 ? '+' : ''}
+              {(data()?.difficulty?.difficultyChange ?? 0).toFixed(1)}%
+            </span>{' '}
+            retarget {(data()?.difficulty?.progressPercent ?? 0).toFixed(0)}%
+          </>
+        )}
       </p>
     </div>
   );
