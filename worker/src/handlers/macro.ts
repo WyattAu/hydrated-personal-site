@@ -273,3 +273,29 @@ export async function handleAuroraHistory(env?: Env): Promise<Response> {
     return error('Aurora history unavailable', 502);
   }
 }
+
+/**
+ * Solar cycle — F10.7 radio flux (10.7 cm), NOAA SWPC hourly obs.
+ * Slimmed to the last 90 entries; 60-minute cache.
+ */
+export async function handleSolarCycle(): Promise<Response> {
+  const cached = getCached('solar-cycle');
+  if (cached) return json(cached);
+
+  try {
+    const data = await fetchJson(
+      'https://services.swpc.noaa.gov/json/f107_cm_flux.json',
+      'solar-cycle',
+    );
+    const list = (Array.isArray(data) ? data : []) as Array<{
+      time_tag?: string;
+      flux?: number;
+    }>;
+    const slim = list.slice(-90).map((e) => ({ time_tag: e.time_tag ?? '', flux: e.flux ?? 0 }));
+    setCache('solar-cycle', slim, 60 * 60 * 1000);
+    return json(slim);
+  } catch (e) {
+    log('error', 'solar-cycle fetch failed', { error: String(e) });
+    return error('Upstream NOAA F10.7 unavailable', 502);
+  }
+}

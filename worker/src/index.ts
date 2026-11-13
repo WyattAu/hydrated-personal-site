@@ -23,6 +23,7 @@ import {
   handleMetrics,
   handleRestCountries,
   handleSocialSentiment,
+  handleSolarCycle,
   handleSpaceLaunches,
   handleStockChart,
   handleStockQuote,
@@ -102,6 +103,8 @@ export default {
         response = await handleFearGreed();
       } else if (routePath === '/api/kp-index') {
         response = await handleKpIndex();
+      } else if (routePath === '/api/solar-cycle') {
+        response = await handleSolarCycle();
       } else if (routePath === '/api/swpc-alerts') {
         response = await handleSwpcAlerts();
       } else if (routePath === '/api/aurora-history') {
