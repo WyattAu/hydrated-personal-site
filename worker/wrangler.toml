@@ -23,3 +23,6 @@ id = "0b46da33092a4d598f7a19054c7d636e"
 # [[durable_objects.bindings]]
 # name = "PRICE_STREAM"
 # class_name = "PriceStream"
+
+[triggers]
+crons = ["*/30 * * * *"]

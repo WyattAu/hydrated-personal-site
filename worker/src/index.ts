@@ -31,6 +31,7 @@ import {
   handleWeather,
   handleWorldBank,
   resolveVersionedRoute,
+  scheduledAuroraSnapshot,
 } from './handlers';
 import { handleCryptoTickerSSE, handleMetricsSSE } from './handlers/sse';
 import { clearTraceId, log, setTraceId } from './logger';
@@ -43,6 +44,14 @@ const LATEST_VERSION = 'v1';
 export type { Env } from './types';
 
 export default {
+  async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(
+      scheduledAuroraSnapshot(env).catch((e: unknown) =>
+        console.error('aurora cron snapshot failed', e),
+      ),
+    );
+  },
+
   async fetch(request: Request, env: Env): Promise<Response> {
     const start = Date.now();
     metrics.requests++;

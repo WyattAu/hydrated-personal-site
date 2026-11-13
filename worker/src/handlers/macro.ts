@@ -159,20 +159,10 @@ export async function handleAurora(request: Request, env?: Env): Promise<Respons
     };
     setCache(key, payload, 10 * 60 * 1000);
 
-    // Persist a city-independent activity index (max probability over the
-    // 55-65N band) every 30-minute OVATION bucket for the history sparkline.
+    // Persist the city-independent activity index for the history series.
     if (env?.AURORA_HISTORY) {
       try {
-        let bandMax = 0;
-        for (const c of cells) {
-          if (c.latitude >= 55 && c.latitude <= 65 && c.aurora > bandMax) bandMax = c.aurora;
-        }
-        const bucket = Math.floor(Date.now() / 1800000); // 30-min dedup
-        await env.AURORA_HISTORY.put(
-          `hist:${bucket}`,
-          JSON.stringify({ ts: Date.now(), prob: bandMax }),
-          { expirationTtl: 14 * 24 * 3600 },
-        );
+        await recordAuroraSnapshot(env, cells);
       } catch (kvErr) {
         log('error', 'aurora history write failed', { error: String(kvErr) });
       }
@@ -186,11 +176,43 @@ export async function handleAurora(request: Request, env?: Env): Promise<Respons
 }
 
 /**
+ * Write one 30-minute-bucket aurora activity snapshot (max probability
+ * over 55-65N) into KV. Called from handleAurora (write-on-view) and the
+ * cron trigger (autonomous snapshots), deduped by bucket key.
+ */
+export async function recordAuroraSnapshot(env: Env, cells: AuroraCell[]): Promise<void> {
+  if (!env.AURORA_HISTORY) return;
+  let bandMax = 0;
+  for (const c of cells) {
+    if (c.latitude >= 55 && c.latitude <= 65 && c.aurora > bandMax) bandMax = c.aurora;
+  }
+  const bucket = Math.floor(Date.now() / 1800000); // 30-min dedup
+  await env.AURORA_HISTORY.put(
+    `hist:${bucket}`,
+    JSON.stringify({ ts: Date.now(), prob: bandMax }),
+    { expirationTtl: 14 * 24 * 3600 },
+  );
+}
+
+/** Cron-driven autonomous snapshot: fetch the grid, write the bucket. */
+export async function scheduledAuroraSnapshot(env: Env): Promise<void> {
+  const grid = (await fetchJson(
+    'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json',
+    'aurora-grid',
+  )) as { coordinates?: Array<[number, number, number]> };
+  const cells: AuroraCell[] = (grid.coordinates ?? []).map(([longitude, latitude, aurora]) => ({
+    longitude,
+    latitude,
+    aurora,
+  }));
+  await recordAuroraSnapshot(env, cells);
+}
+
+/**
  * SWPC space-weather alerts — NOAA public alert products
  * (/products/alerts.json). Slimmed to the newest 6 with a first-line
  * summary; 10-minute cache.
- */
-export async function handleSwpcAlerts(): Promise<Response> {
+ */ export async function handleSwpcAlerts(): Promise<Response> {
   const cached = getCached('swpc-alerts');
   if (cached) return json(cached);
 

@@ -6,6 +6,7 @@ export {
   handleKpIndex,
   handleAurora,
   handleAuroraHistory,
+  scheduledAuroraSnapshot,
   handleSwpcAlerts,
   handleSpaceLaunches,
   handleMempool,

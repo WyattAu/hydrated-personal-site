@@ -14,7 +14,8 @@ const allProjects = (await getCollection('projects')).sort((a, b) => a.data.orde
 const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologies))].sort();
 ---
 
-<BaseLayout title="Projects — Wyatt Au" description="Open-source projects and technical work by Wyatt Au.">
+<BaseLayout title="Projects — Wyatt Au"
+  ogImage="/og/projects.png" description="Open-source projects and technical work by Wyatt Au.">
   <Nav />
 
     <main id="main-content" class="pt-32">
