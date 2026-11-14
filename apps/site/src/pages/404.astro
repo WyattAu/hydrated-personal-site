@@ -1,12 +1,20 @@
 ---
 import '../styles/base.css';
 import GlitchText from '../components/solid/fx/GlitchText';
+import LetterGlitch from '../components/solid/fx/LetterGlitch';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="404 — Not Found" description="Page not found.">
   <main class="min-h-screen flex flex-col items-center justify-center px-6">
-    <div class="text-center">
+    <LetterGlitch
+      client:load
+      class="absolute inset-0 pointer-events-none opacity-30"
+      glitchColors={['#ef4444', '#00e5ff', '#f97316']}
+      baseColor="#1a1a2e"
+      fontSize={0.9}
+    />
+    <div class="text-center relative">
       <GlitchText client:load class="stat-value mb-4 block" speed={1} enableShadows shadowColors={['var(--negative, #ef4444)', 'var(--accent)']}>
         404
       </GlitchText>

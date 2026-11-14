@@ -12,17 +12,25 @@ interface FluxEntry {
   flux: number;
 }
 
+interface SolarCyclePayload {
+  flux: FluxEntry[];
+  regions: number;
+  regions_date: string;
+}
+
 export default function SolarCycle() {
   const [entries, setEntries] = createSignal<FluxEntry[]>([]);
+  const [regions, setRegions] = createSignal(0);
   const [error, setError] = createSignal('');
 
   onMount(async () => {
     try {
       const res = await fetch(`${apiBase()}/api/solar-cycle`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const d = (await res.json()) as FluxEntry[];
-      if (!Array.isArray(d) || d.length === 0) throw new Error('empty feed');
-      setEntries(d);
+      const d = (await res.json()) as SolarCyclePayload;
+      if (!Array.isArray(d.flux) || d.flux.length === 0) throw new Error('empty feed');
+      setEntries(d.flux);
+      setRegions(d.regions ?? 0);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'SWPC feed unavailable');
     }
@@ -84,7 +92,8 @@ export default function SolarCycle() {
         </For>
       </div>
       <p class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>
-        window mean {entries().length > 0 ? mean().toFixed(0) : '—'} sfu · F10.7 ≥150 = active sun
+        {regions() > 0 ? `${regions()} active regions · ` : ''}window mean{' '}
+        {entries().length > 0 ? mean().toFixed(0) : '—'} sfu · F10.7 ≥150 = active sun
       </p>
     </div>
   );
