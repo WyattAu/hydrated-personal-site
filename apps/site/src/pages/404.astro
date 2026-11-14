@@ -1,12 +1,15 @@
 ---
 import '../styles/base.css';
+import GlitchText from '../components/solid/fx/GlitchText';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="404 — Not Found" description="Page not found.">
   <main class="min-h-screen flex flex-col items-center justify-center px-6">
     <div class="text-center">
-      <p class="stat-value mb-4" style="color: var(--accent);">404</p>
+      <GlitchText client:load class="stat-value mb-4 block" speed={1} enableShadows shadowColors={['var(--negative, #ef4444)', 'var(--accent)']}>
+        404
+      </GlitchText>
       <div class="font-mono text-sm mb-8" style="color: var(--text-secondary);">
         <span style="color: var(--accent);">$</span> find / —name "this_page" 2>/dev/null<br />
         <span style="color: var(--text-secondary);">find: no results found</span>

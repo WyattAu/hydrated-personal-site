@@ -9,6 +9,7 @@ export {
   scheduledAuroraSnapshot,
   handleSwpcAlerts,
   handleSolarCycle,
+  handleProtonFlux,
   handleSpaceLaunches,
   handleMempool,
 } from './macro';

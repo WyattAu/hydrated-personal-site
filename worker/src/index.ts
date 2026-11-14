@@ -21,6 +21,7 @@ import {
   handleLlmBenchmarks,
   handleMempool,
   handleMetrics,
+  handleProtonFlux,
   handleRestCountries,
   handleSocialSentiment,
   handleSolarCycle,
@@ -103,6 +104,8 @@ export default {
         response = await handleFearGreed();
       } else if (routePath === '/api/kp-index') {
         response = await handleKpIndex();
+      } else if (routePath === '/api/proton-flux') {
+        response = await handleProtonFlux();
       } else if (routePath === '/api/solar-cycle') {
         response = await handleSolarCycle();
       } else if (routePath === '/api/swpc-alerts') {

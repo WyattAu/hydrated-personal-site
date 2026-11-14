@@ -299,3 +299,44 @@ export async function handleSolarCycle(): Promise<Response> {
     return error('Upstream NOAA F10.7 unavailable', 502);
   }
 }
+
+/**
+ * GOES integral proton flux — radiation storm context (S-scale).
+ * Latest reading per energy channel from the 1-day integral feed;
+ * 10-minute cache.
+ */
+export async function handleProtonFlux(): Promise<Response> {
+  const cached = getCached('proton-flux');
+  if (cached) return json(cached);
+
+  try {
+    const data = await fetchJson(
+      'https://services.swpc.noaa.gov/json/goes/primary/integral-protons-1-day.json',
+      'proton-flux',
+    );
+    const list = (Array.isArray(data) ? data : []) as Array<{
+      time_tag?: string;
+      energy?: string;
+      flux?: number;
+    }>;
+    const latest: Record<string, { flux: number; time_tag: string }> = {};
+    let timeTag = '';
+    for (const e of list) {
+      if (!e.energy || typeof e.flux !== 'number') continue;
+      timeTag = e.time_tag ?? timeTag;
+      latest[e.energy] = { flux: e.flux, time_tag: e.time_tag ?? '' };
+    }
+    const payload = {
+      time_tag: timeTag,
+      p1: latest['>=1 MeV']?.flux ?? null,
+      p10: latest['>=10 MeV']?.flux ?? null,
+      p100: latest['>=100 MeV']?.flux ?? null,
+      source: 'NOAA SWPC GOES integral protons',
+    };
+    setCache('proton-flux', payload, 10 * 60 * 1000);
+    return json(payload);
+  } catch (e) {
+    log('error', 'proton-flux fetch failed', { error: String(e) });
+    return error('Upstream NOAA proton feed unavailable', 502);
+  }
+}
