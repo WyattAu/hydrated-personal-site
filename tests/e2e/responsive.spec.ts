@@ -6,7 +6,7 @@ test.describe('Responsive Design', () => {
 
     test('page loads and displays content', async ({ page }) => {
       await page.goto('/');
-      await expect(page.locator('main, body')).toBeVisible();
+      await expect(page.locator('main').first()).toBeVisible();
     });
 
     test('single column layout - content fits viewport', async ({ page }) => {
@@ -51,7 +51,7 @@ test.describe('Responsive Design', () => {
 
     test('page loads and displays content', async ({ page }) => {
       await page.goto('/');
-      await expect(page.locator('main, body')).toBeVisible();
+      await expect(page.locator('main').first()).toBeVisible();
     });
 
     test('2-column grid layout', async ({ page }) => {
@@ -81,7 +81,7 @@ test.describe('Responsive Design', () => {
 
     test('page loads and displays content', async ({ page }) => {
       await page.goto('/');
-      await expect(page.locator('main, body')).toBeVisible();
+      await expect(page.locator('main').first()).toBeVisible();
     });
 
     test('full layout visible', async ({ page }) => {
@@ -108,7 +108,7 @@ test.describe('Responsive Design', () => {
 
     test('page loads and displays content', async ({ page }) => {
       await page.goto('/');
-      await expect(page.locator('main, body')).toBeVisible();
+      await expect(page.locator('main').first()).toBeVisible();
     });
 
     test('max-width container constrains content', async ({ page }) => {
