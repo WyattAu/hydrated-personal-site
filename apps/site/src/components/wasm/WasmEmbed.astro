@@ -261,7 +261,11 @@ const widgetId = `wasm-${widget}-${Math.random().toString(36).slice(2, 8)}`;
                     rxRender();
                   }
                 }).catch(function(err) {
-                  el.innerHTML = '<div class="wasm-error"><p>Failed to load widget.</p><p class="wasm-error-detail">' + (err.message || err) + '</p></div>';
+                  var msg = (err && err.message) || String(err);
+                  var friendly = /WebAssembly is not defined|WebAssembly.instantiate/.test(msg)
+                    ? 'Graphs need WebAssembly, which this browser has disabled (hardened Firefox/Tor security levels do this). Switch to &quot;Standard&quot; security or Chrome/Samsung Internet to see the graphs.'
+                    : 'Failed to load widget.';
+                  el.innerHTML = '<div class="wasm-error"><p>' + friendly + '</p><p class="wasm-error-detail">' + msg + '</p></div>';
                   console.error('WASM widget "' + widget + '" failed:', err);
                 });
                 observer.unobserve(el);
