@@ -231,6 +231,23 @@ export const GET: APIRoute = async (ctx) => {
     }
     return J(getCached('eq') || { error: 'unavailable' });
   }
+  // Space/weather endpoints implemented in the standalone worker —
+  // same-origin proxy so agent clients need only wyattau.com.
+  const WORKER_ROUTES = ['swpc-alerts', 'solar-cycle', 'proton-flux', 'aurora', 'aurora-history'];
+  if (WORKER_ROUTES.includes(path)) {
+    const upstream = `https://hydrated-worker.wyatt-au.workers.dev/api/${path}${url.search}`;
+    const res = await fetch(upstream, { headers: { Accept: 'application/json' } });
+    const body = await res.text();
+    return new Response(body, {
+      status: res.status,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=300',
+        'Access-Control-Allow-Origin': origin || '*',
+      },
+    });
+  }
+
   if (path === 'kp-index') {
     const c = getCached('kp');
     if (c) return J(c);
