@@ -17,6 +17,8 @@
 - [Dossier](https://wyattau.com/dossier): detailed biography and timeline.
 - [Projects](https://wyattau.com/projects): selected engineering projects.
 - [Guestbook](https://wyattau.com/guestbook): visitor messages, persisted in Cloudflare KV.
+- [Uses](https://wyattau.com/uses): development and infrastructure gear.
+- [Showcase](https://wyattau.com/showcase): interactive WASM demo gallery.
 
 ## Highlights
 
@@ -64,6 +66,14 @@ high-performance systems. Currently bootstrapping QuestHive.
 
 A detailed biography and career timeline, plus an inventory of the WASM
 widgets powering the dashboards on this site.
+
+## Frequently asked questions
+
+**Who is Wyatt Au?** A backend engineer and systems architect based in the United Kingdom, working across Rust, WebAssembly, infrastructure engineering, DevOps, and cloud architecture. Currently bootstrapping QuestHive.
+
+**What is in the dossier?** A detailed biography and career timeline, plus an inventory of the 16 WebAssembly widgets that power the dashboards on this site.
+
+**What are the interactive demos?** The WASM widgets compiled from Rust — Monte Carlo simulation, volatility surfaces, Fourier analysis, cellular automata, and more — all running client-side.
 
 
 ---
@@ -211,6 +221,14 @@ reading.
 
 Full inventory: [GitHub](https://github.com/WyattAu) and
 [Forgejo](https://forgejo.wyattau.com/wyatt_admin).
+
+## Frequently asked questions
+
+**What is plychart?** A custom Rust/WASM charting library with pan and zoom, built by Wyatt Au, powering every chart on this site.
+
+**Where are the crates published?** On crates.io — webhookkit, throttle-kit, otelkit, and more, all with estate-standard CI and documentation.
+
+**Is the source open?** Yes — public repos on GitHub (WyattAu) and Forgejo (forgejo.wyattau.com), including this site.
 
 
 ---

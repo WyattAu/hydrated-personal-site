@@ -24,6 +24,10 @@ interface MempoolPayload {
     estimatedRetargetDate?: number;
     remainingEpoch?: number;
   };
+  lightning?: {
+    channels: number | null;
+    capacity_btc: number | null;
+  };
 }
 
 export default function MempoolFeeGauge() {
@@ -56,6 +60,13 @@ export default function MempoolFeeGauge() {
   };
 
   const maxFee = () => Math.max(...tiers().map((t) => t.v), 1);
+
+  const lnLine = (): string => {
+    const l = data()?.lightning;
+    if (!l?.channels) return '';
+    const cap = ((l.capacity_btc ?? 0) / 1e8).toFixed(0);
+    return `LN ${l.channels.toLocaleString('en-US')} channels · ${cap} BTC capacity · `;
+  };
 
   return (
     <div>
@@ -107,6 +118,7 @@ export default function MempoolFeeGauge() {
         </For>
       </div>
       <p class="font-mono text-[9px] mt-2" style={{ color: 'var(--text-secondary)' }}>
+        {lnLine()}
         next-block fees ≥20 sat/vB flagged as congestion
         {data()?.difficulty && typeof data()?.difficulty?.difficultyChange === 'number' && (
           <>

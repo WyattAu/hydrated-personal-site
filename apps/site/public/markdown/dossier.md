@@ -18,3 +18,11 @@ high-performance systems. Currently bootstrapping QuestHive.
 
 A detailed biography and career timeline, plus an inventory of the WASM
 widgets powering the dashboards on this site.
+
+## Frequently asked questions
+
+**Who is Wyatt Au?** A backend engineer and systems architect based in the United Kingdom, working across Rust, WebAssembly, infrastructure engineering, DevOps, and cloud architecture. Currently bootstrapping QuestHive.
+
+**What is in the dossier?** A detailed biography and career timeline, plus an inventory of the 16 WebAssembly widgets that power the dashboards on this site.
+
+**What are the interactive demos?** The WASM widgets compiled from Rust — Monte Carlo simulation, volatility surfaces, Fourier analysis, cellular automata, and more — all running client-side.

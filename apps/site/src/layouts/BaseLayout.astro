@@ -68,10 +68,14 @@ const faqSchema = faq?.length
 const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': 'https://wyattau.com/#person',
   name: 'Wyatt Au',
   jobTitle: 'Backend Engineer & Systems Architect',
   url: siteUrl,
   email: 'wyatt_au@protonmail.com',
+  alternateName: 'WyattAu',
+  givenName: 'Wyatt',
+  familyName: 'Au',
   location: {
     '@type': 'Place',
     address: {
@@ -103,10 +107,12 @@ const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Wyatt Au',
+  alternateName: 'WyattAu',
   url: siteUrl,
   description: description,
   author: {
     '@type': 'Person',
+    '@id': 'https://wyattau.com/#person',
     name: 'Wyatt Au',
   },
   publisher: {

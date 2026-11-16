@@ -57,12 +57,25 @@ export async function handleMempool(): Promise<Response> {
   if (cached) return json(cached);
 
   try {
-    const [fees, stats, difficulty] = await Promise.all([
+    const [fees, stats, difficulty, lightningRaw] = await Promise.all([
       fetchJson('https://mempool.space/api/v1/fees/recommended', 'mempool-fees'),
       fetchJson('https://mempool.space/api/mempool', 'mempool-stats'),
       fetchJson('https://mempool.space/api/v1/difficulty-adjustment', 'mempool-difficulty'),
+      fetchJson('https://mempool.space/api/v1/lightning/statistics/latest', 'mempool-lightning'),
     ]);
-    const data = { fees, mempool: stats, difficulty };
+    const lightningNested = (lightningRaw ?? {}) as {
+      latest?: { channel_count?: number; total_capacity?: number };
+    };
+    const lightning = lightningNested.latest ?? {};
+    const data = {
+      fees,
+      mempool: stats,
+      difficulty,
+      lightning: {
+        channels: lightning?.channel_count ?? null,
+        capacity_btc: lightning?.total_capacity ?? null,
+      },
+    };
     setCache('mempool', data, 60 * 1000);
     return json(data);
   } catch (e) {

@@ -18,3 +18,11 @@ reading.
 
 Full inventory: [GitHub](https://github.com/WyattAu) and
 [Forgejo](https://forgejo.wyattau.com/wyatt_admin).
+
+## Frequently asked questions
+
+**What is plychart?** A custom Rust/WASM charting library with pan and zoom, built by Wyatt Au, powering every chart on this site.
+
+**Where are the crates published?** On crates.io — webhookkit, throttle-kit, otelkit, and more, all with estate-standard CI and documentation.
+
+**Is the source open?** Yes — public repos on GitHub (WyattAu) and Forgejo (forgejo.wyattau.com), including this site.

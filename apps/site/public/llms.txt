@@ -17,6 +17,8 @@
 - [Dossier](https://wyattau.com/dossier): detailed biography and timeline.
 - [Projects](https://wyattau.com/projects): selected engineering projects.
 - [Guestbook](https://wyattau.com/guestbook): visitor messages, persisted in Cloudflare KV.
+- [Uses](https://wyattau.com/uses): development and infrastructure gear.
+- [Showcase](https://wyattau.com/showcase): interactive WASM demo gallery.
 
 ## Highlights
 
