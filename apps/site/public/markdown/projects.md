@@ -26,3 +26,7 @@ Full inventory: [GitHub](https://github.com/WyattAu) and
 **Where are the crates published?** On crates.io — webhookkit, throttle-kit, otelkit, and more, all with estate-standard CI and documentation.
 
 **Is the source open?** Yes — public repos on GitHub (WyattAu) and Forgejo (forgejo.wyattau.com), including this site.
+
+## Related pages
+
+[Dossier](https://wyattau.com/dossier) | [World Monitor](https://wyattau.com/world) | [ETF Intelligence](https://wyattau.com/etf) | [Home](https://wyattau.com/)

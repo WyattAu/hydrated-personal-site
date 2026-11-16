@@ -52,3 +52,7 @@ Currently bootstrapping QuestHive. Based in the United Kingdom.
 - GitHub: github.com/WyattAu
 - Forgejo: forgejo.wyattau.com/wyatt
 - X: @_WyattAu_
+
+## Related pages
+
+[World Monitor](https://wyattau.com/world) | [ETF Intelligence](https://wyattau.com/etf) | [ML Intelligence](https://wyattau.com/ml) | [Dossier](https://wyattau.com/dossier) | [Projects](https://wyattau.com/projects)

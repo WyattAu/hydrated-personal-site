@@ -22,3 +22,7 @@ server round-trips, no data leaves the browser.
 **Does the ETF analysis send my data anywhere?** No. All quantitative computation runs client-side in Rust compiled to WebAssembly — no server round-trips, no data leaves the browser.
 
 **What can I backtest?** Allocation strategies with walk-forward analysis, Monte Carlo forecast paths, drawdown profiles, and risk/return scatter against the selected benchmark.
+
+## Related pages
+
+[Home](https://wyattau.com/) | [World Monitor](https://wyattau.com/world) | [ML Intelligence](https://wyattau.com/ml) | [Dossier](https://wyattau.com/dossier)

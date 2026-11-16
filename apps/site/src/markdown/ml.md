@@ -23,3 +23,7 @@ server round-trips, no data collection.
 **Where do the LLM benchmarks come from?** Publicly reported benchmark scores aggregated into leaderboards with model comparison radar charts, served via the site Worker API.
 
 **Is the throughput simulator real inference?** No — it is a client-side WebAssembly simulation of inference throughput across hardware profiles, not live model serving.
+
+## Related pages
+
+[Home](https://wyattau.com/) | [World Monitor](https://wyattau.com/world) | [ETF Intelligence](https://wyattau.com/etf) | [Docs](https://wyattau.com/docs)

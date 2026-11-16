@@ -22,3 +22,7 @@ gold), earthquakes, solar-wind telemetry, and upcoming orbital launches.
 All data is fetched client-side from keyless public APIs (Binance, Yahoo
 Finance, USGS, NOAA SWPC, Launch Library 2, wheretheiss.at) and edge-cached
 by the site's Workers API. No API keys, no authentication.
+
+## Related pages
+
+[Home](https://wyattau.com/) | [ETF Intelligence](https://wyattau.com/etf) | [ML Intelligence](https://wyattau.com/ml) | [Projects](https://wyattau.com/projects)

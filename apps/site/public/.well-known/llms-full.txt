@@ -75,6 +75,10 @@ widgets powering the dashboards on this site.
 
 **What are the interactive demos?** The WASM widgets compiled from Rust — Monte Carlo simulation, volatility surfaces, Fourier analysis, cellular automata, and more — all running client-side.
 
+## Related pages
+
+[Projects](https://wyattau.com/projects) | [World Monitor](https://wyattau.com/world) | [Uses](https://wyattau.com/uses) | [Home](https://wyattau.com/)
+
 
 ---
 
@@ -104,6 +108,10 @@ server round-trips, no data leaves the browser.
 **Does the ETF analysis send my data anywhere?** No. All quantitative computation runs client-side in Rust compiled to WebAssembly — no server round-trips, no data leaves the browser.
 
 **What can I backtest?** Allocation strategies with walk-forward analysis, Monte Carlo forecast paths, drawdown profiles, and risk/return scatter against the selected benchmark.
+
+## Related pages
+
+[Home](https://wyattau.com/) | [World Monitor](https://wyattau.com/world) | [ML Intelligence](https://wyattau.com/ml) | [Dossier](https://wyattau.com/dossier)
 
 
 ---
@@ -165,6 +173,10 @@ Currently bootstrapping QuestHive. Based in the United Kingdom.
 - Forgejo: forgejo.wyattau.com/wyatt
 - X: @_WyattAu_
 
+## Related pages
+
+[World Monitor](https://wyattau.com/world) | [ETF Intelligence](https://wyattau.com/etf) | [ML Intelligence](https://wyattau.com/ml) | [Dossier](https://wyattau.com/dossier) | [Projects](https://wyattau.com/projects)
+
 
 ---
 
@@ -195,6 +207,10 @@ server round-trips, no data collection.
 **Where do the LLM benchmarks come from?** Publicly reported benchmark scores aggregated into leaderboards with model comparison radar charts, served via the site Worker API.
 
 **Is the throughput simulator real inference?** No — it is a client-side WebAssembly simulation of inference throughput across hardware profiles, not live model serving.
+
+## Related pages
+
+[Home](https://wyattau.com/) | [World Monitor](https://wyattau.com/world) | [ETF Intelligence](https://wyattau.com/etf) | [Docs](https://wyattau.com/docs)
 
 
 ---
@@ -230,6 +246,10 @@ Full inventory: [GitHub](https://github.com/WyattAu) and
 
 **Is the source open?** Yes — public repos on GitHub (WyattAu) and Forgejo (forgejo.wyattau.com), including this site.
 
+## Related pages
+
+[Dossier](https://wyattau.com/dossier) | [World Monitor](https://wyattau.com/world) | [ETF Intelligence](https://wyattau.com/etf) | [Home](https://wyattau.com/)
+
 
 ---
 
@@ -259,6 +279,10 @@ gold), earthquakes, solar-wind telemetry, and upcoming orbital launches.
 All data is fetched client-side from keyless public APIs (Binance, Yahoo
 Finance, USGS, NOAA SWPC, Launch Library 2, wheretheiss.at) and edge-cached
 by the site's Workers API. No API keys, no authentication.
+
+## Related pages
+
+[Home](https://wyattau.com/) | [ETF Intelligence](https://wyattau.com/etf) | [ML Intelligence](https://wyattau.com/ml) | [Projects](https://wyattau.com/projects)
 
 
 ---

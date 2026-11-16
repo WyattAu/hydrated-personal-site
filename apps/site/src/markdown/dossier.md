@@ -26,3 +26,7 @@ widgets powering the dashboards on this site.
 **What is in the dossier?** A detailed biography and career timeline, plus an inventory of the 16 WebAssembly widgets that power the dashboards on this site.
 
 **What are the interactive demos?** The WASM widgets compiled from Rust — Monte Carlo simulation, volatility surfaces, Fourier analysis, cellular automata, and more — all running client-side.
+
+## Related pages
+
+[Projects](https://wyattau.com/projects) | [World Monitor](https://wyattau.com/world) | [Uses](https://wyattau.com/uses) | [Home](https://wyattau.com/)
