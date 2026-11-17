@@ -118,6 +118,49 @@ export default function AuroraVisibility() {
     const h = history();
     return h.length > 0 ? h[0].ts : Date.now() - 24 * 3600 * 1000;
   };
+
+  // Pearson r between aurora index and Kp (Kp linearly interpolated to the
+  // aurora 30-min buckets). Returns null when either series lacks variance
+  // or the overlap is too small — quiet spells make r meaningless.
+  const auroraKpCorrelation = (): number | null => {
+    const h = history();
+    const k = kpSeries()
+      .slice()
+      .sort((a, b) => a.ts - b.ts);
+    if (h.length < 8 || k.length < 4) return null;
+    const pairs: Array<[number, number]> = [];
+    for (const p of h) {
+      let prev = k[0];
+      let next = k[k.length - 1];
+      let found = false;
+      for (let i = 0; i < k.length; i++) {
+        if (k[i].ts <= p.ts) prev = k[i];
+        if (k[i].ts >= p.ts) {
+          next = k[i];
+          found = true;
+          break;
+        }
+      }
+      if (!found || next.ts === prev.ts) continue;
+      const t = (p.ts - prev.ts) / (next.ts - prev.ts);
+      pairs.push([p.prob, prev.kp + t * (next.kp - prev.kp)]);
+    }
+    if (pairs.length < 8) return null;
+    const n = pairs.length;
+    const mx = pairs.reduce((acc, pr) => acc + pr[0], 0) / n;
+    const my = pairs.reduce((acc, pr) => acc + pr[1], 0) / n;
+    let sxy = 0;
+    let sxx = 0;
+    let syy = 0;
+    for (const [x, y] of pairs) {
+      sxy += (x - mx) * (y - my);
+      sxx += (x - mx) * (x - mx);
+      syy += (y - my) * (y - my);
+    }
+    if (sxx < 1e-6 || syy < 1e-6) return null;
+    return sxy / Math.sqrt(sxx * syy);
+  };
+  const corr = () => auroraKpCorrelation();
   const lv = () => level(data()?.probability ?? 0);
   const obs = () => `${(data()?.observation_time ?? '').slice(11, 16)}Z`;
   const fct = () => `${(data()?.forecast_time ?? '').slice(11, 16)}Z`;
@@ -157,6 +200,12 @@ export default function AuroraVisibility() {
             : (kp() ?? 0) >= 4
               ? 'elevated — high-latitudes only'
               : 'quiet — high-latitudes only'}
+        </p>
+      )}
+      {corr() !== null && (
+        <p class="font-mono text-[9px] mb-2" style={{ color: 'var(--text-secondary)' }}>
+          AURORA–KP r = {corr()?.toFixed(2)} (24h){' '}
+          {Math.abs(corr() ?? 0) >= 0.5 ? '· moving together' : '· decoupled this window'}
         </p>
       )}
       <p class="font-mono text-[9px] mb-2" style={{ color: 'var(--text-secondary)' }}>
