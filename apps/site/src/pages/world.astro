@@ -93,6 +93,63 @@ import TickerManager from '../components/solid/world/TickerManager';
 import WasmEmbed from '../components/wasm/WasmEmbed.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/base.css';
+const datasetSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'Wyatt Au World Monitor live OSINT feed collection',
+  description:
+    'Keyless, edge-cached JSON feeds served by wyattau.com: NOAA planetary K-index and 3-day geomagnetic forecast, GOES X-ray and integral proton flux, OVATION aurora probability by coordinate, USGS earthquakes (GeoJSON), Launch Library 2 upcoming launches, and Bitcoin mempool fees.',
+  url: 'https://wyattau.com/world',
+  creator: { '@type': 'Person', name: 'Wyatt Au', url: 'https://wyattau.com' },
+  temporalCoverage: 'P1D',
+  isAccessibleForFree: true,
+  keywords: [
+    'space weather',
+    'aurora',
+    'geomagnetic',
+    'earthquakes',
+    'launches',
+    'bitcoin',
+    'OSINT',
+  ],
+  distribution: [
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: 'https://wyattau.com/api/kp-index',
+    },
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: 'https://wyattau.com/api/swpc-alerts',
+    },
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: 'https://wyattau.com/api/solar-cycle',
+    },
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: 'https://wyattau.com/api/proton-flux',
+    },
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: 'https://wyattau.com/api/aurora?lat=56&lon=-3',
+    },
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: 'https://wyattau.com/api/earthquakes',
+    },
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: 'https://wyattau.com/api/space-launches',
+    },
+  ],
+};
 ---
 
 <BaseLayout
@@ -123,6 +180,7 @@ import '../styles/base.css';
   <Nav />
 
   <main id="main-content" class="pt-32">
+    <script type="application/ld+json" set:html={JSON.stringify(datasetSchema)} />
     <ThemeCrosshair client:load />
 
     <!-- ====== SECTION 1: MARKET OVERVIEW ====== -->

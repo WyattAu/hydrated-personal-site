@@ -63,6 +63,7 @@ export default function AuroraVisibility() {
   const [place, setPlace] = createSignal(PLACES[1]); // Edinburgh default — highest UK odds
   const [data, setData] = createSignal<AuroraPayload | null>(null);
   const [kp, setKp] = createSignal<number | null>(null);
+  const [kpSeries, setKpSeries] = createSignal<{ ts: number; kp: number }[]>([]);
   const [history, setHistory] = createSignal<HistoryPoint[]>([]);
   const [error, setError] = createSignal('');
   const [loading, setLoading] = createSignal(false);
@@ -87,8 +88,16 @@ export default function AuroraVisibility() {
     try {
       const res = await fetch(`${apiBase()}/api/kp-index`);
       if (res.ok) {
-        const d = (await res.json()) as { Kp: number }[];
-        if (Array.isArray(d) && d.length > 0) setKp(d[d.length - 1].Kp);
+        const d = (await res.json()) as { Kp: number; time_tag: string }[];
+        if (Array.isArray(d) && d.length > 0) {
+          setKp(d[d.length - 1].Kp);
+          const windowStart = Date.now() - 24 * 3600 * 1000;
+          setKpSeries(
+            d
+              .map((r) => ({ ts: new Date(`${r.time_tag}Z`).getTime(), kp: r.Kp }))
+              .filter((r) => Number.isFinite(r.ts) && r.ts >= windowStart),
+          );
+        }
       }
     } catch {
       /* Kp chip is best-effort */
@@ -105,6 +114,10 @@ export default function AuroraVisibility() {
     }
   });
 
+  const windowStartTs = (): number => {
+    const h = history();
+    return h.length > 0 ? h[0].ts : Date.now() - 24 * 3600 * 1000;
+  };
   const lv = () => level(data()?.probability ?? 0);
   const obs = () => `${(data()?.observation_time ?? '').slice(11, 16)}Z`;
   const fct = () => `${(data()?.forecast_time ?? '').slice(11, 16)}Z`;
@@ -156,16 +169,32 @@ export default function AuroraVisibility() {
       </p>
       {history().length >= 2 && (
         <svg
-          viewBox="0 0 300 36"
+          viewBox="0 0 300 44"
           class="w-full mb-2"
           role="img"
-          aria-label="Aurora activity index history (max probability 55-65N, 30-minute snapshots)"
+          aria-label="Aurora activity index (solid, percent) vs planetary K-index x11 (dashed) over the last 24 hours"
         >
+          {kpSeries().length >= 2 && (
+            <polyline
+              points={kpSeries()
+                .map((r) => {
+                  const x = ((r.ts - windowStartTs()) / 86400000) * 300;
+                  const y = 42 - (Math.min(r.kp, 9) / 9) * 38;
+                  return `${x.toFixed(1)},${y.toFixed(1)}`;
+                })
+                .join(' ')}
+              fill="none"
+              stroke="var(--accent-warm, #ff9800)"
+              stroke-width="1"
+              stroke-dasharray="2 3"
+              opacity="0.8"
+            />
+          )}
           <polyline
             points={history()
-              .map((p, i) => {
-                const x = (i / (history().length - 1)) * 300;
-                const y = 34 - (Math.min(p.prob, 100) / 100) * 30;
+              .map((p) => {
+                const x = ((p.ts - windowStartTs()) / 86400000) * 300;
+                const y = 42 - (Math.min(p.prob, 100) / 100) * 38;
                 return `${x.toFixed(1)},${y.toFixed(1)}`;
               })
               .join(' ')}
@@ -174,6 +203,12 @@ export default function AuroraVisibility() {
             stroke-width="1.5"
           />
         </svg>
+      )}
+      {history().length >= 2 && (
+        <p class="font-mono text-[9px] mb-2" style={{ color: 'var(--text-secondary)' }}>
+          24h overlay — <span style={{ color: 'var(--accent)' }}>aurora index %</span> vs{' '}
+          <span style={{ color: 'var(--accent-warm, #ff9800)' }}>Kp ×11</span>
+        </p>
       )}
       <div class="grid grid-cols-4 gap-1 mb-2">
         <For each={PLACES}>
