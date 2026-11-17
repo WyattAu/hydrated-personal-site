@@ -6,7 +6,7 @@
     "descriptionLength": 160,
     "h1Count": 1,
     "wordCount": 133,
-    "fetchTimeMs": 3,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -21,7 +21,7 @@
     "descriptionLength": 74,
     "h1Count": 1,
     "wordCount": 743,
-    "fetchTimeMs": 5,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -36,7 +36,7 @@
     "descriptionLength": 63,
     "h1Count": 1,
     "wordCount": 823,
-    "fetchTimeMs": 4,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -51,7 +51,7 @@
     "descriptionLength": 105,
     "h1Count": 1,
     "wordCount": 463,
-    "fetchTimeMs": 4,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -66,7 +66,7 @@
     "descriptionLength": 120,
     "h1Count": 1,
     "wordCount": 123,
-    "fetchTimeMs": 3,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -81,7 +81,7 @@
     "descriptionLength": 102,
     "h1Count": 1,
     "wordCount": 794,
-    "fetchTimeMs": 3,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -96,7 +96,7 @@
     "descriptionLength": 141,
     "h1Count": 1,
     "wordCount": 676,
-    "fetchTimeMs": 3,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -111,7 +111,7 @@
     "descriptionLength": 84,
     "h1Count": 1,
     "wordCount": 23,
-    "fetchTimeMs": 3,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -126,7 +126,7 @@
     "descriptionLength": 52,
     "h1Count": 1,
     "wordCount": 566,
-    "fetchTimeMs": 2,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -141,7 +141,7 @@
     "descriptionLength": 153,
     "h1Count": 1,
     "wordCount": 436,
-    "fetchTimeMs": 2,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -156,7 +156,7 @@
     "descriptionLength": 67,
     "h1Count": 1,
     "wordCount": 590,
-    "fetchTimeMs": 2,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -171,7 +171,7 @@
     "descriptionLength": 81,
     "h1Count": 1,
     "wordCount": 289,
-    "fetchTimeMs": 2,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -186,7 +186,7 @@
     "descriptionLength": 134,
     "h1Count": 1,
     "wordCount": 913,
-    "fetchTimeMs": 2,
+    "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
