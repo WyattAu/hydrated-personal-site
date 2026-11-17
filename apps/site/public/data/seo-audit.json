@@ -53,7 +53,7 @@
     {
       "code": "CNT001",
       "title": "Thin content",
-      "description": "Only 23 words.",
+      "description": "Only 25 words.",
       "severity": "warning",
       "category": "content"
     }
@@ -82,12 +82,12 @@
       "title_length": 21,
       "description": "Reference datasets powering the dashboards: the 89-fund ETF database with allocations and holdings, plus site SEO audit results. Keyless JSON, free to download.",
       "description_length": 160,
-      "body_size": 17093,
+      "body_size": 17113,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 32,
-      "word_count": 133,
+      "word_count": 135,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -189,7 +189,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "133 words.",
+          "description": "135 words.",
           "recommendation": ""
         },
         {
@@ -225,12 +225,12 @@
       "title_length": 15,
       "description": "Technical notes, architecture decisions, and infrastructure documentation.",
       "description_length": 74,
-      "body_size": 27718,
+      "body_size": 27738,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 33,
-      "word_count": 743,
+      "word_count": 745,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -332,7 +332,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "743 words.",
+          "description": "745 words.",
           "recommendation": ""
         },
         {
@@ -368,12 +368,12 @@
       "title_length": 18,
       "description": "Personal dossier, timeline, and detailed biography of Wyatt Au.",
       "description_length": 63,
-      "body_size": 84126,
+      "body_size": 84146,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 30,
-      "word_count": 823,
+      "word_count": 825,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -475,7 +475,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "823 words.",
+          "description": "825 words.",
           "recommendation": ""
         },
         {
@@ -511,12 +511,12 @@
       "title_length": 27,
       "description": "ETF database with allocation analysis, portfolio comparison, correlation matrix, and performance metrics.",
       "description_length": 105,
-      "body_size": 42668,
-      "fetch_time_ms": 1,
+      "body_size": 42688,
+      "fetch_time_ms": 2,
       "status_code": 200,
       "headings": 1,
       "links": 29,
-      "word_count": 463,
+      "word_count": 465,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -618,7 +618,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "463 words.",
+          "description": "465 words.",
           "recommendation": ""
         },
         {
@@ -654,12 +654,12 @@
       "title_length": 20,
       "description": "Sign the guestbook and leave a message — visitor entries are persisted in Cloudflare KV and shown publicly on this page.",
       "description_length": 120,
-      "body_size": 31807,
+      "body_size": 31827,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 30,
-      "word_count": 123,
+      "word_count": 125,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -761,7 +761,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "123 words.",
+          "description": "125 words.",
           "recommendation": ""
         },
         {
@@ -797,12 +797,12 @@
       "title_length": 47,
       "description": "Building deterministic infrastructure and high-performance systems. Currently bootstrapping QuestHive.",
       "description_length": 102,
-      "body_size": 129418,
-      "fetch_time_ms": 1,
+      "body_size": 129500,
+      "fetch_time_ms": 2,
       "status_code": 200,
       "headings": 1,
       "links": 46,
-      "word_count": 794,
+      "word_count": 796,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -904,7 +904,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "794 words.",
+          "description": "796 words.",
           "recommendation": ""
         },
         {
@@ -940,12 +940,12 @@
       "title_length": 26,
       "description": "LLM benchmark leaderboards, model comparison radar charts, ArXiv paper feeds, GPU requirement calculator, and inference throughput simulator.",
       "description_length": 141,
-      "body_size": 81643,
+      "body_size": 81663,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 30,
-      "word_count": 676,
+      "word_count": 678,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -1047,7 +1047,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "676 words.",
+          "description": "678 words.",
           "recommendation": ""
         },
         {
@@ -1083,12 +1083,12 @@
       "title_length": 18,
       "description": "You are offline. Reconnect to see the live dashboards and data feeds on wyattau.com.",
       "description_length": 84,
-      "body_size": 6491,
+      "body_size": 6511,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 7,
-      "word_count": 23,
+      "word_count": 25,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -1190,7 +1190,7 @@
           "code": "CNT001",
           "severity": "warning",
           "title": "Thin content",
-          "description": "Only 23 words.",
+          "description": "Only 25 words.",
           "recommendation": "Add substantive content."
         },
         {
@@ -1226,12 +1226,12 @@
       "title_length": 19,
       "description": "Open-source projects and technical work by Wyatt Au.",
       "description_length": 52,
-      "body_size": 42906,
+      "body_size": 42926,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 43,
-      "word_count": 566,
+      "word_count": 568,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -1333,7 +1333,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "566 words.",
+          "description": "568 words.",
           "recommendation": ""
         },
         {
@@ -1369,12 +1369,12 @@
       "title_length": 20,
       "description": "Comprehensive SEO audit, site health analysis, domain authority metrics, performance scoring, and actionable recommendations powered by crawlkit crawler.",
       "description_length": 153,
-      "body_size": 34141,
+      "body_size": 34161,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 29,
-      "word_count": 436,
+      "word_count": 438,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -1476,7 +1476,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "436 words.",
+          "description": "438 words.",
           "recommendation": ""
         },
         {
@@ -1512,12 +1512,12 @@
       "title_length": 24,
       "description": "WebAssembly computation demos. Real algorithms running client-side.",
       "description_length": 67,
-      "body_size": 123364,
+      "body_size": 123384,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 32,
-      "word_count": 590,
+      "word_count": 592,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -1619,7 +1619,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "590 words.",
+          "description": "592 words.",
           "recommendation": ""
         },
         {
@@ -1655,12 +1655,12 @@
       "title_length": 15,
       "description": "Tools and software I use daily for development, infrastructure, and productivity.",
       "description_length": 81,
-      "body_size": 30850,
+      "body_size": 30870,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 50,
-      "word_count": 289,
+      "word_count": 291,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -1762,7 +1762,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "289 words.",
+          "description": "291 words.",
           "recommendation": ""
         },
         {
@@ -1798,12 +1798,12 @@
       "title_length": 24,
       "description": "Multi-asset intelligence dashboard: stocks, ETFs, forex, commodities, crypto. All quantitative analysis runs client-side in Rust/WASM.",
       "description_length": 134,
-      "body_size": 147616,
+      "body_size": 147888,
       "fetch_time_ms": 1,
       "status_code": 200,
       "headings": 1,
       "links": 33,
-      "word_count": 913,
+      "word_count": 915,
       "issues_count": 14,
       "issues_by_severity": {
         "error": 0,
@@ -1905,7 +1905,7 @@
           "code": "CNT001",
           "severity": "info",
           "title": "Content depth",
-          "description": "913 words.",
+          "description": "915 words.",
           "recommendation": ""
         },
         {

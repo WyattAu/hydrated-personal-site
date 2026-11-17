@@ -5,7 +5,7 @@
     "titleLength": 21,
     "descriptionLength": 160,
     "h1Count": 1,
-    "wordCount": 133,
+    "wordCount": 135,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
@@ -20,7 +20,7 @@
     "titleLength": 15,
     "descriptionLength": 74,
     "h1Count": 1,
-    "wordCount": 743,
+    "wordCount": 745,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
@@ -35,7 +35,7 @@
     "titleLength": 18,
     "descriptionLength": 63,
     "h1Count": 1,
-    "wordCount": 823,
+    "wordCount": 825,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
@@ -50,8 +50,8 @@
     "titleLength": 27,
     "descriptionLength": 105,
     "h1Count": 1,
-    "wordCount": 463,
-    "fetchTimeMs": 1,
+    "wordCount": 465,
+    "fetchTimeMs": 2,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -65,7 +65,7 @@
     "titleLength": 20,
     "descriptionLength": 120,
     "h1Count": 1,
-    "wordCount": 123,
+    "wordCount": 125,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
@@ -80,8 +80,8 @@
     "titleLength": 47,
     "descriptionLength": 102,
     "h1Count": 1,
-    "wordCount": 794,
-    "fetchTimeMs": 1,
+    "wordCount": 796,
+    "fetchTimeMs": 2,
     "issues": 14,
     "issuesBySeverity": {
       "error": 0,
@@ -95,7 +95,7 @@
     "titleLength": 26,
     "descriptionLength": 141,
     "h1Count": 1,
-    "wordCount": 676,
+    "wordCount": 678,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
@@ -110,7 +110,7 @@
     "titleLength": 18,
     "descriptionLength": 84,
     "h1Count": 1,
-    "wordCount": 23,
+    "wordCount": 25,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
@@ -125,7 +125,7 @@
     "titleLength": 19,
     "descriptionLength": 52,
     "h1Count": 1,
-    "wordCount": 566,
+    "wordCount": 568,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
@@ -140,7 +140,7 @@
     "titleLength": 20,
     "descriptionLength": 153,
     "h1Count": 1,
-    "wordCount": 436,
+    "wordCount": 438,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
@@ -155,7 +155,7 @@
     "titleLength": 24,
     "descriptionLength": 67,
     "h1Count": 1,
-    "wordCount": 590,
+    "wordCount": 592,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
@@ -170,7 +170,7 @@
     "titleLength": 15,
     "descriptionLength": 81,
     "h1Count": 1,
-    "wordCount": 289,
+    "wordCount": 291,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {
@@ -185,7 +185,7 @@
     "titleLength": 24,
     "descriptionLength": 134,
     "h1Count": 1,
-    "wordCount": 913,
+    "wordCount": 915,
     "fetchTimeMs": 1,
     "issues": 14,
     "issuesBySeverity": {

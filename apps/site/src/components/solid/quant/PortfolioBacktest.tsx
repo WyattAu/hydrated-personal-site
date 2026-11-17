@@ -282,6 +282,8 @@ export default function PortfolioBacktest() {
         <label class="font-mono text-[10px]" style={{ color: 'var(--text-secondary)' }}>
           REBALANCE: {rebalanceEvery()}d
           <input
+            id="rebalance-every"
+            aria-label="Rebalance interval in days"
             type="range"
             min="5"
             max="60"
