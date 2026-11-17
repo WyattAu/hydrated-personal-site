@@ -95,8 +95,10 @@ test.describe('Home Page', () => {
       errors.push(text);
     });
 
-    await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    // networkidle never settles on live-data pages (15s polling + Binance
+    // WS) — a fixed settle lets fetches land without hanging the test.
+    await page.waitForTimeout(3000);
 
     expect(errors).toEqual([]);
   });

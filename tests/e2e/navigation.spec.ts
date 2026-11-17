@@ -15,10 +15,10 @@ test.describe('Navigation', () => {
 
       if (href && !href.startsWith('#') && !href.startsWith('http')) {
         await link.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(2500);
         expect(page.url()).toContain(href);
         await page.goBack();
-        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(2500);
       }
     }
   });

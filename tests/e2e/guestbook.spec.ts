@@ -51,7 +51,7 @@ test.describe('Guestbook Page', () => {
   });
 
   test('existing entries are displayed', async ({ page }) => {
-    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2500);
 
     const entries = page.locator('[class*="entry"], [class*="message"], article, [class*="card"]');
 
@@ -72,8 +72,10 @@ test.describe('Guestbook Page', () => {
       errors.push(text);
     });
 
-    await page.reload();
-    await page.waitForLoadState('networkidle');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    // networkidle never settles on live-data pages (15s polling + Binance
+    // WS) — a fixed settle lets fetches land without hanging the test.
+    await page.waitForTimeout(3000);
 
     expect(errors).toEqual([]);
   });

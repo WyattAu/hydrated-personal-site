@@ -2,8 +2,8 @@ import { defineConfig } from '@playwright/test';
 
 // Multiple agents share this workstation and all follow the estate
 // playbook's `http.server 4321` pattern — when another project's server
-// occupies 4321, pass E2E_PORT=4322 to run this suite in parallel.
-const E2E_PORT = Number(process.env.E2E_PORT ?? 4321);
+// occupies 4321, pass E2E_PORT=4322 to run this suite in parallel; the default 4399 is dedicated to this suite.
+const E2E_PORT = Number(process.env.E2E_PORT ?? 4399);
 
 export default defineConfig({
   testDir: './tests/e2e',

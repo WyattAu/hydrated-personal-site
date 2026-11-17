@@ -53,7 +53,10 @@ test.describe('GUI Traversal: DOM & Screenshot Audit', () => {
 
   for (const route of ROUTES) {
     test(`Route: ${route.path} (${route.name})`, async ({ page }) => {
-      const response = await page.goto(route.path, { waitUntil: 'networkidle', timeout: 30000 });
+      const response = await page.goto(route.path, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30000,
+      });
       expect(response?.status()).toBe(200);
 
       // Wait for any dynamic content to settle.
@@ -145,7 +148,8 @@ test.describe('GUI Traversal: DOM & Screenshot Audit', () => {
 
 test.describe('GUI Traversal: Navigation Integrity', () => {
   test('all nav links resolve to valid pages', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2500);
 
     const navLinks = page.locator('nav a[href^="/"]');
     const count = await navLinks.count();
@@ -160,7 +164,8 @@ test.describe('GUI Traversal: Navigation Integrity', () => {
   });
 
   test('footer links resolve to valid pages', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2500);
 
     const internalFooterLinks = page.locator('footer a[href^="/"]');
     const count = await internalFooterLinks.count();
@@ -212,7 +217,8 @@ test.describe('GUI Traversal: Responsive Design', () => {
       page,
     }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto('/', { waitUntil: 'networkidle' });
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(2500);
       await page.waitForTimeout(500);
 
       const hero = page.locator('.hero-name, h1').first();
@@ -230,7 +236,8 @@ test.describe('GUI Traversal: Responsive Design', () => {
 
 test.describe('GUI Traversal: Design Philosophy Compliance', () => {
   test('Spatial Materialism: z-index tokens exist and are respected', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2500);
 
     const audit = await page.evaluate(() => {
       const root = window.getComputedStyle(document.documentElement);
@@ -282,7 +289,8 @@ test.describe('GUI Traversal: Design Philosophy Compliance', () => {
   });
 
   test('Spatial Materialism: shadow system has consistent light source', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2500);
 
     const shadows = await page.evaluate(() => {
       const root = window.getComputedStyle(document.documentElement);
@@ -310,7 +318,8 @@ test.describe('GUI Traversal: Design Philosophy Compliance', () => {
   });
 
   test('Amoebic UI: interactive elements have transition properties', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2500);
 
     const transitionAudit = await page.evaluate(() => {
       const buttons = document.querySelectorAll('button, a[href]');
@@ -334,7 +343,8 @@ test.describe('GUI Traversal: Design Philosophy Compliance', () => {
   });
 
   test('Amoebic UI: easing tokens present and use cubic-bezier', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2500);
 
     const easings = await page.evaluate(() => {
       const root = window.getComputedStyle(document.documentElement);
@@ -359,7 +369,8 @@ test.describe('GUI Traversal: Design Philosophy Compliance', () => {
       /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u;
 
     for (const route of ROUTES) {
-      await page.goto(route.path, { waitUntil: 'networkidle' });
+      await page.goto(route.path, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(2500);
 
       const textContent = await page.evaluate(() => document.body.textContent || '');
       const hasEmoji = emojiRegex.test(textContent);
@@ -407,7 +418,8 @@ test.describe('GUI Traversal: Design Philosophy Compliance', () => {
   test('Cinematic entry: prefers-reduced-motion respected', async ({ page }) => {
     await page.context().addCookies([{ name: 'noop', value: '1', url: 'https://localhost' }]);
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2500);
 
     // When reduced motion is requested, no element should run infinite
     // keyframe animations longer than 0s.
