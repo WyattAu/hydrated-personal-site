@@ -1,12 +1,17 @@
 import { defineConfig } from '@playwright/test';
 
+// Multiple agents share this workstation and all follow the estate
+// playbook's `http.server 4321` pattern — when another project's server
+// occupies 4321, pass E2E_PORT=4322 to run this suite in parallel.
+const E2E_PORT = Number(process.env.E2E_PORT ?? 4321);
+
 export default defineConfig({
   testDir: './tests/e2e',
   timeout: 30000,
   retries: 2,
   workers: process.env.CI ? 2 : 4,
   use: {
-    baseURL: 'http://localhost:4321',
+    baseURL: `http://localhost:${E2E_PORT}`,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     headless: true,
@@ -21,8 +26,8 @@ export default defineConfig({
     // The cloudflare adapter has no `astro preview`; serve the built dist
     // statically instead — identical to what Pages ships. Run `bun run build`
     // in apps/site first when dist is stale.
-    command: 'python3 -m http.server 4321 --directory apps/site/dist',
-    port: 4321,
+    command: `python3 -m http.server ${E2E_PORT} --directory apps/site/dist`,
+    port: E2E_PORT,
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
   },
