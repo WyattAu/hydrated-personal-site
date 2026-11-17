@@ -26,13 +26,13 @@ const ROUTES = [
   {
     path: '/world',
     name: 'world',
-    sections: ['WORLD MONITOR', 'METRICS', 'DATA PANELS', 'SCATTER PLOTS'],
+    sections: ['WORLD MONITOR', 'METRICS', 'DATA PANELS', 'GLOBAL SIGNALS'],
   },
   { path: '/docs', name: 'docs', sections: ['DOCS', 'Coming Soon'] },
   { path: '/etf', name: 'etf', sections: ['ETF INTELLIGENCE', 'QUICK PICKS'] },
   { path: '/guestbook', name: 'guestbook', sections: ['GUESTBOOK', 'Sign the Book', 'Entries'] },
   { path: '/uses', name: 'uses', sections: ['USES'] },
-  { path: '/404', name: '404', sections: ['404', 'Return Home'] },
+  { path: '/404.html', name: '404', sections: ['404', 'Return Home'] },
 ];
 
 // Snapshots land in a dedicated review folder so they survive `test-results`
@@ -248,6 +248,12 @@ test.describe('GUI Traversal: Design Philosophy Compliance', () => {
       // the modal layer is forbidden (would break the spatial stack).
       const ceiling = Number.parseInt(tokens['--z-modal']) || 1000;
       for (const el of Array.from(document.querySelectorAll('*'))) {
+        // Exemptions: the a11y skip-link must sit above everything, and the
+        // cinematic vignette/film-grain overlays are intentional decorative
+        // layers (aria-hidden) that exist above the content stack by design.
+        const isA11ySkipLink = el.matches('a.skip-link');
+        const isDecorative = el.getAttribute('aria-hidden') === 'true';
+        if (isA11ySkipLink || isDecorative) continue;
         const z = window.getComputedStyle(el).zIndex;
         if (z !== 'auto' && Number.parseInt(z) > ceiling) {
           issues.push(

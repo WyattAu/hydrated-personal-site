@@ -218,7 +218,10 @@ function useExchangeRates() {
 
 function SkeletonCard() {
   return (
-    <div class="p-3 border" style="border-color: var(--border); background: var(--bg-card);">
+    <div
+      class="metric-card p-3 border"
+      style="border-color: var(--border); background: var(--bg-card);"
+    >
       <div
         class="h-2 w-16 mb-2"
         style="background: var(--border); animation: pulse 1.5s infinite;"

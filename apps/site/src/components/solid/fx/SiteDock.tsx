@@ -10,12 +10,12 @@ import { prefersReducedMotion } from './theme';
  * server-side, so items live here and mount is desktop-only.
  */
 const LINKS = [
-  { label: 'World Monitor', href: '/world', glyph: '◉' },
-  { label: 'ETF Intelligence', href: '/etf', glyph: '▤' },
-  { label: 'ML Benchmarks', href: '/ml', glyph: '▲' },
-  { label: 'Docs', href: '/docs', glyph: '≡' },
-  { label: 'Guestbook', href: '/guestbook', glyph: '✎' },
-  { label: 'GitHub', href: 'https://github.com/WyattAu', glyph: '✦', external: true },
+  { label: 'World Monitor', href: '/world', glyph: 'WLD' },
+  { label: 'ETF Intelligence', href: '/etf', glyph: 'ETF' },
+  { label: 'ML Benchmarks', href: '/ml', glyph: 'ML' },
+  { label: 'Docs', href: '/docs', glyph: 'DOC' },
+  { label: 'Guestbook', href: '/guestbook', glyph: 'GBK' },
+  { label: 'GitHub', href: 'https://github.com/WyattAu', glyph: 'GH', external: true },
 ] as const;
 
 export default function SiteDock() {
@@ -37,7 +37,7 @@ export default function SiteDock() {
           items={LINKS.map((l) => ({
             icon: (
               <span
-                class="font-mono text-lg leading-none"
+                class="font-mono text-xs font-bold tracking-wider leading-none"
                 style={{ color: 'var(--text-primary)' }}
                 aria-hidden="true"
               >
