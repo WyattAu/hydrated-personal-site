@@ -26,7 +26,7 @@ export default defineConfig({
     // The cloudflare adapter has no `astro preview`; serve the built dist
     // statically instead — identical to what Pages ships. Run `bun run build`
     // in apps/site first when dist is stale.
-    command: 'python3 /home/wyatt/e2e-logs/e2e-server.py',
+    command: 'bun /home/wyatt/e2e-logs/e2e-server.mjs',
     port: E2E_PORT,
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
