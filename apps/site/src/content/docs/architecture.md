@@ -3,7 +3,7 @@ title: "Architecture"
 description: "System architecture and design decisions"
 order: 2
 ---
-# Architecture
+## Architecture
 
 ## Design Philosophy
 

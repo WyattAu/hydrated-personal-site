@@ -3,7 +3,7 @@ title: "Getting Started"
 description: "Quick start guide for the Hydrated Personal Site"
 order: 1
 ---
-# Getting Started
+## Getting Started
 
 ## Architecture Overview
 

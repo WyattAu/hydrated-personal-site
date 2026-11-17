@@ -1,63 +1,153 @@
 [
   {
-    "url": "https://wyattau.com/sitemap.xml",
-    "status": 404,
-    "titleLength": 15,
-    "descriptionLength": 15,
-    "h1Count": 0,
-    "wordCount": 17221,
-    "fetchTimeMs": 121,
-    "issues": 27
-  },
-  {
-    "url": "https://wyattau.com/uses",
+    "url": "https://wyattau.com/data",
     "status": 200,
-    "titleLength": 15,
-    "descriptionLength": 81,
-    "h1Count": 9,
-    "wordCount": 41558,
-    "fetchTimeMs": 150,
-    "issues": 35
-  },
-  {
-    "url": "https://wyattau.com/guestbook",
-    "status": 200,
-    "titleLength": 20,
-    "descriptionLength": 39,
+    "titleLength": 21,
+    "descriptionLength": 160,
     "h1Count": 1,
-    "wordCount": 33907,
-    "fetchTimeMs": 154,
-    "issues": 32
+    "wordCount": 133,
+    "fetchTimeMs": 3,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
+  },
+  {
+    "url": "https://wyattau.com/docs",
+    "status": 200,
+    "titleLength": 15,
+    "descriptionLength": 74,
+    "h1Count": 1,
+    "wordCount": 743,
+    "fetchTimeMs": 5,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
+  },
+  {
+    "url": "https://wyattau.com/dossier",
+    "status": 200,
+    "titleLength": 18,
+    "descriptionLength": 63,
+    "h1Count": 1,
+    "wordCount": 823,
+    "fetchTimeMs": 4,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
   },
   {
     "url": "https://wyattau.com/etf",
     "status": 200,
     "titleLength": 27,
     "descriptionLength": 105,
-    "h1Count": 3,
-    "wordCount": 59020,
-    "fetchTimeMs": 143,
-    "issues": 32
+    "h1Count": 1,
+    "wordCount": 463,
+    "fetchTimeMs": 4,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
+  },
+  {
+    "url": "https://wyattau.com/guestbook",
+    "status": 200,
+    "titleLength": 20,
+    "descriptionLength": 120,
+    "h1Count": 1,
+    "wordCount": 123,
+    "fetchTimeMs": 3,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
+  },
+  {
+    "url": "https://wyattau.com/",
+    "status": 200,
+    "titleLength": 47,
+    "descriptionLength": 102,
+    "h1Count": 1,
+    "wordCount": 794,
+    "fetchTimeMs": 3,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
   },
   {
     "url": "https://wyattau.com/ml",
     "status": 200,
     "titleLength": 26,
-    "descriptionLength": 78,
-    "h1Count": 8,
-    "wordCount": 90596,
-    "fetchTimeMs": 192,
-    "issues": 32
+    "descriptionLength": 141,
+    "h1Count": 1,
+    "wordCount": 676,
+    "fetchTimeMs": 3,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
   },
   {
-    "url": "https://wyattau.com/world",
+    "url": "https://wyattau.com/offline",
     "status": 200,
-    "titleLength": 24,
-    "descriptionLength": 134,
-    "h1Count": 7,
-    "wordCount": 147402,
-    "fetchTimeMs": 205,
-    "issues": 32
+    "titleLength": 18,
+    "descriptionLength": 84,
+    "h1Count": 1,
+    "wordCount": 23,
+    "fetchTimeMs": 3,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 1,
+      "info": 13
+    }
+  },
+  {
+    "url": "https://wyattau.com/projects",
+    "status": 200,
+    "titleLength": 19,
+    "descriptionLength": 52,
+    "h1Count": 1,
+    "wordCount": 566,
+    "fetchTimeMs": 2,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
+  },
+  {
+    "url": "https://wyattau.com/seo",
+    "status": 200,
+    "titleLength": 20,
+    "descriptionLength": 153,
+    "h1Count": 1,
+    "wordCount": 436,
+    "fetchTimeMs": 2,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
   },
   {
     "url": "https://wyattau.com/showcase",
@@ -65,38 +155,43 @@
     "titleLength": 24,
     "descriptionLength": 67,
     "h1Count": 1,
-    "wordCount": 219256,
-    "fetchTimeMs": 330,
-    "issues": 33
+    "wordCount": 590,
+    "fetchTimeMs": 2,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
   },
   {
-    "url": "https://wyattau.com/dossier",
+    "url": "https://wyattau.com/uses",
     "status": 200,
-    "titleLength": 18,
-    "descriptionLength": 63,
-    "h1Count": 5,
-    "wordCount": 93403,
-    "fetchTimeMs": 290,
-    "issues": 33
+    "titleLength": 15,
+    "descriptionLength": 81,
+    "h1Count": 1,
+    "wordCount": 289,
+    "fetchTimeMs": 2,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
   },
   {
-    "url": "https://wyattau.com/projects",
+    "url": "https://wyattau.com/world",
     "status": 200,
-    "titleLength": 19,
-    "descriptionLength": 52,
-    "h1Count": 10,
-    "wordCount": 47978,
-    "fetchTimeMs": 129,
-    "issues": 35
-  },
-  {
-    "url": "https://wyattau.com/",
-    "status": 200,
-    "titleLength": 47,
-    "descriptionLength": 102,
-    "h1Count": 21,
-    "wordCount": 55687,
-    "fetchTimeMs": 167,
-    "issues": 34
+    "titleLength": 24,
+    "descriptionLength": 134,
+    "h1Count": 1,
+    "wordCount": 913,
+    "fetchTimeMs": 2,
+    "issues": 14,
+    "issuesBySeverity": {
+      "error": 0,
+      "warning": 0,
+      "info": 14
+    }
   }
 ]

@@ -3,7 +3,7 @@ title: "API Reference"
 description: "Cloudflare Worker API endpoint documentation"
 order: 3
 ---
-# API Reference
+## API Reference
 
 All endpoints are served from the Cloudflare Worker at `/api/`.
 
