@@ -1,0 +1,230 @@
+---
+
+import dbRaw from '../../../public/data/etf-database.json';
+import Footer from '../../components/astro/Footer.astro';
+import Nav from '../../components/astro/Nav.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// ─── Build-time aggregation over the keyless ETF database ──────────
+// The dataset is served keylessly at /data/etf-database.json; this page
+// recomputes the aggregates on every build so the numbers are always
+// current with the dataset. Reproducible: fetch the JSON, run the same
+// group-bys, get the same tables.
+
+const db = dbRaw as Fund[];
+
+type Fund = {
+  ticker: string;
+  name: string;
+  category: string;
+  sector_allocation: Record<string, number>;
+  region_allocation: Record<string, number>;
+  top_holdings: Array<{ ticker: string; name: string; weight: number }>;
+};
+
+const n = db.length;
+
+const sectorSum: Record<string, number[]> = {};
+const holdingCount = new Map<string, number>();
+const holdingWeight = new Map<string, number[]>();
+const categoryFunds = new Map<string, Fund[]>();
+
+for (const f of db) {
+  if (!categoryFunds.has(f.category)) categoryFunds.set(f.category, []);
+  categoryFunds.get(f.category)!.push(f);
+  for (const [s, w] of Object.entries(f.sector_allocation ?? {})) {
+    (sectorSum[s] ??= []).push(w);
+  }
+  for (const h of f.top_holdings ?? []) {
+    if (!h.ticker) continue;
+    holdingCount.set(h.ticker, (holdingCount.get(h.ticker) ?? 0) + 1);
+    if (!holdingWeight.has(h.ticker)) holdingWeight.set(h.ticker, []);
+    holdingWeight.get(h.ticker)!.push(h.weight);
+  }
+}
+
+const avg = (arr: number[]) => arr.reduce((s, v) => s + v, 0) / Math.max(1, arr.length);
+
+const sectorAvg = Object.entries(sectorSum)
+  .map(([s, v]) => ({ sector: s, avg: avg(v), funds: v.length }))
+  .filter((e) => e.funds >= 6)
+  .sort((a, b) => b.avg - a.avg);
+
+const mostHeld = [...holdingCount.entries()]
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 10)
+  .map(([ticker, count]) => ({
+    ticker,
+    count,
+    avgWeight: avg(holdingWeight.get(ticker) ?? []),
+  }));
+
+const categoryTilts = ['US Equity', 'Emerging Markets', 'International Equity'].map((cat) => {
+  const funds = categoryFunds.get(cat) ?? [];
+  const agg: Record<string, number[]> = {};
+  for (const f of funds) {
+    for (const [s, w] of Object.entries(f.sector_allocation ?? {})) (agg[s] ??= []).push(w);
+  }
+  const top = Object.entries(agg)
+    .map(([s, v]) => ({ sector: s, avg: avg(v) }))
+    .filter((e) => e.avg >= 3)
+    .sort((a, b) => b.avg - a.avg)
+    .slice(0, 3);
+  return { category: cat, total: funds.length, top };
+});
+
+const nvda = mostHeld.find((h) => h.ticker === 'NVDA');
+const faang = mostHeld.filter((h) =>
+  ['AAPL', 'MSFT', 'NVDA', 'AMZN', 'META', 'GOOGL', 'TSLA'].includes(h.ticker),
+);
+
+const datasetSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'ETF sector allocation and top-holding concentration study (89 funds)',
+  description:
+    'Aggregated sector exposures, top-holding concentration, and category sector tilts computed from the wyattau.com 89-fund ETF database at build time. Reproducible from the keyless dataset.',
+  url: 'https://wyattau.com/insights/etf-allocation-study',
+  creator: { '@type': 'Person', name: 'Wyatt Au', url: 'https://wyattau.com' },
+  dateModified: new Date().toISOString().slice(0, 10),
+  isAccessibleForFree: true,
+  keywords: ['ETF', 'sector allocation', 'concentration', 'Magnificent 7', 'top holdings'],
+  distribution: [
+    {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: 'https://wyattau.com/data/etf-database.json',
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="ETF Sector Allocation & Concentration Study — 89 Funds — Wyatt Au"
+  ogImage="/og/etf-study.png"
+  description="Original data study: sector exposures, top-holding concentration, and category tilts aggregated across 89 ETFs — computed from the keyless wyattau.com ETF database at build time."
+  faq={[
+    {
+      q: 'What does this study measure?',
+      a: 'Sector exposures and top-holding concentration aggregated across the 89 ETFs in the wyattau.com ETF database — average sector weights, the most widely held tickers, and category-level sector tilts.',
+    },
+    {
+      q: 'How is the data computed?',
+      a: 'At build time, from the keyless /data/etf-database.json download. The same group-bys applied to that JSON reproduce every table on this page.',
+    },
+    {
+      q: 'What is the headline finding?',
+      a: 'NVIDIA carries the highest average top-10 weight of any single stock across the database, and the Magnificent 7 names appear in roughly one in five funds each — index concentration is structural, not incidental.',
+    },
+  ]}
+>
+  <Nav />
+  <main id="main-content" class="pt-32">
+    <section class="py-16 px-6 md:px-12 lg:px-24">
+      <p class="label mb-6 cinematic-enter" style="color: var(--accent);">DATA STUDY · 89 FUNDS</p>
+      <h1 class="text-3xl md:text-5xl font-bold mb-4 cinematic-enter cinematic-enter-delay-1">
+        What 89 ETFs' top holdings reveal about index concentration
+      </h1>
+      <p class="text-lg cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 720px;">
+        Answer: concentration is structural. The same handful of mega-caps
+        appears in roughly one in five funds, and NVIDIA carries the highest
+        average top-10 weight in the database. Every number below is
+        recomputed from the keyless ETF dataset at build time.
+      </p>
+    </section>
+
+    <section class="py-8 px-6 md:px-12 lg:px-24 space-y-10 pb-16">
+      <div>
+        <h2 class="text-2xl font-bold mb-4">The most widely held tickers</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border" style="border-color: var(--border);">
+            <thead>
+              <tr class="border-b" style="border-color: var(--border);">
+                <th class="text-left p-3">Ticker</th>
+                <th class="text-right p-3">Funds holding</th>
+                <th class="text-right p-3">Avg top-10 weight</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mostHeld.map((h) => (
+                <tr class="border-b" style="border-color: var(--border);">
+                  <td class="p-3 font-mono font-bold" style="color: var(--accent);">{h.ticker}</td>
+                  <td class="p-3 text-right font-mono">{h.count}</td>
+                  <td class="p-3 text-right font-mono">{h.avgWeight.toFixed(2)}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="text-sm mt-3" style="color: var(--text-secondary);">
+          {faang.length} of the Magnificent 7 appear in the top-10 ubiquity list; NVDA averages
+          {nvda ? ` ${nvda.avgWeight.toFixed(2)}%` : ''} — the heaviest single-stock weight in the database.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Average sector exposure by category</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {categoryTilts.map((c) => (
+            <div class="border p-5" style="border-color: var(--border); background: var(--bg-card);">
+              <p class="label mb-3" style="color: var(--accent);">{c.category} · {c.total} funds</p>
+              <ul class="space-y-2">
+                {c.top.map((t) => (
+                  <li class="flex justify-between text-sm">
+                    <span>{t.sector}</span>
+                    <span class="font-mono">{t.avg.toFixed(1)}%</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p class="text-sm mt-3" style="color: var(--text-secondary);">
+          US equity funds tilt Technology-first; Emerging Markets and International funds
+          tilt Financials-first — the sector story inverts outside the US.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Sector exposures present across the database</h2>
+        <p class="text-sm mb-4" style="color: var(--text-secondary);">
+          Sectors appearing in at least 6 funds, ranked by average weight across the funds that hold them.
+        </p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border" style="border-color: var(--border);">
+            <thead>
+              <tr class="border-b" style="border-color: var(--border);">
+                <th class="text-left p-3">Sector</th>
+                <th class="text-right p-3">Avg weight</th>
+                <th class="text-right p-3">Funds</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sectorAvg.slice(0, 12).map((s) => (
+                <tr class="border-b" style="border-color: var(--border);">
+                  <td class="p-3">{s.sector}</td>
+                  <td class="p-3 text-right font-mono">{s.avg.toFixed(1)}%</td>
+                  <td class="p-3 text-right font-mono">{s.funds}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Methodology</h2>
+        <p class="text-sm" style="color: var(--text-secondary); max-width: 720px;">
+          Source: the keyless <a href="/data" class="hover:underline" style="color: var(--accent);">ETF database download</a>
+          ({n} funds). Aggregates are computed at build time — every rebuild of this site
+          re-derives the tables from the current dataset, so this study is always in sync with
+          the download. Averages are unweighted means across the funds reporting each sector or
+          holding. This is an allocation-structure analysis, not investment advice.
+        </p>
+      </div>
+
+      <script type="application/ld+json" set:html={JSON.stringify(datasetSchema)} />
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

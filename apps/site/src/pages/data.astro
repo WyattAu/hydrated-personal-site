@@ -94,6 +94,16 @@ const datasetSchema = {
         <a href="/data/seo-pages.json" class="font-mono text-xs hover:underline" style="color: var(--accent);">GET /data/seo-pages.json ↗</a>
       </div>
 
+      <div class="border p-6" style="border-color: var(--accent); background: var(--bg-card);">
+        <p class="label mb-2" style="color: var(--accent);">DATA STUDY</p>
+        <h2 class="text-xl font-bold mb-2">ETF allocation & concentration</h2>
+        <p class="text-sm mb-4" style="color: var(--text-secondary);">
+          Built from this dataset: sector exposures, top-holding ubiquity, and
+          category tilts across all 89 funds — recomputed at build time.
+        </p>
+        <a href="/insights/etf-allocation-study" class="font-mono text-xs hover:underline" style="color: var(--accent);">Read the study ↗</a>
+      </div>
+
       <script type="application/ld+json" set:html={JSON.stringify(datasetSchema)} />
     </section>
   </main>
