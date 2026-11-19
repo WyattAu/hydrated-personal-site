@@ -19,6 +19,7 @@
 - [Guestbook](https://wyattau.com/guestbook): visitor messages, persisted in Cloudflare KV.
 - [Uses](https://wyattau.com/uses): development and infrastructure gear.
 - [Showcase](https://wyattau.com/showcase): interactive WASM demo gallery.
+- [Insights](https://wyattau.com/insights): hub for original data studies and first-hand event reports — reproducible analyses from own datasets and instrumentation.
 - [G1 Storm Report 2026-11-19](https://wyattau.com/insights/g1-storm-2026-11-19): first-hand event record — the site's aurora monitor captured the Nov 19 G1 storm end-to-end (Kp 5.0, 20%->55%, r=0.79 vs official index).
 - [ETF Allocation Study](https://wyattau.com/insights/etf-allocation-study): original data study — sector exposures and top-holding concentration across the 89-fund database, recomputed at build time.
 

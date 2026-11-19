@@ -7,6 +7,8 @@ export interface Props {
   description?: string;
   ogImage?: string;
   canonical?: string;
+  /** ISO date (YYYY-MM-DD) → WebPage schema dateModified (G4 freshness). */
+  lastModified?: string;
   type?: string;
   noindex?: boolean;
   /** FAQPage JSON-LD entries (answer-first citability). */
@@ -17,6 +19,7 @@ const {
   title = 'Wyatt Au — Backend Engineer & Systems Architect',
   description = 'Building deterministic infrastructure and high-performance systems. Currently bootstrapping QuestHive.',
   ogImage = '/og-image.png',
+  lastModified,
   canonical = Astro.url.href,
   type = 'website',
   noindex = false,
@@ -128,6 +131,7 @@ const webPageSchema = {
   description: description,
   url: canonical,
   inLanguage: 'en-GB',
+  ...(lastModified ? { dateModified: lastModified } : {}),
 };
 ---
 
