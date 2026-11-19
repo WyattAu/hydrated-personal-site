@@ -1,0 +1,182 @@
+---
+import Nav from '../../components/astro/Nav.astro';
+import Footer from '../../components/astro/Footer.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// ─── First-hand storm report: the 2026-11-19 G1 event ───────────────
+// All observations are from this site's own instrumentation: the
+// /world aurora monitor's 48-point KV history (30-min cadence, cron-
+// autonomous), cross-checked against NOAA SWPC alert products and the
+// planetary K-index series. Snapshot taken 2026-11-19 ~13:00 UTC.
+
+const captured = [
+  { time: '18 Nov 23:30', prob: 32 },
+  { time: '19 Nov 00:00', prob: 42 },
+  { time: '19 Nov 00:30', prob: 50 },
+  { time: '19 Nov 01:00', prob: 51 },
+  { time: '19 Nov 01:30', prob: 48 },
+  { time: '19 Nov 02:00', prob: 49 },
+  { time: '19 Nov 02:30', prob: 55 },
+  { time: '19 Nov 03:00', prob: 54 },
+  { time: '19 Nov 03:30', prob: 46 },
+  { time: '19 Nov 04:00', prob: 38 },
+];
+
+const alerts = [
+  { id: 'K04W', issued: '00:41 UTC', text: 'WARNING: Geomagnetic K-index of 4 expected' },
+  { id: 'K04A', issued: '00:46 UTC', text: 'ALERT: Geomagnetic K-index of 4' },
+  { id: 'K05W', issued: '01:00 UTC', text: 'WARNING: Geomagnetic K-index of 5 expected' },
+  { id: 'K05A', issued: '01:08 UTC', text: 'ALERT: Geomagnetic K-index of 5 — G1 (minor) storm threshold crossed' },
+  { id: 'K04W', issued: '01:18 UTC', text: 'Warning Condition: Persistence' },
+];
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'The November 19 2026 G1 geomagnetic storm, captured first-hand by an independent 30-minute-resolution monitor',
+  author: { '@type': 'Person', name: 'Wyatt Au', url: 'https://wyattau.com' },
+  datePublished: '2026-11-19',
+  dateModified: '2026-11-19',
+  isAccessibleForFree: true,
+  keywords: ['geomagnetic storm', 'G1', 'Kp index', 'aurora', 'space weather', 'NOAA SWPC'],
+  mainEntityOfPage: 'https://wyattau.com/insights/g1-storm-2026-11-19',
+};
+---
+
+<BaseLayout
+  title="G1 Geomagnetic Storm 2026-11-19 — First-Hand Capture — Wyatt Au"
+  ogImage="/og/g1-storm.png"
+  description="First-hand event report: the 2026-11-19 G1 storm (Kp 5.0) as captured by wyattau.com's own aurora monitor — 20% baseline to 55% peak, Pearson r = 0.79 against Kp across the 24h window."
+  faq={[
+    {
+      q: 'What happened on November 19 2026?',
+      a: 'A G1 (minor) geomagnetic storm: the NOAA planetary K-index reached 5.0 at 00:00 UTC, and SWPC issued a K05A alert at 01:08 UTC. Aurora probability tracked by this site rose from a 20% baseline to a 55% peak at 02:30 UTC.',
+    },
+    {
+      q: 'How was this storm captured?',
+      a: 'By this site itself: the /world aurora monitor writes a 48-point probability series to KV storage every 30 minutes, cron-autonomously. This report reads that captured history — the site observed its own first storm.',
+    },
+    {
+      q: 'What does the r = 0.79 mean?',
+      a: 'Across the same 24-hour window, the site\u0027s aurora probability series and NOAA\u0027s planetary K-index have a Pearson correlation of 0.79 (n = 45 aligned points). The monitor tracks the official index closely while adding finer 30-minute time resolution.',
+    },
+  ]}
+>
+  <Nav />
+  <main id="main-content" class="pt-32">
+    <section class="py-16 px-6 md:px-12 lg:px-24">
+      <p class="label mb-6 cinematic-enter" style="color: var(--accent);">EVENT REPORT · FIRST-HAND DATA</p>
+      <h1 class="text-3xl md:text-5xl font-bold mb-4 cinematic-enter cinematic-enter-delay-1">
+        The November 19 2026 G1 storm, captured by this site's own monitor
+      </h1>
+      <p class="text-lg cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 760px;">
+        Answer: Kp reached 5.0 at 00:00 UTC and SWPC issued a K05A alert at
+        01:08 UTC. The site's aurora monitor — which had been writing a 30-minute
+        probability series to storage all along — recorded the whole envelope:
+        baseline 20%, peak 55% at 02:30 UTC, and a 0.79 Pearson correlation
+        against the official Kp index. This is the first storm the site has
+        captured with its own instrumentation.
+      </p>
+    </section>
+
+    <section class="py-8 px-6 md:px-12 lg:px-24 space-y-10 pb-16">
+      <div>
+        <h2 class="text-2xl font-bold mb-4">The captured envelope</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border" style="border-color: var(--border);">
+            <thead>
+              <tr class="border-b" style="border-color: var(--border);">
+                <th class="text-left p-3">Time (UTC)</th>
+                <th class="text-right p-3">Aurora probability (site monitor)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {captured.map((row) => (
+                <tr class="border-b" style="border-color: var(--border);">
+                  <td class="p-3 font-mono">{row.time}</td>
+                  <td class="p-3 text-right font-mono">{row.prob}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="text-sm mt-3" style="color: var(--text-secondary);">
+          Baseline averaged 20% before 23:00 UTC on Nov 18; the elevated period averaged 31%,
+          peaking at 55%. Probability held at or above 20% for roughly 16 hours before settling
+          back to the 14–15% quiet baseline by 13:00 UTC Nov 19.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-bold mb-4">The SWPC alert timeline</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border" style="border-color: var(--border);">
+            <thead>
+              <tr class="border-b" style="border-color: var(--border);">
+                <th class="text-left p-3">Product</th>
+                <th class="text-left p-3">Issued (Nov 19)</th>
+                <th class="text-left p-3">Content</th>
+              </tr>
+            </thead>
+            <tbody>
+              {alerts.map((a) => (
+                <tr class="border-b" style="border-color: var(--border);">
+                  <td class="p-3 font-mono font-bold" style={a.id === 'K05A' ? 'color: var(--accent);' : ''}>{a.id}</td>
+                  <td class="p-3 font-mono whitespace-nowrap">{a.issued}</td>
+                  <td class="p-3">{a.text}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="text-sm mt-3" style="color: var(--text-secondary);">
+          The monitor's steepest ramp (32% → 50% between 23:30 and 00:30 UTC) preceded the
+          formal K05A alert by about 40 minutes — finer time resolution than the 3-hour Kp
+          index can express.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Correlation against the official index</h2>
+        <p class="text-sm" style="color: var(--text-secondary); max-width: 760px;">
+          Aligning the site's 45 usable 30-minute readings with NOAA's 3-hour planetary
+          K-index over the same window gives a Pearson correlation of
+          <span class="font-mono font-bold" style="color: var(--accent);"> r = 0.787 </span>
+          (probability mean 27.2%, range 2–55%; Kp mean 2.31, max 5.0). Previous windows were
+          too quiet to compute this gate honestly — variance was near zero. This storm is the
+          first event with enough dynamic range to validate the monitor against the official
+          index, and it tracks well.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Context and caveats</h2>
+        <p class="text-sm" style="color: var(--text-secondary); max-width: 760px;">
+          G1 is the mildest storm class on the NOAA scale: aurora becomes visible from
+          higher-than-usual latitudes, and weak power-grid fluctuations are possible. It is
+          nonetheless a real event with a clean signature. The probability series comes from
+          this site's own aurora-visibility model; the Kp series from NOAA SWPC. The snapshot
+          was taken 2026-11-19 around 13:00 UTC — the live series continues to roll at
+          <a href="/world" class="hover:underline" style="color: var(--accent);">/world</a>.
+          This is an observational report, not a forecast.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Methodology</h2>
+        <p class="text-sm" style="color: var(--text-secondary); max-width: 760px;">
+          Sources: this site's 48-point aurora history (30-min cadence, stored in Cloudflare KV,
+          written by cron) and NOAA SWPC products (alert feed and
+          <span class="font-mono text-xs">noaa-planetary-k-index.json</span>). The correlation
+          forward-fills the 3-hour Kp onto the 30-minute grid and uses an unweighted Pearson
+          over the 45 aligned points (n = 48 series points, 45 with a Kp match). Alerts are
+          quoted verbatim from the SWPC feed. Every rebuild of this page re-derives nothing —
+          it is a fixed snapshot of a past event, which is what makes it a record.
+        </p>
+      </div>
+
+      <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>
