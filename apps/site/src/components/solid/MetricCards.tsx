@@ -23,7 +23,9 @@ function useCryptoTicker() {
           change?: number;
           volume?: number;
         }>) {
-          map[e.symbol] = { price: e.price || 0, change: e.change || 0, volume: e.volume || 0 };
+          // price-0 quotes are failed/stale fetches — omit so the N/A fallback engages
+          if (e.price)
+            map[e.symbol] = { price: e.price, change: e.change || 0, volume: e.volume || 0 };
         }
         setData(map);
         recordFetch('crypto-ticker');
@@ -60,12 +62,14 @@ function useStockQuote(symbols: string) {
           changePct: number;
           name: string;
         }>) {
-          map[e.symbol] = {
-            price: e.price || 0,
-            change: e.change || 0,
-            changePct: e.changePct || 0,
-            name: e.name || e.symbol,
-          };
+          // price-0 quotes are failed/stale fetches — omit so N/A engages
+          if (e.price)
+            map[e.symbol] = {
+              price: e.price,
+              change: e.change || 0,
+              changePct: e.changePct || 0,
+              name: e.name || e.symbol,
+            };
         }
         setData(map);
         recordFetch('stock-quote');

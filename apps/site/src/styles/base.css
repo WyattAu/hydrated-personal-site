@@ -632,3 +632,25 @@ h1, h2, h3 {
   border-color: var(--accent);
   background: rgba(201, 168, 108, 0.08);
 }
+
+/* Chapter band: full-bleed image divider (photo stays at full contrast;
+   a thin caption rule above gives it rhythm, not a caption). */
+.chapter-band {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  overflow: clip;
+  border-top: 1px solid var(--border);
+}
+.chapter-band picture, .chapter-band img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+@media (max-width: 768px) {
+  .chapter-band { aspect-ratio: 16 / 10; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chapter-band img { object-position: 50% 55%; }
+}
