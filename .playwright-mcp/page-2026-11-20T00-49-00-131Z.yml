@@ -1,0 +1,349 @@
+- generic [active] [ref=f9e1]:
+  - link "Skip to content" [ref=f9e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - navigation "Main navigation" [ref=f9e3]:
+    - generic [ref=f9e4]:
+      - link "WYATT_AU" [ref=f9e5] [cursor=pointer]:
+        - /url: /
+      - generic [ref=f9e6]:
+        - link "Projects" [ref=f9e7] [cursor=pointer]:
+          - /url: /projects
+        - link "World" [ref=f9e8] [cursor=pointer]:
+          - /url: /world
+        - link "ETF" [ref=f9e9] [cursor=pointer]:
+          - /url: /etf
+        - link "Dossier" [ref=f9e10] [cursor=pointer]:
+          - /url: /dossier
+        - link "Uses" [ref=f9e11] [cursor=pointer]:
+          - /url: /uses
+  - main [ref=f9e12]:
+    - generic [ref=f9e14]:
+      - heading "Systems thinker, infrastructure builder." [level=1] [ref=f9e15]: Systems thinker,infrastructure builder.
+      - paragraph [ref=f9e16]: Wyatt Au — building deterministic infrastructure and high-performance systems. Currently bootstrapping QuestHive.
+      - paragraph [ref=f9e17]:
+        - text: United Kingdom //
+        - link "wyatt_au@protonmail.com" [ref=f9e18] [cursor=pointer]:
+          - /url: mailto:wyatt_au@protonmail.com
+      - generic [ref=f9e19]:
+        - link "GitHub" [ref=f9e20] [cursor=pointer]:
+          - /url: https://github.com/WyattAu
+        - link "Forgejo" [ref=f9e21] [cursor=pointer]:
+          - /url: https://forgejo.wyattau.com/wyatt_admin
+        - link "X / Twitter" [ref=f9e22] [cursor=pointer]:
+          - /url: https://x.com/_WyattAu_
+        - link "CV" [ref=f9e23] [cursor=pointer]:
+          - /url: https://ocis.wyattau.com/s/RvJsRemvgLYnuIh
+    - status "Cryptocurrency price ticker" [ref=f9e26]
+    - generic [ref=f9e27]:
+      - generic [ref=f9e28]:
+        - generic [ref=f9e29]:
+          - generic [ref=f9e31]:
+            - generic [ref=f9e32]: "16"
+            - generic [aria-hidden] [ref=f9e33]:
+              - generic [ref=f9e34]:
+                - generic:
+                  - generic:
+                    - generic: "0"
+                    - generic: "1"
+                    - generic: "2"
+                    - generic: "3"
+                    - generic: "4"
+                    - generic: "5"
+                    - generic: "6"
+                    - generic: "7"
+                    - generic: "8"
+                    - generic: "9"
+              - generic [ref=f9e35]:
+                - generic:
+                  - generic:
+                    - generic: "0"
+                    - generic: "1"
+                    - generic: "2"
+                    - generic: "3"
+                    - generic: "4"
+                    - generic: "5"
+                    - generic: "6"
+                    - generic: "7"
+                    - generic: "8"
+                    - generic: "9"
+          - paragraph [ref=f9e36]: WASM WIDGETS
+        - generic [ref=f9e37]:
+          - generic [ref=f9e39]:
+            - generic [ref=f9e40]: "89"
+            - generic [aria-hidden] [ref=f9e41]:
+              - generic [ref=f9e42]:
+                - generic:
+                  - generic:
+                    - generic: "0"
+                    - generic: "1"
+                    - generic: "2"
+                    - generic: "3"
+                    - generic: "4"
+                    - generic: "5"
+                    - generic: "6"
+                    - generic: "7"
+                    - generic: "8"
+                    - generic: "9"
+              - generic [ref=f9e43]:
+                - generic:
+                  - generic:
+                    - generic: "0"
+                    - generic: "1"
+                    - generic: "2"
+                    - generic: "3"
+                    - generic: "4"
+                    - generic: "5"
+                    - generic: "6"
+                    - generic: "7"
+                    - generic: "8"
+                    - generic: "9"
+          - paragraph [ref=f9e44]: ETF DATABASE
+        - generic [ref=f9e45]:
+          - generic [ref=f9e47]:
+            - generic [ref=f9e48]: "8"
+            - generic [ref=f9e50]:
+              - generic:
+                - generic:
+                  - generic: "0"
+                  - generic: "1"
+                  - generic: "2"
+                  - generic: "3"
+                  - generic: "4"
+                  - generic: "5"
+                  - generic: "6"
+                  - generic: "7"
+                  - generic: "8"
+                  - generic: "9"
+          - paragraph [ref=f9e51]: LIVE DATA FEEDS
+      - region "Technologies powering this site" [ref=f9e53]:
+        - generic [ref=f9e54]:
+          - list [aria-hidden] [ref=f9e55]
+          - list [ref=f9e56]:
+            - listitem [ref=f9e57]:
+              - generic [ref=f9e58]: RUST
+            - listitem [ref=f9e61]:
+              - generic [ref=f9e62]: WEBASSEMBLY
+            - listitem [ref=f9e65]:
+              - generic [ref=f9e66]: ASTRO 5
+            - listitem [ref=f9e69]:
+              - generic [ref=f9e70]: SOLIDJS 1.9
+            - listitem [ref=f9e73]:
+              - generic [ref=f9e74]: TAILWIND 4
+            - listitem [ref=f9e77]:
+              - generic [ref=f9e78]: PLYCHART
+            - listitem [ref=f9e81]:
+              - generic [ref=f9e82]: CLOUDFLARE
+          - list [aria-hidden] [ref=f9e85]
+    - generic [ref=f9e86]:
+      - paragraph [ref=f9e87]: 001 — About
+      - generic [ref=f9e88]:
+        - heading "Systems thinker, infrastructure builder." [level=2] [ref=f9e89]
+        - paragraph [ref=f9e90]: UK-based backend and DevOps engineer with 6 years of experience building reproducible infrastructure, CI/CD pipelines, and high-performance systems. I architect solutions that stay standing after the next "must-have feature" ships to production.
+        - paragraph [ref=f9e91]: My work spans distributed systems, real-time data pipelines, developer experience tooling, and security-focused sandboxing. I believe in deterministic builds, modular architecture, and infrastructure that can be reasoned about.
+        - paragraph [ref=f9e92]: Currently focused on WebAssembly-powered developer tools and infrastructure automation through QuestHive. When not shipping code, I'm probably debugging a CI pipeline or contributing to open-source projects that solve real problems.
+    - generic [ref=f9e93]:
+      - paragraph [ref=f9e94]: Featured Projects
+      - generic [ref=f9e95]:
+        - link "plychart Featured High-performance WASM charting library for Rust. Renders candles, heatmaps, gauges, vol surfaces and correlation matrices to canvas, with a framework-agnostic zoom/pan interaction state machine and a JSON API consumed by SolidJS islands. Rust · WASM · TypeScript · SolidJS" [ref=f9e99] [cursor=pointer]:
+          - /url: https://github.com/WyattAu/plychart
+          - generic [ref=f9e100]:
+            - heading "plychart" [level=3] [ref=f9e101]
+            - generic [ref=f9e102]: Featured
+          - paragraph [ref=f9e103]: High-performance WASM charting library for Rust. Renders candles, heatmaps, gauges, vol surfaces and correlation matrices to canvas, with a framework-agnostic zoom/pan interaction state machine and a JSON API consumed by SolidJS islands.
+          - paragraph [ref=f9e104]: Rust · WASM · TypeScript · SolidJS
+        - link "ferro Featured High-performance, self-hosted file storage platform in Rust. WebDAV, OIDC, WASM, S3-compatible API and full-text search in a single binary you run yourself. Rust · WASM · WebDAV · S3" [ref=f9e108] [cursor=pointer]:
+          - /url: https://github.com/WyattAu/ferro
+          - generic [ref=f9e109]:
+            - heading "ferro" [level=3] [ref=f9e110]
+            - generic [ref=f9e111]: Featured
+          - paragraph [ref=f9e112]: High-performance, self-hosted file storage platform in Rust. WebDAV, OIDC, WASM, S3-compatible API and full-text search in a single binary you run yourself.
+          - paragraph [ref=f9e113]: Rust · WASM · WebDAV · S3
+        - link "crawlkit Featured Site crawl kit in Rust. Crawls, analyzes and stores SEO and content signals for whole sites, with a WASM build that powers the live SEO audit dashboard on this site. Rust · WASM · SEO" [ref=f9e117] [cursor=pointer]:
+          - /url: https://github.com/WyattAu/crawlkit
+          - generic [ref=f9e118]:
+            - heading "crawlkit" [level=3] [ref=f9e119]
+            - generic [ref=f9e120]: Featured
+          - paragraph [ref=f9e121]: Site crawl kit in Rust. Crawls, analyzes and stores SEO and content signals for whole sites, with a WASM build that powers the live SEO audit dashboard on this site.
+          - paragraph [ref=f9e122]: Rust · WASM · SEO
+        - link "model-router Featured Cost-aware LLM routing core. Per-model pricing tables, USD budget tracking and task-class routing with fallback chains, so agentic workloads pick the cheapest model that can do the job. Rust · LLM" [ref=f9e126] [cursor=pointer]:
+          - /url: https://github.com/WyattAu/model-router
+          - generic [ref=f9e127]:
+            - heading "model-router" [level=3] [ref=f9e128]
+            - generic [ref=f9e129]: Featured
+          - paragraph [ref=f9e130]: Cost-aware LLM routing core. Per-model pricing tables, USD budget tracking and task-class routing with fallback chains, so agentic workloads pick the cheapest model that can do the job.
+          - paragraph [ref=f9e131]: Rust · LLM
+        - link "Aileron Featured A blazingly fast, keyboard-driven web environment built in Rust with the Servo rendering engine. Features native window tiling, Lua-configurable keybindings, zero-extension ad-blocking via request filtering, and an integrated AI MCP server that allows LLMs to observe and interact with web content. Designed to be a performant alternative to Electron-based browsers. Rust · Servo · Lua" [ref=f9e135] [cursor=pointer]:
+          - /url: https://github.com/WyattAu/aileron
+          - generic [ref=f9e136]:
+            - heading "Aileron" [level=3] [ref=f9e137]
+            - generic [ref=f9e138]: Featured
+          - paragraph [ref=f9e139]: A blazingly fast, keyboard-driven web environment built in Rust with the Servo rendering engine. Features native window tiling, Lua-configurable keybindings, zero-extension ad-blocking via request filtering, and an integrated AI MCP server that allows LLMs to observe and interact with web content. Designed to be a performant alternative to Electron-based browsers.
+          - paragraph [ref=f9e140]: Rust · Servo · Lua
+        - link "Clawdius Featured Remote agentic coding environment with WASM-based sandbox isolation. Uses Linux bubblewrap for read-only system access with full filesystem isolation, enabling safe execution of untrusted code while maintaining performance advantages over traditional containerized approaches. Rust · WASM · Bubblewrap" [ref=f9e144] [cursor=pointer]:
+          - /url: https://github.com/WyattAu/clawdius
+          - generic [ref=f9e145]:
+            - heading "Clawdius" [level=3] [ref=f9e146]
+            - generic [ref=f9e147]: Featured
+          - paragraph [ref=f9e148]: Remote agentic coding environment with WASM-based sandbox isolation. Uses Linux bubblewrap for read-only system access with full filesystem isolation, enabling safe execution of untrusted code while maintaining performance advantages over traditional containerized approaches.
+          - paragraph [ref=f9e149]: Rust · WASM · Bubblewrap
+      - link "View All Projects →" [ref=f9e151] [cursor=pointer]:
+        - /url: /projects
+    - generic [ref=f9e152]:
+      - paragraph [ref=f9e153]: Wasm Showcase
+      - heading "Interactive Demonstrations" [level=2] [ref=f9e154]
+      - paragraph [ref=f9e155]: Real-time, client-side computations powered by WebAssembly. No server round-trips.
+      - button [ref=f9e157] [cursor=pointer]:
+        - generic [ref=f9e159]:
+          - paragraph [ref=f9e160]: LIVE — BINANCE WS
+          - generic [ref=f9e162]:
+            - generic [ref=f9e163]:
+              - paragraph [ref=f9e164]: LIVE PRICES
+              - generic [ref=f9e165]: CONNECTING
+            - paragraph [ref=f9e168]: Connecting to market data — CONNECTING...
+      - generic [ref=f9e169]:
+        - generic [ref=f9e170]:
+          - paragraph [ref=f9e171]: SVI VOL SURFACE
+          - paragraph [ref=f9e172]: Quasi-explicit SVI calibration from live Deribit option chains. Computed in WASM.
+          - generic [ref=f9e174]:
+            - paragraph [ref=f9e176]: BTC VOLATILITY SURFACE (SVI)
+            - paragraph [ref=f9e177]: Fitting SVI slices...
+        - generic [ref=f9e178]:
+          - paragraph [ref=f9e179]: WALK-FORWARD BACKTEST
+          - paragraph [ref=f9e180]: Three strategies. Fitted per window. Net of slippage and commission. No look-ahead.
+          - generic [ref=f9e182]:
+            - paragraph [ref=f9e184]: PORTFOLIO BACKTEST
+            - generic [ref=f9e185]:
+              - button "MIN VARIANCE" [ref=f9e186] [cursor=pointer]
+              - button "INVERSE VOL" [ref=f9e187] [cursor=pointer]
+              - button "EQUAL WEIGHT" [ref=f9e188] [cursor=pointer]
+              - generic [ref=f9e189]:
+                - text: "REBALANCE: 20d"
+                - slider "Rebalance interval in days" [ref=f9e190]: "20"
+              - button "RUN" [ref=f9e191] [cursor=pointer]
+            - paragraph [ref=f9e192]: Backtesting portfolio...
+        - generic [ref=f9e193]:
+          - paragraph [ref=f9e194]: FOURIER SERIES — TIME VS FREQUENCY
+          - paragraph [ref=f9e195]: Partial sums S_N(t) converge to the target waveform while the magnitude spectrum |c_n| traces a continuous analytic envelope. Drag the harmonic count and watch Gibbs overshoot persist at discontinuities.
+          - generic [ref=f9e197]:
+            - generic [ref=f9e200]:
+              - generic [ref=f9e201]:
+                - generic [ref=f9e202]: Harmonics
+                - slider "Harmonics" [ref=f9e203]: "5"
+                - generic [ref=f9e204]: "5"
+              - generic [ref=f9e205]:
+                - generic [ref=f9e206]: Waveform
+                - combobox "Waveform" [ref=f9e207]:
+                  - option "Sine" [selected]
+                  - option "Square"
+                  - option "Triangle"
+                  - option "Sawtooth"
+                  - option "Pulse"
+                - button "PAUSE" [ref=f9e208] [cursor=pointer]
+            - generic [ref=f9e209]:
+              - paragraph [ref=f9e210]: S_N(t) = sum_n a_n * sin(n * w * t + phi_n)
+              - paragraph [ref=f9e211]: "Sine: a_1 = 1, all other a_n = 0."
+              - paragraph [ref=f9e212]: "Truncating the series at N leaves an RMS (L2) error that shrinks as N grows; smooth targets (sine, triangle) converge fastest. Near a jump discontinuity the partial sums overshoot by about 8.9% no matter how large N gets. This is the Gibbs phenomenon: the overshoot narrows but never disappears."
+    - generic [ref=f9e213]:
+      - paragraph [ref=f9e214]: Expertise
+      - generic [ref=f9e215]:
+        - generic [ref=f9e216]:
+          - generic [ref=f9e217]:
+            - generic [ref=f9e218]: "{ }"
+            - heading "Systems Programming" [level=3] [ref=f9e219]
+          - paragraph [ref=f9e220]: Rust, C++, C, Lean 4, WASM
+        - generic [ref=f9e221]:
+          - generic [ref=f9e222]:
+            - generic [ref=f9e223]: <>
+            - heading "Web Assembly" [level=3] [ref=f9e224]
+          - paragraph [ref=f9e225]: Leptos, wasm-pack, WASM sandboxing
+        - generic [ref=f9e226]:
+          - generic [ref=f9e227]:
+            - generic [ref=f9e228]: "::"
+            - heading "Infrastructure" [level=3] [ref=f9e229]
+          - paragraph [ref=f9e230]: Docker, Kubernetes, Cloudflare, Terraform, Nix Flakes
+        - generic [ref=f9e231]:
+          - generic [ref=f9e232]:
+            - generic [ref=f9e233]: "##"
+            - heading "Data Engineering" [level=3] [ref=f9e234]
+          - paragraph [ref=f9e235]: PostgreSQL, TimescaleDB, Redis, Prometheus + Grafana
+        - generic [ref=f9e236]:
+          - generic [ref=f9e237]:
+            - generic [ref=f9e238]: "[]"
+            - heading "Security" [level=3] [ref=f9e239]
+          - paragraph [ref=f9e240]: Bubblewrap isolation, CSP headers, Keycloak IAM
+        - generic [ref=f9e241]:
+          - generic [ref=f9e242]:
+            - generic [ref=f9e243]: //
+            - heading "UI/UX" [level=3] [ref=f9e244]
+          - paragraph [ref=f9e245]: SolidJS, Flutter, Brutalist design, Theme systems
+    - generic [ref=f9e246]:
+      - paragraph [ref=f9e247]: Employment
+      - generic [ref=f9e248]:
+        - generic [ref=f9e249]:
+          - generic [ref=f9e250]:
+            - heading "Founder & Backend Engineer" [level=3] [ref=f9e251]
+            - generic [ref=f9e252]: Jun 2025 — Present
+          - paragraph [ref=f9e253]: QuestHive
+          - paragraph [ref=f9e254]: Bootstrapping an early-stage SaaS platform focused on infrastructure automation. Responsible for system architecture, interfacing services, and deployment pipelines.
+          - generic [ref=f9e255]:
+            - generic [ref=f9e256]: System architecture
+            - generic [ref=f9e257]: CI/CD pipelines
+            - generic [ref=f9e258]: Cloudflare Workers deployment
+        - generic [ref=f9e259]:
+          - generic [ref=f9e260]:
+            - heading "Freelance Developer" [level=3] [ref=f9e261]
+            - generic [ref=f9e262]: 2022 — 2025
+          - paragraph [ref=f9e263]: Self-Employed
+          - paragraph [ref=f9e264]: Delivered full-stack solutions for clients including web applications, mobile apps, and infrastructure automation.
+          - generic [ref=f9e265]:
+            - generic [ref=f9e266]: Full-stack web apps
+            - generic [ref=f9e267]: Mobile applications
+            - generic [ref=f9e268]: Infrastructure automation
+    - generic [ref=f9e269]:
+      - paragraph [ref=f9e270]: Contact
+      - generic [ref=f9e271]:
+        - generic [ref=f9e272]:
+          - heading "Get in touch." [level=2] [ref=f9e273]
+          - paragraph [ref=f9e274]: Open to collaborations on high-performance systems, infrastructure tooling, and developer experience projects.
+          - generic [ref=f9e275]:
+            - link "Email" [ref=f9e276] [cursor=pointer]:
+              - /url: mailto:wyatt_au@protonmail.com
+            - link "GitHub" [ref=f9e277] [cursor=pointer]:
+              - /url: https://github.com/WyattAu
+            - link "Forgejo" [ref=f9e278] [cursor=pointer]:
+              - /url: https://forgejo.wyattau.com/wyatt_admin
+            - link "X / Twitter" [ref=f9e279] [cursor=pointer]:
+              - /url: https://x.com/_WyattAu_
+        - generic [ref=f9e280]:
+          - paragraph [ref=f9e281]: Send a Message
+          - generic [ref=f9e285]:
+            - generic [ref=f9e286]:
+              - generic [ref=f9e287]: Name
+              - textbox "Name" [ref=f9e288]:
+                - /placeholder: Your name
+            - generic [ref=f9e289]:
+              - generic [ref=f9e290]: Email
+              - textbox "Email" [ref=f9e291]:
+                - /placeholder: you@example.com
+            - generic [ref=f9e292]:
+              - generic [ref=f9e293]: Message
+              - textbox "Message" [ref=f9e294]:
+                - /placeholder: Your message...
+              - paragraph [ref=f9e295]: 0/2000
+            - button "Send Message" [ref=f9e296] [cursor=pointer]
+  - contentinfo [ref=f9e297]:
+    - generic [ref=f9e298]:
+      - generic [ref=f9e299]:
+        - paragraph [ref=f9e300]: WYATT_AU
+        - paragraph [ref=f9e301]: © 2026 Wyatt Au. Built with Astro + SolidJS.
+      - generic [ref=f9e302]:
+        - link "GitHub" [ref=f9e303] [cursor=pointer]:
+          - /url: https://github.com/WyattAu
+        - link "Forgejo" [ref=f9e304] [cursor=pointer]:
+          - /url: https://forgejo.wyattau.com/WyattAu
+        - link "Email" [ref=f9e305] [cursor=pointer]:
+          - /url: mailto:wyatt_au@protonmail.com
+  - 'button "Current theme: MIDNIGHT. Click to cycle themes." [ref=f9e307] [cursor=pointer]': MIDNIGHT
+  - generic:
+    - region "Notifications alt+T"
+  - generic "2026-11-20T00:12:40Z": "864e290"

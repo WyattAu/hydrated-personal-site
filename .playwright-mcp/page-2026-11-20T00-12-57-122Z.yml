@@ -1,0 +1,67 @@
+- generic [active] [ref=f5e1]:
+  - link "Skip to content" [ref=f5e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - navigation "Main navigation" [ref=f5e3]:
+    - generic [ref=f5e4]:
+      - link "WYATT_AU" [ref=f5e5] [cursor=pointer]:
+        - /url: /
+      - generic [ref=f5e6]:
+        - link "PROJECTS" [ref=f5e7] [cursor=pointer]:
+          - /url: /projects
+        - link "DOSSIER" [ref=f5e8] [cursor=pointer]:
+          - /url: /dossier
+        - link "SHOWCASE" [ref=f5e9] [cursor=pointer]:
+          - /url: /showcase
+        - link "WORLD" [ref=f5e10] [cursor=pointer]:
+          - /url: /world
+        - link "ML" [ref=f5e11] [cursor=pointer]:
+          - /url: /ml
+        - link "SEO" [ref=f5e12] [cursor=pointer]:
+          - /url: /seo
+        - link "ETF" [ref=f5e13] [cursor=pointer]:
+          - /url: /etf
+        - link "GUESTBOOK" [ref=f5e14] [cursor=pointer]:
+          - /url: /guestbook
+        - link "USES" [ref=f5e15] [cursor=pointer]:
+          - /url: /uses
+  - main [ref=f5e16]:
+    - generic [ref=f5e17]:
+      - paragraph [ref=f5e18]: INSIGHTS
+      - heading "Original data, first-hand observations" [level=1] [ref=f5e19]
+      - paragraph [ref=f5e20]: "Answer: analyses nobody else can publish — event reports captured by this site's own instrumentation, and studies recomputed at build time from keyless dataset downloads. Every number is reproducible from a public source, and every page documents its method."
+    - generic [ref=f5e21]:
+      - link [ref=f5e22] [cursor=pointer]:
+        - /url: /insights/g1-storm-2026-11-19
+        - paragraph [ref=f5e23]: EVENT REPORT · FIRST-HAND
+        - heading "The November 19 2026 G1 storm, captured by this site’s own monitor" [level=2] [ref=f5e24]
+        - paragraph [ref=f5e25]: Kp 5.0, SWPC K05A alert, and a 20%→55% aurora-probability envelope recorded at 30-minute cadence by the /world monitor — the site observed its own first storm, and the correlation against the official index is r = 0.79.
+        - paragraph [ref=f5e26]: Read the report ↗
+      - link [ref=f5e27] [cursor=pointer]:
+        - /url: /insights/etf-allocation-study
+        - paragraph [ref=f5e28]: DATA STUDY · 89 FUNDS
+        - heading "What 89 ETFs’ top holdings reveal about index concentration" [level=2] [ref=f5e29]
+        - paragraph [ref=f5e30]: "NVIDIA carries the heaviest average top-10 weight in the database (8.58%) and the Magnificent 7 appear in roughly one in five funds each. Sector tilts invert outside the US: Technology-first at home, Financials-first abroad. Recomputed from the keyless dataset at build time."
+        - paragraph [ref=f5e31]: Read the report ↗
+      - generic [ref=f5e32]:
+        - paragraph [ref=f5e33]: SOURCE DATA
+        - paragraph [ref=f5e34]:
+          - text: "The raw material lives in the keyless downloads: the"
+          - link "dataset catalog" [ref=f5e35] [cursor=pointer]:
+            - /url: /data
+          - text: (89-fund ETF database, transparency reports) and the live
+          - link "OSINT dashboards" [ref=f5e36] [cursor=pointer]:
+            - /url: /world
+          - text: whose 30-minute history feeds the event reports. New studies are added as events happen and as the datasets grow.
+  - contentinfo [ref=f5e37]:
+    - generic [ref=f5e38]:
+      - generic [ref=f5e39]:
+        - paragraph [ref=f5e40]: WYATT_AU
+        - paragraph [ref=f5e41]: © 2026 Wyatt Au. Built with Astro + SolidJS.
+      - generic [ref=f5e42]:
+        - link "GitHub" [ref=f5e43] [cursor=pointer]:
+          - /url: https://github.com/WyattAu
+        - link "Forgejo" [ref=f5e44] [cursor=pointer]:
+          - /url: https://forgejo.wyattau.com/WyattAu
+        - link "Email" [ref=f5e45] [cursor=pointer]:
+          - /url: mailto:wyatt_au@protonmail.com
+  - generic "2026-11-19T16:45:35Z": 0c9a6a5
