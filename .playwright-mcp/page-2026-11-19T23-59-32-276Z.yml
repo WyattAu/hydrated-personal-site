@@ -1,0 +1,625 @@
+- generic [active] [ref=f3e1]:
+  - link "Skip to content" [ref=f3e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - navigation "Main navigation" [ref=f3e3]:
+    - generic [ref=f3e4]:
+      - link "WYATT_AU" [ref=f3e5] [cursor=pointer]:
+        - /url: /
+      - generic [ref=f3e6]:
+        - link "PROJECTS" [ref=f3e7] [cursor=pointer]:
+          - /url: /projects
+        - link "DOSSIER" [ref=f3e8] [cursor=pointer]:
+          - /url: /dossier
+        - link "SHOWCASE" [ref=f3e9] [cursor=pointer]:
+          - /url: /showcase
+        - link "WORLD" [ref=f3e10] [cursor=pointer]:
+          - /url: /world
+        - link "ML" [ref=f3e12] [cursor=pointer]:
+          - /url: /ml
+        - link "SEO" [ref=f3e13] [cursor=pointer]:
+          - /url: /seo
+        - link "ETF" [ref=f3e14] [cursor=pointer]:
+          - /url: /etf
+        - link "GUESTBOOK" [ref=f3e15] [cursor=pointer]:
+          - /url: /guestbook
+        - link "USES" [ref=f3e16] [cursor=pointer]:
+          - /url: /uses
+  - main [ref=f3e17]:
+    - generic [ref=f3e20]:
+      - paragraph [ref=f3e21]:
+        - generic [ref=f3e23]:
+          - generic [ref=f3e24]: WORLD MONITOR
+          - generic [aria-hidden] [ref=f3e25]:
+            - generic [ref=f3e26]: WORLD
+            - generic [ref=f3e27]: MONITOR
+      - heading "Intelligence Dashboard" [level=1] [ref=f3e28]
+      - paragraph [ref=f3e29]: Multi-asset market data, client-side quantitative analysis, and global signals.
+    - generic [ref=f3e30]:
+      - generic [ref=f3e35]:
+        - region "Interactive world map with earthquake markers and capital indicators" [ref=f3e36]
+        - paragraph [ref=f3e40]: Loading map...
+      - generic [ref=f3e45]:
+        - generic [ref=f3e46]:
+          - paragraph [ref=f3e47]: LIVE PRICES
+          - generic [ref=f3e48]: REST POLL
+        - generic [ref=f3e50]:
+          - generic [ref=f3e51]:
+            - paragraph [ref=f3e52]: BTC/USDT
+            - paragraph [ref=f3e53]: 61,963
+            - paragraph [ref=f3e54]: "-1.76%"
+            - paragraph [ref=f3e55]: H 0.0000 · L 0.0000
+          - generic [ref=f3e56]:
+            - paragraph [ref=f3e57]: ETH/USDT
+            - paragraph [ref=f3e58]: 1,757
+            - paragraph [ref=f3e59]: "-1.13%"
+            - paragraph [ref=f3e60]: H 0.0000 · L 0.0000
+          - generic [ref=f3e61]:
+            - paragraph [ref=f3e62]: SOL/USDT
+            - paragraph [ref=f3e63]: "73.12"
+            - paragraph [ref=f3e64]: "-0.69%"
+            - paragraph [ref=f3e65]: H 0.0000 · L 0.0000
+          - generic [ref=f3e66]:
+            - paragraph [ref=f3e67]: BNB/USDT
+            - paragraph [ref=f3e68]: "579.85"
+            - paragraph [ref=f3e69]: "-0.48%"
+            - paragraph [ref=f3e70]: H 0.0000 · L 0.0000
+          - generic [ref=f3e71]:
+            - paragraph [ref=f3e72]: XRP/USDT
+            - paragraph [ref=f3e73]: "0.9600"
+            - paragraph [ref=f3e74]: "-0.79%"
+            - paragraph [ref=f3e75]: H 0.0000 · L 0.0000
+          - generic [ref=f3e76]:
+            - paragraph [ref=f3e77]: ADA/USDT
+            - paragraph [ref=f3e78]: "0.1519"
+            - paragraph [ref=f3e79]: +0.26%
+            - paragraph [ref=f3e80]: H 0.0000 · L 0.0000
+    - generic [ref=f3e149]:
+      - generic [ref=f3e155]:
+        - paragraph [ref=f3e156]: NEXT LAUNCHES
+        - generic [ref=f3e157]: LL2 · LIVE CLOCK
+      - generic [ref=f3e162]:
+        - generic [ref=f3e163]:
+          - paragraph [ref=f3e164]: UPCOMING LAUNCHES
+          - generic [ref=f3e165]: LL2 · THESPACEDEVS
+        - paragraph [ref=f3e166]: Failed to fetch — launch feed blocked or rate-limited.
+    - generic [ref=f3e171]:
+      - generic [ref=f3e172]:
+        - paragraph [ref=f3e173]: MARKET OVERVIEW
+        - generic [ref=f3e174]:
+          - button "1D" [ref=f3e175] [cursor=pointer]
+          - button "1W" [ref=f3e176] [cursor=pointer]
+          - button "1M" [ref=f3e177] [cursor=pointer]
+          - button "3M" [ref=f3e178] [cursor=pointer]
+          - button "1Y" [ref=f3e179] [cursor=pointer]
+      - generic [ref=f3e180]:
+        - textbox "Add symbol (e.g. AAPL, ^GSPC, BTCUSDT)" [ref=f3e182]
+        - button "Price" [ref=f3e183] [cursor=pointer]
+      - generic [ref=f3e185]:
+        - text: ^GSPC
+        - button "Remove ^GSPC" [ref=f3e187] [cursor=pointer]: ×
+      - paragraph [ref=f3e192]: Loading chart...
+    - generic [ref=f3e193]:
+      - generic [ref=f3e194]:
+        - generic [ref=f3e195]:
+          - paragraph [ref=f3e196]: QUANT ANALYTICS
+          - heading "Single-Asset Analysis" [level=2] [ref=f3e197]
+          - paragraph [ref=f3e198]: Select an asset. All charts below update instantly. Computations run in Rust/WASM.
+        - button "S&P 500 CHANGE" [ref=f3e201] [cursor=pointer]:
+          - generic [ref=f3e202]: S&P 500
+          - generic [ref=f3e203]: CHANGE
+      - generic [ref=f3e204]:
+        - generic [ref=f3e209]:
+          - paragraph [ref=f3e211]: "WALK-FORWARD BACKTEST: ^GSPC"
+          - generic [ref=f3e212]:
+            - button "SMA CROSS" [ref=f3e213] [cursor=pointer]
+            - button "MOMENTUM" [ref=f3e214] [cursor=pointer]
+            - button "MEAN REV" [ref=f3e215] [cursor=pointer]
+            - button "6M" [ref=f3e217] [cursor=pointer]
+            - button "1Y" [ref=f3e218] [cursor=pointer]
+            - button "2Y" [ref=f3e219] [cursor=pointer]
+            - button "SPY ON" [ref=f3e221] [cursor=pointer]
+          - generic [ref=f3e222]:
+            - generic [ref=f3e223]:
+              - text: "IS WINDOW: 120d"
+              - 'slider "IS WINDOW: 120d" [ref=f3e224]': "120"
+            - generic [ref=f3e225]:
+              - text: "OOS WINDOW: 40d"
+              - 'slider "OOS WINDOW: 40d" [ref=f3e226]': "40"
+            - generic [ref=f3e227]:
+              - text: "SLIPPAGE: 5bps"
+              - 'slider "SLIPPAGE: 5bps" [ref=f3e228]': "5"
+            - generic [ref=f3e229]:
+              - text: "COMMISSION: 5bps"
+              - 'slider "COMMISSION: 5bps" [ref=f3e230]': "5"
+          - button "RUN BACKTEST" [ref=f3e232] [cursor=pointer]
+          - paragraph [ref=f3e233]: Running walk-forward...
+        - generic [ref=f3e238]:
+          - paragraph [ref=f3e240]: PORTFOLIO BACKTEST
+          - generic [ref=f3e241]:
+            - button "MIN VARIANCE" [ref=f3e242] [cursor=pointer]
+            - button "INVERSE VOL" [ref=f3e243] [cursor=pointer]
+            - button "EQUAL WEIGHT" [ref=f3e244] [cursor=pointer]
+            - generic [ref=f3e245]:
+              - text: "REBALANCE: 20d"
+              - slider "Rebalance interval in days" [ref=f3e246]: "20"
+            - button "RUN" [ref=f3e247] [cursor=pointer]
+          - paragraph [ref=f3e248]: Backtesting portfolio...
+        - generic [ref=f3e253]:
+          - paragraph [ref=f3e255]: BTC VOLATILITY SURFACE (SVI)
+          - paragraph [ref=f3e256]: Fitting SVI slices...
+        - generic [ref=f3e262]:
+          - paragraph [ref=f3e263]: MONTE CARLO FORECAST
+          - generic [ref=f3e264]: SIMULATING...
+        - generic [ref=f3e270]:
+          - generic [ref=f3e271]:
+            - paragraph [ref=f3e272]: GARCH(1,1) VOLATILITY FORECAST
+            - generic [ref=f3e273]:
+              - button "7D" [ref=f3e274] [cursor=pointer]
+              - button "30D" [ref=f3e275] [cursor=pointer]
+              - button "90D" [ref=f3e276] [cursor=pointer]
+          - paragraph [ref=f3e277]: Computing...
+        - generic [ref=f3e283]:
+          - paragraph [ref=f3e284]: VALUE AT RISK
+          - paragraph [ref=f3e285]: Computing...
+        - generic [ref=f3e291]:
+          - paragraph [ref=f3e293]: BLACK-SCHOLES GREEKS
+          - paragraph [ref=f3e294]: Loading Deribit options chain...
+        - generic [ref=f3e300]:
+          - generic [ref=f3e301]:
+            - paragraph [ref=f3e302]: "L2 ORDER BOOK: SPYUSDT"
+            - generic [ref=f3e303]: RECONNECTING
+          - generic [ref=f3e306]:
+            - text: PAIR
+            - combobox "PAIR" [ref=f3e307] [cursor=pointer]:
+              - option "BTCUSDT"
+              - option "ETHUSDT"
+              - option "SOLUSDT"
+              - option "BNBUSDT"
+              - option "XRPUSDT"
+              - option "ADAUSDT"
+              - option "DOGEUSDT"
+              - option "LINKUSDT"
+        - generic [ref=f3e313]:
+          - generic [ref=f3e314]:
+            - paragraph [ref=f3e315]: "TRADE TAPE: ^GSPCUSDT"
+            - generic [ref=f3e316]: aggTrade
+          - generic [ref=f3e318]:
+            - table [ref=f3e319]:
+              - rowgroup [ref=f3e320]:
+                - row [ref=f3e321]:
+                  - columnheader "TIME" [ref=f3e322]
+                  - columnheader "PRICE" [ref=f3e323]
+                  - columnheader "QTY" [ref=f3e324]
+                  - columnheader "SIDE" [ref=f3e325]
+              - rowgroup
+            - paragraph [ref=f3e326]: Waiting for trades...
+        - generic [ref=f3e331]:
+          - generic [ref=f3e332]:
+            - paragraph [ref=f3e333]: PRICE ALERTS
+            - button "ENABLE NOTIFICATIONS" [ref=f3e334] [cursor=pointer]
+          - generic [ref=f3e335]:
+            - combobox [ref=f3e336] [cursor=pointer]:
+              - option "BTCUSDT" [selected]
+              - option "ETHUSDT"
+              - option "SOLUSDT"
+              - option "BNBUSDT"
+              - option "XRPUSDT"
+              - option "ADAUSDT"
+            - combobox [ref=f3e337] [cursor=pointer]:
+              - option "≥ above" [selected]
+              - option "≤ below"
+            - spinbutton "threshold" [ref=f3e338]
+            - button "ARM" [ref=f3e339] [cursor=pointer]
+          - paragraph [ref=f3e340]: Arm a threshold — alerts fire as browser notifications while the page is open.
+        - generic [ref=f3e345]:
+          - paragraph [ref=f3e347]: LIQUIDITY METRICS
+          - paragraph [ref=f3e348]: Computing liquidity...
+        - generic [ref=f3e353]:
+          - paragraph [ref=f3e355]: REGIME DETECTION (HMM 2-STATE)
+          - paragraph [ref=f3e356]: Computing regimes...
+        - generic [ref=f3e362]:
+          - paragraph [ref=f3e364]: REALIZED VOLATILITY DECOMPOSITION
+          - paragraph [ref=f3e365]: Computing realized vol...
+        - generic [ref=f3e371]:
+          - paragraph [ref=f3e373]: ROLLING FACTOR EXPOSURE (β vs ^GSPC)
+          - paragraph [ref=f3e374]: Computing rolling beta...
+        - generic [ref=f3e380]:
+          - paragraph [ref=f3e382]: KELLY CRITERION
+          - paragraph [ref=f3e383]: Computing Kelly...
+        - generic [ref=f3e388]:
+          - paragraph [ref=f3e390]: COMMODITY TERM STRUCTURE
+          - paragraph [ref=f3e391]: Select a commodity futures contract (e.g. CL=F, GC=F, NG=F). Showing default CL=F.
+          - paragraph [ref=f3e392]: Loading term structure...
+        - generic [ref=f3e397]:
+          - paragraph [ref=f3e399]: RISK-ADJUSTED RETURNS
+          - paragraph [ref=f3e400]: Computing risk ratios...
+          - paragraph [ref=f3e401]: "1Y daily | rf=4% | Sharpe: excess return / total vol | Sortino: excess return / downside vol | Calmar: ann return / max DD"
+        - generic [ref=f3e406]:
+          - paragraph [ref=f3e408]: IMPLIED VOLATILITY SOLVER
+          - paragraph [ref=f3e409]: Loading spot price...
+        - generic [ref=f3e414]:
+          - paragraph [ref=f3e416]: 52-WEEK RANGE
+          - paragraph [ref=f3e417]: Loading 52-week range...
+        - generic [ref=f3e422]:
+          - paragraph [ref=f3e424]: VWAP TRACKER
+          - paragraph [ref=f3e425]: Computing VWAP...
+        - generic [ref=f3e430]:
+          - paragraph [ref=f3e432]: VOLUME PROFILE
+          - paragraph [ref=f3e433]: Building volume profile...
+        - generic [ref=f3e438]:
+          - paragraph [ref=f3e440]: FIBONACCI RETRACEMENT
+          - paragraph [ref=f3e441]: Computing Fibonacci levels...
+        - generic [ref=f3e446]:
+          - paragraph [ref=f3e447]: OPTIONS PAYOFF DIAGRAM
+          - generic [ref=f3e449]:
+            - generic [ref=f3e450]:
+              - text: buy 1x call K=100000 @ 5000
+              - button "x" [ref=f3e451] [cursor=pointer]
+            - button "+ ADD LEG" [ref=f3e452] [cursor=pointer]
+          - paragraph [ref=f3e453]: Green = profit zone | Red = loss zone | Orange line = current spot
+    - generic [ref=f3e454]:
+      - paragraph [ref=f3e455]: PORTFOLIO ANALYTICS
+      - heading "Cross-Asset Intelligence" [level=2] [ref=f3e456]
+      - paragraph [ref=f3e457]: Add or remove tickers below. All cross-asset widgets update instantly.
+      - generic [ref=f3e462]:
+        - generic [ref=f3e463]:
+          - generic [ref=f3e464]:
+            - text: S&P 500
+            - button "x" [ref=f3e465] [cursor=pointer]
+          - generic [ref=f3e466]:
+            - text: QQQ
+            - button "x" [ref=f3e467] [cursor=pointer]
+          - generic [ref=f3e468]:
+            - text: AAPL
+            - button "x" [ref=f3e469] [cursor=pointer]
+          - generic [ref=f3e470]:
+            - text: NVDA
+            - button "x" [ref=f3e471] [cursor=pointer]
+          - generic [ref=f3e472]:
+            - text: GLD
+            - button "x" [ref=f3e473] [cursor=pointer]
+          - generic [ref=f3e474]:
+            - text: TLT
+            - button "x" [ref=f3e475] [cursor=pointer]
+          - generic [ref=f3e476]:
+            - text: BTC
+            - button "x" [ref=f3e477] [cursor=pointer]
+          - generic [ref=f3e478]:
+            - text: ETH
+            - button "x" [ref=f3e479] [cursor=pointer]
+          - generic [ref=f3e480]:
+            - text: Oil
+            - button "x" [ref=f3e481] [cursor=pointer]
+          - generic [ref=f3e482]:
+            - text: EUR/USD
+            - button "x" [ref=f3e483] [cursor=pointer]
+          - button "+ ADD" [ref=f3e484] [cursor=pointer]
+          - button "PRESETS" [ref=f3e485] [cursor=pointer]
+        - paragraph [ref=f3e486]: 10 assets | min 3 / max 20 | all cross-asset widgets update when you change this list
+      - generic [ref=f3e487]:
+        - generic [ref=f3e492]:
+          - generic [ref=f3e493]:
+            - paragraph [ref=f3e494]: EFFICIENT FRONTIER
+            - generic [ref=f3e495]: OPTIMIZING...
+          - generic [ref=f3e497]:
+            - generic [ref=f3e498]: "SRC: Binance"
+            - generic [ref=f3e499]: 90d daily · 5000 random portfolios
+          - paragraph [ref=f3e500]: ■ random portfolios ■ efficient frontier | 5000 portfolios | 8 assets | 90d daily returns | risk-free 4%
+        - generic [ref=f3e505]:
+          - paragraph [ref=f3e507]: ROLLING CORRELATION MATRIX
+          - paragraph [ref=f3e508]: Computing rolling correlations...
+          - paragraph [ref=f3e510]: "| 8 assets | 180d daily | animated 30d rolling window | cyan = positive | magenta = negative"
+        - generic [ref=f3e515]:
+          - paragraph [ref=f3e517]: CORRELATION NETWORK
+          - paragraph [ref=f3e518]: Computing correlations...
+          - generic [ref=f3e520]:
+            - generic [ref=f3e521]: "SRC: Binance"
+            - generic [ref=f3e522]: 60d daily returns
+          - paragraph [ref=f3e523]: 60d daily returns | green = positive corr | red = negative corr | size = volatility
+        - generic [ref=f3e528]:
+          - paragraph [ref=f3e529]: BETA MATRIX
+          - paragraph [ref=f3e530]: Computing betas...
+          - generic [ref=f3e531]:
+            - generic [ref=f3e533]:
+              - generic [ref=f3e534]: BTC-30D
+              - generic [ref=f3e535]: BTC-90D
+              - generic [ref=f3e536]: ETH-30D
+              - generic [ref=f3e537]: ETH-90D
+            - generic [ref=f3e540]:
+              - generic [ref=f3e541]: "SRC: OKX/Kraken + Yahoo Finance"
+              - generic [ref=f3e542]: 30d/90d rolling beta
+          - paragraph [ref=f3e543]: 10 alts vs BTC + ETH | 30d / 90d rolling beta | log returns
+        - generic [ref=f3e548]:
+          - paragraph [ref=f3e549]: REALIZED VOLATILITY RANKING
+          - paragraph [ref=f3e550]: Computing 30d realized vol...
+          - generic [ref=f3e552]:
+            - generic [ref=f3e553]: "SRC: OKX/Kraken + Yahoo Finance"
+            - generic [ref=f3e554]: 30d annualized
+          - paragraph [ref=f3e555]: 8 assets | 30d log returns | annualized (x sqrt 252) | sorted desc
+        - generic [ref=f3e560]:
+          - paragraph [ref=f3e561]: RISK / RETURN BUBBLES
+          - paragraph [ref=f3e562]: Computing risk/return...
+          - generic [ref=f3e564]:
+            - generic [ref=f3e565]: "SRC: OKX/Kraken + Yahoo Finance"
+            - generic [ref=f3e566]: 1y daily · Sharpe rf 4%
+          - generic [ref=f3e567]:
+            - generic [ref=f3e568]: ■ LOW VOL
+            - generic [ref=f3e569]: ■ MED VOL
+            - generic [ref=f3e570]: ■ HIGH VOL
+            - generic [ref=f3e571]: bucket = 24h volume (S/M/L)
+          - paragraph [ref=f3e572]: 1y daily | BTC ETH SOL BNB XRP SPY QQQ GLD | Sharpe vs rf 4%
+        - generic [ref=f3e577]:
+          - paragraph [ref=f3e579]: HRP ALLOCATION
+          - paragraph [ref=f3e580]: Computing HRP allocation...
+        - generic [ref=f3e586]:
+          - paragraph [ref=f3e588]: COMPONENT VaR DECOMPOSITION
+          - paragraph [ref=f3e589]: Computing component VaR...
+        - generic [ref=f3e595]:
+          - paragraph [ref=f3e597]: SECTOR ROTATION SIGNAL
+          - paragraph [ref=f3e598]: Computing sector rotation...
+        - generic [ref=f3e604]:
+          - paragraph [ref=f3e606]: STRESS TEST SCENARIOS
+          - paragraph [ref=f3e607]: Running stress tests...
+        - generic [ref=f3e612]:
+          - paragraph [ref=f3e614]: MOMENTUM SCANNER
+          - paragraph [ref=f3e615]: Scanning momentum...
+        - generic [ref=f3e620]:
+          - paragraph [ref=f3e622]: BLACK-LITTERMAN OPTIMIZATION
+          - paragraph [ref=f3e623]: Loading returns...
+          - paragraph [ref=f3e624]: Bayesian posterior combining market equilibrium with investor views
+        - generic [ref=f3e629]:
+          - generic [ref=f3e630]:
+            - paragraph [ref=f3e631]: MULTI DRAWDOWN
+            - generic [ref=f3e632]:
+              - combobox [ref=f3e633]:
+                - option "none"
+                - option "SPY" [selected]
+                - option "QQQ"
+                - option "VTI"
+                - option "IWM"
+                - option "GLD"
+                - option "TSLA"
+                - option "AAPL"
+                - option "NVDA"
+                - option "MSFT"
+                - option "AMD"
+                - option "META"
+                - option "GOOGL"
+                - option "AMZN"
+                - option "^VIX"
+                - option "^GSPC"
+                - option "^DJI"
+                - option "^IXIC"
+              - combobox [ref=f3e634]:
+                - option "none"
+                - option "SPY"
+                - option "QQQ" [selected]
+                - option "VTI"
+                - option "IWM"
+                - option "GLD"
+                - option "TSLA"
+                - option "AAPL"
+                - option "NVDA"
+                - option "MSFT"
+                - option "AMD"
+                - option "META"
+                - option "GOOGL"
+                - option "AMZN"
+                - option "^VIX"
+                - option "^GSPC"
+                - option "^DJI"
+                - option "^IXIC"
+              - combobox [ref=f3e635]:
+                - option "none"
+                - option "SPY"
+                - option "QQQ"
+                - option "VTI"
+                - option "IWM"
+                - option "GLD" [selected]
+                - option "TSLA"
+                - option "AAPL"
+                - option "NVDA"
+                - option "MSFT"
+                - option "AMD"
+                - option "META"
+                - option "GOOGL"
+                - option "AMZN"
+                - option "^VIX"
+                - option "^GSPC"
+                - option "^DJI"
+                - option "^IXIC"
+          - paragraph [ref=f3e636]: Computing drawdowns...
+          - generic [ref=f3e638]:
+            - generic [ref=f3e639]: "SRC: OKX/Kraken + Yahoo Finance"
+            - generic [ref=f3e640]: 1y daily
+          - paragraph [ref=f3e641]: select up to 3 assets | overlapping underwater curves | 1Y daily
+    - generic [ref=f3e642]:
+      - paragraph [ref=f3e643]: ECONOMETRICS
+      - heading "Advanced Cross-Asset Analytics" [level=2] [ref=f3e644]
+      - generic [ref=f3e645]:
+        - generic [ref=f3e650]:
+          - paragraph [ref=f3e652]: COINTEGRATION SCANNER
+          - paragraph [ref=f3e653]: Computing cointegration...
+        - generic [ref=f3e658]:
+          - paragraph [ref=f3e660]: PAIRS TRADING SIGNAL
+          - paragraph [ref=f3e661]: Computing pairs signal...
+        - generic [ref=f3e666]:
+          - paragraph [ref=f3e668]: TAIL DEPENDENCE MATRIX (5% LEVEL)
+          - paragraph [ref=f3e669]: Computing tail dependence...
+        - generic [ref=f3e674]:
+          - paragraph [ref=f3e676]: TAIL DEPENDENCE MATRIX
+          - paragraph [ref=f3e677]: Computing tail dependence...
+          - paragraph [ref=f3e678]: 5% lower tail | P(both crash together) | Pearson correlation misses this
+    - generic [ref=f3e679]:
+      - paragraph [ref=f3e680]: MACROECONOMIC
+      - heading "Rates & Economic Indicators" [level=2] [ref=f3e681]
+      - generic [ref=f3e682]:
+        - generic [ref=f3e687]:
+          - paragraph [ref=f3e688]: YIELD CURVE (NELSON-SIEGEL)
+          - paragraph [ref=f3e689]: Loading FRED Treasury data...
+        - generic [ref=f3e695]:
+          - paragraph [ref=f3e697]: FORWARD RATE CURVE
+          - paragraph [ref=f3e698]: Computing forward rates...
+          - paragraph [ref=f3e700]: Spot vs forward rates | Green = market expects rate hikes | Red = expects cuts
+        - generic [ref=f3e705]:
+          - paragraph [ref=f3e706]: GLOBAL STRESS GAUGE
+          - paragraph [ref=f3e707]: Computing stress signal...
+          - generic [ref=f3e709]:
+            - generic [ref=f3e710]: "SRC: USGS · NOAA SWPC · Yahoo · Alt.me"
+            - generic [ref=f3e711]: composite 0-100
+        - generic [ref=f3e716]:
+          - paragraph [ref=f3e717]: CURRENCY STRENGTH MATRIX
+          - paragraph [ref=f3e718]: Loading exchange rates...
+          - generic [ref=f3e720]:
+            - generic [ref=f3e721]: "SRC: ExchangeRate-API"
+            - generic [ref=f3e722]: spot · 8 currencies
+          - paragraph [ref=f3e723]: 8x8 FX cross-rates | spot snapshot | green = row stronger than column
+        - generic [ref=f3e728]:
+          - paragraph [ref=f3e729]: FRED SPARKLINES
+          - paragraph [ref=f3e730]: Loading FRED series...
+          - paragraph [ref=f3e731]: 8 macro series | last 30 obs | green = latest higher than first
+    - generic [ref=f3e732]:
+      - paragraph [ref=f3e733]: GEOPHYSICAL
+      - heading "Global Signals" [level=2] [ref=f3e734]
+      - generic [ref=f3e735]:
+        - generic [ref=f3e740]:
+          - paragraph [ref=f3e741]: EARTHQUAKE MAGNITUDE HISTOGRAM
+          - paragraph [ref=f3e742]: Loading USGS feed...
+          - generic [ref=f3e744]:
+            - generic [ref=f3e745]: "SRC: USGS"
+            - generic [ref=f3e746]: 24h feed
+          - paragraph [ref=f3e747]: USGS 24h feed | binned by magnitude | plychart linear Y (original log scale Gutenberg-Richter)
+        - generic [ref=f3e752]:
+          - paragraph [ref=f3e753]: SOLAR WIND PANEL
+          - paragraph [ref=f3e754]: Fetching NOAA SWPC...
+          - generic [ref=f3e756]:
+            - generic [ref=f3e757]: "SRC: NOAA SWPC"
+            - generic [ref=f3e758]: 1d plasma + mag
+          - paragraph [ref=f3e759]: NOAA SWPC | 1-day plasma + mag | 1h sparkline
+        - generic [ref=f3e764]:
+          - generic [ref=f3e765]:
+            - paragraph [ref=f3e766]: SPACE WEATHER
+            - generic [ref=f3e767]: NOAA SWPC
+          - generic [ref=f3e768]:
+            - generic [ref=f3e769]: —
+            - generic [ref=f3e770]: GOES PRIMARY · 0.1–0.8 nm
+          - generic [ref=f3e771]:
+            - generic [ref=f3e772]:
+              - generic [ref=f3e773]: "0"
+              - generic [ref=f3e774]: X-class
+            - generic [ref=f3e775]:
+              - generic [ref=f3e776]: "0"
+              - generic [ref=f3e777]: M-class
+            - generic [ref=f3e778]:
+              - generic [ref=f3e779]: "0"
+              - generic [ref=f3e780]: C-class
+          - paragraph [ref=f3e781]: "24h peak: — · background X-ray flux, last 24 h"
+        - generic [ref=f3e786]:
+          - paragraph [ref=f3e787]: WEATHER STRIP
+          - paragraph [ref=f3e788]: Loading weather...
+          - generic [ref=f3e790]:
+            - generic [ref=f3e791]: "SRC: Open-Meteo"
+            - generic [ref=f3e792]: 5 cities · 7d highs
+          - paragraph [ref=f3e793]: 5 cities x 7 days | open-meteo | colour scaled -10C to 35C
+        - generic [ref=f3e798]:
+          - generic [ref=f3e799]:
+            - paragraph [ref=f3e800]: KP INDEX
+            - generic [ref=f3e801]: NOAA SWPC
+          - generic [ref=f3e802]:
+            - generic [ref=f3e803]: —
+            - generic [ref=f3e804]: QUIET · 3-HOURLY
+          - img "Planetary K-index history sparkline" [ref=f3e805]
+          - paragraph [ref=f3e806]: "dashed: G1 threshold (Kp 5) · 5-day max —"
+        - generic [ref=f3e811]:
+          - generic [ref=f3e812]:
+            - paragraph [ref=f3e813]: 3-DAY FORECAST
+            - generic [ref=f3e814]: SWPC
+          - table [ref=f3e816]:
+            - rowgroup [ref=f3e817]:
+              - row [ref=f3e818]
+            - rowgroup
+          - paragraph [ref=f3e820]: peak expected Kp — · colored ≥4 (G1+)
+        - generic [ref=f3e825]:
+          - generic [ref=f3e826]:
+            - paragraph [ref=f3e827]: AURORA
+            - generic [ref=f3e828]: OVATION
+          - generic [ref=f3e829]:
+            - generic [ref=f3e830]: …
+            - generic [ref=f3e831]: — · EDINBURGH
+          - paragraph [ref=f3e832]: MOON 74% waxing gibbous · bright skies — poor contrast
+          - generic [ref=f3e833]:
+            - button "LONDON" [ref=f3e834] [cursor=pointer]
+            - button "EDINBURGH" [ref=f3e835] [cursor=pointer]
+            - button "REYKJAVIK" [ref=f3e836] [cursor=pointer]
+            - button "TROMSØ" [ref=f3e837] [cursor=pointer]
+          - paragraph [ref=f3e838]: OVATION 30-min model · obs — → fc — · 0 grid cells
+        - generic [ref=f3e843]:
+          - generic [ref=f3e844]:
+            - paragraph [ref=f3e845]: SWPC ALERTS
+            - generic [ref=f3e846]: NOAA · 0
+          - paragraph [ref=f3e847]: newest 6 public NOAA SWPC alert products · 10-min cache
+        - generic [ref=f3e852]:
+          - generic [ref=f3e853]:
+            - paragraph [ref=f3e854]: F10.7 FLUX
+            - generic [ref=f3e855]: SWPC
+          - generic [ref=f3e856]:
+            - generic [ref=f3e857]: —
+            - generic [ref=f3e858]: sfu · —
+          - paragraph [ref=f3e860]: window mean — sfu · F10.7 ≥150 = active sun
+        - generic [ref=f3e865]:
+          - generic [ref=f3e866]:
+            - paragraph [ref=f3e867]: PROTON FLUX
+            - generic [ref=f3e868]: GOES PRIMARY
+          - generic [ref=f3e869]:
+            - generic [ref=f3e870]: —
+            - generic [ref=f3e871]: —
+          - generic [ref=f3e872]:
+            - generic [ref=f3e873]:
+              - generic [ref=f3e874]: ≥1 MeV
+              - generic [ref=f3e877]: 0.0 pfu
+            - generic [ref=f3e878]:
+              - generic [ref=f3e879]: ≥10 MeV
+              - generic [ref=f3e882]: 0.0 pfu
+            - generic [ref=f3e883]:
+              - generic [ref=f3e884]: ≥100 MeV
+              - generic [ref=f3e887]: 0.0 pfu
+          - paragraph [ref=f3e888]: S1 storm = ≥10 MeV exceeding 10 pfu · Z
+    - generic [ref=f3e889]:
+      - paragraph [ref=f3e890]: CRYPTO MARKETS
+      - heading "Digital Asset Monitor" [level=2] [ref=f3e891]
+      - generic [ref=f3e892]:
+        - generic [ref=f3e897]:
+          - paragraph [ref=f3e898]: CRYPTO DOMINANCE
+          - paragraph [ref=f3e899]: Loading crypto ticker...
+          - generic [ref=f3e901]:
+            - generic [ref=f3e902]: "SRC: OKX · Bybit"
+            - generic [ref=f3e903]: 24h quote volume
+          - paragraph [ref=f3e904]: top 50 by 24h volume | BTC + ETH + top 10 alts + rest
+        - generic [ref=f3e909]:
+          - paragraph [ref=f3e910]: FUNDING RATES (PERPS)
+          - paragraph [ref=f3e911]: Loading...
+          - paragraph [ref=f3e913]: Binance perpetuals | green = longs pay shorts | red = shorts pay longs
+        - paragraph [ref=f3e919]: Loading treemap...
+        - generic [ref=f3e925]:
+          - generic [ref=f3e926]:
+            - paragraph [ref=f3e927]: BTC MEMPOOL
+            - generic [ref=f3e928]: MEMPOOL.SPACE
+          - generic [ref=f3e929]:
+            - generic [ref=f3e930]: —
+            - generic [ref=f3e931]: 0 TX PENDING
+          - paragraph [ref=f3e932]: next-block fees ≥20 sat/vB flagged as congestion
+      - paragraph [ref=f3e975]: DATA PANELS
+  - contentinfo [ref=f3e1031]:
+    - generic [ref=f3e1032]:
+      - generic [ref=f3e1033]:
+        - paragraph [ref=f3e1034]: WYATT_AU
+        - paragraph [ref=f3e1035]: © 2026 Wyatt Au. Built with Astro + SolidJS.
+      - generic [ref=f3e1036]:
+        - link "GitHub" [ref=f3e1037] [cursor=pointer]:
+          - /url: https://github.com/WyattAu
+        - link "Forgejo" [ref=f3e1038] [cursor=pointer]:
+          - /url: https://forgejo.wyattau.com/WyattAu
+        - link "Email" [ref=f3e1039] [cursor=pointer]:
+          - /url: mailto:wyatt_au@protonmail.com
+  - 'button "Current theme: LIGHT. Click to cycle themes." [ref=f3e1041] [cursor=pointer]': LIGHT
+  - generic "2026-11-19T14:57:28Z": b47f775

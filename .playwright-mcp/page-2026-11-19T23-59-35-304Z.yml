@@ -1,0 +1,87 @@
+- generic [active] [ref=f4e1]:
+  - link "Skip to content" [ref=f4e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - navigation "Main navigation" [ref=f4e3]:
+    - generic [ref=f4e4]:
+      - link "WYATT_AU" [ref=f4e5] [cursor=pointer]:
+        - /url: /
+      - generic [ref=f4e6]:
+        - link "PROJECTS" [ref=f4e7] [cursor=pointer]:
+          - /url: /projects
+        - link "DOSSIER" [ref=f4e8] [cursor=pointer]:
+          - /url: /dossier
+        - link "SHOWCASE" [ref=f4e9] [cursor=pointer]:
+          - /url: /showcase
+        - link "WORLD" [ref=f4e10] [cursor=pointer]:
+          - /url: /world
+        - link "ML" [ref=f4e11] [cursor=pointer]:
+          - /url: /ml
+        - link "SEO" [ref=f4e12] [cursor=pointer]:
+          - /url: /seo
+        - link "ETF" [ref=f4e13] [cursor=pointer]:
+          - /url: /etf
+        - link "GUESTBOOK" [ref=f4e14] [cursor=pointer]:
+          - /url: /guestbook
+        - link "USES" [ref=f4e15] [cursor=pointer]:
+          - /url: /uses
+      - button "Toggle menu" [ref=f4e16]
+    - generic [ref=f4e18]:
+      - link "PROJECTS" [ref=f4e19] [cursor=pointer]:
+        - /url: /projects
+      - link "DOSSIER" [ref=f4e20] [cursor=pointer]:
+        - /url: /dossier
+      - link "SHOWCASE" [ref=f4e21] [cursor=pointer]:
+        - /url: /showcase
+      - link "WORLD" [ref=f4e22] [cursor=pointer]:
+        - /url: /world
+      - link "ML" [ref=f4e23] [cursor=pointer]:
+        - /url: /ml
+      - link "SEO" [ref=f4e24] [cursor=pointer]:
+        - /url: /seo
+      - link "ETF" [ref=f4e25] [cursor=pointer]:
+        - /url: /etf
+      - link "GUESTBOOK" [ref=f4e26] [cursor=pointer]:
+        - /url: /guestbook
+      - link "USES" [ref=f4e27] [cursor=pointer]:
+        - /url: /uses
+  - main [ref=f4e28]:
+    - generic [ref=f4e29]:
+      - paragraph [ref=f4e30]: INSIGHTS
+      - heading "Original data, first-hand observations" [level=1] [ref=f4e31]
+      - paragraph [ref=f4e32]: "Answer: analyses nobody else can publish — event reports captured by this site's own instrumentation, and studies recomputed at build time from keyless dataset downloads. Every number is reproducible from a public source, and every page documents its method."
+    - generic [ref=f4e33]:
+      - link [ref=f4e34] [cursor=pointer]:
+        - /url: /insights/g1-storm-2026-11-19
+        - paragraph [ref=f4e35]: EVENT REPORT · FIRST-HAND
+        - heading "The November 19 2026 G1 storm, captured by this site’s own monitor" [level=2] [ref=f4e36]
+        - paragraph [ref=f4e37]: Kp 5.0, SWPC K05A alert, and a 20%→55% aurora-probability envelope recorded at 30-minute cadence by the /world monitor — the site observed its own first storm, and the correlation against the official index is r = 0.79.
+        - paragraph [ref=f4e38]: Read the report ↗
+      - link [ref=f4e39] [cursor=pointer]:
+        - /url: /insights/etf-allocation-study
+        - paragraph [ref=f4e40]: DATA STUDY · 89 FUNDS
+        - heading "What 89 ETFs’ top holdings reveal about index concentration" [level=2] [ref=f4e41]
+        - paragraph [ref=f4e42]: "NVIDIA carries the heaviest average top-10 weight in the database (8.58%) and the Magnificent 7 appear in roughly one in five funds each. Sector tilts invert outside the US: Technology-first at home, Financials-first abroad. Recomputed from the keyless dataset at build time."
+        - paragraph [ref=f4e43]: Read the report ↗
+      - generic [ref=f4e44]:
+        - paragraph [ref=f4e45]: SOURCE DATA
+        - paragraph [ref=f4e46]:
+          - text: "The raw material lives in the keyless downloads: the"
+          - link "dataset catalog" [ref=f4e47] [cursor=pointer]:
+            - /url: /data
+          - text: (89-fund ETF database, transparency reports) and the live
+          - link "OSINT dashboards" [ref=f4e48] [cursor=pointer]:
+            - /url: /world
+          - text: whose 30-minute history feeds the event reports. New studies are added as events happen and as the datasets grow.
+  - contentinfo [ref=f4e49]:
+    - generic [ref=f4e50]:
+      - generic [ref=f4e51]:
+        - paragraph [ref=f4e52]: WYATT_AU
+        - paragraph [ref=f4e53]: © 2026 Wyatt Au. Built with Astro + SolidJS.
+      - generic [ref=f4e54]:
+        - link "GitHub" [ref=f4e55] [cursor=pointer]:
+          - /url: https://github.com/WyattAu
+        - link "Forgejo" [ref=f4e56] [cursor=pointer]:
+          - /url: https://forgejo.wyattau.com/WyattAu
+        - link "Email" [ref=f4e57] [cursor=pointer]:
+          - /url: mailto:wyatt_au@protonmail.com
+  - generic "2026-11-19T14:57:28Z" [ref=f4e58]: b47f775

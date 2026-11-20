@@ -1,6 +1,11 @@
 ---
 import { SEO } from 'astro-seo';
 import { BUILD_ID, BUILD_TIME } from '../lib/build-id';
+// Global style pipeline lives HERE, not in pages: every BaseLayout page
+// gets tokens, Tailwind, and animations. (Pages that predate this and
+// import the files themselves are fine — Vite dedupes.)
+import '../styles/base.css';
+import '../styles/animations.css';
 
 export interface Props {
   title?: string;
