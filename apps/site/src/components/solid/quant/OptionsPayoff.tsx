@@ -82,7 +82,7 @@ export default function OptionsPayoff() {
     ctx.fillRect(pad.l, zeroY, cW, pad.t + cH - zeroY);
 
     // Payoff curve
-    ctx.strokeStyle = colors.accent || '#00e5ff';
+    ctx.strokeStyle = colors.accent || '#c9a86c';
     ctx.lineWidth = 2;
     ctx.beginPath();
     points.forEach((p, i) => {

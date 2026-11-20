@@ -36,7 +36,7 @@ export default function EtfApp() {
   });
 
   const accentColor = () => {
-    return getThemeColors().accent || '#00e5ff';
+    return getThemeColors().accent || '#c9a86c';
   };
 
   function handleExportCsv() {

@@ -34,16 +34,16 @@ const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologi
 
     <main id="main-content" class="pt-32">
     <section class="py-16 px-6 md:px-12 lg:px-24">
-      <p class="label mb-6 cinematic-enter" style="color: var(--accent);">PROJECTS</p>
-      <h1 class="text-3xl md:text-5xl font-bold mb-4 cinematic-enter cinematic-enter-delay-1">Projects</h1>
-      <p class="text-lg cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 640px;">
+      <p class="label mb-6" style="color: var(--accent);">PROJECTS</p>
+      <h1 class="text-3xl md:text-5xl font-bold mb-4">Projects</h1>
+      <p class="text-lg" style="color: var(--text-secondary); max-width: 640px;">
         Open-source projects, tools, and experiments. Filter by language or sort by criteria.
       </p>
     </section>
 
     <!-- Filters -->
     <section class="px-6 md:px-12 lg:px-24 pb-8">
-      <div class="flex flex-wrap gap-3 items-center reveal">
+      <div class="flex flex-wrap gap-3 items-center">
         <span class="font-mono text-[10px] font-bold uppercase tracking-wider" style="color: var(--accent);">Filter:</span>
         <button
           class="project-filter font-mono text-[10px] px-3 py-1.5 border uppercase tracking-wider transition-all"
@@ -63,7 +63,7 @@ const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologi
         ))}
       </div>
 
-      <div class="flex gap-3 mt-4 items-center reveal">
+      <div class="flex gap-3 mt-4 items-center">
         <span class="font-mono text-[10px] font-bold uppercase tracking-wider" style="color: var(--accent);">Sort:</span>
         <button
           class="project-sort font-mono text-[10px] px-3 py-1.5 border uppercase tracking-wider transition-all active"
@@ -84,7 +84,7 @@ const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologi
 
     <!-- Project Grid -->
     <section class="py-8 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
-      <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children reveal">
+      <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {allProjects.map((project) => (
           <a
             href={project.data.url}
@@ -123,14 +123,14 @@ const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologi
 
     <!-- Live GitHub Repos -->
     <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
-      <div class="flex items-center gap-3 mb-6 reveal">
+      <div class="flex items-center gap-3 mb-6">
         <p class="label" style="color: var(--accent);">LIVE FROM GITHUB</p>
         <span class="block w-2 h-2 rounded-full animate-pulse" style="background: var(--accent);" />
       </div>
-      <p class="text-sm mb-6 reveal" style="color: var(--text-secondary); max-width: 640px;">
+      <p class="text-sm mb-6" style="color: var(--text-secondary); max-width: 640px;">
         Real-time repository data synced from GitHub. Sorted by most recently updated.
       </p>
-      <div class="reveal">
+      <div class="">
         <DynamicRepos client:load />
       </div>
     </section>

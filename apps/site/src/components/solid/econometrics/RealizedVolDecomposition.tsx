@@ -86,7 +86,7 @@ export default function RealizedVolDecomposition() {
     }));
 
     const series = [
-      { color: 'var(--accent, #00e5ff)', data: contData },
+      { color: 'var(--accent, #c9a86c)', data: contData },
       { color: '#ff6b35', data: jumpData },
     ];
     tipData = contData;

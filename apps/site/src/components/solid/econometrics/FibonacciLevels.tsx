@@ -78,7 +78,7 @@ export default function FibonacciLevels() {
       close: v,
       volume: 0,
     }));
-    const series = [{ color: 'var(--accent, #00e5ff)', data }];
+    const series = [{ color: 'var(--accent, #c9a86c)', data }];
     tipData = data;
     renderPlychart('fib-levels', 'update_line', JSON.stringify(series), '');
   }

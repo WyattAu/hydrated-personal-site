@@ -71,7 +71,7 @@ export default function RegimeDetector() {
       close: v,
       volume: 0,
     }));
-    const series = [{ color: 'var(--accent, #00e5ff)', data: chartData }];
+    const series = [{ color: 'var(--accent, #c9a86c)', data: chartData }];
     tipData = chartData;
     renderPlychart('regime-detector', 'update_line', JSON.stringify(series), '');
   }

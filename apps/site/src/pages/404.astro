@@ -1,35 +1,22 @@
 ---
-import '../styles/base.css';
-import GlitchText from '../components/solid/fx/GlitchText';
-import LetterGlitch from '../components/solid/fx/LetterGlitch';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="404 — Not Found" description="Page not found.">
   <main class="min-h-screen flex flex-col items-center justify-center px-6">
-    <LetterGlitch
-      client:load
-      class="absolute inset-0 pointer-events-none opacity-30"
-      glitchColors={['#ef4444', '#00e5ff', '#f97316']}
-      baseColor="#1a1a2e"
-      fontSize={0.9}
-    />
-    <div class="text-center relative">
-      <GlitchText client:load class="stat-value mb-4 block" speed={1} enableShadows shadowColors={['var(--negative, #ef4444)', 'var(--accent)']}>
-        404
-      </GlitchText>
-      <div class="font-mono text-sm mb-8" style="color: var(--text-secondary);">
-        <span style="color: var(--accent);">$</span> find / —name "this_page" 2>/dev/null<br />
-        <span style="color: var(--text-secondary);">find: no results found</span>
+    <div class="text-center max-w-lg">
+      <p class="text-7xl md:text-8xl font-semibold mb-6" style="font-family: var(--font-display, 'Fraunces', Georgia, serif); color: var(--accent);">404</p>
+      <h1 class="text-2xl md:text-3xl font-bold mb-4" style="color: var(--text-primary);">This page doesn't exist.</h1>
+      <p class="mb-8" style="color: var(--text-secondary);">
+        The address is wrong or the page moved. Everything published lives
+        under these doors:
+      </p>
+      <div class="flex gap-3 justify-center flex-wrap mb-10">
+        <a href="/" class="px-5 py-2.5 border text-sm hover:underline" style="border-color: var(--border); color: var(--text-primary);">Home</a>
+        <a href="/projects" class="px-5 py-2.5 border text-sm hover:underline" style="border-color: var(--border); color: var(--text-primary);">Projects</a>
+        <a href="/insights" class="px-5 py-2.5 border text-sm hover:underline" style="border-color: var(--border); color: var(--text-primary);">Insights</a>
+        <a href="/data" class="px-5 py-2.5 border text-sm hover:underline" style="border-color: var(--border); color: var(--text-primary);">Data</a>
       </div>
-      <p class="mb-8" style="color: var(--text-secondary);">The page you are looking for does not exist.</p>
-      <a
-        href="/"
-        class="amoeba-hover inline-block px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider"
-        style="background: var(--accent); color: var(--bg-primary);"
-      >
-        Return Home
-      </a>
     </div>
   </main>
 </BaseLayout>

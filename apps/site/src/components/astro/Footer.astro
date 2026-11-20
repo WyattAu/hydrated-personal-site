@@ -1,36 +1,53 @@
 ---
 const currentYear = new Date().getFullYear();
 
-const links = [
+const external = [
   { label: 'GitHub', href: 'https://github.com/WyattAu' },
   { label: 'Forgejo', href: 'https://forgejo.wyattau.com/WyattAu' },
   { label: 'Email', href: 'mailto:wyatt_au@protonmail.com' },
 ];
+
+const pages = [
+  { label: 'Projects', href: '/projects' },
+  { label: 'Dossier', href: '/dossier' },
+  { label: 'Showcase', href: '/showcase' },
+  { label: 'World', href: '/world' },
+  { label: 'ML', href: '/ml' },
+  { label: 'SEO', href: '/seo' },
+  { label: 'ETF', href: '/etf' },
+  { label: 'Insights', href: '/insights' },
+  { label: 'Data', href: '/data' },
+  { label: 'Guestbook', href: '/guestbook' },
+  { label: 'Uses', href: '/uses' },
+];
 ---
 
-<footer
-  class="border-t py-12 px-6 md:px-12 lg:px-24"
-  style="border-color: var(--border);"
->
-  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-    <div>
-      <p class="font-mono text-xs font-bold tracking-widest uppercase mb-2" style="color: var(--accent);">
-        WYATT_AU
-      </p>
-      <p class="code-text" style="color: var(--text-secondary);">
-        &copy; {currentYear} Wyatt Au. Built with Astro + SolidJS.
-      </p>
+<footer class="border-t py-12 px-6 md:px-12 lg:px-24" style="border-color: var(--border);">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div>
+        <p class="text-sm font-semibold mb-2" style="color: var(--text-primary);">Wyatt Au</p>
+        <p class="text-sm" style="color: var(--text-secondary);">
+          &copy; {currentYear} — Built with Astro + SolidJS.
+        </p>
+      </div>
+      <div class="flex gap-6">
+        {external.map((link) => (
+          <a
+            href={link.href}
+            target={link.href.startsWith('http') ? '_blank' : undefined}
+            rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+            class="text-sm hover:underline"
+            style="color: var(--text-secondary);"
+          >
+            {link.label}
+          </a>
+        ))}
+      </div>
     </div>
-
-    <div class="flex gap-6">
-      {links.map((link) => (
-        <a
-          href={link.href}
-          target={link.href.startsWith('http') ? '_blank' : undefined}
-          rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-          class="nav-text transition-opacity hover:opacity-100 opacity-50"
-          style="color: var(--text-secondary);"
-        >
+    <div class="flex flex-wrap gap-x-5 gap-y-2 mt-8 pt-6 border-t" style="border-color: var(--border);">
+      {pages.map((link) => (
+        <a href={link.href} class="text-xs hover:underline" style="color: var(--text-secondary);">
           {link.label}
         </a>
       ))}

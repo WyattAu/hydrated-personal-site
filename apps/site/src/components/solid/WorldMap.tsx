@@ -532,7 +532,7 @@ export default function WorldMap() {
 
   function getMagnitudeColor(mag: number | null): string {
     if (mag === null) return '#888888';
-    if (mag < 1) return '#00e5ff';
+    if (mag < 1) return '#9aa7b5';
     if (mag < 2) return '#69f0ae';
     if (mag < 3) return '#ffff00';
     if (mag < 4) return '#ff9800';
@@ -568,7 +568,7 @@ export default function WorldMap() {
             <div><strong>M${mag ?? '?'}</strong></div>
             <div style="color:#888">${escapeHtml(eq.properties.place ?? 'Unknown')}</div>
             <div style="color:#888">${new Date(eq.properties.time).toLocaleString()}</div>
-            <a href="${escapeHtml(eq.properties.url ?? '')}" target="_blank" style="color:#00e5ff">USGS Details</a>
+            <a href="${escapeHtml(eq.properties.url ?? '')}" target="_blank" style="color:var(--accent)">USGS Details</a>
           </div>`,
         )
         .addTo(leafletMap);
@@ -812,7 +812,7 @@ export default function WorldMap() {
       for (const cap of CAPITALS) {
         const m = L.circleMarker([cap.lat, cap.lon], {
           radius: 4,
-          color: 'var(--accent, #00e5ff)',
+          color: 'var(--accent, #c9a86c)',
           fillColor: '#00e5ff',
           fillOpacity: 0.8,
           weight: 1,

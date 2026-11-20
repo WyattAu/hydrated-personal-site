@@ -118,9 +118,9 @@ export default function RollingFactorExposure() {
     });
 
     const series = [
-      { color: 'var(--accent, #00e5ff)', data: betaData },
-      { color: 'var(--accent, #00e5ff)', data: upperData },
-      { color: 'var(--accent, #00e5ff)', data: lowerData },
+      { color: 'var(--accent, #c9a86c)', data: betaData },
+      { color: 'var(--accent, #c9a86c)', data: upperData },
+      { color: 'var(--accent, #c9a86c)', data: lowerData },
     ];
     tipData = betaData;
 
@@ -173,7 +173,7 @@ export default function RollingFactorExposure() {
 
       <Show when={!loading() && data().length > 0}>
         <div class="flex items-center gap-4 mt-1 flex-wrap">
-          <span class="font-mono text-[9px]" style={{ color: 'var(--accent, #00e5ff)' }}>
+          <span class="font-mono text-[9px]" style={{ color: 'var(--accent, #c9a86c)' }}>
             ■ ROLLING β (60d)
           </span>
           <span class="font-mono text-[9px]" style={{ color: 'var(--text-secondary)' }}>

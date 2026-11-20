@@ -200,7 +200,7 @@ export default function GreeksDashboard() {
 
     const labels = ['DELTA', 'GAMMA', 'THETA', 'VEGA', 'RHO'];
     const seriesArr = [g.delta, g.gamma, g.theta, g.vega, g.rho];
-    const seriesColors = ['#00e5ff', '#ff4081', '#4caf50', '#ff9800', '#7c4dff'];
+    const seriesColors = ['#c9a86c', '#ff4081', '#4caf50', '#ff9800', '#7c4dff'];
 
     // Normalize each series against global max abs (shared axis)
     let yMax = 0;
@@ -299,7 +299,7 @@ export default function GreeksDashboard() {
   );
 }
 
-const GREEK_COLORS = ['#00e5ff', '#ff4081', '#4caf50', '#ff9800', '#7c4dff'];
+const GREEK_COLORS = ['#c9a86c', '#ff4081', '#4caf50', '#ff9800', '#7c4dff'];
 
 function formatPrice(v: number): string {
   if (v >= 10000) return v.toFixed(0);

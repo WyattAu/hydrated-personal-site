@@ -107,7 +107,7 @@ export default function EtfConcentrationGauge(props: { holdings: Holding[] }) {
     // Fill value bar (normalised HHI)
     const val = Math.max(0, Math.min(1, r.normalised_hhi));
     const fillGrad = ctx.createLinearGradient(gaugeX, 0, seg(val), 0);
-    fillGrad.addColorStop(0, colors.accent || '#00e5ff');
+    fillGrad.addColorStop(0, colors.accent || '#c9a86c');
     fillGrad.addColorStop(1, colors.accentWarm || '#f0883e');
     ctx.fillStyle = fillGrad;
     ctx.fillRect(gaugeX, gaugeY, val * gaugeW, gaugeH);
@@ -133,7 +133,7 @@ export default function EtfConcentrationGauge(props: { holdings: Holding[] }) {
     ctx.fillText('1', seg(1) - 2, gaugeY + gaugeH + 18);
 
     // Value readout (top-left)
-    ctx.fillStyle = colors.accent || '#00e5ff';
+    ctx.fillStyle = colors.accent || '#c9a86c';
     ctx.font = 'bold 11px "JetBrains Mono", monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`HHI ${r.hhi.toFixed(3)}`, gaugeX, 34);

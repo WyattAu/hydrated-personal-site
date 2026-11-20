@@ -134,7 +134,7 @@ export default function PairsTradingSignal() {
       close: v,
       volume: 0,
     }));
-    const series = [{ color: 'var(--accent, #00e5ff)', data: seriesData }];
+    const series = [{ color: 'var(--accent, #c9a86c)', data: seriesData }];
     tipData = seriesData;
     renderPlychart('pairs-signal', 'update_line', JSON.stringify(series), '');
   }

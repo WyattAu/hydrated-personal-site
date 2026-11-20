@@ -173,8 +173,8 @@ export default function PortfolioOptimizer(props: PortfolioOptimizerProps) {
   const [results, setResults] = createSignal<OptimizationResult[]>([]);
 
   const accentColor = () => {
-    if (typeof document === 'undefined') return '#00e5ff';
-    return getThemeColors().accent || '#00e5ff';
+    if (typeof document === 'undefined') return '#c9a86c';
+    return getThemeColors().accent || '#c9a86c';
   };
 
   createEffect(() => {

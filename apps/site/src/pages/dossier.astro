@@ -167,17 +167,17 @@ const education = [
     <main id="main-content" class="pt-32">
     <!-- Header -->
     <section class="py-16 px-6 md:px-12 lg:px-24">
-      <p class="label mb-6 cinematic-enter" style="color: var(--accent);">DOSSIER</p>
-      <h1 class="text-3xl md:text-5xl font-bold mb-4 cinematic-enter cinematic-enter-delay-1">Dossier</h1>
-      <p class="text-lg cinematic-enter cinematic-enter-delay-2" style="color: var(--text-secondary); max-width: 640px;">
+      <p class="label mb-6" style="color: var(--accent);">DOSSIER</p>
+      <h1 class="text-3xl md:text-5xl font-bold mb-4">Dossier</h1>
+      <p class="text-lg" style="color: var(--text-secondary); max-width: 640px;">
         A detailed overview of technical expertise, professional timeline, and educational background.
       </p>
     </section>
 
     <!-- Expertise Grid -->
     <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
-      <p class="label mb-8 reveal" style="color: var(--accent);">EXPERTISE</p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 stagger-children reveal">
+      <p class="label mb-8" style="color: var(--accent);">EXPERTISE</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         {expertiseCategories.map((cat) => (
           <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
             <div class="flex items-center gap-3 mb-4">
@@ -202,8 +202,8 @@ const education = [
 
     <!-- Employment Timeline -->
     <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
-      <p class="label mb-8 reveal" style="color: var(--accent);">EMPLOYMENT</p>
-      <div class="max-w-3xl stagger-children reveal">
+      <p class="label mb-8" style="color: var(--accent);">EMPLOYMENT</p>
+      <div class="max-w-3xl">
         {employment.map((job, i) => (
           <div class={i < employment.length - 1 ? 'mb-12' : ''}>
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1 gap-1">
@@ -227,8 +227,8 @@ const education = [
 
     <!-- Education -->
     <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
-      <p class="label mb-8 reveal" style="color: var(--accent);">EDUCATION</p>
-      <div class="max-w-3xl reveal">
+      <p class="label mb-8" style="color: var(--accent);">EDUCATION</p>
+      <div class="max-w-3xl">
         {education.map((edu) => (
           <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1 gap-1">
@@ -244,12 +244,12 @@ const education = [
 
     <!-- WASM Widgets -->
     <section class="py-16 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
-      <p class="label mb-6 reveal" style="color: var(--accent);">INTERACTIVE DEMOS</p>
-      <h2 class="text-2xl md:text-3xl font-bold mb-4 reveal">WASM Widgets</h2>
-      <p class="mb-8 reveal" style="color: var(--text-secondary); max-width: 640px;">
+      <p class="label mb-6" style="color: var(--accent);">INTERACTIVE DEMOS</p>
+      <h2 class="text-2xl md:text-3xl font-bold mb-4">WASM Widgets</h2>
+      <p class="mb-8" style="color: var(--text-secondary); max-width: 640px;">
         Client-side interactive demonstrations powered by WebAssembly.
       </p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 stagger-children reveal">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="p-6 border" style="border-color: var(--border); background: var(--bg-card);">
           <p class="font-mono text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--accent);">Climate Data Explorer</p>
           <p class="text-sm mb-4" style="color: var(--text-secondary);">Visualize historical climate datasets with interactive charts and filtering.</p>

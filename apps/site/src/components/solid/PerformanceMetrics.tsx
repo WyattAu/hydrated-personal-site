@@ -33,7 +33,7 @@ function MetricCard(props: {
 }) {
   const accentColor = () => {
     const v = getThemeColors().accent;
-    return v || '#00e5ff';
+    return v || '#c9a86c';
   };
 
   return (
@@ -90,7 +90,7 @@ export default function PerformanceMetrics(props: PerformanceMetricsProps) {
 
   const accentColor = () => {
     const v = getThemeColors().accent;
-    return v || '#00e5ff';
+    return v || '#c9a86c';
   };
 
   return (

@@ -88,7 +88,7 @@ export default function EtfSectorRadar() {
 
     const labels = [...SECTOR_LABELS];
     getPlychart().then((p) => {
-      p.update_radar('sector-radar', JSON.stringify(vals), JSON.stringify(labels), '#00e5ff', '');
+      p.update_radar('sector-radar', JSON.stringify(vals), JSON.stringify(labels), '#c9a86c', '');
     });
   });
 

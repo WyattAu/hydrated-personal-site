@@ -209,7 +209,7 @@ export default function CorrelationNetwork() {
       const py = cy + p.y;
       const radius = 6 + (p.vol / 100) * 10;
       ctx.fillStyle =
-        p.ret >= 0 ? `${colors.accent || '#00e5ff'}` : `${colors.accentWarm || '#f0883e'}`;
+        p.ret >= 0 ? `${colors.accent || '#c9a86c'}` : `${colors.accentWarm || '#f0883e'}`;
       ctx.beginPath();
       ctx.arc(px, py, radius, 0, Math.PI * 2);
       ctx.fill();

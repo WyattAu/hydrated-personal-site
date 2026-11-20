@@ -113,7 +113,7 @@ export default function VwapTracker() {
       volume: 0,
     }));
     const series = [
-      { color: 'var(--accent, #00e5ff)', data: vwapData },
+      { color: 'var(--accent, #c9a86c)', data: vwapData },
       { color: '#ff4081', data: priceData },
     ];
     tipData = vwapData;

@@ -128,7 +128,7 @@ export default function SolarWindPanel() {
         frac = Math.max(0, Math.min(1, g.value / g.max));
       }
       const danger = g.signed ? g.value < -10 : g.value >= g.max * 0.85;
-      ctx.fillStyle = danger ? '#ef4444' : colors.accent || '#00e5ff';
+      ctx.fillStyle = danger ? '#ef4444' : colors.accent || '#c9a86c';
       if (g.signed) {
         const mid = barX + barW / 2;
         if (g.value < 0)
@@ -164,7 +164,7 @@ export default function SolarWindPanel() {
         const mn = Math.min(...sp);
         const mx = Math.max(...sp);
         const rng = mx - mn || 1;
-        ctx.strokeStyle = danger ? '#ef4444' : colors.accent || '#00e5ff';
+        ctx.strokeStyle = danger ? '#ef4444' : colors.accent || '#c9a86c';
         ctx.lineWidth = 1;
         ctx.beginPath();
         for (let j = 0; j < sp.length; j++) {

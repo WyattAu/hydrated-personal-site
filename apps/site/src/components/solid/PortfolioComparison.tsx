@@ -124,7 +124,7 @@ export default function PortfolioComparison(props: PortfolioComparisonProps) {
   const [etfB, setEtfB] = createSignal<EtfEntry | null>(null);
 
   const accentColor = () => {
-    return getThemeColors().accent || '#00e5ff';
+    return getThemeColors().accent || '#c9a86c';
   };
 
   function renderChartA() {
