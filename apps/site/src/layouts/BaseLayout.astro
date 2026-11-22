@@ -235,8 +235,8 @@ const webPageSchema = {
     <slot />
 
     <!-- Cinematic overlays -->
-    <div class="vignette" aria-hidden="true"></div>
-    <div class="film-grain" aria-hidden="true"></div>
+    <!-- No vignette / film-grain overlays: flat paper, clean edges
+         (the cinematic layer read as a dirty wash on light themes). -->
 
     <div
       data-build-stamp
