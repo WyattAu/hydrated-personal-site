@@ -23,10 +23,11 @@ web-sys = { version = "0.3", features = [
     "Performance",
     "CssStyleDeclaration",
 ] }
-# Shared charting + quant computation crates.
-plycore = { path = "/home/wyatt/dev/src/github.com/WyattAu/plychart/crates/plycore" }
-plychart = { path = "/home/wyatt/dev/src/github.com/WyattAu/plychart/crates/plychart" }
-plycompute = { path = "/home/wyatt/dev/src/github.com/WyattAu/plychart/crates/plycompute" }
+# Shared charting + quant computation crates (dogfooded WyattAu/plychart).
+# Git deps so CI and any machine can build; pin by rev when needed.
+plycore = { git = "https://github.com/WyattAu/plychart", package = "plycore" }
+plychart = { git = "https://github.com/WyattAu/plychart", package = "plychart" }
+plycompute = { git = "https://github.com/WyattAu/plychart", package = "plycompute" }
 
 [profile.release]
 opt-level = "s"
