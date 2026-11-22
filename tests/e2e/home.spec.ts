@@ -24,7 +24,10 @@ test.describe('Home Page', () => {
     const nav = page.locator('nav, header nav');
     await expect(nav).toBeVisible();
 
-    const links = page.locator('nav a');
+    // Only visible links: the nav also renders the mobile menu panel's
+    // links in the DOM (display:none until the menu opens) — those are
+    // hidden by design and must not fail this assertion.
+    const links = page.locator('nav a:visible');
     const count = await links.count();
     expect(count).toBeGreaterThan(0);
 
@@ -73,13 +76,15 @@ test.describe('Home Page', () => {
 
     if ((await themeToggle.count()) > 0) {
       const html = page.locator('html');
-      const initialClass = (await html.getAttribute('class')) || '';
+      // The theme system switches the data-theme ATTRIBUTE (themes.css
+      // owns all palette values); the class attribute never changes.
+      const initialTheme = (await html.getAttribute('data-theme')) || '';
 
       await themeToggle.first().click();
       await page.waitForTimeout(500);
 
-      const newClass = (await html.getAttribute('class')) || '';
-      expect(newClass).not.toBe(initialClass);
+      const newTheme = (await html.getAttribute('data-theme')) || '';
+      expect(newTheme).not.toBe(initialTheme);
     }
   });
 

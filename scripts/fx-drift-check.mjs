@@ -18,10 +18,12 @@ const LOCAL = new URL('../apps/site/src/components/solid/fx/', import.meta.url).
 const LOCAL_ADAPTATIONS = new Set([
   'theme.ts', 'ThemeCrosshair.tsx', 'ThemeDotField.tsx', 'ThemeElectricBorder.tsx',
   'ThemeRadar.tsx', 'SiteDock.tsx', 'Aurora.tsx', 'TechLoop.tsx',
+  // intentional local rewrites (same name, different component):
+  'Counter.tsx', 'CountUp.tsx', 'Radar.tsx',
 ]);
 
 const kebab = (s) => s.replace(/\.tsx?$/, '').replace(/(?<=[a-z0-9])([A-Z])/g, '-$1').toLowerCase();
-const norm = (s) => s.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ').trim();
+const norm = (s) => s.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/[;,]/g, '').replace(/\s+/g, ' ').trim();
 
 let drift = 0, checked = 0, upstreamless = 0;
 for (const f of readdirSync(LOCAL)) {
