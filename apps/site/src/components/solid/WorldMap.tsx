@@ -813,7 +813,7 @@ export default function WorldMap() {
         const m = L.circleMarker([cap.lat, cap.lon], {
           radius: 4,
           color: 'var(--accent, #c9a86c)',
-          fillColor: '#00e5ff',
+          fillColor: 'var(--accent, #c9a86c)',
           fillOpacity: 0.8,
           weight: 1,
         })

@@ -78,7 +78,7 @@ function estimateVolatility(etf: EtfEntry): number {
 }
 
 const COLORS = [
-  '#00e5ff',
+  '#60a5fa',
   '#69f0ae',
   '#ff9800',
   '#b388ff',

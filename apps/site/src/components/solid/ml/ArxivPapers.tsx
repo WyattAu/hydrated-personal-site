@@ -12,7 +12,7 @@ interface Paper {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  'cs.AI': '#00e5ff',
+  'cs.AI': '#60a5fa',
   'cs.LG': '#69f0ae',
   'cs.CL': '#ffab40',
   'cs.CV': '#ff4081',

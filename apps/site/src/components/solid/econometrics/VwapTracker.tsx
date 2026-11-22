@@ -186,7 +186,7 @@ export default function VwapTracker() {
             <span class="inline-block w-2 h-2" style={{ background: '#ff4081' }} /> PRICE
           </span>
           <span class="flex items-center gap-1">
-            <span class="inline-block w-2 h-2" style={{ background: '#00e5ff' }} /> VWAP
+            <span class="inline-block w-2 h-2" style={{ background: 'var(--accent)' }} /> VWAP
           </span>
           <span class="flex items-center gap-1">
             <span class="inline-block w-2 h-2" style={{ background: '#4caf50' }} /> ABOVE (bullish)

@@ -21,7 +21,7 @@ interface AuditSummary {
 
 const _CATEGORIES = ['SEO', 'Security', 'Accessibility', 'Performance', 'Content', 'Links'];
 const CATEGORY_COLORS: Record<string, string> = {
-  SEO: '#00e5ff',
+  SEO: '#60a5fa',
   Security: '#f44336',
   Accessibility: '#a855f7',
   Performance: '#ff6b35',

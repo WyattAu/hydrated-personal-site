@@ -29,7 +29,7 @@ const SYMBOLS = [
   '^IXIC',
 ];
 
-const COLORS = ['#00e5ff', '#ff6b35', '#a855f7'];
+const COLORS = ['#60a5fa', '#ff6b35', '#a855f7'];
 
 interface Curve {
   symbol: string;

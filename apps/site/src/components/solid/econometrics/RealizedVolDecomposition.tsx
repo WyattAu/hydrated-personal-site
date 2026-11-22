@@ -143,7 +143,7 @@ export default function RealizedVolDecomposition() {
           style={{ color: 'var(--text-secondary)' }}
         >
           <span class="flex items-center gap-1">
-            <span class="inline-block w-2 h-2" style={{ background: '#00e5ff' }} /> CONTINUOUS
+            <span class="inline-block w-2 h-2" style={{ background: 'var(--accent)' }} /> CONTINUOUS
           </span>
           <span class="flex items-center gap-1">
             <span class="inline-block w-2 h-2" style={{ background: '#ff6b35' }} /> JUMP

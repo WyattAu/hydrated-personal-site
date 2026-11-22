@@ -17,7 +17,7 @@ interface AuditData {
 function severityBadgeColor(severity: string): string {
   if (severity === 'error') return '#f44336';
   if (severity === 'warning') return '#eab308';
-  return '#00e5ff';
+  return '#94a3b8';
 }
 
 function severityLabel(severity: string): string {
@@ -28,7 +28,7 @@ function severityLabel(severity: string): string {
 
 function categoryColor(category: string): string {
   const map: Record<string, string> = {
-    SEO: '#00e5ff',
+    SEO: '#60a5fa',
     Security: '#f44336',
     Accessibility: '#a855f7',
     Performance: '#ff6b35',

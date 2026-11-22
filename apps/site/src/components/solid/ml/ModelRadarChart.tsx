@@ -14,7 +14,7 @@ const ALL_AXES: { key: keyof LLMBenchmarkModel; label: string }[] = [
   { key: 'truthfulqa', label: 'TruthfulQA' },
 ];
 
-const PALETTE = ['#00e5ff', '#ff4081', '#7c4dff', '#4caf50', '#ffa726'];
+const PALETTE = ['#60a5fa', '#ff4081', '#7c4dff', '#4caf50', '#ffa726'];
 
 export default function ModelRadarChart() {
   const { data, loading } = useLlmData();

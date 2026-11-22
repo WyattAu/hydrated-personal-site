@@ -111,9 +111,7 @@ export default function CorrelationMatrix(props: CorrelationMatrixProps) {
     setHoverIdx(null);
   }
 
-  const accentColor = () => {
-    return '#00e5ff';
-  };
+  const accentColor = () => 'var(--accent)';
 
   const [addQuery, setAddQuery] = createSignal('');
   const [addOpen, setAddOpen] = createSignal(false);

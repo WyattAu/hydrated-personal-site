@@ -23,7 +23,7 @@ const TIMEFRAMES: { key: Timeframe; label: string; interval: string; limit: stri
 ];
 
 const COLORS = [
-  '#00e5ff',
+  '#c9a86c',
   '#ff4081',
   '#69f0ae',
   '#ffab40',

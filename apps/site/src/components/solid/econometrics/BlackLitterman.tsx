@@ -386,7 +386,7 @@ export default function BlackLitterman() {
                 style={{ color: 'var(--text-secondary)' }}
               >
                 <span class="flex items-center gap-1">
-                  <span class="inline-block w-2 h-2" style={{ background: '#00e5ff' }} />
+                  <span class="inline-block w-2 h-2" style={{ background: 'var(--accent)' }} />
                   EQUILIBRIUM
                 </span>
                 <span class="flex items-center gap-1">

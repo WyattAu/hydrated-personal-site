@@ -68,7 +68,7 @@ const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
         function defaultBodies() {
           return [
             { x: width / 2, y: height / 2, vx: 0, vy: 0, mass: 1000, color: '#ffcc00', radius: 8 },
-            { x: width / 2 - 100, y: height / 2, vx: 0, vy: 2.5, mass: 10, color: '#00e5ff', radius: 3 },
+            { x: width / 2 - 100, y: height / 2, vx: 0, vy: 2.5, mass: 10, color: '#c9a86c', radius: 3 },
             { x: width / 2 + 150, y: height / 2, vx: 0, vy: -1.8, mass: 20, color: '#ff4081', radius: 4 },
             { x: width / 2, y: height / 2 - 120, vx: 1.5, vy: 0, mass: 15, color: '#7c4dff', radius: 3 },
           ];
@@ -152,7 +152,7 @@ const widgetId = `nbody-sim-${Math.random().toString(36).slice(2, 8)}`;
         });
 
         document.getElementById(el.id + '-add').addEventListener('click', function () {
-          var colors = ['#00e5ff', '#ff4081', '#7c4dff', '#69f0ae', '#ffab40', '#40c4ff'];
+          var colors = ['#c9a86c', '#ff4081', '#7c4dff', '#69f0ae', '#ffab40', '#60a5fa'];
           bodies.push({
             x: Math.random() * width,
             y: Math.random() * height,
