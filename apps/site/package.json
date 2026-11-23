@@ -31,6 +31,7 @@
     "@solidjs/testing-library": "^0.8.10",
     "@tailwindcss/vite": "^4.0.0",
     "@types/leaflet": "^1.9.21",
+    "jsrepo": "^3.8.2",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.0.0",
     "valibot": "^1.0.0",

@@ -35,11 +35,21 @@ deployed to Cloudflare Pages + Worker. Fleet rules for AI agents.
 
 ### Vendored-code policy
 
-`fx/` components are vendored, not imported (solid-fx is not yet an npm
-package). Rules: provenance header stays at top; run the drift check
-after touching any fx component; upstream fixes should be re-vendored
-deliberately, not hand-merged. Long-term: publish solid-fx to npm and
-switch to imports.
+`fx/` components are vendored, not imported (solid-fx is distributed via
+a jsrepo registry, not npm). Rules: provenance header stays at top; run
+the drift check after touching any fx component; upstream fixes should
+be re-vendored deliberately, not hand-merged.
+
+jsrepo consumer config is present (`apps/site/jsrepo.config.mts`,
+registry `github/WyattAu/solid-fx`) — but **full jsrepo adoption has a
+layout conflict**: solid-fx's registry items declare explicit file
+targets (`src/components/<Name>/<Name>.tsx`), which override consumer
+path mapping, so `jsrepo add/update` installs blocks in subdirs while
+this site vendors them flat in `src/components/solid/fx/`. Adoption
+requires either accepting subdir layout (migrate ~20 import paths) or
+an upstream solid-fx config change (drop explicit targets). Until then,
+re-vendor by hand from `jsrepo list` / upstream sources and run the
+drift check.
 
 ## Known traps
 

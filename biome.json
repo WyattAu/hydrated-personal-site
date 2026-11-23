@@ -1,6 +1,8 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.0.0/schema.json",
-  "organizeImports": { "enabled": true },
+  "organizeImports": {
+    "enabled": true
+  },
   "linter": {
     "enabled": true,
     "rules": {
@@ -21,7 +23,10 @@
         "noConsole": {
           "level": "warn",
           "options": {
-            "allow": ["warn", "error"]
+            "allow": [
+              "warn",
+              "error"
+            ]
           }
         }
       },
@@ -54,27 +59,30 @@
   },
   "files": {
     "ignore": [
-      "node_modules",
-      "dist",
       ".astro",
       ".turbo",
       ".wrangler",
-      "bun.lock",
-      "coverage",
-      "playwright-report",
-      "test-results",
-      "packages/widgets/pkg",
-      "packages/widgets/target",
       "apps/site/public/wasm",
       "apps/site/public/wasm-anim.js",
       "apps/site/public/wasm-v2",
       "apps/site/public/wasm-v3",
-      "apps/site/public/wasm-v4"
+      "apps/site/public/wasm-v4",
+      "apps/site/src/components/solid/fx/**",
+      "bun.lock",
+      "coverage",
+      "dist",
+      "node_modules",
+      "packages/widgets/pkg",
+      "packages/widgets/target",
+      "playwright-report",
+      "test-results"
     ]
   },
   "overrides": [
     {
-      "include": ["*.astro"],
+      "include": [
+        "*.astro"
+      ],
       "linter": {
         "rules": {
           "correctness": {
@@ -85,7 +93,10 @@
       }
     },
     {
-      "include": ["*.test.ts", "*.spec.ts"],
+      "include": [
+        "*.test.ts",
+        "*.spec.ts"
+      ],
       "linter": {
         "rules": {
           "style": {
@@ -98,7 +109,9 @@
       }
     },
     {
-      "include": ["apps/site/src/components/solid/quant/**/*.tsx"],
+      "include": [
+        "apps/site/src/components/solid/quant/**/*.tsx"
+      ],
       "linter": {
         "rules": {
           "correctness": {
@@ -116,7 +129,9 @@
       }
     },
     {
-      "include": ["apps/site/src/components/solid/world/**/*.tsx"],
+      "include": [
+        "apps/site/src/components/solid/world/**/*.tsx"
+      ],
       "linter": {
         "rules": {
           "correctness": {
