@@ -189,7 +189,7 @@ const datasetSchema = {
     <div class="relative overflow-hidden">
       <ThemeRadar class="absolute right-0 top-0 h-[260px] w-[360px] opacity-40 pointer-events-none" targets={5} />
       <section class="px-6 md:px-12 lg:px-24 pb-6 relative">
-      <p class="label mb-2" style="color: var(--accent);"><DecryptedText client:load text="WORLD MONITOR" speed={28} class="text-current" /></p>
+      <p class="label mb-2"><DecryptedText client:load text="WORLD MONITOR" speed={28} class="text-current" /></p>
       <h1 class="text-2xl md:text-3xl font-bold mb-1">Intelligence Dashboard</h1>
       <p class="text-sm" style="color: var(--text-secondary);">Multi-asset market data, client-side quantitative analysis, and global signals.</p>
       </section>
@@ -221,7 +221,7 @@ const datasetSchema = {
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
       <div class="flex items-start justify-between mb-4 flex-wrap gap-4">
         <div>
-          <p class="label" style="color: var(--accent);">QUANT ANALYTICS</p>
+          <p class="label">Quant Analytics</p>
           <h2 class="text-xl md:text-2xl font-bold">Single-Asset Analysis</h2>
           <p class="text-sm" style="color: var(--text-secondary);">Select an asset. All charts below update instantly. Computations run in Rust/WASM.</p>
         </div>
@@ -256,7 +256,7 @@ const datasetSchema = {
 
     <!-- ====== SECTION 3: CROSS-ASSET INTELLIGENCE ====== -->
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
-      <p class="label" style="color: var(--accent);">PORTFOLIO ANALYTICS</p>
+      <p class="label">Portfolio Analytics</p>
       <h2 class="text-xl md:text-2xl font-bold mb-3">Cross-Asset Intelligence</h2>
       <p class="mb-4 text-sm" style="color: var(--text-secondary);">Add or remove tickers below. All cross-asset widgets update instantly.</p>
       <div class="mb-6"><AppErrorBoundary client:load><TickerManager client:load /></AppErrorBoundary></div>
@@ -279,7 +279,7 @@ const datasetSchema = {
 
     <!-- ====== SECTION 4: ECONOMETRICS ====== -->
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
-      <p class="label" style="color: var(--accent);">ECONOMETRICS</p>
+      <p class="label">Econometrics</p>
       <h2 class="text-xl md:text-2xl font-bold mb-4">Advanced Cross-Asset Analytics</h2>
       <div class="grid grid-cols-1 gap-4">
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><CointegrationScanner client:load /></AppErrorBoundary></div>
@@ -291,7 +291,7 @@ const datasetSchema = {
 
     <!-- ====== SECTION 5: MACRO & RATES ====== -->
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
-      <p class="label" style="color: var(--accent);">MACROECONOMIC</p>
+      <p class="label">Macroeconomic</p>
       <h2 class="text-xl md:text-2xl font-bold mb-4">Rates & Economic Indicators</h2>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><YieldCurveChart client:load /></AppErrorBoundary></div>
@@ -304,7 +304,7 @@ const datasetSchema = {
 
     <!-- ====== SECTION 6: GLOBAL SIGNALS ====== -->
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
-      <p class="label" style="color: var(--accent);">GEOPHYSICAL</p>
+      <p class="label">Geophysical</p>
       <h2 class="text-xl md:text-2xl font-bold mb-4">Global Signals</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><EarthquakeHistogram client:load /></AppErrorBoundary></div>
@@ -322,7 +322,7 @@ const datasetSchema = {
 
     <!-- ====== SECTION 7: CRYPTO MARKETS ====== -->
     <section class="px-6 md:px-12 lg:px-24 py-8 border-t" style="border-color: var(--border);">
-      <p class="label" style="color: var(--accent);">CRYPTO MARKETS</p>
+      <p class="label">Crypto Markets</p>
       <h2 class="text-xl md:text-2xl font-bold mb-4">Digital Asset Monitor</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="p-4 border" style="border-color: var(--border); background: var(--bg-card);"><AppErrorBoundary client:load><CryptoDominancePie client:load /></AppErrorBoundary></div>

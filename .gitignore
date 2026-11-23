@@ -196,3 +196,7 @@ metrics.json
 post-crawl-findings.json
 apps/site/pnpm-lock.yaml
 apps/site/pnpm-workspace.yaml
+
+# Crawlkit run artifacts (local audit output, not site content)
+crawlkit.db
+crawl-results.json
