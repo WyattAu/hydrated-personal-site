@@ -1,98 +1,96 @@
-// Dogfooded from WyattAu/solid-fx (Animations/ElectricBorder/ElectricBorder) via jsrepo-style single-file distribution.
-// Upstream: src/content/Animations/ElectricBorder/ElectricBorder.tsx
-import { createEffect, createSignal, onCleanup } from 'solid-js';
-import type { JSX } from 'solid-js';
+import type { JSX } from 'solid-js'
+import { createEffect, createSignal, onCleanup } from 'solid-js'
 
 export interface ElectricBorderProps {
-  children?: JSX.Element;
-  color?: string;
-  glowColor?: string;
-  speed?: number;
-  chaos?: number;
-  spread?: number;
-  thickness?: number;
-  strands?: number;
-  glow?: number;
-  intensity?: number;
-  arcs?: number;
-  flicker?: number;
-  borderRadius?: number;
-  offset?: number;
-  active?: boolean;
-  intro?: boolean;
-  interactive?: boolean;
-  cursorRadius?: number;
-  theme?: 'dark' | 'light';
-  className?: string;
-  class?: string;
-  style?: JSX.CSSProperties;
+  children?: JSX.Element
+  color?: string
+  glowColor?: string
+  speed?: number
+  chaos?: number
+  spread?: number
+  thickness?: number
+  strands?: number
+  glow?: number
+  intensity?: number
+  arcs?: number
+  flicker?: number
+  borderRadius?: number
+  offset?: number
+  active?: boolean
+  intro?: boolean
+  interactive?: boolean
+  cursorRadius?: number
+  theme?: 'dark' | 'light'
+  className?: string
+  class?: string
+  style?: JSX.CSSProperties
 }
 
 interface Settings {
-  core: number[];
-  glowColor: number[];
-  speed: number;
-  chaos: number;
-  spread: number;
-  thickness: number;
-  strands: number;
-  glow: number;
-  intensity: number;
-  arcs: number;
-  flicker: number;
-  borderRadius: number;
-  offset: number;
-  active: boolean;
-  intro: boolean;
-  interactive: boolean;
-  cursorRadius: number;
-  light: boolean;
+  core: number[]
+  glowColor: number[]
+  speed: number
+  chaos: number
+  spread: number
+  thickness: number
+  strands: number
+  glow: number
+  intensity: number
+  arcs: number
+  flicker: number
+  borderRadius: number
+  offset: number
+  active: boolean
+  intro: boolean
+  interactive: boolean
+  cursorRadius: number
+  light: boolean
 }
 
 interface Program {
-  program: WebGLProgram;
-  uniforms: Record<string, WebGLUniformLocation | null>;
+  program: WebGLProgram
+  uniforms: Record<string, WebGLUniformLocation | null>
 }
 
 interface BorderPath {
-  hx: number;
-  hy: number;
-  r: number;
-  vr: number;
-  ax: number;
-  ay: number;
-  quarter: number;
-  perimeter: number;
+  hx: number
+  hy: number
+  r: number
+  vr: number
+  ax: number
+  ay: number
+  quarter: number
+  perimeter: number
 }
 
 interface Spark {
-  ax: number;
-  ay: number;
-  bx: number;
-  by: number;
-  bow: number;
-  seed: number;
-  born: number;
-  life: number;
+  ax: number
+  ay: number
+  bx: number
+  by: number
+  bow: number
+  seed: number
+  born: number
+  life: number
 }
 
 interface Pulse {
-  s: number;
-  born: number;
+  s: number
+  born: number
 }
 
-const ARCS = 4;
-const PULSES = 3;
-const MARGIN = 64;
-const PIXEL_BUDGET = 3e6;
-const SURGE_SPEED = 560;
-const HALF_PI = Math.PI / 2;
+const ARCS = 4
+const PULSES = 3
+const MARGIN = 64
+const PIXEL_BUDGET = 3e6
+const SURGE_SPEED = 560
+const HALF_PI = Math.PI / 2
 
 const VERTEX = `#version 300 es
 const vec2 corners[3] = vec2[3](vec2(-1.0, -1.0), vec2(3.0, -1.0), vec2(-1.0, 3.0));
 void main() {
   gl_Position = vec4(corners[gl_VertexID], 0.0, 1.0);
-}`;
+}`
 
 const FRAGMENT = `#version 300 es
 precision highp float;
@@ -329,151 +327,150 @@ void main() {
   float grain = (fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) - 0.5) / 255.0;
   alpha = clamp(alpha + grain, 0.0, 1.0);
   fragColor = vec4(clamp(color + grain, 0.0, alpha), alpha);
-}`;
+}`
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 const parseColor = (value: string): number[] => {
-  const text = String(value || '').trim();
-  const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(text);
+  const text = String(value || '').trim()
+  const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(text)
   if (hex) {
-    const full = hex[1].length === 3 ? hex[1].replace(/./g, (digit) => digit + digit) : hex[1];
-    return [0, 2, 4].map((index) => Number.parseInt(full.slice(index, index + 2), 16) / 255);
+    const full = hex[1].length === 3 ? hex[1].replace(/./g, digit => digit + digit) : hex[1]
+    return [0, 2, 4].map(index => parseInt(full.slice(index, index + 2), 16) / 255)
   }
-  const rgb = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(text);
-  if (rgb)
-    return [rgb[1], rgb[2], rgb[3]].map((channel) => clamp(Number.parseFloat(channel) / 255, 0, 1));
+  const rgb = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(text)
+  if (rgb) return [rgb[1], rgb[2], rgb[3]].map(channel => clamp(parseFloat(channel) / 255, 0, 1))
   if (typeof document !== 'undefined') {
-    const context = document.createElement('canvas').getContext('2d');
+    const context = document.createElement('canvas').getContext('2d')
     if (context) {
-      context.fillStyle = '#000000';
-      context.fillStyle = text;
-      const normal = String(context.fillStyle);
-      if (normal !== '#000000' || /^(#0{3}|#0{6}|black)$/i.test(text)) return parseColor(normal);
+      context.fillStyle = '#000000'
+      context.fillStyle = text
+      const normal = String(context.fillStyle)
+      if (normal !== '#000000' || /^(#0{3}|#0{6}|black)$/i.test(text)) return parseColor(normal)
     }
   }
-  return [0.49, 0.98, 1];
-};
+  return [0.49, 0.98, 1]
+}
 
 const compile = (gl: WebGL2RenderingContext, type: number, source: string) => {
-  const shader = gl.createShader(type);
-  if (!shader) return null;
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
+  const shader = gl.createShader(type)
+  if (!shader) return null
+  gl.shaderSource(shader, source)
+  gl.compileShader(shader)
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error(gl.getShaderInfoLog(shader));
-    gl.deleteShader(shader);
-    return null;
+    console.error(gl.getShaderInfoLog(shader))
+    gl.deleteShader(shader)
+    return null
   }
-  return shader;
-};
+  return shader
+}
 
 const link = (gl: WebGL2RenderingContext): Program | null => {
-  const vertex = compile(gl, gl.VERTEX_SHADER, VERTEX);
-  const fragment = compile(gl, gl.FRAGMENT_SHADER, FRAGMENT);
-  const program = vertex && fragment ? gl.createProgram() : null;
+  const vertex = compile(gl, gl.VERTEX_SHADER, VERTEX)
+  const fragment = compile(gl, gl.FRAGMENT_SHADER, FRAGMENT)
+  const program = vertex && fragment ? gl.createProgram() : null
   if (!vertex || !fragment || !program) {
-    if (vertex) gl.deleteShader(vertex);
-    if (fragment) gl.deleteShader(fragment);
-    return null;
+    if (vertex) gl.deleteShader(vertex)
+    if (fragment) gl.deleteShader(fragment)
+    return null
   }
-  gl.attachShader(program, vertex);
-  gl.attachShader(program, fragment);
-  gl.linkProgram(program);
-  gl.deleteShader(vertex);
-  gl.deleteShader(fragment);
+  gl.attachShader(program, vertex)
+  gl.attachShader(program, fragment)
+  gl.linkProgram(program)
+  gl.deleteShader(vertex)
+  gl.deleteShader(fragment)
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error(gl.getProgramInfoLog(program));
-    gl.deleteProgram(program);
-    return null;
+    console.error(gl.getProgramInfoLog(program))
+    gl.deleteProgram(program)
+    return null
   }
-  const uniforms: Program['uniforms'] = {};
-  const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+  const uniforms: Program['uniforms'] = {}
+  const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS)
   for (let index = 0; index < count; index++) {
-    const info = gl.getActiveUniform(program, index);
-    if (info) uniforms[info.name.replace(/\[0\]$/, '')] = gl.getUniformLocation(program, info.name);
+    const info = gl.getActiveUniform(program, index)
+    if (info) uniforms[info.name.replace(/\[0\]$/, '')] = gl.getUniformLocation(program, info.name)
   }
-  return { program, uniforms };
-};
+  return { program, uniforms }
+}
 
 const roundBox = (x: number, y: number, hx: number, hy: number, r: number) => {
-  const qx = Math.abs(x) - (hx - r);
-  const qy = Math.abs(y) - (hy - r);
-  return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - r;
-};
+  const qx = Math.abs(x) - (hx - r)
+  const qy = Math.abs(y) - (hy - r)
+  return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - r
+}
 
 const pathOf = (width: number, height: number, radius: number, offset: number): BorderPath => {
-  const hx = Math.max(1, width / 2 + offset);
-  const hy = Math.max(1, height / 2 + offset);
-  const r = clamp(radius + offset, 0, Math.min(hx, hy));
-  const vr = Math.min(r + 48, Math.min(hx, hy));
-  const ax = hx - vr;
-  const ay = hy - vr;
-  const quarter = ax + ay + HALF_PI * vr;
-  return { hx, hy, r, vr, ax, ay, quarter, perimeter: quarter * 4 };
-};
+  const hx = Math.max(1, width / 2 + offset)
+  const hy = Math.max(1, height / 2 + offset)
+  const r = clamp(radius + offset, 0, Math.min(hx, hy))
+  const vr = Math.min(r + 48, Math.min(hx, hy))
+  const ax = hx - vr
+  const ay = hy - vr
+  const quarter = ax + ay + HALF_PI * vr
+  return { hx, hy, r, vr, ax, ay, quarter, perimeter: quarter * 4 }
+}
 
 const pointOn = (path: BorderPath, s: number) => {
-  const { hx, hy, r, vr, ax, ay, quarter, perimeter } = path;
-  const u = ((s % perimeter) + perimeter) % perimeter;
-  const part = Math.min(3, Math.floor(u / quarter));
-  const rest = u - part * quarter;
-  const local = part % 2 ? quarter - rest : rest;
-  let x = 0;
-  let y = 0;
+  const { hx, hy, r, vr, ax, ay, quarter, perimeter } = path
+  const u = ((s % perimeter) + perimeter) % perimeter
+  const part = Math.min(3, Math.floor(u / quarter))
+  const rest = u - part * quarter
+  const local = part % 2 ? quarter - rest : rest
+  let x
+  let y
   if (local <= ax) {
-    x = local;
-    y = -hy;
+    x = local
+    y = -hy
   } else if (local <= ax + HALF_PI * vr) {
-    const angle = vr > 0 ? (local - ax) / vr : 0;
-    const dx = Math.sin(angle);
-    const dy = -Math.cos(angle);
-    let low = 0;
-    let high = vr + r + 2;
+    const angle = vr > 0 ? (local - ax) / vr : 0
+    const dx = Math.sin(angle)
+    const dy = -Math.cos(angle)
+    let low = 0
+    let high = vr + r + 2
     for (let step = 0; step < 18; step++) {
-      const mid = (low + high) / 2;
-      if (roundBox(ax + dx * mid, -ay + dy * mid, hx, hy, r) < 0) low = mid;
-      else high = mid;
+      const mid = (low + high) / 2
+      if (roundBox(ax + dx * mid, -ay + dy * mid, hx, hy, r) < 0) low = mid
+      else high = mid
     }
-    x = ax + dx * low;
-    y = -ay + dy * low;
+    x = ax + dx * low
+    y = -ay + dy * low
   } else {
-    x = hx;
-    y = -ay + (local - ax - HALF_PI * vr);
+    x = hx
+    y = -ay + (local - ax - HALF_PI * vr)
   }
-  const flipX = part >= 2 ? -1 : 1;
-  const flipY = part === 1 || part === 2 ? -1 : 1;
-  const px = x * flipX;
-  const py = y * flipY;
-  const nx = roundBox(px + 0.5, py, hx, hy, r) - roundBox(px - 0.5, py, hx, hy, r);
-  const ny = roundBox(px, py + 0.5, hx, hy, r) - roundBox(px, py - 0.5, hx, hy, r);
-  const length = Math.hypot(nx, ny) || 1;
-  return { x: px, y: py, nx: nx / length, ny: ny / length };
-};
+  const flipX = part >= 2 ? -1 : 1
+  const flipY = part === 1 || part === 2 ? -1 : 1
+  const px = x * flipX
+  const py = y * flipY
+  const nx = roundBox(px + 0.5, py, hx, hy, r) - roundBox(px - 0.5, py, hx, hy, r)
+  const ny = roundBox(px, py + 0.5, hx, hy, r) - roundBox(px, py - 0.5, hx, hy, r)
+  const length = Math.hypot(nx, ny) || 1
+  return { x: px, y: py, nx: nx / length, ny: ny / length }
+}
 
 const nearestOn = (path: BorderPath, x: number, y: number) => {
-  const { ax, ay, vr, quarter } = path;
-  const qx = Math.abs(x) - ax;
-  const qy = Math.abs(y) - ay;
-  let t = 0;
-  if (qx > 0 && qy > 0) t = ax + vr * Math.atan2(qx, qy);
-  else if (qx > qy) t = ax + HALF_PI * vr + ay - Math.abs(y);
-  else t = Math.abs(x);
-  t = clamp(t, 0, quarter);
-  if (x >= 0) return y < 0 ? t : 2 * quarter - t;
-  return y < 0 ? 4 * quarter - t : 2 * quarter + t;
-};
+  const { ax, ay, vr, quarter } = path
+  const qx = Math.abs(x) - ax
+  const qy = Math.abs(y) - ay
+  let t
+  if (qx > 0 && qy > 0) t = ax + vr * Math.atan2(qx, qy)
+  else if (qx > qy) t = ax + HALF_PI * vr + ay - Math.abs(y)
+  else t = Math.abs(x)
+  t = clamp(t, 0, quarter)
+  if (x >= 0) return y < 0 ? t : 2 * quarter - t
+  return y < 0 ? 4 * quarter - t : 2 * quarter + t
+}
 
 const ElectricBorder = (props: ElectricBorderProps) => {
-  let container!: HTMLDivElement;
-  let canvas!: HTMLCanvasElement;
-  let wakeRef: (() => void) | null = null;
-  const [generation, setGeneration] = createSignal(0);
+  let container!: HTMLDivElement
+  let canvas!: HTMLCanvasElement
+  let wakeRef: (() => void) | null = null
+  const [generation, setGeneration] = createSignal(0)
 
   const computeSettings = (): Settings => {
-    const base = parseColor(props.color ?? '#7df9ff');
+    const base = parseColor(props.color ?? '#7df9ff')
     return {
-      core: base.map((channel) => channel + (1 - channel) * 0.55),
+      core: base.map(channel => channel + (1 - channel) * 0.55),
       glowColor: props.glowColor ? parseColor(props.glowColor) : base,
       speed: Math.max(0, props.speed ?? 1),
       chaos: clamp(props.chaos ?? 0.5, 0, 2),
@@ -491,22 +488,22 @@ const ElectricBorder = (props: ElectricBorderProps) => {
       interactive: props.interactive ?? true,
       cursorRadius: Math.max(1, props.cursorRadius ?? 90),
       light: (props.theme ?? 'dark') === 'light',
-    };
-  };
+    }
+  }
 
   // Upstream re-derived settings every render and called wake() after each
   // render; this effect tracks every prop to the same end.
-  let settings: Settings = computeSettings();
+  let settings: Settings = computeSettings()
   createEffect(() => {
-    settings = computeSettings();
-    wakeRef?.();
-  });
+    settings = computeSettings()
+    wakeRef?.()
+  })
 
   createEffect(() => {
-    const gen = generation();
-    const containerEl = container;
-    const canvasEl = canvas;
-    if (!containerEl || !canvasEl) return;
+    const gen = generation()
+    const containerEl = container
+    const canvasEl = canvas
+    if (!containerEl || !canvasEl) return
 
     const gl = canvasEl.getContext('webgl2', {
       alpha: true,
@@ -515,69 +512,69 @@ const ElectricBorder = (props: ElectricBorderProps) => {
       depth: false,
       stencil: false,
       powerPreference: 'default',
-    });
-    const program = gl ? link(gl) : null;
-    if (!gl || !program) return;
+    })
+    const program = gl ? link(gl) : null
+    if (!gl || !program) return
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const vao = gl.createVertexArray();
-    const arcEnds = new Float32Array(ARCS * 4);
-    const arcShape = new Float32Array(ARCS * 4);
-    const pulseData = new Float32Array(PULSES * 4);
-    const size = { width: 1, height: 1, ratio: 1 };
-    const pointer = { x: 0, y: 0, over: false, near: false };
-    const hover = { x: 0, y: 0, vx: 0, vy: 0, power: 0 };
-    const sparks: Spark[] = [];
-    const pulses: Pulse[] = [];
-    const first = settings;
-    let power = first.active && !(first.intro && !reduced && gen === 0) ? 1 : 0;
-    let reveal = power;
-    let wasActive = first.active;
-    let ink = first.light ? 1 : 0;
-    let path = pathOf(1, 1, 0, 0);
-    let time = Math.random() * 100;
-    let raf = 0;
-    let last = 0;
-    let visible = true;
-    let pageVisible = document.visibilityState !== 'hidden';
-    let lost = false;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const vao = gl.createVertexArray()
+    const arcEnds = new Float32Array(ARCS * 4)
+    const arcShape = new Float32Array(ARCS * 4)
+    const pulseData = new Float32Array(PULSES * 4)
+    const size = { width: 1, height: 1, ratio: 1 }
+    const pointer = { x: 0, y: 0, over: false, near: false }
+    const hover = { x: 0, y: 0, vx: 0, vy: 0, power: 0 }
+    const sparks: Spark[] = []
+    const pulses: Pulse[] = []
+    const first = settings
+    let power = first.active && !(first.intro && !reduced && gen === 0) ? 1 : 0
+    let reveal = power
+    let wasActive = first.active
+    let ink = first.light ? 1 : 0
+    let path = pathOf(1, 1, 0, 0)
+    let time = Math.random() * 100
+    let raf = 0
+    let last = 0
+    let visible = true
+    let pageVisible = document.visibilityState !== 'hidden'
+    let lost = false
 
     const resize = () => {
-      const s = settings;
-      const width = Math.max(1, containerEl.offsetWidth);
-      const height = Math.max(1, containerEl.offsetHeight);
-      const canvasWidth = width + MARGIN * 2;
-      const canvasHeight = height + MARGIN * 2;
+      const s = settings
+      const width = Math.max(1, containerEl.offsetWidth)
+      const height = Math.max(1, containerEl.offsetHeight)
+      const canvasWidth = width + MARGIN * 2
+      const canvasHeight = height + MARGIN * 2
       const ratio = Math.min(
         window.devicePixelRatio || 1,
         2,
         Math.sqrt(PIXEL_BUDGET / (canvasWidth * canvasHeight)),
-      );
-      const pixelWidth = Math.max(1, Math.round(canvasWidth * ratio));
-      const pixelHeight = Math.max(1, Math.round(canvasHeight * ratio));
+      )
+      const pixelWidth = Math.max(1, Math.round(canvasWidth * ratio))
+      const pixelHeight = Math.max(1, Math.round(canvasHeight * ratio))
       if (canvasEl.width !== pixelWidth || canvasEl.height !== pixelHeight) {
-        canvasEl.width = pixelWidth;
-        canvasEl.height = pixelHeight;
+        canvasEl.width = pixelWidth
+        canvasEl.height = pixelHeight
       }
-      canvasEl.style.width = `${canvasWidth}px`;
-      canvasEl.style.height = `${canvasHeight}px`;
-      Object.assign(size, { width, height, ratio: pixelWidth / canvasWidth });
-      path = pathOf(width, height, s.borderRadius, s.offset);
-    };
+      canvasEl.style.width = `${canvasWidth}px`
+      canvasEl.style.height = `${canvasHeight}px`
+      Object.assign(size, { width, height, ratio: pixelWidth / canvasWidth })
+      path = pathOf(width, height, s.borderRadius, s.offset)
+    }
 
     const spawnArc = (now: number, near: number | null): Spark => {
-      const span = Math.min(path.perimeter * 0.3, 60 + Math.random() * 90);
-      const start = near ?? Math.random() * path.perimeter;
-      const from = start - span * (0.2 + Math.random() * 0.6);
-      const to = from + span;
-      const a = pointOn(path, from);
-      const b = pointOn(path, to);
-      const mid = pointOn(path, (from + to) / 2);
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const length = Math.hypot(dx, dy) || 1;
-      const side = (-dy / length) * mid.nx + (dx / length) * mid.ny;
-      const bow = Math.min(MARGIN - 30, length * (0.14 + Math.random() * 0.16) + 5);
+      const span = Math.min(path.perimeter * 0.3, 60 + Math.random() * 90)
+      const start = near ?? Math.random() * path.perimeter
+      const from = start - span * (0.2 + Math.random() * 0.6)
+      const to = from + span
+      const a = pointOn(path, from)
+      const b = pointOn(path, to)
+      const mid = pointOn(path, (from + to) / 2)
+      const dx = b.x - a.x
+      const dy = b.y - a.y
+      const length = Math.hypot(dx, dy) || 1
+      const side = (-dy / length) * mid.nx + (dx / length) * mid.ny
+      const bow = Math.min(MARGIN - 30, length * (0.14 + Math.random() * 0.16) + 5)
       return {
         ax: a.x,
         ay: a.y,
@@ -587,236 +584,236 @@ const ElectricBorder = (props: ElectricBorderProps) => {
         seed: 1 + Math.random() * 60,
         born: now,
         life: 0.35 + Math.random() * 0.45,
-      };
-    };
+      }
+    }
 
     const render = (s: Settings, heatPower: number) => {
-      const u = program.uniforms;
-      const width = size.width + MARGIN * 2;
-      const height = size.height + MARGIN * 2;
-      gl.viewport(0, 0, canvasEl.width, canvasEl.height);
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      if (power <= 0.001 && !sparks.length) return;
-      gl.useProgram(program.program);
-      gl.uniform2f(u.uSize, width, height);
-      gl.uniform1f(u.uRatio, size.ratio);
-      gl.uniform2f(u.uCenter, width / 2, height / 2);
-      gl.uniform2f(u.uHalf, path.hx, path.hy);
-      gl.uniform1f(u.uRadius, path.r);
-      gl.uniform3f(u.uParam, path.ax, path.ay, path.vr);
-      gl.uniform1f(u.uPerimeter, path.perimeter);
+      const u = program.uniforms
+      const width = size.width + MARGIN * 2
+      const height = size.height + MARGIN * 2
+      gl.viewport(0, 0, canvasEl.width, canvasEl.height)
+      gl.clearColor(0, 0, 0, 0)
+      gl.clear(gl.COLOR_BUFFER_BIT)
+      if (power <= 0.001 && !sparks.length) return
+      gl.useProgram(program.program)
+      gl.uniform2f(u.uSize, width, height)
+      gl.uniform1f(u.uRatio, size.ratio)
+      gl.uniform2f(u.uCenter, width / 2, height / 2)
+      gl.uniform2f(u.uHalf, path.hx, path.hy)
+      gl.uniform1f(u.uRadius, path.r)
+      gl.uniform3f(u.uParam, path.ax, path.ay, path.vr)
+      gl.uniform1f(u.uPerimeter, path.perimeter)
       gl.uniform4f(
         u.uCells,
         Math.max(1, Math.round(path.perimeter / 75)),
         Math.max(2, Math.round(path.perimeter / 25)),
         Math.max(3, Math.round(path.perimeter / 9)),
         Math.max(4, Math.round(path.perimeter / 4)),
-      );
+      )
       gl.uniform2f(
         u.uSoft,
         Math.max(1, Math.round(path.perimeter / 150)),
         Math.max(1, Math.round(path.perimeter / 50)),
-      );
-      gl.uniform1f(u.uTime, time);
-      gl.uniform1f(u.uPower, power * power * (3 - 2 * power));
-      gl.uniform1f(u.uReveal, reveal);
-      gl.uniform3f(u.uHover, hover.x + MARGIN, hover.y + MARGIN, heatPower);
-      gl.uniform1f(u.uHoverRadius, s.cursorRadius);
-      gl.uniform4fv(u.uPulses, pulseData);
-      gl.uniform3fv(u.uCore, s.core);
-      gl.uniform3fv(u.uGlowColor, s.glowColor);
-      gl.uniform1f(u.uIntensity, s.intensity);
-      gl.uniform1f(u.uGlow, s.glow);
-      gl.uniform1f(u.uThickness, s.thickness);
-      gl.uniform1f(u.uStrands, s.strands);
-      gl.uniform1f(u.uChaos, s.chaos);
-      gl.uniform1f(u.uSpread, s.spread);
-      gl.uniform1f(u.uFlicker, reduced ? 0 : s.flicker);
-      gl.uniform1f(u.uInk, ink);
-      gl.uniform4fv(u.uArcEnds, arcEnds);
-      gl.uniform4fv(u.uArcShape, arcShape);
-      gl.bindVertexArray(vao);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
+      )
+      gl.uniform1f(u.uTime, time)
+      gl.uniform1f(u.uPower, power * power * (3 - 2 * power))
+      gl.uniform1f(u.uReveal, reveal)
+      gl.uniform3f(u.uHover, hover.x + MARGIN, hover.y + MARGIN, heatPower)
+      gl.uniform1f(u.uHoverRadius, s.cursorRadius)
+      gl.uniform4fv(u.uPulses, pulseData)
+      gl.uniform3fv(u.uCore, s.core)
+      gl.uniform3fv(u.uGlowColor, s.glowColor)
+      gl.uniform1f(u.uIntensity, s.intensity)
+      gl.uniform1f(u.uGlow, s.glow)
+      gl.uniform1f(u.uThickness, s.thickness)
+      gl.uniform1f(u.uStrands, s.strands)
+      gl.uniform1f(u.uChaos, s.chaos)
+      gl.uniform1f(u.uSpread, s.spread)
+      gl.uniform1f(u.uFlicker, reduced ? 0 : s.flicker)
+      gl.uniform1f(u.uInk, ink)
+      gl.uniform4fv(u.uArcEnds, arcEnds)
+      gl.uniform4fv(u.uArcShape, arcShape)
+      gl.bindVertexArray(vao)
+      gl.drawArrays(gl.TRIANGLES, 0, 3)
+    }
 
     const frame = (now: number) => {
-      raf = 0;
-      if (lost) return;
-      const s = settings;
-      const dt = clamp((now - last) / 1000 || 0, 0, 0.05);
-      last = Math.max(last, now);
-      const motion = reduced ? 0.2 : 1;
-      time += dt * s.speed * motion;
+      raf = 0
+      if (lost) return
+      const s = settings
+      const dt = clamp((now - last) / 1000 || 0, 0, 0.05)
+      last = Math.max(last, now)
+      const motion = reduced ? 0.2 : 1
+      time += dt * s.speed * motion
 
-      if (s.active && !wasActive) reveal = 0;
-      wasActive = s.active;
-      power += ((s.active ? 1 : 0) - power) * (1 - Math.exp(-dt / (s.active ? 0.28 : 0.4)));
-      if (s.active) reveal = reduced ? 1 : Math.min(1, reveal + dt / 0.9);
-      ink += ((s.light ? 1 : 0) - ink) * (1 - Math.exp(-dt / 0.25));
+      if (s.active && !wasActive) reveal = 0
+      wasActive = s.active
+      power += ((s.active ? 1 : 0) - power) * (1 - Math.exp(-dt / (s.active ? 0.28 : 0.4)))
+      if (s.active) reveal = reduced ? 1 : Math.min(1, reveal + dt / 0.9)
+      ink += ((s.light ? 1 : 0) - ink) * (1 - Math.exp(-dt / 0.25))
 
-      const engaged = s.interactive && pointer.near && s.active;
+      const engaged = s.interactive && pointer.near && s.active
       if (engaged && hover.power < 0.01) {
-        hover.x = pointer.x;
-        hover.y = pointer.y;
-        hover.vx = 0;
-        hover.vy = 0;
+        hover.x = pointer.x
+        hover.y = pointer.y
+        hover.vx = 0
+        hover.vy = 0
       }
-      hover.vx += ((pointer.x - hover.x) * 120 - hover.vx * 19) * dt;
-      hover.vy += ((pointer.y - hover.y) * 120 - hover.vy * 19) * dt;
-      hover.x += hover.vx * dt;
-      hover.y += hover.vy * dt;
+      hover.vx += ((pointer.x - hover.x) * 120 - hover.vx * 19) * dt
+      hover.vy += ((pointer.y - hover.y) * 120 - hover.vy * 19) * dt
+      hover.x += hover.vx * dt
+      hover.y += hover.vy * dt
       hover.power +=
-        ((engaged ? 1 : 0) - hover.power) * (1 - Math.exp(-dt / (engaged ? 0.3 : 0.55)));
+        ((engaged ? 1 : 0) - hover.power) * (1 - Math.exp(-dt / (engaged ? 0.3 : 0.55)))
 
       for (let index = sparks.length - 1; index >= 0; index--) {
-        if (time - sparks[index].born > sparks[index].life) sparks.splice(index, 1);
+        if (time - sparks[index].born > sparks[index].life) sparks.splice(index, 1)
       }
       if (!reduced && s.active && reveal >= 1 && s.arcs > 0 && sparks.length < ARCS) {
-        const chance = dt * s.speed * s.arcs;
+        const chance = dt * s.speed * s.arcs
         if (Math.random() < chance * 5 * hover.power) {
           sparks.push(
             spawnArc(time, nearestOn(path, hover.x - size.width / 2, hover.y - size.height / 2)),
-          );
+          )
         } else if (Math.random() < chance * (0.6 + path.perimeter / 2400)) {
-          sparks.push(spawnArc(time, null));
+          sparks.push(spawnArc(time, null))
         }
       }
-      const fit = power * power * (3 - 2 * power);
+      const fit = power * power * (3 - 2 * power)
       for (let index = 0; index < ARCS; index++) {
-        const o = index * 4;
-        const spark = sparks[index];
+        const o = index * 4
+        const spark = sparks[index]
         if (!spark) {
-          arcShape[o + 1] = 0;
-          continue;
+          arcShape[o + 1] = 0
+          continue
         }
-        const k = clamp((time - spark.born) / spark.life, 0, 1);
-        arcEnds[o] = spark.ax + size.width / 2 + MARGIN;
-        arcEnds[o + 1] = spark.ay + size.height / 2 + MARGIN;
-        arcEnds[o + 2] = spark.bx + size.width / 2 + MARGIN;
-        arcEnds[o + 3] = spark.by + size.height / 2 + MARGIN;
-        arcShape[o] = spark.bow;
-        arcShape[o + 1] = Math.sin(Math.PI * k) * fit;
-        arcShape[o + 2] = spark.seed;
+        const k = clamp((time - spark.born) / spark.life, 0, 1)
+        arcEnds[o] = spark.ax + size.width / 2 + MARGIN
+        arcEnds[o + 1] = spark.ay + size.height / 2 + MARGIN
+        arcEnds[o + 2] = spark.bx + size.width / 2 + MARGIN
+        arcEnds[o + 3] = spark.by + size.height / 2 + MARGIN
+        arcShape[o] = spark.bow
+        arcShape[o + 1] = Math.sin(Math.PI * k) * fit
+        arcShape[o + 2] = spark.seed
       }
 
       for (let index = pulses.length - 1; index >= 0; index--) {
-        if (now - pulses[index].born > 2200) pulses.splice(index, 1);
+        if (now - pulses[index].born > 2200) pulses.splice(index, 1)
       }
       for (let index = 0; index < PULSES; index++) {
-        const o = index * 4;
-        const pulse = pulses[index];
+        const o = index * 4
+        const pulse = pulses[index]
         if (!pulse) {
-          pulseData[o + 2] = 0;
-          continue;
+          pulseData[o + 2] = 0
+          continue
         }
-        pulseData[o] = pulse.s;
-        pulseData[o + 1] = (now - pulse.born) / 1000;
-        pulseData[o + 2] = 1;
+        pulseData[o] = pulse.s
+        pulseData[o + 1] = (now - pulse.born) / 1000
+        pulseData[o + 2] = 1
       }
 
-      render(s, hover.power * (s.interactive ? 1 : 0));
+      render(s, hover.power * (s.interactive ? 1 : 0))
 
-      const busy = power > 0.002 || s.active || sparks.length > 0;
-      if (busy && visible && pageVisible) raf = requestAnimationFrame(frame);
-    };
+      const busy = power > 0.002 || s.active || sparks.length > 0
+      if (busy && visible && pageVisible) raf = requestAnimationFrame(frame)
+    }
 
     const wake = () => {
-      if (raf || lost || !visible || !pageVisible) return;
-      last = performance.now();
-      raf = requestAnimationFrame(frame);
-    };
+      if (raf || lost || !visible || !pageVisible) return
+      last = performance.now()
+      raf = requestAnimationFrame(frame)
+    }
     wakeRef = () => {
-      resize();
-      wake();
-    };
+      resize()
+      wake()
+    }
 
     const locate = (event: PointerEvent) => {
-      const rect = containerEl.getBoundingClientRect();
-      pointer.x = event.clientX - rect.left;
-      pointer.y = event.clientY - rect.top;
+      const rect = containerEl.getBoundingClientRect()
+      pointer.x = event.clientX - rect.left
+      pointer.y = event.clientY - rect.top
       pointer.over =
-        pointer.x >= 0 && pointer.y >= 0 && pointer.x <= rect.width && pointer.y <= rect.height;
+        pointer.x >= 0 && pointer.y >= 0 && pointer.x <= rect.width && pointer.y <= rect.height
       pointer.near =
         pointer.x >= -MARGIN / 2 &&
         pointer.y >= -MARGIN / 2 &&
         pointer.x <= rect.width + MARGIN / 2 &&
-        pointer.y <= rect.height + MARGIN / 2;
-    };
+        pointer.y <= rect.height + MARGIN / 2
+    }
 
     const onPointerMove = (event: PointerEvent) => {
-      locate(event);
-      if (pointer.near) wake();
-    };
+      locate(event)
+      if (pointer.near) wake()
+    }
 
     const onPointerDown = (event: PointerEvent) => {
-      locate(event);
-      const s = settings;
-      if (!pointer.over || !s.interactive || !s.active || reduced) return;
-      const along = nearestOn(path, pointer.x - size.width / 2, pointer.y - size.height / 2);
-      pulses.push({ s: along, born: performance.now() });
-      if (pulses.length > PULSES) pulses.shift();
-      if (sparks.length < ARCS) sparks.push(spawnArc(time, along));
-      wake();
-    };
+      locate(event)
+      const s = settings
+      if (!pointer.over || !s.interactive || !s.active || reduced) return
+      const along = nearestOn(path, pointer.x - size.width / 2, pointer.y - size.height / 2)
+      pulses.push({ s: along, born: performance.now() })
+      if (pulses.length > PULSES) pulses.shift()
+      if (sparks.length < ARCS) sparks.push(spawnArc(time, along))
+      wake()
+    }
 
     const onLeave = () => {
-      pointer.over = false;
-      pointer.near = false;
-    };
+      pointer.over = false
+      pointer.near = false
+    }
 
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
-    window.addEventListener('pointerdown', onPointerDown, { passive: true });
-    document.documentElement.addEventListener('pointerleave', onLeave);
+    window.addEventListener('pointermove', onPointerMove, { passive: true })
+    window.addEventListener('pointerdown', onPointerDown, { passive: true })
+    document.documentElement.addEventListener('pointerleave', onLeave)
 
     const onLost = (event: Event) => {
-      event.preventDefault();
-      lost = true;
-      cancelAnimationFrame(raf);
-      raf = 0;
-    };
-    const onRestored = () => setGeneration((value) => value + 1);
-    canvasEl.addEventListener('webglcontextlost', onLost);
-    canvasEl.addEventListener('webglcontextrestored', onRestored);
+      event.preventDefault()
+      lost = true
+      cancelAnimationFrame(raf)
+      raf = 0
+    }
+    const onRestored = () => setGeneration(value => value + 1)
+    canvasEl.addEventListener('webglcontextlost', onLost)
+    canvasEl.addEventListener('webglcontextrestored', onRestored)
 
     const resizeObserver = new ResizeObserver(() => {
-      resize();
-      wake();
-    });
-    resizeObserver.observe(containerEl);
+      resize()
+      wake()
+    })
+    resizeObserver.observe(containerEl)
 
-    const intersection = new IntersectionObserver((entries) => {
-      visible = entries.some((entry) => entry.isIntersecting);
-      wake();
-    });
-    intersection.observe(containerEl);
+    const intersection = new IntersectionObserver(entries => {
+      visible = entries.some(entry => entry.isIntersecting)
+      wake()
+    })
+    intersection.observe(containerEl)
 
     const onVisibility = () => {
-      pageVisible = document.visibilityState !== 'hidden';
-      wake();
-    };
-    document.addEventListener('visibilitychange', onVisibility);
+      pageVisible = document.visibilityState !== 'hidden'
+      wake()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
 
-    resize();
-    wake();
+    resize()
+    wake()
 
     onCleanup(() => {
-      cancelAnimationFrame(raf);
-      wakeRef = null;
-      resizeObserver.disconnect();
-      intersection.disconnect();
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerdown', onPointerDown);
-      document.documentElement.removeEventListener('pointerleave', onLeave);
-      document.removeEventListener('visibilitychange', onVisibility);
-      canvasEl.removeEventListener('webglcontextlost', onLost);
-      canvasEl.removeEventListener('webglcontextrestored', onRestored);
+      cancelAnimationFrame(raf)
+      wakeRef = null
+      resizeObserver.disconnect()
+      intersection.disconnect()
+      window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('pointerdown', onPointerDown)
+      document.documentElement.removeEventListener('pointerleave', onLeave)
+      document.removeEventListener('visibilitychange', onVisibility)
+      canvasEl.removeEventListener('webglcontextlost', onLost)
+      canvasEl.removeEventListener('webglcontextrestored', onRestored)
       if (!gl.isContextLost()) {
-        gl.deleteVertexArray(vao);
-        gl.deleteProgram(program.program);
+        gl.deleteVertexArray(vao)
+        gl.deleteProgram(program.program)
       }
-    });
-  });
+    })
+  })
 
   return (
     <div
@@ -831,7 +828,7 @@ const ElectricBorder = (props: ElectricBorderProps) => {
         style={{ top: `${-MARGIN}px`, left: `${-MARGIN}px` }}
       />
     </div>
-  );
-};
+  )
+}
 
-export default ElectricBorder;
+export default ElectricBorder
