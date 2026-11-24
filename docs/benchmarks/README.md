@@ -119,6 +119,13 @@ documented practices only — no proprietary internals.
 5. **Accessibility is tested but not certified.** One a11y spec exists;
    FAANG/defence would add axe-core in CI with a hard gate.
 
+## Parity resolution roadmap
+
+The seven actionable gaps above have a sequenced resolution plan in
+[parity-roadmap.md](parity-roadmap.md): four batches, ~3.5 days total,
+each gap with target state, acceptance criteria, and effort. Projected
+post-parity practice-parity: 3.8 -> ~4.4.
+
 ## What not to do
 
 - Do not adopt microservices, Kubernetes, or event-driven architecture:
