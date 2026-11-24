@@ -1,5 +1,6 @@
 ---
 import { SEO } from 'astro-seo';
+import ThemeCrosshair from '../components/solid/fx/ThemeCrosshair';
 import { BUILD_ID, BUILD_TIME } from '../lib/build-id';
 // Global style pipeline lives HERE, not in pages: every BaseLayout page
 // gets tokens, Tailwind, and animations. (Pages that predate this and
@@ -230,6 +231,8 @@ const webPageSchema = {
   </script>
   </head>
   <body>
+    <!-- Site-wide theme-aware mouse layer (pointer-fine + reduced-motion guarded inside the component). -->
+    <ThemeCrosshair client:load />
     <a href="#main-content" class="skip-link">Skip to content</a>
 
     <slot />

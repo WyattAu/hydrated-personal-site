@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OG card generator — single source of truth for all social cards.
+"""OG card generator, single source of truth for all social cards.
 
 Identity: midnight-navy #0a0e17 + gold #c9a86c (the default theme's voice).
 Editorial serif headline, quiet mono metadata, no gradients, no glow.
@@ -21,17 +21,17 @@ MONO = "/usr/share/fonts/TTF/DejaVuSansMono.ttf"
 
 CARDS = [
     ("home", "Wyatt Au", "Systems thinker, infrastructure builder.", None),
-    ("world", "World Monitor", "Live OSINT dashboards — 8 feeds, client-side analysis.", None),
+    ("world", "World Monitor", "Live OSINT dashboards, 8 feeds, client-side analysis.", None),
     ("etf", "ETF Intelligence", "89 funds · correlation & allocation · open database.", None),
     ("ml", "ML Benchmarks", "Model performance, measured and charted client-side.", None),
-    ("dossier", "Dossier", "The background file — how the work is done.", None),
+    ("dossier", "Dossier", "The background file, how the work is done.", None),
     ("projects", "Projects", "Deterministic infrastructure, in production.", None),
     ("docs", "Docs", "Published standards, records, and audits.", None),
     ("guestbook", "Guestbook", "Sign the log.", None),
     ("data", "Open Data", "Keyless downloads, recomputed at every build.", None),
     ("insights", "Insights", "Original studies and first-hand event reports.", None),
-    ("g1-storm", "The G1 storm, first-hand", "Captured by this site's own monitor — Kp 5.0, r = 0.79.", "EVENT REPORT · 2026-11-19"),
-    ("etf-study", "Concentration study", "89 ETFs — NVDA carries the heaviest top-10 weight, 8.58%.", "DATA STUDY · 89 FUNDS"),
+    ("g1-storm", "The G1 storm, first-hand", "Captured by this site's own monitor, Kp 5.0, r = 0.79.", "EVENT REPORT · 2026-11-19"),
+    ("etf-study", "Concentration study", "89 ETFs, NVDA carries the heaviest top-10 weight, 8.58%.", "DATA STUDY · 89 FUNDS"),
 ]
 
 
@@ -46,7 +46,7 @@ def render(slug, headline, summary, slugline):
     tag = slugline or "WYATTAU.COM"
     d.text((x, top + 28), tag, font=ImageFont.truetype(MONO, 22), fill=GOLD)
 
-    # serif headline — wrap at ~26 chars
+    # serif headline, wrap at ~26 chars
     f_head = ImageFont.truetype(SERIF, 72)
     words, lines, cur = headline.split(), [], ""
     for w in words:

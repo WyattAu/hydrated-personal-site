@@ -26,7 +26,7 @@ const alerts = [
   { id: 'K04W', issued: '00:41 UTC', text: 'WARNING: Geomagnetic K-index of 4 expected' },
   { id: 'K04A', issued: '00:46 UTC', text: 'ALERT: Geomagnetic K-index of 4' },
   { id: 'K05W', issued: '01:00 UTC', text: 'WARNING: Geomagnetic K-index of 5 expected' },
-  { id: 'K05A', issued: '01:08 UTC', text: 'ALERT: Geomagnetic K-index of 5 — G1 (minor) storm threshold crossed' },
+  { id: 'K05A', issued: '01:08 UTC', text: 'ALERT: Geomagnetic K-index of 5, G1 (minor) storm threshold crossed' },
   { id: 'K04W', issued: '01:18 UTC', text: 'Warning Condition: Persistence' },
 ];
 
@@ -45,9 +45,9 @@ const articleSchema = {
 
 <BaseLayout
   lastModified="2026-11-19"
-  title="G1 Geomagnetic Storm 2026-11-19 — First-Hand Capture — Wyatt Au"
+  title="G1 Geomagnetic Storm 2026-11-19, First-Hand Capture, Wyatt Au"
   ogImage="/og/g1-storm.png"
-  description="First-hand event report: the 2026-11-19 G1 storm (Kp 5.0) as captured by wyattau.com's own aurora monitor — 20% baseline to 55% peak, Pearson r = 0.79 against Kp across the 24h window."
+  description="First-hand event report: the 2026-11-19 G1 storm (Kp 5.0) as captured by wyattau.com's own aurora monitor, 20% baseline to 55% peak, Pearson r = 0.79 against Kp across the 24h window."
   faq={[
     {
       q: 'What happened on November 19 2026?',
@@ -55,7 +55,7 @@ const articleSchema = {
     },
     {
       q: 'How was this storm captured?',
-      a: 'By this site itself: the /world aurora monitor writes a 48-point probability series to KV storage every 30 minutes, cron-autonomously. This report reads that captured history — the site observed its own first storm.',
+      a: 'By this site itself: the /world aurora monitor writes a 48-point probability series to KV storage every 30 minutes, cron-autonomously. This report reads that captured history, the site observed its own first storm.',
     },
     {
       q: 'What does the r = 0.79 mean?',
@@ -72,8 +72,8 @@ const articleSchema = {
       </h1>
       <p class="text-lg" style="color: var(--text-secondary); max-width: 760px;">
         Answer: Kp reached 5.0 at 00:00 UTC and SWPC issued a K05A alert at
-        01:08 UTC. The site's aurora monitor — which had been writing a 30-minute
-        probability series to storage all along — recorded the whole envelope:
+        01:08 UTC. The site's aurora monitor, which had been writing a 30-minute
+        probability series to storage all along, recorded the whole envelope:
         baseline 20%, peak 55% at 02:30 UTC, and a 0.79 Pearson correlation
         against the official Kp index. This is the first storm the site has
         captured with its own instrumentation.
@@ -132,7 +132,7 @@ const articleSchema = {
         </div>
         <p class="text-sm mt-3" style="color: var(--text-secondary);">
           The monitor's steepest ramp (32% → 50% between 23:30 and 00:30 UTC) preceded the
-          formal K05A alert by about 40 minutes — finer time resolution than the 3-hour Kp
+          formal K05A alert by about 40 minutes, finer time resolution than the 3-hour Kp
           index can express.
         </p>
       </div>
@@ -144,7 +144,7 @@ const articleSchema = {
           K-index over the same window gives a Pearson correlation of
           <span class="font-mono font-bold" style="color: var(--accent);"> r = 0.787 </span>
           (probability mean 27.2%, range 2–55%; Kp mean 2.31, max 5.0). Previous windows were
-          too quiet to compute this gate honestly — variance was near zero. This storm is the
+          too quiet to compute this gate honestly, variance was near zero. This storm is the
           first event with enough dynamic range to validate the monitor against the official
           index, and it tracks well.
         </p>
@@ -157,7 +157,7 @@ const articleSchema = {
           higher-than-usual latitudes, and weak power-grid fluctuations are possible. It is
           nonetheless a real event with a clean signature. The probability series comes from
           this site's own aurora-visibility model; the Kp series from NOAA SWPC. The snapshot
-          was taken 2026-11-19 around 13:00 UTC — the live series continues to roll at
+          was taken 2026-11-19 around 13:00 UTC, the live series continues to roll at
           <a href="/world" class="hover:underline" style="color: var(--accent);">/world</a>.
           This is an observational report, not a forecast.
         </p>
@@ -171,7 +171,7 @@ const articleSchema = {
           <span class="font-mono text-xs">noaa-planetary-k-index.json</span>). The correlation
           forward-fills the 3-hour Kp onto the 30-minute grid and uses an unweighted Pearson
           over the 45 aligned points (n = 48 series points, 45 with a Kp match). Alerts are
-          quoted verbatim from the SWPC feed. Every rebuild of this page re-derives nothing —
+          quoted verbatim from the SWPC feed. Every rebuild of this page re-derives nothing ,
           it is a fixed snapshot of a past event, which is what makes it a record.
         </p>
       </div>

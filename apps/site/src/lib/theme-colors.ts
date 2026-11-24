@@ -6,11 +6,11 @@ export function getThemeColors() {
   if (typeof document === 'undefined') {
     // SSR fallback — midnight-navy defaults
     return {
-      accent: '#00e5ff',
-      accentWarm: '#ff6b35',
-      bgPrimary: '#050505',
-      bgSecondary: '#0a0a0a',
-      bgCard: '#0c0c0c',
+      accent: '#c9a86c',
+      accentWarm: '#b08d55',
+      bgPrimary: '#0a0e17',
+      bgSecondary: '#0e1520',
+      bgCard: '#101828',
       textPrimary: '#ffffff',
       textSecondary: '#888888',
       border: '#1a1a1a',

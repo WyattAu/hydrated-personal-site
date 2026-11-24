@@ -1,4 +1,4 @@
-# Dossier — Wyatt Au
+# Dossier, Wyatt Au
 
 Personal dossier, timeline, and detailed biography of Wyatt Au: backend
 engineer and systems architect working on deterministic infrastructure and
@@ -25,7 +25,7 @@ widgets powering the dashboards on this site.
 
 **What is in the dossier?** A detailed biography and career timeline, plus an inventory of the 16 WebAssembly widgets that power the dashboards on this site.
 
-**What are the interactive demos?** The WASM widgets compiled from Rust — Monte Carlo simulation, volatility surfaces, Fourier analysis, cellular automata, and more — all running client-side.
+**What are the interactive demos?** The WASM widgets compiled from Rust, Monte Carlo simulation, volatility surfaces, Fourier analysis, cellular automata, and more, all running client-side.
 
 ## Related pages
 

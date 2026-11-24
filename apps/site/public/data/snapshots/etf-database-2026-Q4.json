@@ -1,0 +1,2447 @@
+[
+  {
+    "ticker": "SPY",
+    "name": "SPDR S&P 500 ETF Trust",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 29.5,
+      "Healthcare": 13.2,
+      "Financials": 12.8,
+      "Consumer Discretionary": 10.5,
+      "Communication Services": 8.9,
+      "Industrials": 8.4,
+      "Consumer Staples": 6.2,
+      "Energy": 4.1,
+      "Utilities": 2.5,
+      "Materials": 2.3,
+      "Real Estate": 1.6
+    },
+    "region_allocation": {
+      "North America": 98.2,
+      "Europe": 1.1,
+      "Asia Pacific": 0.4,
+      "Other": 0.3
+    },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 7.1 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 6.8 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 5.9 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 3.8 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 2.6 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 2.1 },
+      { "ticker": "BRK.B", "name": "Berkshire Hathaway", "weight": 2.0 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 1.8 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 1.5 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 1.4 }
+    ]
+  },
+  {
+    "ticker": "QQQ",
+    "name": "Invesco QQQ Trust",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 58.2,
+      "Consumer Discretionary": 16.3,
+      "Communication Services": 9.1,
+      "Healthcare": 6.8,
+      "Industrials": 4.2,
+      "Consumer Staples": 2.5,
+      "Energy": 1.3,
+      "Financials": 1.1,
+      "Utilities": 0.3,
+      "Materials": 0.2
+    },
+    "region_allocation": {
+      "North America": 97.5,
+      "Europe": 1.5,
+      "Asia Pacific": 0.7,
+      "Other": 0.3
+    },
+    "top_holdings": [
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 9.2 },
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 8.5 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 7.8 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 5.1 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 4.2 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 3.8 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 3.5 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 3.2 },
+      { "ticker": "COST", "name": "Costco Wholesale", "weight": 2.4 },
+      { "ticker": "NFLX", "name": "Netflix Inc", "weight": 2.1 }
+    ]
+  },
+  {
+    "ticker": "VTI",
+    "name": "Vanguard Total Stock Market ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 28.1,
+      "Healthcare": 13.5,
+      "Financials": 13.2,
+      "Consumer Discretionary": 10.8,
+      "Communication Services": 8.5,
+      "Industrials": 9.1,
+      "Consumer Staples": 6.0,
+      "Energy": 3.8,
+      "Utilities": 2.4,
+      "Materials": 2.6,
+      "Real Estate": 2.0
+    },
+    "region_allocation": {
+      "North America": 99.1,
+      "Europe": 0.5,
+      "Asia Pacific": 0.2,
+      "Other": 0.2
+    },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 6.8 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 6.5 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 5.5 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 3.6 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 2.4 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 2.0 },
+      { "ticker": "BRK.B", "name": "Berkshire Hathaway", "weight": 1.9 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 1.7 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 1.4 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 1.3 }
+    ]
+  },
+  {
+    "ticker": "VOO",
+    "name": "Vanguard S&P 500 ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 30.1,
+      "Healthcare": 13.0,
+      "Financials": 12.5,
+      "Consumer Discretionary": 10.8,
+      "Communication Services": 9.0,
+      "Industrials": 8.3,
+      "Consumer Staples": 6.1,
+      "Energy": 4.0,
+      "Utilities": 2.5,
+      "Materials": 2.2,
+      "Real Estate": 1.5
+    },
+    "region_allocation": {
+      "North America": 98.5,
+      "Europe": 0.9,
+      "Asia Pacific": 0.3,
+      "Other": 0.3
+    },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 7.0 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 6.7 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 5.8 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 3.7 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 2.5 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 2.0 },
+      { "ticker": "BRK.B", "name": "Berkshire Hathaway", "weight": 1.9 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 1.8 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 1.5 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 1.3 }
+    ]
+  },
+  {
+    "ticker": "IVV",
+    "name": "iShares Core S&P 500 ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 29.8,
+      "Healthcare": 13.1,
+      "Financials": 12.6,
+      "Consumer Discretionary": 10.7,
+      "Communication Services": 8.8,
+      "Industrials": 8.5,
+      "Consumer Staples": 6.2,
+      "Energy": 4.1,
+      "Utilities": 2.5,
+      "Materials": 2.3,
+      "Real Estate": 1.4
+    },
+    "region_allocation": {
+      "North America": 98.3,
+      "Europe": 1.0,
+      "Asia Pacific": 0.4,
+      "Other": 0.3
+    },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 7.1 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 6.8 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 5.9 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 3.8 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 2.6 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 2.1 },
+      { "ticker": "BRK.B", "name": "Berkshire Hathaway", "weight": 2.0 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 1.8 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 1.5 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 1.4 }
+    ]
+  },
+  {
+    "ticker": "AGG",
+    "name": "iShares Core U.S. Aggregate Bond ETF",
+    "category": "Fixed Income",
+    "sector_allocation": {
+      "Government": 43.2,
+      "Corporate": 28.5,
+      "MBS": 18.1,
+      "Municipal": 2.8,
+      "Agency": 4.6,
+      "Other": 2.8
+    },
+    "region_allocation": { "North America": 99.5, "Europe": 0.3, "Other": 0.2 },
+    "top_holdings": [
+      { "ticker": "UST", "name": "US Treasury 2Y", "weight": 4.2 },
+      { "ticker": "UST", "name": "US Treasury 5Y", "weight": 3.8 },
+      { "ticker": "UST", "name": "US Treasury 10Y", "weight": 3.5 },
+      { "ticker": "MBS", "name": "FHLMC Gold", "weight": 3.2 },
+      { "ticker": "MBS", "name": "FNMA", "weight": 3.0 },
+      { "ticker": "UST", "name": "US Treasury 30Y", "weight": 2.8 },
+      { "ticker": "CORP", "name": "Apple Inc 3.05%", "weight": 0.8 },
+      { "ticker": "CORP", "name": "Microsoft Corp 3.12%", "weight": 0.7 },
+      { "ticker": "CORP", "name": "JPMorgan 4.25%", "weight": 0.6 },
+      { "ticker": "CORP", "name": "Goldman Sachs 3.75%", "weight": 0.5 }
+    ]
+  },
+  {
+    "ticker": "BND",
+    "name": "Vanguard Total Bond Market ETF",
+    "category": "Fixed Income",
+    "sector_allocation": {
+      "Government": 41.5,
+      "Corporate": 29.8,
+      "MBS": 19.2,
+      "Agency": 5.1,
+      "Municipal": 2.0,
+      "Other": 2.4
+    },
+    "region_allocation": { "North America": 99.2, "Europe": 0.5, "Other": 0.3 },
+    "top_holdings": [
+      { "ticker": "UST", "name": "US Treasury 2Y", "weight": 4.0 },
+      { "ticker": "UST", "name": "US Treasury 5Y", "weight": 3.6 },
+      { "ticker": "UST", "name": "US Treasury 10Y", "weight": 3.3 },
+      { "ticker": "MBS", "name": "FHLMC Gold", "weight": 3.1 },
+      { "ticker": "MBS", "name": "FNMA", "weight": 2.9 },
+      { "ticker": "UST", "name": "US Treasury 30Y", "weight": 2.7 },
+      { "ticker": "CORP", "name": "Apple Inc 3.05%", "weight": 0.7 },
+      { "ticker": "CORP", "name": "Microsoft Corp 3.12%", "weight": 0.6 },
+      { "ticker": "CORP", "name": "JPMorgan 4.25%", "weight": 0.5 },
+      { "ticker": "CORP", "name": "Goldman Sachs 3.75%", "weight": 0.4 }
+    ]
+  },
+  {
+    "ticker": "GLD",
+    "name": "SPDR Gold Shares",
+    "category": "Commodities",
+    "sector_allocation": { "Gold": 100.0 },
+    "region_allocation": {
+      "North America": 45.0,
+      "Europe": 30.0,
+      "Asia Pacific": 20.0,
+      "Other": 5.0
+    },
+    "top_holdings": [{ "ticker": "GLD", "name": "Gold Bullion", "weight": 100.0 }]
+  },
+  {
+    "ticker": "IAU",
+    "name": "iShares Gold Trust",
+    "category": "Commodities",
+    "sector_allocation": { "Gold": 100.0 },
+    "region_allocation": {
+      "North America": 45.0,
+      "Europe": 30.0,
+      "Asia Pacific": 20.0,
+      "Other": 5.0
+    },
+    "top_holdings": [{ "ticker": "IAU", "name": "Gold Bullion", "weight": 100.0 }]
+  },
+  {
+    "ticker": "SLV",
+    "name": "iShares Silver Trust",
+    "category": "Commodities",
+    "sector_allocation": { "Silver": 100.0 },
+    "region_allocation": {
+      "North America": 50.0,
+      "South America": 25.0,
+      "Europe": 15.0,
+      "Asia Pacific": 10.0
+    },
+    "top_holdings": [{ "ticker": "SLV", "name": "Silver Bullion", "weight": 100.0 }]
+  },
+  {
+    "ticker": "VT",
+    "name": "Vanguard Total World Stock ETF",
+    "category": "Global Equity",
+    "sector_allocation": {
+      "Technology": 24.5,
+      "Healthcare": 11.8,
+      "Financials": 15.2,
+      "Consumer Discretionary": 9.8,
+      "Communication Services": 7.5,
+      "Industrials": 8.9,
+      "Consumer Staples": 6.5,
+      "Energy": 4.8,
+      "Utilities": 3.2,
+      "Materials": 4.0,
+      "Real Estate": 3.8
+    },
+    "region_allocation": {
+      "North America": 58.2,
+      "Europe": 22.5,
+      "Asia Pacific": 15.8,
+      "Other": 3.5
+    },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 4.2 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 4.0 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 3.5 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 2.2 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 1.5 },
+      { "ticker": "TSM", "name": "Taiwan Semi", "weight": 1.4 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 1.3 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 1.1 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 0.9 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 0.8 }
+    ]
+  },
+  {
+    "ticker": "VXUS",
+    "name": "Vanguard Total International Stock ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Financials": 22.5,
+      "Technology": 14.2,
+      "Healthcare": 10.8,
+      "Industrials": 12.5,
+      "Consumer Discretionary": 9.1,
+      "Communication Services": 5.8,
+      "Consumer Staples": 7.2,
+      "Energy": 5.5,
+      "Materials": 5.8,
+      "Utilities": 4.2,
+      "Real Estate": 2.4
+    },
+    "region_allocation": {
+      "Europe": 38.5,
+      "Asia Pacific": 35.2,
+      "Emerging Markets": 18.5,
+      "Other": 7.8
+    },
+    "top_holdings": [
+      { "ticker": "TSM", "name": "Taiwan Semiconductor", "weight": 3.2 },
+      { "ticker": "ASML", "name": "ASML Holding", "weight": 1.8 },
+      { "ticker": "NVO", "name": "Novo Nordisk", "weight": 1.5 },
+      { "ticker": "SAP", "name": "SAP SE", "weight": 1.2 },
+      { "ticker": "MC", "name": "LVMH", "weight": 1.1 },
+      { "ticker": "TMO", "name": "Thermo Fisher", "weight": 0.9 },
+      { "ticker": "AZN", "name": "AstraZeneca", "weight": 0.8 },
+      { "ticker": "SHEL", "name": "Shell PLC", "weight": 0.8 },
+      { "ticker": "HSBC", "name": "HSBC Holdings", "weight": 0.7 },
+      { "ticker": "BABA", "name": "Alibaba Group", "weight": 0.7 }
+    ]
+  },
+  {
+    "ticker": "EFA",
+    "name": "iShares MSCI EAFE ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Financials": 21.8,
+      "Industrials": 14.5,
+      "Healthcare": 12.2,
+      "Consumer Discretionary": 10.5,
+      "Communication Services": 6.8,
+      "Consumer Staples": 8.5,
+      "Technology": 8.2,
+      "Energy": 5.1,
+      "Materials": 5.8,
+      "Utilities": 4.2,
+      "Real Estate": 2.4
+    },
+    "region_allocation": { "Europe": 68.5, "Asia Pacific": 20.2, "Other": 11.3 },
+    "top_holdings": [
+      { "ticker": "NVO", "name": "Novo Nordisk", "weight": 2.8 },
+      { "ticker": "ASML", "name": "ASML Holding", "weight": 2.2 },
+      { "ticker": "MC", "name": "LVMH", "weight": 1.9 },
+      { "ticker": "SAP", "name": "SAP SE", "weight": 1.5 },
+      { "ticker": "SHEL", "name": "Shell PLC", "weight": 1.2 },
+      { "ticker": "AZN", "name": "AstraZeneca", "weight": 1.1 },
+      { "ticker": "Nestle", "name": "Nestle SA", "weight": 1.0 },
+      { "ticker": "ROCHE", "name": "Roche Holding", "weight": 0.9 },
+      { "ticker": "TMO", "name": "Thermo Fisher", "weight": 0.8 },
+      { "ticker": "SHEL", "name": "Shell PLC", "weight": 0.7 }
+    ]
+  },
+  {
+    "ticker": "VWO",
+    "name": "Vanguard FTSE Emerging Markets ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Technology": 18.5,
+      "Financials": 22.8,
+      "Energy": 8.2,
+      "Consumer Discretionary": 8.5,
+      "Communication Services": 7.2,
+      "Industrials": 8.1,
+      "Consumer Staples": 6.5,
+      "Healthcare": 5.8,
+      "Materials": 6.2,
+      "Utilities": 4.8,
+      "Real Estate": 3.4
+    },
+    "region_allocation": {
+      "Asia Pacific": 65.2,
+      "Europe": 12.5,
+      "Latin America": 15.8,
+      "Other": 6.5
+    },
+    "top_holdings": [
+      { "ticker": "TSM", "name": "Taiwan Semiconductor", "weight": 5.8 },
+      { "ticker": "BABA", "name": "Alibaba Group", "weight": 2.8 },
+      { "ticker": "TCEHY", "name": "Tencent Holdings", "weight": 2.5 },
+      { "ticker": "RELIANCE", "name": "Reliance Industries", "weight": 1.8 },
+      { "ticker": "SAMSUNG", "name": "Samsung Electronics", "weight": 1.5 },
+      { "ticker": "PDD", "name": "PDD Holdings", "weight": 1.2 },
+      { "ticker": "ICBC", "name": "ICBC", "weight": 1.1 },
+      { "ticker": "CHINA CONST", "name": "China Construction Bank", "weight": 0.9 },
+      { "ticker": "VALE", "name": "Vale SA", "weight": 0.8 },
+      { "ticker": "PETROBRAS", "name": "Petrobras", "weight": 0.7 }
+    ]
+  },
+  {
+    "ticker": "EEM",
+    "name": "iShares MSCI Emerging Markets ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Technology": 17.8,
+      "Financials": 21.5,
+      "Energy": 8.8,
+      "Consumer Discretionary": 8.2,
+      "Communication Services": 7.5,
+      "Industrials": 8.5,
+      "Consumer Staples": 6.8,
+      "Healthcare": 5.5,
+      "Materials": 6.5,
+      "Utilities": 5.0,
+      "Real Estate": 3.9
+    },
+    "region_allocation": {
+      "Asia Pacific": 63.5,
+      "Latin America": 16.2,
+      "Europe": 11.8,
+      "Other": 8.5
+    },
+    "top_holdings": [
+      { "ticker": "TSM", "name": "Taiwan Semiconductor", "weight": 5.5 },
+      { "ticker": "BABA", "name": "Alibaba Group", "weight": 2.6 },
+      { "ticker": "TCEHY", "name": "Tencent Holdings", "weight": 2.3 },
+      { "ticker": "SAMSUNG", "name": "Samsung Electronics", "weight": 1.4 },
+      { "ticker": "RELIANCE", "name": "Reliance Industries", "weight": 1.6 },
+      { "ticker": "PDD", "name": "PDD Holdings", "weight": 1.1 },
+      { "ticker": "ICBC", "name": "ICBC", "weight": 1.0 },
+      { "ticker": "VALE", "name": "Vale SA", "weight": 0.8 },
+      { "ticker": "PETROBRAS", "name": "Petrobras", "weight": 0.7 },
+      { "ticker": "HDFCBANK", "name": "HDFC Bank", "weight": 0.6 }
+    ]
+  },
+  {
+    "ticker": "VEA",
+    "name": "Vanguard FTSE Developed Markets ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Financials": 20.5,
+      "Industrials": 15.2,
+      "Technology": 10.8,
+      "Healthcare": 12.8,
+      "Consumer Discretionary": 10.2,
+      "Communication Services": 5.5,
+      "Consumer Staples": 8.8,
+      "Energy": 5.8,
+      "Materials": 5.2,
+      "Utilities": 3.5,
+      "Real Estate": 1.7
+    },
+    "region_allocation": { "Europe": 72.5, "Asia Pacific": 22.5, "Other": 5.0 },
+    "top_holdings": [
+      { "ticker": "NVO", "name": "Novo Nordisk", "weight": 2.5 },
+      { "ticker": "ASML", "name": "ASML Holding", "weight": 2.0 },
+      { "ticker": "MC", "name": "LVMH", "weight": 1.7 },
+      { "ticker": "SAP", "name": "SAP SE", "weight": 1.3 },
+      { "ticker": "SHEL", "name": "Shell PLC", "weight": 1.1 },
+      { "ticker": "AZN", "name": "AstraZeneca", "weight": 1.0 },
+      { "ticker": "Nestle", "name": "Nestle SA", "weight": 0.9 },
+      { "ticker": "ROCHE", "name": "Roche Holding", "weight": 0.8 },
+      { "ticker": "Siemens", "name": "Siemens AG", "weight": 0.7 },
+      { "ticker": "Total", "name": "TotalEnergies", "weight": 0.6 }
+    ]
+  },
+  {
+    "ticker": "IEF",
+    "name": "iShares 7-10 Year Treasury Bond ETF",
+    "category": "Fixed Income",
+    "sector_allocation": { "Government": 100.0 },
+    "region_allocation": { "North America": 100.0 },
+    "top_holdings": [
+      { "ticker": "UST", "name": "US Treasury 7Y", "weight": 18.5 },
+      { "ticker": "UST", "name": "US Treasury 8Y", "weight": 17.2 },
+      { "ticker": "UST", "name": "US Treasury 9Y", "weight": 16.8 },
+      { "ticker": "UST", "name": "US Treasury 10Y", "weight": 47.5 }
+    ]
+  },
+  {
+    "ticker": "TLT",
+    "name": "iShares 20+ Year Treasury Bond ETF",
+    "category": "Fixed Income",
+    "sector_allocation": { "Government": 100.0 },
+    "region_allocation": { "North America": 100.0 },
+    "top_holdings": [
+      { "ticker": "UST", "name": "US Treasury 20Y", "weight": 12.5 },
+      { "ticker": "UST", "name": "US Treasury 25Y", "weight": 15.8 },
+      { "ticker": "UST", "name": "US Treasury 28Y", "weight": 18.2 },
+      { "ticker": "UST", "name": "US Treasury 30Y", "weight": 53.5 }
+    ]
+  },
+  {
+    "ticker": "LQD",
+    "name": "iShares iBoxx $ Investment Grade Corporate Bond ETF",
+    "category": "Fixed Income",
+    "sector_allocation": { "Corporate": 95.2, "Government": 2.5, "Other": 2.3 },
+    "region_allocation": { "North America": 92.5, "Europe": 5.8, "Other": 1.7 },
+    "top_holdings": [
+      { "ticker": "CORP", "name": "Apple Inc 3.05%", "weight": 2.1 },
+      { "ticker": "CORP", "name": "Microsoft Corp 3.12%", "weight": 1.8 },
+      { "ticker": "CORP", "name": "JPMorgan 4.25%", "weight": 1.5 },
+      { "ticker": "CORP", "name": "Goldman Sachs 3.75%", "weight": 1.2 },
+      { "ticker": "CORP", "name": "Bank of America 4.1%", "weight": 1.1 },
+      { "ticker": "CORP", "name": "Verizon 4.3%", "weight": 0.9 },
+      { "ticker": "CORP", "name": "AT&T 3.5%", "weight": 0.8 },
+      { "ticker": "CORP", "name": "Wells Fargo 3.8%", "weight": 0.7 },
+      { "ticker": "CORP", "name": "MetLife 4.0%", "weight": 0.6 },
+      { "ticker": "CORP", "name": "Prudential 3.6%", "weight": 0.5 }
+    ]
+  },
+  {
+    "ticker": "HYG",
+    "name": "iShares iBoxx $ High Yield Corporate Bond ETF",
+    "category": "Fixed Income",
+    "sector_allocation": { "Corporate": 92.5, "Other": 7.5 },
+    "region_allocation": { "North America": 88.5, "Europe": 8.2, "Other": 3.3 },
+    "top_holdings": [
+      { "ticker": "HY", "name": "Verizon Communications", "weight": 2.8 },
+      { "ticker": "HY", "name": "Energy Transfer", "weight": 2.2 },
+      { "ticker": "HY", "name": "Charter Communications", "weight": 1.8 },
+      { "ticker": "HY", "name": "Dell Technologies", "weight": 1.5 },
+      { "ticker": "HY", "name": "Sprint Capital", "weight": 1.2 },
+      { "ticker": "HY", "name": "Netflix Inc", "weight": 1.0 },
+      { "ticker": "HY", "name": "T-Mobile US", "weight": 0.9 },
+      { "ticker": "HY", "name": "Ford Motor", "weight": 0.8 },
+      { "ticker": "HY", "name": "Pacific Gas & Electric", "weight": 0.7 },
+      { "ticker": "HY", "name": "Altice USA", "weight": 0.6 }
+    ]
+  },
+  {
+    "ticker": "XLF",
+    "name": "Financial Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": {
+      "Banks": 32.5,
+      "Capital Markets": 22.8,
+      "Insurance": 18.2,
+      "Diversified Financials": 15.5,
+      "Consumer Finance": 6.2,
+      "Mortgage Finance": 4.8
+    },
+    "region_allocation": { "North America": 99.2, "Other": 0.8 },
+    "top_holdings": [
+      { "ticker": "BRK.B", "name": "Berkshire Hathaway", "weight": 12.5 },
+      { "ticker": "JPM", "name": "JPMorgan Chase", "weight": 9.8 },
+      { "ticker": "V", "name": "Visa Inc", "weight": 8.2 },
+      { "ticker": "MA", "name": "Mastercard", "weight": 6.5 },
+      { "ticker": "BAC", "name": "Bank of America", "weight": 5.8 },
+      { "ticker": "WFC", "name": "Wells Fargo", "weight": 3.2 },
+      { "ticker": "GS", "name": "Goldman Sachs", "weight": 3.0 },
+      { "ticker": "MS", "name": "Morgan Stanley", "weight": 2.8 },
+      { "ticker": "AXP", "name": "American Express", "weight": 2.5 },
+      { "ticker": "SCHW", "name": "Charles Schwab", "weight": 2.2 }
+    ]
+  },
+  {
+    "ticker": "XLK",
+    "name": "Technology Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": {
+      "Technology": 88.5,
+      "Communication Services": 5.2,
+      "Industrials": 3.5,
+      "Other": 2.8
+    },
+    "region_allocation": { "North America": 99.5, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 22.5 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 21.8 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 18.2 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 5.5 },
+      { "ticker": "AMD", "name": "Advanced Micro Devices", "weight": 3.2 },
+      { "ticker": "CRM", "name": "Salesforce Inc", "weight": 2.8 },
+      { "ticker": "ADBE", "name": "Adobe Inc", "weight": 2.1 },
+      { "ticker": "CSCO", "name": "Cisco Systems", "weight": 1.8 },
+      { "ticker": "ORCL", "name": "Oracle Corp", "weight": 1.5 },
+      { "ticker": "ACN", "name": "Accenture", "weight": 1.2 }
+    ]
+  },
+  {
+    "ticker": "XLV",
+    "name": "Health Care Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": {
+      "Pharmaceuticals": 38.5,
+      "Healthcare Equipment": 25.2,
+      "Biotechnology": 15.8,
+      "Healthcare Services": 12.5,
+      "Life Sciences Tools": 5.2,
+      "Other": 2.8
+    },
+    "region_allocation": { "North America": 97.5, "Europe": 1.8, "Other": 0.7 },
+    "top_holdings": [
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 11.2 },
+      { "ticker": "UNH", "name": "UnitedHealth Group", "weight": 9.8 },
+      { "ticker": "JNJ", "name": "Johnson & Johnson", "weight": 8.5 },
+      { "ticker": "ABBV", "name": "AbbVie Inc", "weight": 6.2 },
+      { "ticker": "MRK", "name": "Merck & Co", "weight": 5.8 },
+      { "ticker": "PFE", "name": "Pfizer Inc", "weight": 3.2 },
+      { "ticker": "TMO", "name": "Thermo Fisher", "weight": 2.8 },
+      { "ticker": "ABT", "name": "Abbott Labs", "weight": 2.5 },
+      { "ticker": "DHR", "name": "Danaher Corp", "weight": 2.2 },
+      { "ticker": "BMY", "name": "Bristol-Myers Squibb", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "XLE",
+    "name": "Energy Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": {
+      "Oil & Gas E&P": 35.2,
+      "Oil & Gas Integrated": 32.5,
+      "Oil & Gas Equipment": 15.8,
+      "Oil & Gas Refining": 10.5,
+      "Other": 6.0
+    },
+    "region_allocation": { "North America": 98.5, "Europe": 1.0, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "XOM", "name": "Exxon Mobil", "weight": 22.5 },
+      { "ticker": "CVX", "name": "Chevron Corp", "weight": 16.2 },
+      { "ticker": "COP", "name": "ConocoPhillips", "weight": 6.8 },
+      { "ticker": "SLB", "name": "Schlumberger", "weight": 4.5 },
+      { "ticker": "EOG", "name": "EOG Resources", "weight": 3.8 },
+      { "ticker": "MPC", "name": "Marathon Petroleum", "weight": 3.2 },
+      { "ticker": "PSX", "name": "Phillips 66", "weight": 2.8 },
+      { "ticker": "VLO", "name": "Valero Energy", "weight": 2.5 },
+      { "ticker": "PXD", "name": "Pioneer Natural", "weight": 2.2 },
+      { "ticker": "OXY", "name": "Occidental Petroleum", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "XLI",
+    "name": "Industrial Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": {
+      "Industrial Conglomerates": 22.5,
+      "Aerospace & Defense": 18.2,
+      "Machinery": 15.5,
+      "Professional Services": 12.8,
+      "Transportation": 10.5,
+      "Building Products": 8.5,
+      "Electrical Equipment": 6.2,
+      "Other": 5.8
+    },
+    "region_allocation": { "North America": 96.5, "Europe": 2.5, "Other": 1.0 },
+    "top_holdings": [
+      { "ticker": "GE", "name": "GE Aerospace", "weight": 8.5 },
+      { "ticker": "CAT", "name": "Caterpillar Inc", "weight": 6.2 },
+      { "ticker": "RTX", "name": "RTX Corp", "weight": 5.5 },
+      { "ticker": "UNP", "name": "Union Pacific", "weight": 4.8 },
+      { "ticker": "HON", "name": "Honeywell", "weight": 4.5 },
+      { "ticker": "BA", "name": "Boeing Co", "weight": 3.8 },
+      { "ticker": "DE", "name": "Deere & Co", "weight": 3.2 },
+      { "ticker": "LMT", "name": "Lockheed Martin", "weight": 2.8 },
+      { "ticker": "MMM", "name": "3M Co", "weight": 2.2 },
+      { "ticker": "GD", "name": "General Dynamics", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "XLP",
+    "name": "Consumer Staples Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": {
+      "Food Products": 28.5,
+      "Beverages": 22.2,
+      "Household Products": 18.5,
+      "Food Retail": 15.8,
+      "Personal Products": 8.2,
+      "Other": 6.8
+    },
+    "region_allocation": { "North America": 95.2, "Europe": 3.5, "Other": 1.3 },
+    "top_holdings": [
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 13.5 },
+      { "ticker": "KO", "name": "Coca-Cola Co", "weight": 9.8 },
+      { "ticker": "PEP", "name": "PepsiCo Inc", "weight": 8.5 },
+      { "ticker": "COST", "name": "Costco Wholesale", "weight": 7.2 },
+      { "ticker": "WMT", "name": "Walmart Inc", "weight": 5.8 },
+      { "ticker": "PM", "name": "Philip Morris", "weight": 4.5 },
+      { "ticker": "MO", "name": "Altria Group", "weight": 2.8 },
+      { "ticker": "CL", "name": "Colgate-Palmolive", "weight": 2.5 },
+      { "ticker": "KMB", "name": "Kimberly-Clark", "weight": 1.8 },
+      { "ticker": "GIS", "name": "General Mills", "weight": 1.5 }
+    ]
+  },
+  {
+    "ticker": "XLY",
+    "name": "Consumer Discretionary Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": {
+      "Broadline Retail": 32.5,
+      "Automobiles": 22.8,
+      "Hotels & Entertainment": 15.2,
+      "Home Improvement": 10.5,
+      "Media": 8.2,
+      "Other": 10.8
+    },
+    "region_allocation": { "North America": 98.8, "Other": 1.2 },
+    "top_holdings": [
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 22.5 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 18.2 },
+      { "ticker": "MCD", "name": "McDonald's Corp", "weight": 5.5 },
+      { "ticker": "LOW", "name": "Lowe's Cos", "weight": 4.2 },
+      { "ticker": "NKE", "name": "Nike Inc", "weight": 3.8 },
+      { "ticker": "SBUX", "name": "Starbucks Corp", "weight": 3.2 },
+      { "ticker": "TJX", "name": "TJX Companies", "weight": 2.8 },
+      { "ticker": "BKNG", "name": "Booking Holdings", "weight": 2.5 },
+      { "ticker": "CMG", "name": "Chipotle Mexican", "weight": 2.2 },
+      { "ticker": "ROST", "name": "Ross Stores", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "XLU",
+    "name": "Utilities Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": {
+      "Electric Utilities": 58.5,
+      "Multi-Utilities": 22.2,
+      "Water Utilities": 8.5,
+      "Independent Power": 6.8,
+      "Gas Utilities": 4.0
+    },
+    "region_allocation": { "North America": 99.5, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "NEE", "name": "NextEra Energy", "weight": 12.5 },
+      { "ticker": "SO", "name": "Southern Co", "weight": 6.8 },
+      { "ticker": "DUK", "name": "Duke Energy", "weight": 5.2 },
+      { "ticker": "D", "name": "Dominion Energy", "weight": 4.8 },
+      { "ticker": "AEP", "name": "American Electric", "weight": 4.2 },
+      { "ticker": "SRE", "name": "Sempra", "weight": 3.8 },
+      { "ticker": "EXC", "name": "Exelon Corp", "weight": 3.5 },
+      { "ticker": "XEL", "name": "Xcel Energy", "weight": 3.2 },
+      { "ticker": "ED", "name": "Consolidated Edison", "weight": 2.8 },
+      { "ticker": "WEC", "name": "WEC Energy", "weight": 2.5 }
+    ]
+  },
+  {
+    "ticker": "XLRE",
+    "name": "Real Estate Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": { "REITs": 82.5, "Real Estate Services": 12.8, "Other": 4.7 },
+    "region_allocation": { "North America": 99.2, "Other": 0.8 },
+    "top_holdings": [
+      { "ticker": "PLD", "name": "Prologis Inc", "weight": 12.5 },
+      { "ticker": "AMT", "name": "American Tower", "weight": 8.2 },
+      { "ticker": "EQIX", "name": "Equinix Inc", "weight": 6.5 },
+      { "ticker": "PSA", "name": "Public Storage", "weight": 5.2 },
+      { "ticker": "O", "name": "Realty Income", "weight": 4.8 },
+      { "ticker": "SPG", "name": "Simon Property", "weight": 3.5 },
+      { "ticker": "CCI", "name": "Crown Castle", "weight": 3.2 },
+      { "ticker": "DLR", "name": "Digital Realty", "weight": 2.8 },
+      { "ticker": "WELL", "name": "Welltower Inc", "weight": 2.5 },
+      { "ticker": "AVB", "name": "AvalonBay", "weight": 2.2 }
+    ]
+  },
+  {
+    "ticker": "XLB",
+    "name": "Materials Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": {
+      "Chemicals": 32.5,
+      "Construction Materials": 22.8,
+      "Metals & Mining": 18.5,
+      "Containers & Packaging": 12.2,
+      "Paper & Forest Products": 8.5,
+      "Other": 5.5
+    },
+    "region_allocation": { "North America": 95.5, "Europe": 3.2, "Other": 1.3 },
+    "top_holdings": [
+      { "ticker": "LIN", "name": "Linde PLC", "weight": 18.5 },
+      { "ticker": "APD", "name": "Air Products", "weight": 6.2 },
+      { "ticker": "SHW", "name": "Sherwin-Williams", "weight": 5.8 },
+      { "ticker": "ECL", "name": "Ecolab Inc", "weight": 4.5 },
+      { "ticker": "FCX", "name": "Freeport-McMoRan", "weight": 4.2 },
+      { "ticker": "NEM", "name": "Newmont Corp", "weight": 3.8 },
+      { "ticker": "NUE", "name": "Nucor Corp", "weight": 3.2 },
+      { "ticker": "DOW", "name": "Dow Inc", "weight": 2.8 },
+      { "ticker": "DD", "name": "DuPont de Nemours", "weight": 2.5 },
+      { "ticker": "PPG", "name": "PPG Industries", "weight": 2.2 }
+    ]
+  },
+  {
+    "ticker": "XLC",
+    "name": "Communication Services Select Sector SPDR Fund",
+    "category": "Sector",
+    "sector_allocation": {
+      "Interactive Media": 42.5,
+      "Media & Entertainment": 32.2,
+      "Telecom Services": 25.3
+    },
+    "region_allocation": { "North America": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "META", "name": "Meta Platforms", "weight": 22.5 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 21.2 },
+      { "ticker": "NFLX", "name": "Netflix Inc", "weight": 10.5 },
+      { "ticker": "DIS", "name": "Walt Disney", "weight": 5.8 },
+      { "ticker": "TMUS", "name": "T-Mobile US", "weight": 5.2 },
+      { "ticker": "VZ", "name": "Verizon Communications", "weight": 4.8 },
+      { "ticker": "T", "name": "AT&T Inc", "weight": 4.5 },
+      { "ticker": "CMCSA", "name": "Comcast Corp", "weight": 3.8 },
+      { "ticker": "CHTR", "name": "Charter Communications", "weight": 2.5 },
+      { "ticker": "EA", "name": "Electronic Arts", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "ARKK",
+    "name": "ARK Innovation ETF",
+    "category": "Thematic",
+    "sector_allocation": {
+      "Biotechnology": 22.5,
+      "Software": 28.2,
+      "Electronics": 18.5,
+      "Internet Media": 15.2,
+      "Other": 15.6
+    },
+    "region_allocation": { "North America": 92.5, "Asia Pacific": 5.2, "Other": 2.3 },
+    "top_holdings": [
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 15.2 },
+      { "ticker": "COIN", "name": "Coinbase Global", "weight": 12.5 },
+      { "ticker": "ROKU", "name": "Roku Inc", "weight": 8.8 },
+      { "ticker": "SQ", "name": "Block Inc", "weight": 7.2 },
+      { "ticker": "PATH", "name": "UiPath Inc", "weight": 5.5 },
+      { "ticker": "DKNG", "name": "DraftKings", "weight": 4.8 },
+      { "ticker": "HOOD", "name": "Robinhood Markets", "weight": 4.2 },
+      { "ticker": "RKLB", "name": "Rocket Lab USA", "weight": 3.5 },
+      { "ticker": "TWLO", "name": "Twilio Inc", "weight": 3.2 },
+      { "ticker": "U", "name": "Unity Software", "weight": 2.8 }
+    ]
+  },
+  {
+    "ticker": "SMH",
+    "name": "VanEck Semiconductor ETF",
+    "category": "Sector",
+    "sector_allocation": { "Semiconductors": 95.2, "Semiconductor Equipment": 4.8 },
+    "region_allocation": { "North America": 62.5, "Asia Pacific": 32.8, "Europe": 4.7 },
+    "top_holdings": [
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 20.5 },
+      { "ticker": "TSM", "name": "Taiwan Semiconductor", "weight": 12.2 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 10.8 },
+      { "ticker": "AMD", "name": "Advanced Micro Devices", "weight": 8.5 },
+      { "ticker": "ASML", "name": "ASML Holding", "weight": 7.2 },
+      { "ticker": "QCOM", "name": "Qualcomm Inc", "weight": 5.8 },
+      { "ticker": "TXN", "name": "Texas Instruments", "weight": 5.2 },
+      { "ticker": "AMAT", "name": "Applied Materials", "weight": 4.5 },
+      { "ticker": "INTC", "name": "Intel Corp", "weight": 3.8 },
+      { "ticker": "MU", "name": "Micron Technology", "weight": 3.5 }
+    ]
+  },
+  {
+    "ticker": "SOXX",
+    "name": "iShares Semiconductor ETF",
+    "category": "Sector",
+    "sector_allocation": { "Semiconductors": 92.5, "Software": 4.2, "Other": 3.3 },
+    "region_allocation": { "North America": 58.5, "Asia Pacific": 35.2, "Europe": 6.3 },
+    "top_holdings": [
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 10.2 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 9.5 },
+      { "ticker": "AMD", "name": "Advanced Micro Devices", "weight": 8.8 },
+      { "ticker": "TXN", "name": "Texas Instruments", "weight": 7.2 },
+      { "ticker": "QCOM", "name": "Qualcomm Inc", "weight": 6.5 },
+      { "ticker": "AMAT", "name": "Applied Materials", "weight": 5.8 },
+      { "ticker": "INTC", "name": "Intel Corp", "weight": 5.2 },
+      { "ticker": "MU", "name": "Micron Technology", "weight": 4.8 },
+      { "ticker": "ADI", "name": "Analog Devices", "weight": 4.2 },
+      { "ticker": "LRCX", "name": "Lam Research", "weight": 3.8 }
+    ]
+  },
+  {
+    "ticker": "IBB",
+    "name": "iShares Biotechnology ETF",
+    "category": "Sector",
+    "sector_allocation": {
+      "Biotechnology": 78.5,
+      "Pharmaceuticals": 15.2,
+      "Life Sciences Tools": 4.8,
+      "Other": 1.5
+    },
+    "region_allocation": { "North America": 92.5, "Europe": 5.8, "Other": 1.7 },
+    "top_holdings": [
+      { "ticker": "AMGN", "name": "Amgen Inc", "weight": 8.5 },
+      { "ticker": "GILD", "name": "Gilead Sciences", "weight": 6.2 },
+      { "ticker": "VRTX", "name": "Vertex Pharmaceuticals", "weight": 5.8 },
+      { "ticker": "REGN", "name": "Regeneron Pharma", "weight": 5.2 },
+      { "ticker": "MRNA", "name": "Moderna Inc", "weight": 4.5 },
+      { "ticker": "BIIB", "name": "Biogen Inc", "weight": 3.8 },
+      { "ticker": "ALNY", "name": "Alnylam Pharma", "weight": 3.2 },
+      { "ticker": "SGEN", "name": "Seagen Inc", "weight": 2.8 },
+      { "ticker": "BMRN", "name": "BioMarin Pharma", "weight": 2.5 },
+      { "ticker": "EXEL", "name": "Exelixis Inc", "weight": 2.2 }
+    ]
+  },
+  {
+    "ticker": "VUG",
+    "name": "Vanguard Growth ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 52.5,
+      "Consumer Discretionary": 15.2,
+      "Communication Services": 12.8,
+      "Healthcare": 8.5,
+      "Industrials": 5.8,
+      "Other": 5.2
+    },
+    "region_allocation": { "North America": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 12.5 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 11.8 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 10.5 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 6.8 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 4.5 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 3.8 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 3.2 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 2.8 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 2.5 },
+      { "ticker": "NFLX", "name": "Netflix Inc", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "VTV",
+    "name": "Vanguard Value ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Financials": 22.5,
+      "Healthcare": 14.8,
+      "Industrials": 12.2,
+      "Consumer Staples": 10.5,
+      "Energy": 8.8,
+      "Utilities": 8.2,
+      "Technology": 8.5,
+      "Communication Services": 5.2,
+      "Materials": 5.8,
+      "Real Estate": 3.5
+    },
+    "region_allocation": { "North America": 98.2, "Other": 1.8 },
+    "top_holdings": [
+      { "ticker": "BRK.B", "name": "Berkshire Hathaway", "weight": 4.5 },
+      { "ticker": "JPM", "name": "JPMorgan Chase", "weight": 3.2 },
+      { "ticker": "UNH", "name": "UnitedHealth Group", "weight": 2.8 },
+      { "ticker": "V", "name": "Visa Inc", "weight": 2.5 },
+      { "ticker": "XOM", "name": "Exxon Mobil", "weight": 2.2 },
+      { "ticker": "JNJ", "name": "Johnson & Johnson", "weight": 2.0 },
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 1.8 },
+      { "ticker": "MA", "name": "Mastercard", "weight": 1.5 },
+      { "ticker": "HD", "name": "Home Depot", "weight": 1.2 },
+      { "ticker": "CVX", "name": "Chevron Corp", "weight": 1.0 }
+    ]
+  },
+  {
+    "ticker": "VB",
+    "name": "Vanguard Small-Cap ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Industrials": 18.5,
+      "Financials": 16.2,
+      "Technology": 14.8,
+      "Healthcare": 15.5,
+      "Consumer Discretionary": 12.2,
+      "Materials": 6.5,
+      "Energy": 5.2,
+      "Communication Services": 4.8,
+      "Real Estate": 3.5,
+      "Consumer Staples": 2.8
+    },
+    "region_allocation": { "North America": 99.5, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "CARG", "name": "Cargurus Inc", "weight": 1.2 },
+      { "ticker": "CW", "name": "Curtiss-Wright", "weight": 0.9 },
+      { "ticker": "POWL", "name": "Powell Industries", "weight": 0.8 },
+      { "ticker": "ARCB", "name": "ArcBest Corp", "weight": 0.7 },
+      { "ticker": "UFPT", "name": "UFP Technologies", "weight": 0.7 },
+      { "ticker": "KLIC", "name": "Kulicke & Soffa", "weight": 0.6 },
+      { "ticker": "CALX", "name": "Calix Inc", "weight": 0.6 },
+      { "ticker": "ENS", "name": "EnerSys", "weight": 0.5 },
+      { "ticker": "NHC", "name": "National HealthCare", "weight": 0.5 },
+      { "ticker": "STRL", "name": "Sterling Infrastructure", "weight": 0.5 }
+    ]
+  },
+  {
+    "ticker": "VO",
+    "name": "Vanguard Mid-Cap ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 22.5,
+      "Industrials": 16.8,
+      "Healthcare": 14.5,
+      "Financials": 13.2,
+      "Consumer Discretionary": 12.5,
+      "Communication Services": 6.2,
+      "Materials": 5.8,
+      "Energy": 4.2,
+      "Real Estate": 2.8,
+      "Other": 1.5
+    },
+    "region_allocation": { "North America": 99.2, "Other": 0.8 },
+    "top_holdings": [
+      { "ticker": "MSTR", "name": "MicroStrategy", "weight": 2.8 },
+      { "ticker": "CZR", "name": "Caesars Entertainment", "weight": 1.5 },
+      { "ticker": "WW", "name": "Warrior Met Coal", "weight": 1.2 },
+      { "ticker": "ONTO", "name": "Onto Innovation", "weight": 1.1 },
+      { "ticker": "CE", "name": "Celanese Corp", "weight": 1.0 },
+      { "ticker": "CROX", "name": "Crocs Inc", "weight": 0.9 },
+      { "ticker": "SMCI", "name": "Super Micro Computer", "weight": 0.8 },
+      { "ticker": "TMDX", "name": "TransMedics", "weight": 0.8 },
+      { "ticker": "LULU", "name": "Lululemon Athletica", "weight": 0.7 },
+      { "ticker": "ALSN", "name": "Allison Transmission", "weight": 0.7 }
+    ]
+  },
+  {
+    "ticker": "DIA",
+    "name": "SPDR Dow Jones Industrial Average ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Healthcare": 18.5,
+      "Financials": 16.2,
+      "Technology": 15.8,
+      "Industrials": 14.5,
+      "Consumer Discretionary": 12.2,
+      "Communication Services": 6.5,
+      "Consumer Staples": 5.8,
+      "Energy": 5.2,
+      "Utilities": 3.5,
+      "Materials": 1.8
+    },
+    "region_allocation": { "North America": 99.5, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "UNH", "name": "UnitedHealth Group", "weight": 12.5 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 6.8 },
+      { "ticker": "GS", "name": "Goldman Sachs", "weight": 5.5 },
+      { "ticker": "AMGN", "name": "Amgen Inc", "weight": 5.2 },
+      { "ticker": "CAT", "name": "Caterpillar Inc", "weight": 4.8 },
+      { "ticker": "HD", "name": "Home Depot", "weight": 4.2 },
+      { "ticker": "SHW", "name": "Sherwin-Williams", "weight": 3.8 },
+      { "ticker": "CRM", "name": "Salesforce Inc", "weight": 3.5 },
+      { "ticker": "MCD", "name": "McDonald's Corp", "weight": 3.2 },
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 2.8 }
+    ]
+  },
+  {
+    "ticker": "IWM",
+    "name": "iShares Russell 2000 ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Healthcare": 16.5,
+      "Financials": 15.8,
+      "Industrials": 15.2,
+      "Technology": 14.5,
+      "Consumer Discretionary": 12.2,
+      "Materials": 7.5,
+      "Energy": 5.8,
+      "Real Estate": 5.2,
+      "Communication Services": 4.2,
+      "Consumer Staples": 3.1
+    },
+    "region_allocation": { "North America": 99.8, "Other": 0.2 },
+    "top_holdings": [
+      { "ticker": "SMCI", "name": "Super Micro Computer", "weight": 0.8 },
+      { "ticker": "MSTR", "name": "MicroStrategy", "weight": 0.7 },
+      { "ticker": "CARG", "name": "Cargurus Inc", "weight": 0.5 },
+      { "ticker": "CW", "name": "Curtiss-Wright", "weight": 0.4 },
+      { "ticker": "POWL", "name": "Powell Industries", "weight": 0.4 },
+      { "ticker": "ARCB", "name": "ArcBest Corp", "weight": 0.3 },
+      { "ticker": "UFPT", "name": "UFP Technologies", "weight": 0.3 },
+      { "ticker": "KLIC", "name": "Kulicke & Soffa", "weight": 0.3 },
+      { "ticker": "CALX", "name": "Calix Inc", "weight": 0.3 },
+      { "ticker": "ENS", "name": "EnerSys", "weight": 0.3 }
+    ]
+  },
+  {
+    "ticker": "QQQM",
+    "name": "Invesco NASDAQ 100 ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 57.8,
+      "Consumer Discretionary": 16.5,
+      "Communication Services": 9.2,
+      "Healthcare": 6.5,
+      "Industrials": 4.5,
+      "Consumer Staples": 2.8,
+      "Other": 2.7
+    },
+    "region_allocation": { "North America": 97.8, "Other": 2.2 },
+    "top_holdings": [
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 9.0 },
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 8.2 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 7.5 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 5.0 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 4.1 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 3.7 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 3.4 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 3.1 },
+      { "ticker": "COST", "name": "Costco Wholesale", "weight": 2.3 },
+      { "ticker": "NFLX", "name": "Netflix Inc", "weight": 2.0 }
+    ]
+  },
+  {
+    "ticker": "SCHD",
+    "name": "Schwab U.S. Dividend Equity ETF",
+    "category": "Income",
+    "sector_allocation": {
+      "Financials": 18.5,
+      "Healthcare": 15.2,
+      "Industrials": 14.8,
+      "Consumer Staples": 12.5,
+      "Technology": 10.2,
+      "Communication Services": 8.5,
+      "Energy": 7.8,
+      "Materials": 5.5,
+      "Utilities": 4.2,
+      "Consumer Discretionary": 2.8
+    },
+    "region_allocation": { "North America": 99.2, "Other": 0.8 },
+    "top_holdings": [
+      { "ticker": "TROW", "name": "T. Rowe Price", "weight": 4.5 },
+      { "ticker": "AFL", "name": "Aflac Inc", "weight": 3.8 },
+      { "ticker": "CVX", "name": "Chevron Corp", "weight": 3.5 },
+      { "ticker": "PEP", "name": "PepsiCo Inc", "weight": 3.2 },
+      { "ticker": "KO", "name": "Coca-Cola Co", "weight": 3.0 },
+      { "ticker": "ABBV", "name": "AbbVie Inc", "weight": 2.8 },
+      { "ticker": "O", "name": "Realty Income", "weight": 2.5 },
+      { "ticker": "AMCR", "name": "Amcor PLC", "weight": 2.2 },
+      { "ticker": "HRL", "name": "Hormel Foods", "weight": 2.0 },
+      { "ticker": "XOM", "name": "Exxon Mobil", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "VYM",
+    "name": "Vanguard High Dividend Yield ETF",
+    "category": "Income",
+    "sector_allocation": {
+      "Financials": 20.5,
+      "Healthcare": 14.2,
+      "Industrials": 13.8,
+      "Consumer Staples": 12.5,
+      "Technology": 10.8,
+      "Communication Services": 8.5,
+      "Energy": 7.2,
+      "Materials": 5.5,
+      "Utilities": 4.8,
+      "Consumer Discretionary": 2.2
+    },
+    "region_allocation": { "North America": 95.5, "Europe": 3.2, "Other": 1.3 },
+    "top_holdings": [
+      { "ticker": "JPM", "name": "JPMorgan Chase", "weight": 4.2 },
+      { "ticker": "UNH", "name": "UnitedHealth Group", "weight": 3.5 },
+      { "ticker": "V", "name": "Visa Inc", "weight": 3.2 },
+      { "ticker": "MA", "name": "Mastercard", "weight": 2.8 },
+      { "ticker": "JNJ", "name": "Johnson & Johnson", "weight": 2.5 },
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 2.2 },
+      { "ticker": "XOM", "name": "Exxon Mobil", "weight": 2.0 },
+      { "ticker": "HD", "name": "Home Depot", "weight": 1.8 },
+      { "ticker": "CVX", "name": "Chevron Corp", "weight": 1.5 },
+      { "ticker": "BAC", "name": "Bank of America", "weight": 1.2 }
+    ]
+  },
+  {
+    "ticker": "NOBL",
+    "name": "ProShares S&P 500 Dividend Aristocrats ETF",
+    "category": "Income",
+    "sector_allocation": {
+      "Healthcare": 16.5,
+      "Industrials": 15.2,
+      "Consumer Staples": 14.8,
+      "Materials": 12.5,
+      "Financials": 10.8,
+      "Technology": 8.5,
+      "Consumer Discretionary": 8.2,
+      "Energy": 6.5,
+      "Utilities": 4.2,
+      "Communication Services": 2.8
+    },
+    "region_allocation": { "North America": 99.5, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "ABBV", "name": "AbbVie Inc", "weight": 4.2 },
+      { "ticker": "JNJ", "name": "Johnson & Johnson", "weight": 3.8 },
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 3.5 },
+      { "ticker": "KO", "name": "Coca-Cola Co", "weight": 3.2 },
+      { "ticker": "PEP", "name": "PepsiCo Inc", "weight": 2.8 },
+      { "ticker": "MMM", "name": "3M Co", "weight": 2.5 },
+      { "ticker": "CL", "name": "Colgate-Palmolive", "weight": 2.2 },
+      { "ticker": "EMR", "name": "Emerson Electric", "weight": 1.8 },
+      { "ticker": "ITW", "name": "Illinois Tool Works", "weight": 1.5 },
+      { "ticker": "GPC", "name": "Genuine Parts", "weight": 1.2 }
+    ]
+  },
+  {
+    "ticker": "SPHD",
+    "name": "Invesco S&P 500 High Dividend Low Volatility ETF",
+    "category": "Income",
+    "sector_allocation": {
+      "Utilities": 22.5,
+      "Consumer Staples": 18.2,
+      "Real Estate": 15.5,
+      "Healthcare": 12.8,
+      "Financials": 10.5,
+      "Industrials": 8.2,
+      "Energy": 6.5,
+      "Materials": 3.2,
+      "Communication Services": 2.6
+    },
+    "region_allocation": { "North America": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "O", "name": "Realty Income", "weight": 4.2 },
+      { "ticker": "KO", "name": "Coca-Cola Co", "weight": 3.8 },
+      { "ticker": "PEP", "name": "PepsiCo Inc", "weight": 3.5 },
+      { "ticker": "NEE", "name": "NextEra Energy", "weight": 3.2 },
+      { "ticker": "SO", "name": "Southern Co", "weight": 2.8 },
+      { "ticker": "T", "name": "AT&T Inc", "weight": 2.5 },
+      { "ticker": "VZ", "name": "Verizon Communications", "weight": 2.2 },
+      { "ticker": "DUK", "name": "Duke Energy", "weight": 2.0 },
+      { "ticker": "CL", "name": "Colgate-Palmolive", "weight": 1.8 },
+      { "ticker": "D", "name": "Dominion Energy", "weight": 1.5 }
+    ]
+  },
+  {
+    "ticker": "HDV",
+    "name": "iShares Core High Dividend ETF",
+    "category": "Income",
+    "sector_allocation": {
+      "Healthcare": 16.2,
+      "Energy": 14.5,
+      "Financials": 14.2,
+      "Consumer Staples": 13.8,
+      "Industrials": 12.5,
+      "Utilities": 10.5,
+      "Communication Services": 6.8,
+      "Real Estate": 5.5,
+      "Materials": 4.2,
+      "Consumer Discretionary": 1.8
+    },
+    "region_allocation": { "North America": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "JNJ", "name": "Johnson & Johnson", "weight": 5.2 },
+      { "ticker": "XOM", "name": "Exxon Mobil", "weight": 4.5 },
+      { "ticker": "ABBV", "name": "AbbVie Inc", "weight": 4.2 },
+      { "ticker": "JPM", "name": "JPMorgan Chase", "weight": 3.8 },
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 3.5 },
+      { "ticker": "KO", "name": "Coca-Cola Co", "weight": 3.2 },
+      { "ticker": "PEP", "name": "PepsiCo Inc", "weight": 2.8 },
+      { "ticker": "VZ", "name": "Verizon Communications", "weight": 2.5 },
+      { "ticker": "CVX", "name": "Chevron Corp", "weight": 2.2 },
+      { "ticker": "BMY", "name": "Bristol-Myers Squibb", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "RSP",
+    "name": "Invesco S&P 500 Equal Weight ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 14.5,
+      "Healthcare": 14.2,
+      "Financials": 14.5,
+      "Consumer Discretionary": 12.8,
+      "Industrials": 12.5,
+      "Communication Services": 5.8,
+      "Consumer Staples": 7.2,
+      "Energy": 5.5,
+      "Utilities": 5.2,
+      "Materials": 5.8,
+      "Real Estate": 2.0
+    },
+    "region_allocation": { "North America": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 0.5 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 0.5 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 0.5 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 0.5 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 0.5 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 0.5 },
+      { "ticker": "BRK.B", "name": "Berkshire Hathaway", "weight": 0.5 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 0.5 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 0.5 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 0.5 }
+    ]
+  },
+  {
+    "ticker": "QUAL",
+    "name": "iShares MSCI USA Quality Factor ETF",
+    "category": "Factor",
+    "sector_allocation": {
+      "Technology": 32.5,
+      "Healthcare": 18.2,
+      "Industrials": 15.5,
+      "Financials": 12.8,
+      "Communication Services": 6.5,
+      "Consumer Discretionary": 5.8,
+      "Other": 8.7
+    },
+    "region_allocation": { "North America": 99.2, "Other": 0.8 },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 8.5 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 8.2 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 7.5 },
+      { "ticker": "UNH", "name": "UnitedHealth Group", "weight": 5.2 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 4.8 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 3.5 },
+      { "ticker": "HD", "name": "Home Depot", "weight": 2.8 },
+      { "ticker": "V", "name": "Visa Inc", "weight": 2.5 },
+      { "ticker": "MA", "name": "Mastercard", "weight": 2.2 },
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "MTUM",
+    "name": "iShares MSCI USA Momentum Factor ETF",
+    "category": "Factor",
+    "sector_allocation": {
+      "Technology": 42.5,
+      "Healthcare": 15.2,
+      "Communication Services": 12.8,
+      "Industrials": 10.5,
+      "Consumer Discretionary": 8.2,
+      "Financials": 5.5,
+      "Other": 5.3
+    },
+    "region_allocation": { "North America": 99.5, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 12.5 },
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 8.8 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 8.2 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 5.5 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 4.8 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 3.5 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 3.2 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 2.8 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 2.5 },
+      { "ticker": "NFLX", "name": "Netflix Inc", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "VLUE",
+    "name": "iShares MSCI USA Value Factor ETF",
+    "category": "Factor",
+    "sector_allocation": {
+      "Financials": 22.5,
+      "Technology": 16.2,
+      "Healthcare": 14.8,
+      "Industrials": 12.5,
+      "Energy": 10.5,
+      "Communication Services": 8.2,
+      "Consumer Discretionary": 6.5,
+      "Other": 8.8
+    },
+    "region_allocation": { "North America": 99.2, "Other": 0.8 },
+    "top_holdings": [
+      { "ticker": "INTC", "name": "Intel Corp", "weight": 3.2 },
+      { "ticker": "CSCO", "name": "Cisco Systems", "weight": 2.8 },
+      { "ticker": "IBM", "name": "IBM Corp", "weight": 2.5 },
+      { "ticker": "BAC", "name": "Bank of America", "weight": 2.2 },
+      { "ticker": "CVX", "name": "Chevron Corp", "weight": 2.0 },
+      { "ticker": "XOM", "name": "Exxon Mobil", "weight": 1.8 },
+      { "ticker": "VZ", "name": "Verizon Communications", "weight": 1.5 },
+      { "ticker": "T", "name": "AT&T Inc", "weight": 1.2 },
+      { "ticker": "WFC", "name": "Wells Fargo", "weight": 1.0 },
+      { "ticker": "PFE", "name": "Pfizer Inc", "weight": 0.8 }
+    ]
+  },
+  {
+    "ticker": "USMV",
+    "name": "iShares MSCI USA Min Volatility ETF",
+    "category": "Factor",
+    "sector_allocation": {
+      "Healthcare": 20.5,
+      "Technology": 16.2,
+      "Financials": 14.8,
+      "Consumer Staples": 14.2,
+      "Industrials": 10.5,
+      "Communication Services": 6.8,
+      "Utilities": 6.5,
+      "Real Estate": 5.2,
+      "Energy": 3.2,
+      "Other": 2.1
+    },
+    "region_allocation": { "North America": 99.5, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "UNH", "name": "UnitedHealth Group", "weight": 5.5 },
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 4.8 },
+      { "ticker": "KO", "name": "Coca-Cola Co", "weight": 4.2 },
+      { "ticker": "PEP", "name": "PepsiCo Inc", "weight": 3.8 },
+      { "ticker": "JNJ", "name": "Johnson & Johnson", "weight": 3.5 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 3.2 },
+      { "ticker": "XOM", "name": "Exxon Mobil", "weight": 2.8 },
+      { "ticker": "V", "name": "Visa Inc", "weight": 2.5 },
+      { "ticker": "MA", "name": "Mastercard", "weight": 2.2 },
+      { "ticker": "ABBV", "name": "AbbVie Inc", "weight": 2.0 }
+    ]
+  },
+  {
+    "ticker": "BNDX",
+    "name": "Vanguard Total International Bond ETF",
+    "category": "Fixed Income",
+    "sector_allocation": {
+      "Government": 62.5,
+      "Corporate": 28.2,
+      "Supranational": 5.8,
+      "Other": 3.5
+    },
+    "region_allocation": {
+      "Europe": 52.5,
+      "Asia Pacific": 28.2,
+      "North America": 12.5,
+      "Other": 6.8
+    },
+    "top_holdings": [
+      { "ticker": "BOND", "name": "German Bund 10Y", "weight": 8.5 },
+      { "ticker": "BOND", "name": "Japan Govt 10Y", "weight": 6.2 },
+      { "ticker": "BOND", "name": "French OAT 10Y", "weight": 5.5 },
+      { "ticker": "BOND", "name": "UK Gilt 10Y", "weight": 4.8 },
+      { "ticker": "BOND", "name": "Italian BTP 10Y", "weight": 3.5 },
+      { "ticker": "BOND", "name": "Spanish Bonos 10Y", "weight": 2.8 },
+      { "ticker": "BOND", "name": "Canadian Govt 10Y", "weight": 2.5 },
+      { "ticker": "BOND", "name": "Australian Govt 10Y", "weight": 2.2 },
+      { "ticker": "BOND", "name": "Supranational Bond", "weight": 1.8 },
+      { "ticker": "BOND", "name": "Corporate EUR Bond", "weight": 1.5 }
+    ]
+  },
+  {
+    "ticker": "TIP",
+    "name": "iShares TIPS Bond ETF",
+    "category": "Fixed Income",
+    "sector_allocation": { "Government": 95.5, "TIPS": 4.5 },
+    "region_allocation": { "North America": 100.0 },
+    "top_holdings": [
+      { "ticker": "TIPS", "name": "US TIPS 5Y", "weight": 22.5 },
+      { "ticker": "TIPS", "name": "US TIPS 7Y", "weight": 18.2 },
+      { "ticker": "TIPS", "name": "US TIPS 10Y", "weight": 25.5 },
+      { "ticker": "TIPS", "name": "US TIPS 20Y", "weight": 18.8 },
+      { "ticker": "TIPS", "name": "US TIPS 30Y", "weight": 15.0 }
+    ]
+  },
+  {
+    "ticker": "VCSH",
+    "name": "Vanguard Short-Term Corporate Bond ETF",
+    "category": "Fixed Income",
+    "sector_allocation": { "Corporate": 92.5, "Government": 5.2, "Other": 2.3 },
+    "region_allocation": { "North America": 95.5, "Europe": 3.2, "Other": 1.3 },
+    "top_holdings": [
+      { "ticker": "CORP", "name": "Apple Inc 2.5%", "weight": 1.8 },
+      { "ticker": "CORP", "name": "Microsoft Corp 2.8%", "weight": 1.5 },
+      { "ticker": "CORP", "name": "JPMorgan 3.2%", "weight": 1.2 },
+      { "ticker": "CORP", "name": "Goldman Sachs 3.0%", "weight": 1.0 },
+      { "ticker": "CORP", "name": "Bank of America 3.5%", "weight": 0.8 },
+      { "ticker": "CORP", "name": "Verizon 3.8%", "weight": 0.7 },
+      { "ticker": "CORP", "name": "AT&T 2.9%", "weight": 0.6 },
+      { "ticker": "CORP", "name": "Wells Fargo 3.1%", "weight": 0.5 },
+      { "ticker": "CORP", "name": "MetLife 3.4%", "weight": 0.4 },
+      { "ticker": "CORP", "name": "Prudential 2.8%", "weight": 0.4 }
+    ]
+  },
+  {
+    "ticker": "VGSH",
+    "name": "Vanguard Short-Term Treasury ETF",
+    "category": "Fixed Income",
+    "sector_allocation": { "Government": 100.0 },
+    "region_allocation": { "North America": 100.0 },
+    "top_holdings": [
+      { "ticker": "UST", "name": "US Treasury 1Y", "weight": 25.5 },
+      { "ticker": "UST", "name": "US Treasury 2Y", "weight": 35.2 },
+      { "ticker": "UST", "name": "US Treasury 3Y", "weight": 22.8 },
+      { "ticker": "UST", "name": "US Treasury 5Y", "weight": 16.5 }
+    ]
+  },
+  {
+    "ticker": "EWT",
+    "name": "iShares MSCI Taiwan ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Technology": 72.5,
+      "Financials": 12.2,
+      "Industrials": 5.8,
+      "Energy": 3.5,
+      "Consumer Discretionary": 2.8,
+      "Materials": 1.8,
+      "Other": 1.4
+    },
+    "region_allocation": { "Asia Pacific": 100.0 },
+    "top_holdings": [
+      { "ticker": "TSM", "name": "Taiwan Semiconductor", "weight": 48.5 },
+      { "ticker": "MSI", "name": "MediaTek Inc", "weight": 5.2 },
+      { "ticker": "AUO", "name": "AU Optronics", "weight": 3.5 },
+      { "ticker": "DELTA", "name": "Delta Electronics", "weight": 2.8 },
+      { "ticker": "HONHAI", "name": "Hon Hai Precision", "weight": 2.5 },
+      { "ticker": "FORMOSA", "name": "Formosa Plastics", "weight": 1.8 },
+      { "ticker": "CATHAY", "name": "Cathay Financial", "weight": 1.5 },
+      { "ticker": "CTBC", "name": "CTBC Financial", "weight": 1.2 },
+      { "ticker": "MEGA", "name": "Mega Financial", "weight": 1.0 },
+      { "ticker": "UMC", "name": "UMC", "weight": 0.8 }
+    ]
+  },
+  {
+    "ticker": "EWJ",
+    "name": "iShares MSCI Japan ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Industrials": 22.5,
+      "Financials": 16.8,
+      "Consumer Discretionary": 15.2,
+      "Technology": 12.5,
+      "Materials": 8.5,
+      "Consumer Staples": 7.8,
+      "Healthcare": 5.5,
+      "Energy": 4.2,
+      "Communication Services": 3.8,
+      "Utilities": 2.2,
+      "Real Estate": 1.0
+    },
+    "region_allocation": { "Asia Pacific": 100.0 },
+    "top_holdings": [
+      { "ticker": "Toyota", "name": "Toyota Motor", "weight": 6.5 },
+      { "ticker": "Sony", "name": "Sony Group", "weight": 4.2 },
+      { "ticker": "Keyence", "name": "Keyence Corp", "weight": 3.8 },
+      { "ticker": "Hitachi", "name": "Hitachi Ltd", "weight": 3.2 },
+      { "ticker": "Mitsubishi", "name": "Mitsubishi UFJ", "weight": 2.8 },
+      { "ticker": "Tokyo Electron", "name": "Tokyo Electron", "weight": 2.5 },
+      { "ticker": "Recruit", "name": "Recruit Holdings", "weight": 2.2 },
+      { "ticker": "KDDI", "name": "KDDI Corp", "weight": 1.8 },
+      { "ticker": "NTT", "name": "NTT Data", "weight": 1.5 },
+      { "ticker": "Shiseido", "name": "Shiseido Co", "weight": 1.2 }
+    ]
+  },
+  {
+    "ticker": "EWZ",
+    "name": "iShares MSCI Brazil ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Financials": 25.5,
+      "Energy": 18.8,
+      "Materials": 15.2,
+      "Consumer Discretionary": 10.5,
+      "Industrials": 8.2,
+      "Utilities": 6.5,
+      "Healthcare": 5.2,
+      "Communication Services": 4.8,
+      "Consumer Staples": 3.2,
+      "Technology": 1.5
+    },
+    "region_allocation": { "Latin America": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "VALE", "name": "Vale SA", "weight": 12.5 },
+      { "ticker": "PETROBRAS", "name": "Petrobras", "weight": 10.2 },
+      { "ticker": "ITAU", "name": "Itau Unibanco", "weight": 7.5 },
+      { "ticker": "BBL", "name": "Banco Bradesco", "weight": 4.8 },
+      { "ticker": "BBAS", "name": "Banco do Brasil", "weight": 3.5 },
+      { "ticker": "AB InBev", "name": "AB InBev", "weight": 3.2 },
+      { "ticker": "WEG", "name": "WEG SA", "weight": 2.8 },
+      { "ticker": "SUZANO", "name": "Suzano Papel", "weight": 2.5 },
+      { "ticker": "RENT", "name": "Localiza Rent", "weight": 2.2 },
+      { "ticker": "RAIA", "name": "Hypera Pharma", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "INDA",
+    "name": "iShares MSCI India ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Financials": 22.5,
+      "Information Technology": 18.2,
+      "Consumer Discretionary": 14.5,
+      "Energy": 10.8,
+      "Materials": 8.5,
+      "Industrials": 8.2,
+      "Healthcare": 6.5,
+      "Consumer Staples": 5.8,
+      "Utilities": 3.2,
+      "Real Estate": 1.8
+    },
+    "region_allocation": { "Asia Pacific": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "RELIANCE", "name": "Reliance Industries", "weight": 9.2 },
+      { "ticker": "TCS", "name": "Tata Consultancy", "weight": 5.5 },
+      { "ticker": "HDFCBANK", "name": "HDFC Bank", "weight": 5.2 },
+      { "ticker": "INFY", "name": "Infosys Ltd", "weight": 4.8 },
+      { "ticker": "ICICIBANK", "name": "ICICI Bank", "weight": 4.2 },
+      { "ticker": "HINDUNILVR", "name": "Hindustan Unilever", "weight": 3.5 },
+      { "ticker": "ITC", "name": "ITC Ltd", "weight": 3.2 },
+      { "ticker": "SBIN", "name": "State Bank of India", "weight": 2.8 },
+      { "ticker": "BHARTIARTL", "name": "Bharti Airtel", "weight": 2.5 },
+      { "ticker": "LT", "name": "Larsen & Toubro", "weight": 2.2 }
+    ]
+  },
+  {
+    "ticker": "EWW",
+    "name": "iShares MSCI Mexico ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Financials": 22.5,
+      "Industrials": 16.8,
+      "Consumer Staples": 14.2,
+      "Consumer Discretionary": 12.5,
+      "Energy": 10.8,
+      "Materials": 8.5,
+      "Healthcare": 6.2,
+      "Utilities": 4.5,
+      "Communication Services": 2.5,
+      "Technology": 1.5
+    },
+    "region_allocation": { "Latin America": 100.0 },
+    "top_holdings": [
+      { "ticker": "GRUMA", "name": "Gruma SAB", "weight": 8.5 },
+      { "ticker": "FEMSA", "name": "Fomento Economico", "weight": 7.2 },
+      { "ticker": "AMX", "name": "America Movil", "weight": 6.5 },
+      { "ticker": "CEMEX", "name": "Cemex SAB", "weight": 5.8 },
+      { "ticker": "GMEXICO", "name": "Grupo Mexico", "weight": 4.5 },
+      { "ticker": "BIMBO", "name": "Grupo Bimbo", "weight": 3.8 },
+      { "ticker": "WALMEX", "name": "Walmart Mexico", "weight": 3.2 },
+      { "ticker": "GFNORTEO", "name": "Grupo Financiero", "weight": 2.8 },
+      { "ticker": "GAP", "name": "Grupo Aeroportuario", "weight": 2.2 },
+      { "ticker": "ASURION", "name": "Asurion", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "EWT",
+    "name": "iShares MSCI Taiwan ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Technology": 72.5,
+      "Financials": 12.2,
+      "Industrials": 5.8,
+      "Energy": 3.5,
+      "Consumer Discretionary": 2.8,
+      "Materials": 1.8,
+      "Other": 1.4
+    },
+    "region_allocation": { "Asia Pacific": 100.0 },
+    "top_holdings": [
+      { "ticker": "TSM", "name": "Taiwan Semiconductor", "weight": 48.5 },
+      { "ticker": "MSI", "name": "MediaTek Inc", "weight": 5.2 },
+      { "ticker": "AUO", "name": "AU Optronics", "weight": 3.5 },
+      { "ticker": "DELTA", "name": "Delta Electronics", "weight": 2.8 },
+      { "ticker": "HONHAI", "name": "Hon Hai Precision", "weight": 2.5 },
+      { "ticker": "FORMOSA", "name": "Formosa Plastics", "weight": 1.8 },
+      { "ticker": "CATHAY", "name": "Cathay Financial", "weight": 1.5 },
+      { "ticker": "CTBC", "name": "CTBC Financial", "weight": 1.2 },
+      { "ticker": "MEGA", "name": "Mega Financial", "weight": 1.0 },
+      { "ticker": "UMC", "name": "UMC", "weight": 0.8 }
+    ]
+  },
+  {
+    "ticker": "EWY",
+    "name": "iShares MSCI South Korea ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Technology": 38.5,
+      "Financials": 16.2,
+      "Industrials": 10.5,
+      "Consumer Discretionary": 8.8,
+      "Materials": 8.2,
+      "Energy": 6.5,
+      "Healthcare": 4.8,
+      "Communication Services": 3.5,
+      "Consumer Staples": 2.2,
+      "Utilities": 0.8
+    },
+    "region_allocation": { "Asia Pacific": 100.0 },
+    "top_holdings": [
+      { "ticker": "Samsung", "name": "Samsung Electronics", "weight": 22.5 },
+      { "ticker": "SK", "name": "SK Hynix", "weight": 6.8 },
+      { "ticker": "HYUNDAI", "name": "Hyundai Motor", "weight": 5.5 },
+      { "ticker": "SAMSUNG ELEC", "name": "Samsung SDI", "weight": 3.2 },
+      { "ticker": "LG", "name": "LG Chem", "weight": 2.8 },
+      { "ticker": "KIA", "name": "Kia Corp", "weight": 2.5 },
+      { "ticker": "NAVER", "name": "Naver Corp", "weight": 2.2 },
+      { "ticker": "KB", "name": "KB Financial", "weight": 1.8 },
+      { "ticker": "HANA", "name": "Hana Financial", "weight": 1.5 },
+      { "ticker": "SAMSUNG LIFE", "name": "Samsung Life", "weight": 1.2 }
+    ]
+  },
+  {
+    "ticker": "EPOL",
+    "name": "iShares MSCI Poland ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Financials": 32.5,
+      "Energy": 18.2,
+      "Industrials": 12.8,
+      "Materials": 10.5,
+      "Consumer Discretionary": 8.5,
+      "Healthcare": 5.8,
+      "Utilities": 5.2,
+      "Communication Services": 3.8,
+      "Consumer Staples": 2.2,
+      "Technology": 0.5
+    },
+    "region_allocation": { "Europe": 95.5, "Other": 4.5 },
+    "top_holdings": [
+      { "ticker": "PEKAO", "name": "Bank Pekao", "weight": 8.5 },
+      { "ticker": "KGHM", "name": "KGHM Polska", "weight": 7.2 },
+      { "ticker": "ORLEN", "name": "PKN Orlen", "weight": 6.5 },
+      { "ticker": "PZU", "name": "PZU SA", "weight": 5.2 },
+      { "ticker": "CDR", "name": "CD Projekt", "weight": 4.5 },
+      { "ticker": "ALLEGRO", "name": "Allegro.eu", "weight": 3.8 },
+      { "ticker": "PKO", "name": "PKO Bank", "weight": 3.2 },
+      { "ticker": "JSW", "name": "JSW SA", "weight": 2.8 },
+      { "ticker": "INGBSK", "name": "ING Bank Slaski", "weight": 2.2 },
+      { "ticker": "LOTOS", "name": "Grupa Lotos", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "THD",
+    "name": "iShares MSCI Thailand ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Financials": 28.5,
+      "Energy": 16.2,
+      "Industrials": 12.8,
+      "Consumer Discretionary": 10.5,
+      "Consumer Staples": 8.2,
+      "Materials": 7.5,
+      "Utilities": 5.8,
+      "Healthcare": 4.5,
+      "Communication Services": 3.8,
+      "Technology": 2.2
+    },
+    "region_allocation": { "Asia Pacific": 100.0 },
+    "top_holdings": [
+      { "ticker": "PTT", "name": "PTT PCL", "weight": 10.5 },
+      { "ticker": "SCB", "name": "Siam Commercial", "weight": 6.2 },
+      { "ticker": "KBANK", "name": "Kasikornbank", "weight": 5.5 },
+      { "ticker": "AOT", "name": "Airports of Thailand", "weight": 4.8 },
+      { "ticker": "GUNKUL", "name": "Gunkul Engineering", "weight": 3.5 },
+      { "ticker": "CPALL", "name": "CP All PCL", "weight": 3.2 },
+      { "ticker": "BDMS", "name": "Bangkok Dusit", "weight": 2.8 },
+      { "ticker": "CPF", "name": "Charoen Pokphand", "weight": 2.5 },
+      { "ticker": "EGCO", "name": "EGCO Group", "weight": 2.2 },
+      { "ticker": "INTUCH", "name": "Intouch Holdings", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "TUR",
+    "name": "iShares MSCI Turkey ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Financials": 32.5,
+      "Industrials": 15.2,
+      "Consumer Discretionary": 12.8,
+      "Energy": 10.5,
+      "Materials": 8.2,
+      "Healthcare": 6.5,
+      "Consumer Staples": 5.8,
+      "Utilities": 4.2,
+      "Communication Services": 2.5,
+      "Technology": 1.8
+    },
+    "region_allocation": { "Europe": 85.5, "Asia Pacific": 12.5, "Other": 2.0 },
+    "top_holdings": [
+      { "ticker": "GARAN", "name": "Garanti Bankasi", "weight": 8.5 },
+      { "ticker": "ASELS", "name": "Aselsan Elektronik", "weight": 6.2 },
+      { "ticker": "KCHOL", "name": "Koc Holding", "weight": 5.5 },
+      { "ticker": "SISE", "name": "Sisecam", "weight": 4.2 },
+      { "ticker": "BIMAS", "name": "BIM Magazalar", "weight": 3.8 },
+      { "ticker": "TUPRS", "name": "Tupras", "weight": 3.5 },
+      { "ticker": "THYAO", "name": "Turk Hava Yollari", "weight": 3.2 },
+      { "ticker": "EREGL", "name": "Eregli Demir", "weight": 2.8 },
+      { "ticker": "FROTO", "name": "Ford Otosan", "weight": 2.5 },
+      { "ticker": "SAHOL", "name": "Sabanci Holding", "weight": 2.2 }
+    ]
+  },
+  {
+    "ticker": "EZA",
+    "name": "iShares MSCI South Africa ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Financials": 28.5,
+      "Materials": 18.2,
+      "Consumer Discretionary": 12.5,
+      "Industrials": 10.8,
+      "Energy": 8.5,
+      "Healthcare": 6.2,
+      "Utilities": 5.8,
+      "Communication Services": 4.5,
+      "Technology": 3.2,
+      "Consumer Staples": 1.8
+    },
+    "region_allocation": { "Africa": 95.5, "Other": 4.5 },
+    "top_holdings": [
+      { "ticker": "Naspers", "name": "Naspers Ltd", "weight": 12.5 },
+      { "ticker": "AB_INBEV", "name": "AB InBev", "weight": 8.2 },
+      { "ticker": "ANGLO", "name": "Anglo American", "weight": 6.5 },
+      { "ticker": "SASOL", "name": "Sasol Ltd", "weight": 4.8 },
+      { "ticker": "FINBANK", "name": "FirstRand Bank", "weight": 3.5 },
+      { "ticker": "STANDART", "name": "Standard Bank", "weight": 3.2 },
+      { "ticker": "RMB", "name": "Rand Merchant Bank", "weight": 2.8 },
+      { "ticker": "MTN", "name": "MTN Group", "weight": 2.5 },
+      { "ticker": "VODACOM", "name": "Vodacom Group", "weight": 2.2 },
+      { "ticker": "DISCOVERY", "name": "Discovery Ltd", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "EIS",
+    "name": "iShares MSCI Israel ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Technology": 38.5,
+      "Financials": 18.2,
+      "Healthcare": 15.5,
+      "Industrials": 8.8,
+      "Consumer Discretionary": 6.2,
+      "Energy": 4.5,
+      "Materials": 3.2,
+      "Utilities": 2.5,
+      "Other": 2.6
+    },
+    "region_allocation": { "Middle East": 95.5, "Other": 4.5 },
+    "top_holdings": [
+      { "ticker": "CHKP", "name": "Check Point Software", "weight": 8.5 },
+      { "ticker": "NICE", "name": "NICE Ltd", "weight": 6.2 },
+      { "ticker": "TSEM", "name": "Tower Semiconductor", "weight": 5.5 },
+      { "ticker": "ELAL", "name": "El Al Israel Airlines", "weight": 4.2 },
+      { "ticker": "ICL", "name": "ICL Group", "weight": 3.8 },
+      { "ticker": "ZIM", "name": "ZIM Integrated", "weight": 3.5 },
+      { "ticker": "DPR", "name": "Delek Group", "weight": 2.8 },
+      { "ticker": "IAI", "name": "Israel Aerospace", "weight": 2.2 },
+      { "ticker": "PHR", "name": "Phase Holographic", "weight": 1.8 },
+      { "ticker": "ORB", "name": "Orbotix Inc", "weight": 1.2 }
+    ]
+  },
+  {
+    "ticker": "ILF",
+    "name": "iShares Latin America 40 ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Financials": 28.5,
+      "Energy": 18.2,
+      "Materials": 12.5,
+      "Consumer Discretionary": 8.5,
+      "Industrials": 8.2,
+      "Utilities": 6.5,
+      "Healthcare": 5.8,
+      "Communication Services": 5.2,
+      "Consumer Staples": 4.5,
+      "Technology": 3.2,
+      "Real Estate": 2.9
+    },
+    "region_allocation": { "Latin America": 100.0 },
+    "top_holdings": [
+      { "ticker": "VALE", "name": "Vale SA", "weight": 8.5 },
+      { "ticker": "PETROBRAS", "name": "Petrobras", "weight": 7.2 },
+      { "ticker": "ITAU", "name": "Itau Unibanco", "weight": 5.5 },
+      { "ticker": "BBL", "name": "Banco Bradesco", "weight": 3.8 },
+      { "ticker": "AMX", "name": "America Movil", "weight": 3.2 },
+      { "ticker": "BHP", "name": "BHP Group", "weight": 2.8 },
+      { "ticker": "SURGUT", "name": "Surgutneftegas", "weight": 2.5 },
+      { "ticker": "CEMEX", "name": "Cemex SAB", "weight": 2.2 },
+      { "ticker": "WDS", "name": "Woodside Energy", "weight": 1.8 },
+      { "ticker": "GGB", "name": "Gerdau SA", "weight": 1.5 }
+    ]
+  },
+  {
+    "ticker": "EWN",
+    "name": "iShares MSCI Netherlands ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Technology": 22.5,
+      "Financials": 18.2,
+      "Industrials": 16.5,
+      "Healthcare": 12.8,
+      "Consumer Discretionary": 8.5,
+      "Materials": 6.2,
+      "Energy": 5.5,
+      "Communication Services": 4.8,
+      "Consumer Staples": 3.2,
+      "Utilities": 1.8
+    },
+    "region_allocation": { "Europe": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "ASML", "name": "ASML Holding", "weight": 18.5 },
+      { "ticker": "ING", "name": "ING Groep", "weight": 6.2 },
+      { "ticker": "PHILIPS", "name": "Philips", "weight": 5.5 },
+      { "ticker": "UNILEVER", "name": "Unilever NV", "weight": 4.8 },
+      { "ticker": "SHELL", "name": "Shell PLC", "weight": 4.2 },
+      { "ticker": "RELX", "name": "RELX Group", "weight": 3.5 },
+      { "ticker": "AKZN", "name": "Akzo Nobel", "weight": 2.8 },
+      { "ticker": "WKL", "name": "Wolters Kluwer", "weight": 2.2 },
+      { "ticker": "IMCD", "name": "IMCD Group", "weight": 1.8 },
+      { "ticker": "ADYEN", "name": "Adyen NV", "weight": 1.5 }
+    ]
+  },
+  {
+    "ticker": "EWO",
+    "name": "iShares MSCI Austria ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Financials": 28.5,
+      "Industrials": 18.2,
+      "Energy": 12.5,
+      "Materials": 10.8,
+      "Healthcare": 8.5,
+      "Consumer Discretionary": 6.2,
+      "Utilities": 5.5,
+      "Technology": 4.8,
+      "Communication Services": 3.2,
+      "Consumer Staples": 1.8
+    },
+    "region_allocation": { "Europe": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "OMV", "name": "OMV AG", "weight": 10.5 },
+      { "ticker": "RAIFFEISEN", "name": "Raiffeisen Bank", "weight": 8.2 },
+      { "ticker": "WIEN", "name": "Wienerberger", "weight": 5.5 },
+      { "ticker": "VIE", "name": "Vienna Insurance", "weight": 4.8 },
+      { "ticker": "VERBUND", "name": "Verbund AG", "weight": 4.2 },
+      { "ticker": "ERSTE", "name": "Erste Group", "weight": 3.8 },
+      { "ticker": "MUV2", "name": "Muenchener Rueck", "weight": 2.5 },
+      { "ticker": "LIPO", "name": "Lipoid", "weight": 1.8 },
+      { "ticker": "DO&CO", "name": "DO&CO AG", "weight": 1.2 },
+      { "ticker": "PALFINGER", "name": "Palfinger AG", "weight": 0.8 }
+    ]
+  },
+  {
+    "ticker": "EWP",
+    "name": "iShares MSCI Spain ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Financials": 28.2,
+      "Industrials": 18.5,
+      "Energy": 12.8,
+      "Consumer Discretionary": 10.5,
+      "Healthcare": 8.2,
+      "Materials": 6.5,
+      "Utilities": 5.8,
+      "Communication Services": 4.5,
+      "Technology": 2.8,
+      "Consumer Staples": 2.2
+    },
+    "region_allocation": { "Europe": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "BBSR", "name": "Banco Santander", "weight": 12.5 },
+      { "ticker": "TEF", "name": "Telefonica", "weight": 6.2 },
+      { "ticker": "IBE", "name": "Iberdrola", "weight": 5.5 },
+      { "ticker": "REP", "name": "Repsol", "weight": 4.8 },
+      { "ticker": "ENDESA", "name": "Endesa", "weight": 3.5 },
+      { "ticker": "MAPFRE", "name": "Mapfre SA", "weight": 3.2 },
+      { "ticker": "BKT", "name": "Bankinter", "weight": 2.8 },
+      { "ticker": "GRF", "name": "Grifols", "weight": 2.2 },
+      { "ticker": "AENA", "name": "Aena SME", "weight": 1.8 },
+      { "ticker": "FERG", "name": "Ferrovial", "weight": 1.2 }
+    ]
+  },
+  {
+    "ticker": "EIRL",
+    "name": "iShares MSCI Ireland ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Technology": 32.5,
+      "Healthcare": 22.8,
+      "Industrials": 12.5,
+      "Financials": 10.8,
+      "Consumer Discretionary": 6.5,
+      "Energy": 4.2,
+      "Materials": 3.8,
+      "Communication Services": 3.2,
+      "Consumer Staples": 2.2,
+      "Other": 1.5
+    },
+    "region_allocation": { "Europe": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "DCC", "name": "DCC PLC", "weight": 8.5 },
+      { "ticker": "KRY", "name": "Kerry Group", "weight": 6.2 },
+      { "ticker": "CRH", "name": "CRH PLC", "weight": 5.5 },
+      { "ticker": "GPN", "name": "Global Payments", "weight": 4.8 },
+      { "ticker": "KWD", "name": "Kingspan", "weight": 3.5 },
+      { "ticker": "RYA", "name": "Ryanair", "weight": 3.2 },
+      { "ticker": "IBOC", "name": "Bank of Ireland", "weight": 2.8 },
+      { "ticker": "DGE", "name": "Diageo", "weight": 2.5 },
+      { "ticker": "ALK", "name": "Alkermes", "weight": 2.2 },
+      { "ticker": "INM", "name": "Inmateria", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "ENZL",
+    "name": "iShares MSCI New Zealand ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Financials": 28.5,
+      "Consumer Discretionary": 18.2,
+      "Industrials": 15.5,
+      "Healthcare": 10.8,
+      "Utilities": 8.5,
+      "Energy": 5.8,
+      "Materials": 5.2,
+      "Communication Services": 4.5,
+      "Technology": 2.2,
+      "Consumer Staples": 0.8
+    },
+    "region_allocation": { "Asia Pacific": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "Fisher", "name": "Fisher & Paykel", "weight": 8.5 },
+      { "ticker": "A2K", "name": "A2 Milk", "weight": 6.2 },
+      { "ticker": "XERO", "name": "Xero Ltd", "weight": 5.5 },
+      { "ticker": "INFRATL", "name": "Infratil", "weight": 4.8 },
+      { "ticker": "FLETCHER", "name": "Fletcher Building", "weight": 3.5 },
+      { "ticker": "MAINFREIGHT", "name": "Mainfreight", "weight": 3.2 },
+      { "ticker": "MERIDIAN", "name": "Meridian Energy", "weight": 2.8 },
+      { "ticker": "CONTACT", "name": "Contact Energy", "weight": 2.5 },
+      { "ticker": "SKY", "name": "Sky Network", "weight": 2.2 },
+      { "ticker": "EBOS", "name": "EBOS Group", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "EPU",
+    "name": "iShares MSCI Peru ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Materials": 32.5,
+      "Financials": 22.8,
+      "Energy": 18.5,
+      "Utilities": 8.2,
+      "Industrials": 6.5,
+      "Consumer Discretionary": 4.8,
+      "Healthcare": 3.2,
+      "Communication Services": 2.2,
+      "Consumer Staples": 1.0,
+      "Technology": 0.3
+    },
+    "region_allocation": { "Latin America": 100.0 },
+    "top_holdings": [
+      { "ticker": "FRESNILLO", "name": "Fresnillo PLC", "weight": 12.5 },
+      { "ticker": "SCOTIABANK", "name": "Scotiabank Peru", "weight": 8.2 },
+      { "ticker": "SOUTHERN", "name": "Southern Copper", "weight": 7.5 },
+      { "ticker": "VOLCAN", "name": "Volcan Compania", "weight": 5.8 },
+      { "ticker": "GRA", "name": "Graña y Montero", "weight": 4.5 },
+      { "ticker": "LIM", "name": "Lima Airport", "weight": 3.8 },
+      { "ticker": "CAS", "name": "Cementos Pacasmayo", "weight": 3.2 },
+      { "ticker": "INRETAIL", "name": "InRetail", "weight": 2.8 },
+      { "ticker": "REPSOL", "name": "Repsol Peru", "weight": 2.2 },
+      { "ticker": "BREPAC", "name": "BREPAC", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "EIS",
+    "name": "iShares MSCI Israel ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Technology": 38.5,
+      "Financials": 18.2,
+      "Healthcare": 15.5,
+      "Industrials": 8.8,
+      "Consumer Discretionary": 6.2,
+      "Energy": 4.5,
+      "Materials": 3.2,
+      "Utilities": 2.5,
+      "Other": 2.6
+    },
+    "region_allocation": { "Middle East": 95.5, "Other": 4.5 },
+    "top_holdings": [
+      { "ticker": "CHKP", "name": "Check Point Software", "weight": 8.5 },
+      { "ticker": "NICE", "name": "NICE Ltd", "weight": 6.2 },
+      { "ticker": "TSEM", "name": "Tower Semiconductor", "weight": 5.5 },
+      { "ticker": "ELAL", "name": "El Al Israel Airlines", "weight": 4.2 },
+      { "ticker": "ICL", "name": "ICL Group", "weight": 3.8 },
+      { "ticker": "ZIM", "name": "ZIM Integrated", "weight": 3.5 },
+      { "ticker": "DPR", "name": "Delek Group", "weight": 2.8 },
+      { "ticker": "IAI", "name": "Israel Aerospace", "weight": 2.2 },
+      { "ticker": "PHR", "name": "Phase Holographic", "weight": 1.8 },
+      { "ticker": "ORB", "name": "Orbotix Inc", "weight": 1.2 }
+    ]
+  },
+  {
+    "ticker": "EWM",
+    "name": "iShares MSCI Malaysia ETF",
+    "category": "Emerging Markets",
+    "sector_allocation": {
+      "Financials": 28.5,
+      "Technology": 22.2,
+      "Industrials": 12.8,
+      "Consumer Discretionary": 8.5,
+      "Energy": 6.2,
+      "Utilities": 5.8,
+      "Materials": 5.2,
+      "Healthcare": 4.8,
+      "Communication Services": 3.5,
+      "Consumer Staples": 2.5
+    },
+    "region_allocation": { "Asia Pacific": 100.0 },
+    "top_holdings": [
+      { "ticker": "MYX", "name": "Maybank", "weight": 12.5 },
+      { "ticker": "PCHEM", "name": "Petronas Chemical", "weight": 6.2 },
+      { "ticker": "AXIATA", "name": "Axiata Group", "weight": 4.5 },
+      { "ticker": "DIGI", "name": "DiGi Communications", "weight": 3.8 },
+      { "ticker": "TENAGA", "name": "Tenaga Nasional", "weight": 3.5 },
+      { "ticker": "IOICORP", "name": "IOI Corp", "weight": 3.2 },
+      { "ticker": "PBBANK", "name": "Public Bank", "weight": 2.8 },
+      { "ticker": "CAFG", "name": "CIMB Group", "weight": 2.5 },
+      { "ticker": "IHH", "name": "IHH Healthcare", "weight": 2.2 },
+      { "ticker": "TOPGLOV", "name": "Top Glove", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "EWNZ",
+    "name": "iShares MSCI New Zealand ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Financials": 28.5,
+      "Consumer Discretionary": 18.2,
+      "Industrials": 15.5,
+      "Healthcare": 10.8,
+      "Utilities": 8.5,
+      "Energy": 5.8,
+      "Materials": 5.2,
+      "Communication Services": 4.5,
+      "Technology": 2.2,
+      "Consumer Staples": 0.8
+    },
+    "region_allocation": { "Asia Pacific": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "Fisher", "name": "Fisher & Paykel", "weight": 8.5 },
+      { "ticker": "A2K", "name": "A2 Milk", "weight": 6.2 },
+      { "ticker": "XERO", "name": "Xero Ltd", "weight": 5.5 },
+      { "ticker": "INFRATL", "name": "Infratil", "weight": 4.8 },
+      { "ticker": "FLETCHER", "name": "Fletcher Building", "weight": 3.5 },
+      { "ticker": "MAINFREIGHT", "name": "Mainfreight", "weight": 3.2 },
+      { "ticker": "MERIDIAN", "name": "Meridian Energy", "weight": 2.8 },
+      { "ticker": "CONTACT", "name": "Contact Energy", "weight": 2.5 },
+      { "ticker": "SKY", "name": "Sky Network", "weight": 2.2 },
+      { "ticker": "EBOS", "name": "EBOS Group", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "EWO",
+    "name": "iShares MSCI Austria ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Financials": 28.5,
+      "Industrials": 18.2,
+      "Energy": 12.5,
+      "Materials": 10.8,
+      "Healthcare": 8.5,
+      "Consumer Discretionary": 6.2,
+      "Utilities": 5.5,
+      "Technology": 4.8,
+      "Communication Services": 3.2,
+      "Consumer Staples": 1.8
+    },
+    "region_allocation": { "Europe": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "OMV", "name": "OMV AG", "weight": 10.5 },
+      { "ticker": "RAIFFEISEN", "name": "Raiffeisen Bank", "weight": 8.2 },
+      { "ticker": "WIEN", "name": "Wienerberger", "weight": 5.5 },
+      { "ticker": "VIE", "name": "Vienna Insurance", "weight": 4.8 },
+      { "ticker": "VERBUND", "name": "Verbund AG", "weight": 4.2 },
+      { "ticker": "ERSTE", "name": "Erste Group", "weight": 3.8 },
+      { "ticker": "MUV2", "name": "Muenchener Rueck", "weight": 2.5 },
+      { "ticker": "LIPO", "name": "Lipoid", "weight": 1.8 },
+      { "ticker": "DO&CO", "name": "DO&CO AG", "weight": 1.2 },
+      { "ticker": "PALFINGER", "name": "Palfinger AG", "weight": 0.8 }
+    ]
+  },
+  {
+    "ticker": "SPGP",
+    "name": "Invesco S&P 500 GARP ETF",
+    "category": "Factor",
+    "sector_allocation": {
+      "Technology": 35.5,
+      "Healthcare": 18.2,
+      "Industrials": 14.5,
+      "Consumer Discretionary": 12.8,
+      "Communication Services": 6.5,
+      "Financials": 5.8,
+      "Other": 6.7
+    },
+    "region_allocation": { "North America": 99.5, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 6.5 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 6.2 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 5.8 },
+      { "ticker": "UNH", "name": "UnitedHealth Group", "weight": 4.5 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 4.2 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 3.5 },
+      { "ticker": "HD", "name": "Home Depot", "weight": 2.8 },
+      { "ticker": "V", "name": "Visa Inc", "weight": 2.5 },
+      { "ticker": "MA", "name": "Mastercard", "weight": 2.2 },
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 1.8 }
+    ]
+  },
+  {
+    "ticker": "RPV",
+    "name": "Invesco S&P 500 Pure Value ETF",
+    "category": "Factor",
+    "sector_allocation": {
+      "Financials": 22.5,
+      "Energy": 15.2,
+      "Industrials": 12.8,
+      "Healthcare": 10.5,
+      "Materials": 8.5,
+      "Technology": 8.2,
+      "Consumer Discretionary": 7.5,
+      "Communication Services": 5.8,
+      "Consumer Staples": 5.2,
+      "Utilities": 3.8
+    },
+    "region_allocation": { "North America": 99.2, "Other": 0.8 },
+    "top_holdings": [
+      { "ticker": "INTC", "name": "Intel Corp", "weight": 3.5 },
+      { "ticker": "CVX", "name": "Chevron Corp", "weight": 3.2 },
+      { "ticker": "XOM", "name": "Exxon Mobil", "weight": 3.0 },
+      { "ticker": "CSCO", "name": "Cisco Systems", "weight": 2.8 },
+      { "ticker": "IBM", "name": "IBM Corp", "weight": 2.5 },
+      { "ticker": "BAC", "name": "Bank of America", "weight": 2.2 },
+      { "ticker": "VZ", "name": "Verizon Communications", "weight": 1.8 },
+      { "ticker": "T", "name": "AT&T Inc", "weight": 1.5 },
+      { "ticker": "WFC", "name": "Wells Fargo", "weight": 1.2 },
+      { "ticker": "PFE", "name": "Pfizer Inc", "weight": 1.0 }
+    ]
+  },
+  {
+    "ticker": "RPD",
+    "name": "Invesco S&P 500 Pure Growth ETF",
+    "category": "Factor",
+    "sector_allocation": {
+      "Technology": 45.5,
+      "Healthcare": 18.2,
+      "Consumer Discretionary": 14.5,
+      "Communication Services": 10.8,
+      "Industrials": 5.5,
+      "Other": 5.5
+    },
+    "region_allocation": { "North America": 99.5, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 12.8 },
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 10.5 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 9.8 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 6.2 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 5.5 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 4.2 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 3.8 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 3.2 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 2.8 },
+      { "ticker": "NFLX", "name": "Netflix Inc", "weight": 2.0 }
+    ]
+  },
+  {
+    "ticker": "VFMF",
+    "name": "Vanguard U.S. Multifactor ETF",
+    "category": "Factor",
+    "sector_allocation": {
+      "Technology": 22.5,
+      "Financials": 16.2,
+      "Healthcare": 14.8,
+      "Industrials": 13.5,
+      "Consumer Discretionary": 10.2,
+      "Energy": 6.5,
+      "Communication Services": 5.8,
+      "Materials": 4.2,
+      "Consumer Staples": 3.5,
+      "Other": 2.8
+    },
+    "region_allocation": { "North America": 99.2, "Other": 0.8 },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 4.5 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 4.2 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 3.8 },
+      { "ticker": "JPM", "name": "JPMorgan Chase", "weight": 3.2 },
+      { "ticker": "V", "name": "Visa Inc", "weight": 2.8 },
+      { "ticker": "MA", "name": "Mastercard", "weight": 2.5 },
+      { "ticker": "UNH", "name": "UnitedHealth Group", "weight": 2.2 },
+      { "ticker": "HD", "name": "Home Depot", "weight": 2.0 },
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 1.8 },
+      { "ticker": "XOM", "name": "Exxon Mobil", "weight": 1.5 }
+    ]
+  },
+  {
+    "ticker": "DGRW",
+    "name": "WisdomTree U.S. Quality Dividend Growth Fund",
+    "category": "Income",
+    "sector_allocation": {
+      "Healthcare": 22.5,
+      "Technology": 18.2,
+      "Industrials": 16.5,
+      "Consumer Discretionary": 12.8,
+      "Financials": 10.5,
+      "Communication Services": 6.8,
+      "Consumer Staples": 5.2,
+      "Other": 7.5
+    },
+    "region_allocation": { "North America": 98.5, "Other": 1.5 },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 5.5 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 5.2 },
+      { "ticker": "UNH", "name": "UnitedHealth Group", "weight": 4.8 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 4.2 },
+      { "ticker": "JNJ", "name": "Johnson & Johnson", "weight": 3.8 },
+      { "ticker": "V", "name": "Visa Inc", "weight": 3.5 },
+      { "ticker": "MA", "name": "Mastercard", "weight": 3.2 },
+      { "ticker": "HD", "name": "Home Depot", "weight": 2.8 },
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 2.5 },
+      { "ticker": "ABBV", "name": "AbbVie Inc", "weight": 2.2 }
+    ]
+  },
+  {
+    "ticker": "IWB",
+    "name": "iShares Russell 1000 ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 29.5,
+      "Healthcare": 13.5,
+      "Financials": 13.0,
+      "Consumer Discretionary": 10.8,
+      "Communication Services": 8.8,
+      "Industrials": 8.5,
+      "Consumer Staples": 6.0,
+      "Energy": 3.8,
+      "Utilities": 2.5,
+      "Materials": 2.3,
+      "Real Estate": 1.3
+    },
+    "region_allocation": { "North America": 99.2, "Other": 0.8 },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 7.0 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 6.7 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 5.8 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 3.7 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 2.5 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 2.0 },
+      { "ticker": "BRK.B", "name": "Berkshire Hathaway", "weight": 1.9 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 1.8 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 1.5 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 1.3 }
+    ]
+  },
+  {
+    "ticker": "IWF",
+    "name": "iShares Russell 1000 Growth ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Technology": 48.5,
+      "Consumer Discretionary": 15.2,
+      "Communication Services": 12.8,
+      "Healthcare": 8.5,
+      "Industrials": 5.8,
+      "Other": 9.2
+    },
+    "region_allocation": { "North America": 99.2, "Other": 0.8 },
+    "top_holdings": [
+      { "ticker": "AAPL", "name": "Apple Inc", "weight": 12.2 },
+      { "ticker": "MSFT", "name": "Microsoft Corp", "weight": 11.5 },
+      { "ticker": "NVDA", "name": "NVIDIA Corp", "weight": 10.2 },
+      { "ticker": "AMZN", "name": "Amazon.com Inc", "weight": 6.5 },
+      { "ticker": "META", "name": "Meta Platforms Inc", "weight": 4.2 },
+      { "ticker": "GOOGL", "name": "Alphabet Inc", "weight": 3.5 },
+      { "ticker": "AVGO", "name": "Broadcom Inc", "weight": 3.0 },
+      { "ticker": "TSLA", "name": "Tesla Inc", "weight": 2.5 },
+      { "ticker": "LLY", "name": "Eli Lilly & Co", "weight": 2.2 },
+      { "ticker": "NFLX", "name": "Netflix Inc", "weight": 1.5 }
+    ]
+  },
+  {
+    "ticker": "IWD",
+    "name": "iShares Russell 1000 Value ETF",
+    "category": "US Equity",
+    "sector_allocation": {
+      "Financials": 20.5,
+      "Healthcare": 14.8,
+      "Industrials": 12.2,
+      "Consumer Staples": 10.5,
+      "Energy": 8.8,
+      "Technology": 8.5,
+      "Communication Services": 5.2,
+      "Utilities": 8.2,
+      "Materials": 5.8,
+      "Real Estate": 3.5
+    },
+    "region_allocation": { "North America": 99.5, "Other": 0.5 },
+    "top_holdings": [
+      { "ticker": "BRK.B", "name": "Berkshire Hathaway", "weight": 4.2 },
+      { "ticker": "JPM", "name": "JPMorgan Chase", "weight": 3.0 },
+      { "ticker": "UNH", "name": "UnitedHealth Group", "weight": 2.5 },
+      { "ticker": "V", "name": "Visa Inc", "weight": 2.2 },
+      { "ticker": "XOM", "name": "Exxon Mobil", "weight": 2.0 },
+      { "ticker": "JNJ", "name": "Johnson & Johnson", "weight": 1.8 },
+      { "ticker": "PG", "name": "Procter & Gamble", "weight": 1.5 },
+      { "ticker": "MA", "name": "Mastercard", "weight": 1.2 },
+      { "ticker": "HD", "name": "Home Depot", "weight": 1.0 },
+      { "ticker": "CVX", "name": "Chevron Corp", "weight": 0.8 }
+    ]
+  },
+  {
+    "ticker": "EFV",
+    "name": "iShares MSCI EAFE Value ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Financials": 25.5,
+      "Energy": 10.2,
+      "Industrials": 12.8,
+      "Healthcare": 8.5,
+      "Consumer Staples": 8.2,
+      "Materials": 8.5,
+      "Technology": 5.8,
+      "Communication Services": 4.5,
+      "Utilities": 8.2,
+      "Real Estate": 2.5,
+      "Consumer Discretionary": 5.1
+    },
+    "region_allocation": { "Europe": 72.5, "Asia Pacific": 18.5, "Other": 9.0 },
+    "top_holdings": [
+      { "ticker": "Nestle", "name": "Nestle SA", "weight": 2.2 },
+      { "ticker": "HSBC", "name": "HSBC Holdings", "weight": 1.8 },
+      { "ticker": "NVO", "name": "Novo Nordisk", "weight": 1.5 },
+      { "ticker": "SHELL", "name": "Shell PLC", "weight": 1.2 },
+      { "ticker": "SAP", "name": "SAP SE", "weight": 1.0 },
+      { "ticker": "Siemens", "name": "Siemens AG", "weight": 0.8 },
+      { "ticker": "Total", "name": "TotalEnergies", "weight": 0.7 },
+      { "ticker": "Allianz", "name": "Allianz SE", "weight": 0.6 },
+      { "ticker": "AZN", "name": "AstraZeneca", "weight": 0.5 },
+      { "ticker": "UNILEVER", "name": "Unilever PLC", "weight": 0.4 }
+    ]
+  },
+  {
+    "ticker": "EFG",
+    "name": "iShares MSCI EAFE Growth ETF",
+    "category": "International Equity",
+    "sector_allocation": {
+      "Technology": 14.5,
+      "Healthcare": 16.2,
+      "Industrials": 14.8,
+      "Consumer Discretionary": 12.5,
+      "Communication Services": 8.5,
+      "Financials": 12.2,
+      "Consumer Staples": 8.8,
+      "Materials": 5.2,
+      "Energy": 2.5,
+      "Utilities": 2.2,
+      "Real Estate": 2.6
+    },
+    "region_allocation": { "Europe": 65.5, "Asia Pacific": 25.2, "Other": 9.3 },
+    "top_holdings": [
+      { "ticker": "ASML", "name": "ASML Holding", "weight": 4.5 },
+      { "ticker": "NVO", "name": "Novo Nordisk", "weight": 4.2 },
+      { "ticker": "MC", "name": "LVMH", "weight": 3.5 },
+      { "ticker": "SAP", "name": "SAP SE", "weight": 2.8 },
+      { "ticker": "AZN", "name": "AstraZeneca", "weight": 2.2 },
+      { "ticker": "ROCHE", "name": "Roche Holding", "weight": 1.8 },
+      { "ticker": "TMO", "name": "Thermo Fisher", "weight": 1.5 },
+      { "ticker": "SHEL", "name": "Shell PLC", "weight": 1.2 },
+      { "ticker": "Siemens", "name": "Siemens AG", "weight": 1.0 },
+      { "ticker": "TSM", "name": "Taiwan Semi", "weight": 0.8 }
+    ]
+  }
+]

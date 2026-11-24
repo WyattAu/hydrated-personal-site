@@ -14,7 +14,7 @@ const allProjects = (await getCollection('projects')).sort((a, b) => a.data.orde
 const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologies))].sort();
 ---
 
-<BaseLayout lastModified="2026-11-19" title="Projects — Wyatt Au"
+<BaseLayout lastModified="2026-11-19" title="Projects, Wyatt Au"
   ogImage="/og/projects.png" description="Open-source projects and technical work by Wyatt Au."
   faq={[
     {
@@ -23,11 +23,11 @@ const allTechnologies = [...new Set(allProjects.flatMap((p) => p.data.technologi
     },
     {
       q: 'Where are the crates published?',
-      a: 'On crates.io — webhookkit, throttle-kit, otelkit, and more, all with estate-standard CI and documentation.',
+      a: 'On crates.io, webhookkit, throttle-kit, otelkit, and more, all with estate-standard CI and documentation.',
     },
     {
       q: 'Is the source open?',
-      a: 'Yes — public repos on GitHub (WyattAu) and Forgejo (forgejo.wyattau.com), including this site.',
+      a: 'Yes, public repos on GitHub (WyattAu) and Forgejo (forgejo.wyattau.com), including this site.',
     },
   ]}>
   <Nav />

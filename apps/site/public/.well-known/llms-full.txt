@@ -1,4 +1,4 @@
-# Wyatt Au — Backend Engineer & Systems Architect
+# Wyatt Au, Backend Engineer & Systems Architect
 
 > Personal site and intelligence dashboard of Wyatt Au: deterministic
 > infrastructure, high-performance systems, and client-side quantitative
@@ -8,30 +8,30 @@
 
 ## Pages
 
-- [Home](https://wyattau.com/): overview of Wyatt Au — backend engineering, systems architecture, and current work bootstrapping QuestHive.
-- [World Monitor](https://wyattau.com/world): real-time intelligence dashboard — crypto prices via Binance WebSocket, world map with live ISS position, macro rates (VIX, DXY, yields), earthquakes, GOES X-ray solar activity, planetary K-index with 3-day geomagnetic forecast, Bitcoin fee market, and upcoming orbital launches.
+- [Home](https://wyattau.com/): overview of Wyatt Au, backend engineering, systems architecture, and current work bootstrapping QuestHive.
+- [World Monitor](https://wyattau.com/world): real-time intelligence dashboard, crypto prices via Binance WebSocket, world map with live ISS position, macro rates (VIX, DXY, yields), earthquakes, GOES X-ray solar activity, planetary K-index with 3-day geomagnetic forecast, Bitcoin fee market, and upcoming orbital launches.
 - [ETF Intelligence](https://wyattau.com/etf): database of 89 ETFs with allocation analysis, correlation matrix, Monte Carlo simulation, VaR, portfolio backtesting, and walk-forward analysis.
 - [ML Benchmarks](https://wyattau.com/ml): LLM benchmark leaderboards, model comparison radar charts, GPU requirement calculator, and inference throughput simulator.
-- [World Data](https://wyattau.com/data): reference datasets powering the dashboards — the 89-fund ETF database and site SEO audits as keyless JSON downloads.
+- [World Data](https://wyattau.com/data): reference datasets powering the dashboards, the 89-fund ETF database and site SEO audits as keyless JSON downloads.
 - [Docs](https://wyattau.com/docs): technical notes, architecture decisions, and infrastructure documentation.
 - [Dossier](https://wyattau.com/dossier): detailed biography and timeline.
 - [Projects](https://wyattau.com/projects): selected engineering projects.
 - [Guestbook](https://wyattau.com/guestbook): visitor messages, persisted in Cloudflare KV.
 - [Uses](https://wyattau.com/uses): development and infrastructure gear.
 - [Showcase](https://wyattau.com/showcase): interactive WASM demo gallery.
-- [Insights](https://wyattau.com/insights): hub for original data studies and first-hand event reports — reproducible analyses from own datasets and instrumentation.
-- [G1 Storm Report 2026-11-19](https://wyattau.com/insights/g1-storm-2026-11-19): first-hand event record — the site's aurora monitor captured the Nov 19 G1 storm end-to-end (Kp 5.0, 20%->55%, r=0.79 vs official index).
-- [ETF Allocation Study](https://wyattau.com/insights/etf-allocation-study): original data study — sector exposures and top-holding concentration across the 89-fund database, recomputed at build time.
+- [Insights](https://wyattau.com/insights): hub for original data studies and first-hand event reports, reproducible analyses from own datasets and instrumentation.
+- [G1 Storm Report 2026-11-19](https://wyattau.com/insights/g1-storm-2026-11-19): first-hand event record, the site's aurora monitor captured the Nov 19 G1 storm end-to-end (Kp 5.0, 20%->55%, r=0.79 vs official index).
+- [ETF Allocation Study](https://wyattau.com/insights/etf-allocation-study): original data study, sector exposures and top-holding concentration across the 89-fund database, recomputed at build time.
 
 ## Highlights
 
-- All client-side computation is Rust compiled to WebAssembly (lock-free ring buffers, binary serialization, SIMD-optimized numerics) — roughly 140 KB across 16 widgets.
+- All client-side computation is Rust compiled to WebAssembly (lock-free ring buffers, binary serialization, SIMD-optimized numerics), roughly 140 KB across 16 widgets.
 - Charts render via [plychart](https://github.com/WyattAu/plychart), a custom Rust/WASM charting library with pan and zoom.
 - The stack is Astro 5 + SolidJS 1.9 + Tailwind CSS 4, deployed on Cloudflare Pages and Workers.
 
 ## Machine-readable access
 
-- Markdown variants of key pages (for AI citation): [/markdown/index.md](https://wyattau.com/markdown/index.md), [/markdown/world.md](https://wyattau.com/markdown/world.md), [/markdown/etf.md](https://wyattau.com/markdown/etf.md), [/markdown/ml.md](https://wyattau.com/markdown/ml.md), [/markdown/dossier.md](https://wyattau.com/markdown/dossier.md), [/markdown/projects.md](https://wyattau.com/markdown/projects.md) — advertised per-page via `Link: ...; rel="alternate"; type="text/markdown"` headers.
+- Markdown variants of key pages (for AI citation): [/markdown/index.md](https://wyattau.com/markdown/index.md), [/markdown/world.md](https://wyattau.com/markdown/world.md), [/markdown/etf.md](https://wyattau.com/markdown/etf.md), [/markdown/ml.md](https://wyattau.com/markdown/ml.md), [/markdown/dossier.md](https://wyattau.com/markdown/dossier.md), [/markdown/projects.md](https://wyattau.com/markdown/projects.md), advertised per-page via `Link: ...; rel="alternate"; type="text/markdown"` headers.
 - Agent discovery: [/.well-known/api-catalog](https://wyattau.com/.well-known/api-catalog) (RFC 9727), [/.well-known/agent-card.json](https://wyattau.com/.well-known/agent-card.json) (A2A), [/.well-known/agent-skills/index.json](https://wyattau.com/.well-known/agent-skills/index.json), [/auth.md](https://wyattau.com/auth.md), [/.well-known/oauth-protected-resource](https://wyattau.com/.well-known/oauth-protected-resource) (RFC 9728; no auth required).
 - Keyless JSON APIs (edge-cached, GET, no auth): `/api/crypto-ticker`, `/api/earthquakes`, `/api/kp-index`, `/api/aurora?lat=&lon=`, `/api/aurora-history`, `/api/swpc-alerts`, `/api/space-launches`, `/api/fear-greed`, `/api/stock-quote`, `/api/mempool`, `/api/health`, plus market/FX/reference endpoints. See [/auth.md](https://wyattau.com/auth.md) for the full list and etiquette.
 
@@ -49,26 +49,26 @@
 
 # Page: data (https://wyattau.com/data)
 
-# World Data — reference datasets
+# World Data, reference datasets
 
 The machine-readable files powering the dashboards on wyattau.com:
 keyless JSON downloads, no authentication.
 
 ## What datasets are available?
 
-- [ETF database](https://wyattau.com/data/etf-database.json) — 89 funds
+- [ETF database](https://wyattau.com/data/etf-database.json), 89 funds
   with ticker, name, category, sector allocation, region allocation, and
   top holdings. Powers the ETF Intelligence page.
-- [SEO audit (site-wide)](https://wyattau.com/data/seo-audit.json) — the
+- [SEO audit (site-wide)](https://wyattau.com/data/seo-audit.json), the
   site crawling itself: pages crawled, issues, warnings, passes, category
   scores, recommendations.
-- [SEO per-page metrics](https://wyattau.com/data/seo-pages.json) —
+- [SEO per-page metrics](https://wyattau.com/data/seo-pages.json) ,
   per-URL status, title/description lengths, h1 count, word count, fetch
   time, issues.
 
 ## Can I use the data?
 
-Yes — keyless JSON, free to download. The ETF database powers the ETF
+Yes, keyless JSON, free to download. The ETF database powers the ETF
 Intelligence page; attribution appreciated but not required. Related
 pages: [ETF Intelligence](https://wyattau.com/etf) |
 [Home](https://wyattau.com/) | [Projects](https://wyattau.com/projects)
@@ -78,7 +78,7 @@ pages: [ETF Intelligence](https://wyattau.com/etf) |
 
 # Page: Dossier (https://wyattau.com/dossier)
 
-# Dossier — Wyatt Au
+# Dossier, Wyatt Au
 
 Personal dossier, timeline, and detailed biography of Wyatt Au: backend
 engineer and systems architect working on deterministic infrastructure and
@@ -105,7 +105,7 @@ widgets powering the dashboards on this site.
 
 **What is in the dossier?** A detailed biography and career timeline, plus an inventory of the 16 WebAssembly widgets that power the dashboards on this site.
 
-**What are the interactive demos?** The WASM widgets compiled from Rust — Monte Carlo simulation, volatility surfaces, Fourier analysis, cellular automata, and more — all running client-side.
+**What are the interactive demos?** The WASM widgets compiled from Rust, Monte Carlo simulation, volatility surfaces, Fourier analysis, cellular automata, and more, all running client-side.
 
 ## Related pages
 
@@ -116,7 +116,7 @@ widgets powering the dashboards on this site.
 
 # Page: etf-allocation-study (https://wyattau.com/etf-allocation-study)
 
-# ETF sector allocation & concentration study — 89 funds
+# ETF sector allocation & concentration study, 89 funds
 
 Answer: concentration is structural. The same handful of mega-caps appears
 in roughly one in five funds, and NVIDIA carries the highest average
@@ -125,13 +125,13 @@ keyless ETF dataset at build time.
 
 ## Most widely held tickers
 
-- CORP — in 28 funds, avg top-10 weight 0.89%
-- UST — in 20 funds, avg 16.39%
-- AAPL — in 19 funds, avg 7.93%
-- MSFT — in 19 funds, avg 7.74%
-- NVDA — in 19 funds, avg 8.58% (heaviest single-stock weight)
-- AVGO — in 18 funds, avg 3.59%
-- LLY — in 16 funds, avg 2.90%
+- CORP, in 28 funds, avg top-10 weight 0.89%
+- UST, in 20 funds, avg 16.39%
+- AAPL, in 19 funds, avg 7.93%
+- MSFT, in 19 funds, avg 7.74%
+- NVDA, in 19 funds, avg 8.58% (heaviest single-stock weight)
+- AVGO, in 18 funds, avg 3.59%
+- LLY, in 16 funds, avg 2.90%
 
 ## Category sector tilts
 
@@ -140,12 +140,12 @@ keyless ETF dataset at build time.
 - International Equity (13 funds): Financials 22.3%, Industrials 15.9%, Healthcare 11.4%
 
 US equity funds tilt Technology-first; Emerging Markets and International
-funds tilt Financials-first — the sector story inverts outside the US.
+funds tilt Financials-first, the sector story inverts outside the US.
 
 ## Methodology
 
 Source: the keyless [ETF database download](https://wyattau.com/data/etf-database.json)
-(89 funds). Aggregates are computed at build time — every rebuild of the
+(89 funds). Aggregates are computed at build time, every rebuild of the
 site re-derives the tables from the current dataset. Averages are
 unweighted means across the funds reporting each sector or holding. This
 is an allocation-structure analysis, not investment advice.
@@ -159,7 +159,7 @@ Related pages: [ETF Intelligence](https://wyattau.com/etf) |
 
 # Page: ETF Intelligence (https://wyattau.com/etf)
 
-# ETF Intelligence — database and analysis
+# ETF Intelligence, database and analysis
 
 ETF database with 89 ETFs: allocation analysis, portfolio comparison,
 correlation matrix, Monte Carlo simulation, VaR, portfolio backtesting,
@@ -173,14 +173,14 @@ and walk-forward analysis.
 - Walk-forward backtesting of allocation strategies.
 - Efficient frontier and HRP allocation demos.
 
-All quantitative computation runs client-side in Rust/WebAssembly — no
+All quantitative computation runs client-side in Rust/WebAssembly, no
 server round-trips, no data leaves the browser.
 
 ## Frequently asked questions
 
 **How many ETFs are in the database?** 89 ETFs with allocation analysis, correlation matrices, Monte Carlo simulation, VaR, portfolio backtesting, and walk-forward analysis.
 
-**Does the ETF analysis send my data anywhere?** No. All quantitative computation runs client-side in Rust compiled to WebAssembly — no server round-trips, no data leaves the browser.
+**Does the ETF analysis send my data anywhere?** No. All quantitative computation runs client-side in Rust compiled to WebAssembly, no server round-trips, no data leaves the browser.
 
 **What can I backtest?** Allocation strategies with walk-forward analysis, Monte Carlo forecast paths, drawdown profiles, and risk/return scatter against the selected benchmark.
 
@@ -196,8 +196,8 @@ server round-trips, no data leaves the browser.
 # The November 19 2026 G1 storm, captured by this site's own monitor
 
 Answer: Kp reached 5.0 at 00:00 UTC and SWPC issued a K05A alert at 01:08
-UTC. The site's aurora monitor — which had been writing a 30-minute
-probability series to storage all along — recorded the whole envelope:
+UTC. The site's aurora monitor, which had been writing a 30-minute
+probability series to storage all along, recorded the whole envelope:
 baseline 20%, peak 55% at 02:30 UTC, and a 0.79 Pearson correlation
 against the official Kp index. This is the first storm the site has
 captured with its own instrumentation.
@@ -212,20 +212,20 @@ captured with its own instrumentation.
 
 ## SWPC alert timeline (Nov 19 UTC)
 
-- 00:41 K04W — WARNING: K-index 4 expected
-- 00:46 K04A — ALERT: K-index 4
-- 01:00 K05W — WARNING: K-index 5 expected
-- 01:08 K05A — ALERT: K-index 5 (G1 minor storm threshold)
-- 01:18 K04W — Warning Condition: Persistence
+- 00:41 K04W, WARNING: K-index 4 expected
+- 00:46 K04A, ALERT: K-index 4
+- 01:00 K05W, WARNING: K-index 5 expected
+- 01:08 K05A, ALERT: K-index 5 (G1 minor storm threshold)
+- 01:18 K04W, Warning Condition: Persistence
 
 The monitor's steepest ramp preceded the formal K05A alert by about
-40 minutes — finer resolution than the 3-hour Kp index can express.
+40 minutes, finer resolution than the 3-hour Kp index can express.
 
 ## Correlation against the official index
 
 Pearson r = 0.787 over 45 aligned points (site probability vs NOAA
 planetary K-index, same 24h window). Previous windows were too quiet to
-compute this honestly — this storm is the first event with enough
+compute this honestly, this storm is the first event with enough
 dynamic range to validate the monitor against the official index.
 
 ## Methodology
@@ -233,7 +233,7 @@ dynamic range to validate the monitor against the official index.
 Sources: this site's 48-point aurora history (30-min cadence, Cloudflare
 KV, cron-written) and NOAA SWPC products. The correlation forward-fills
 the 3-hour Kp onto the 30-minute grid; unweighted Pearson. This page is
-a fixed snapshot of a past event — that is what makes it a record.
+a fixed snapshot of a past event, that is what makes it a record.
 
 Related pages: [World OSINT dashboards](https://wyattau.com/world) |
 [Home](https://wyattau.com/)
@@ -243,7 +243,7 @@ Related pages: [World OSINT dashboards](https://wyattau.com/world) |
 
 # Page: Home (https://wyattau.com/)
 
-# Wyatt Au — Backend Engineer & Systems Architect
+# Wyatt Au, Backend Engineer & Systems Architect
 
 Personal intelligence dashboard and portfolio site of Wyatt Au: real-time
 market data, OSINT feeds, 16 Rust/WASM quantitative widgets, and an
@@ -252,34 +252,34 @@ data APIs are keyless and edge-cached.
 
 ## What is on this site?
 
-- [World Monitor](https://wyattau.com/world) — real-time intelligence
+- [World Monitor](https://wyattau.com/world), real-time intelligence
   dashboard: crypto prices via Binance WebSocket, world map with capital
   markets and ISS position, macro rates (VIX, DXY, yields, gold), earthquakes,
   solar-wind telemetry, and upcoming orbital launches.
-- [ETF Intelligence](https://wyattau.com/etf) — database of 89 ETFs with
+- [ETF Intelligence](https://wyattau.com/etf), database of 89 ETFs with
   allocation analysis, correlation matrix, Monte Carlo simulation, VaR,
   portfolio backtesting, and walk-forward analysis.
-- [ML Benchmarks](https://wyattau.com/ml) — LLM benchmark leaderboards,
+- [ML Benchmarks](https://wyattau.com/ml), LLM benchmark leaderboards,
   model comparison radar charts, GPU requirement calculator, and inference
   throughput simulator.
-- [WASM Showcase](https://wyattau.com/#wasm-showcase) — 16 interactive
+- [WASM Showcase](https://wyattau.com/#wasm-showcase), 16 interactive
   Rust/WASM demonstrations: Monte Carlo simulation, SVI volatility surface,
   Fourier analysis, cellular automata, physics sandbox, generative art.
-- [Docs](https://wyattau.com/docs) — technical notes and architecture
+- [Docs](https://wyattau.com/docs), technical notes and architecture
   decisions.
-- [Dossier](https://wyattau.com/dossier) — detailed biography and timeline.
-- [Projects](https://wyattau.com/projects) — selected engineering projects.
+- [Dossier](https://wyattau.com/dossier), detailed biography and timeline.
+- [Projects](https://wyattau.com/projects), selected engineering projects.
 
 ## Live data APIs (keyless, no auth)
 
 All data endpoints are public GET, edge-cached, and return JSON:
 
-- `GET /api/crypto-ticker` — Binance 24h USDT mini-tickers.
-- `GET /api/earthquakes` — USGS all-day earthquake feed (GeoJSON).
-- `GET /api/kp-index` — NOAA planetary K-index.
-- `GET /api/space-launches` — upcoming orbital launches (Launch Library 2).
-- `GET /api/fear-greed` — crypto Fear & Greed index.
-- `GET /api/stock-quote?symbols=^VIX,DX-Y.NYB` — Yahoo Finance quotes.
+- `GET /api/crypto-ticker`, Binance 24h USDT mini-tickers.
+- `GET /api/earthquakes`, USGS all-day earthquake feed (GeoJSON).
+- `GET /api/kp-index`, NOAA planetary K-index.
+- `GET /api/space-launches`, upcoming orbital launches (Launch Library 2).
+- `GET /api/fear-greed`, crypto Fear & Greed index.
+- `GET /api/stock-quote?symbols=^VIX,DX-Y.NYB`, Yahoo Finance quotes.
 
 Poll at most once per cache window (60 s–30 min). Identify yourself with a
 User-Agent header. Full machine-readable discovery:
@@ -307,7 +307,7 @@ Currently bootstrapping QuestHive. Based in the United Kingdom.
 
 # Page: ML Intelligence (https://wyattau.com/ml)
 
-# ML Intelligence — LLM benchmarks and tools
+# ML Intelligence, LLM benchmarks and tools
 
 LLM benchmark leaderboards, model comparison radar charts, ArXiv paper
 feeds, GPU requirement calculator, and inference throughput simulator for
@@ -322,16 +322,16 @@ AI and machine learning engineers.
   batch size.
 - Simulate inference throughput (tokens/s) across hardware profiles.
 
-All quantitative computation runs client-side in Rust/WebAssembly — no
+All quantitative computation runs client-side in Rust/WebAssembly, no
 server round-trips, no data collection.
 
 ## Frequently asked questions
 
-**What does the GPU requirement calculator cover?** Serving estimates across hardware profiles for a target model context and batch size — VRAM, parameter counts, and quantization tradeoffs.
+**What does the GPU requirement calculator cover?** Serving estimates across hardware profiles for a target model context and batch size, VRAM, parameter counts, and quantization tradeoffs.
 
 **Where do the LLM benchmarks come from?** Publicly reported benchmark scores aggregated into leaderboards with model comparison radar charts, served via the site Worker API.
 
-**Is the throughput simulator real inference?** No — it is a client-side WebAssembly simulation of inference throughput across hardware profiles, not live model serving.
+**Is the throughput simulator real inference?** No, it is a client-side WebAssembly simulation of inference throughput across hardware profiles, not live model serving.
 
 ## Related pages
 
@@ -342,7 +342,7 @@ server round-trips, no data collection.
 
 # Page: Projects (https://wyattau.com/projects)
 
-# Projects — Wyatt Au
+# Projects, Wyatt Au
 
 Open-source projects and technical work by Wyatt Au: Rust crates, WASM
 quantitative widgets, MCP servers, and the intelligence dashboard you are
@@ -350,14 +350,14 @@ reading.
 
 ## What projects are featured?
 
-- **plychart** — custom Rust/WASM charting library with pan and zoom
+- **plychart**, custom Rust/WASM charting library with pan and zoom
   powering every chart on this site.
-- **estate crates** — webhookkit (idempotent webhooks), throttle-kit
+- **estate crates**, webhookkit (idempotent webhooks), throttle-kit
   (rate limiting), otelkit (OpenTelemetry composition) and more,
   published on crates.io.
-- **MCP servers** — native Rust implementations (GitHub, filesystem,
+- **MCP servers**, native Rust implementations (GitHub, filesystem,
   web search, memory) used across the development estate.
-- **hydrated personal site** — Astro 5 + SolidJS 1.9 + Rust/WASM
+- **hydrated personal site**, Astro 5 + SolidJS 1.9 + Rust/WASM
   intelligence dashboard, deployed on Cloudflare Pages and Workers.
 
 Full inventory: [GitHub](https://github.com/WyattAu) and
@@ -367,9 +367,9 @@ Full inventory: [GitHub](https://github.com/WyattAu) and
 
 **What is plychart?** A custom Rust/WASM charting library with pan and zoom, built by Wyatt Au, powering every chart on this site.
 
-**Where are the crates published?** On crates.io — webhookkit, throttle-kit, otelkit, and more, all with estate-standard CI and documentation.
+**Where are the crates published?** On crates.io, webhookkit, throttle-kit, otelkit, and more, all with estate-standard CI and documentation.
 
-**Is the source open?** Yes — public repos on GitHub (WyattAu) and Forgejo (forgejo.wyattau.com), including this site.
+**Is the source open?** Yes, public repos on GitHub (WyattAu) and Forgejo (forgejo.wyattau.com), including this site.
 
 ## Related pages
 
@@ -380,7 +380,7 @@ Full inventory: [GitHub](https://github.com/WyattAu) and
 
 # Page: World Monitor (https://wyattau.com/world)
 
-# World Monitor — intelligence dashboard
+# World Monitor, intelligence dashboard
 
 Real-time intelligence dashboard of Wyatt Au: crypto prices via Binance
 WebSocket, world map with ISS position, macro rates (VIX, DXY, 10Y yield,
@@ -392,7 +392,7 @@ gold), earthquakes, solar-wind telemetry, and upcoming orbital launches.
   24h change and high/low.
 - World map with ISS live position (wheretheiss.at, 5 s polling) and
   capital-city markers.
-- Macro rates: VIX, DXY, US 10Y yield, gold, silver, copper, WTI, Brent —
+- Macro rates: VIX, DXY, US 10Y yield, gold, silver, copper, WTI, Brent ,
   from Yahoo Finance.
 - Bitcoin structure: market cap estimate, 24h volume, funding rate, open
   interest, long/short ratio, NVT.

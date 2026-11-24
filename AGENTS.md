@@ -51,6 +51,17 @@ an upstream solid-fx config change (drop explicit targets). Until then,
 re-vendor by hand from `jsrepo list` / upstream sources and run the
 drift check.
 
+
+## Copy rules
+
+1. **No em-dashes.** Em-dashes are an AI-writing tell and are banned in
+   all site copy (pages, markdown, llms.txt, OG cards). Use commas,
+   colons, or periods; restructure the sentence if needed. Hyphens are
+   fine for compound words and ranges.
+2. Headlines and card titles: sentence case, no tracked-caps eyebrows,
+   no `001 —` numbering.
+3. No invented metrics, testimonials, or customer counts.
+
 ## Known traps
 
 - **ThemeToggle must not inject inline CSS vars** — `data-theme` only;

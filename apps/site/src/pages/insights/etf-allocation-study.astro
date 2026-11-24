@@ -101,13 +101,13 @@ const datasetSchema = {
 
 <BaseLayout
   lastModified="2026-11-19"
-  title="ETF Sector Allocation & Concentration Study — 89 Funds — Wyatt Au"
+  title="ETF Sector Allocation & Concentration Study, 89 Funds, Wyatt Au"
   ogImage="/og/etf-study.png"
-  description="Original data study: sector exposures, top-holding concentration, and category tilts aggregated across 89 ETFs — computed from the keyless wyattau.com ETF database at build time."
+  description="Original data study: sector exposures, top-holding concentration, and category tilts aggregated across 89 ETFs, computed from the keyless wyattau.com ETF database at build time."
   faq={[
     {
       q: 'What does this study measure?',
-      a: 'Sector exposures and top-holding concentration aggregated across the 89 ETFs in the wyattau.com ETF database — average sector weights, the most widely held tickers, and category-level sector tilts.',
+      a: 'Sector exposures and top-holding concentration aggregated across the 89 ETFs in the wyattau.com ETF database, average sector weights, the most widely held tickers, and category-level sector tilts.',
     },
     {
       q: 'How is the data computed?',
@@ -115,7 +115,7 @@ const datasetSchema = {
     },
     {
       q: 'What is the headline finding?',
-      a: 'NVIDIA carries the highest average top-10 weight of any single stock across the database, and the Magnificent 7 names appear in roughly one in five funds each — index concentration is structural, not incidental.',
+      a: 'NVIDIA carries the highest average top-10 weight of any single stock across the database, and the Magnificent 7 names appear in roughly one in five funds each, index concentration is structural, not incidental.',
     },
   ]}
 >
@@ -159,7 +159,7 @@ const datasetSchema = {
         </div>
         <p class="text-sm mt-3" style="color: var(--text-secondary);">
           {faang.length} of the Magnificent 7 appear in the top-10 ubiquity list; NVDA averages
-          {nvda ? ` ${nvda.avgWeight.toFixed(2)}%` : ''} — the heaviest single-stock weight in the database.
+          {nvda ? ` ${nvda.avgWeight.toFixed(2)}%` : ''}, the heaviest single-stock weight in the database.
         </p>
       </div>
 
@@ -182,7 +182,7 @@ const datasetSchema = {
         </div>
         <p class="text-sm mt-3" style="color: var(--text-secondary);">
           US equity funds tilt Technology-first; Emerging Markets and International funds
-          tilt Financials-first — the sector story inverts outside the US.
+          tilt Financials-first, the sector story inverts outside the US.
         </p>
       </div>
 
@@ -217,7 +217,7 @@ const datasetSchema = {
         <h2 class="text-2xl font-bold mb-4">Methodology</h2>
         <p class="text-sm" style="color: var(--text-secondary); max-width: 720px;">
           Source: the keyless <a href="/data" class="hover:underline" style="color: var(--accent);">ETF database download</a>
-          ({n} funds). Aggregates are computed at build time — every rebuild of this site
+          ({n} funds). Aggregates are computed at build time, every rebuild of this site
           re-derives the tables from the current dataset, so this study is always in sync with
           the download. Averages are unweighted means across the funds reporting each sector or
           holding. This is an allocation-structure analysis, not investment advice.
