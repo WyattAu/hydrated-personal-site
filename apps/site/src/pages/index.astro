@@ -163,7 +163,7 @@ const employment = [
       <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-12 items-start">
         <div class="max-w-3xl">
           <p class="section-label">About</p>
-          <h2 class="text-2xl md:text-3xl font-bold mb-6">Systems thinker, infrastructure builder.</h2>
+          <h2 class="text-2xl md:text-3xl font-bold mb-6">The longer version.</h2>
           <p class="mb-4" style="color: var(--text-secondary);">
             UK-based backend and DevOps engineer with 6 years of experience building reproducible infrastructure,
             CI/CD pipelines, and high-performance systems. I architect solutions that stay standing after the next
@@ -450,17 +450,4 @@ const employment = [
       }, 5000);
     })();
 
-    // Scroll reveal
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-    );
-
-    document.querySelectorAll('.reveal, .stagger-children').forEach((el) => observer.observe(el));
     </script>
