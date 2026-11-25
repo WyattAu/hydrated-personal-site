@@ -97,6 +97,16 @@ list: sanitize/NaN-policy builds for the WASM compute (graphics finding),
 and golden-image visual regression (graphics finding). The estate-side
 `plychart` cosmetic PRs remain optional.
 
+## Phase 2 roadmap (remaining parities)
+
+Fourteen concrete steal-items remain across the seven verticals,
+sequenced into five batches in
+[parity-roadmap-2.md](parity-roadmap-2.md): quant-correctness tests,
+data-governance pages, ops documentation, tooling (golden-image CI,
+error beacon, signing, trace export), and estate-depth items (Lean
+proofs for plycompute money math). Projected post-Phase-2 parity:
+~4.7, with the residual 0.3 documented as team-scale.
+
 ## What not to do (unchanged from v1)
 
 Microservices, Kubernetes, canary machinery, ITIL change boards,
