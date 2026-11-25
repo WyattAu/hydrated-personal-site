@@ -13,6 +13,8 @@ the measurement-gap note).
 | Email authentication (SPF) | SPF chain analysis | ✅ Present |
 | **Email authentication (DKIM + DMARC)** | TXT probes on `_dmarc` + Proton selectors | ❌ **Absent — the domain sends via Proton but the custom-domain DKIM/DMARC DNS records were never published** |
 | **Google ranking / indexing** | Requires Search Console | ❌ **Unmeasurable — GSC verification is the single blocking lever** |
+| **Served robots.txt policy** | Curl of live robots.txt vs repo policy record | ❌ **CONTRADICTION — Cloudflare injects a managed Content-Signals preamble + AI-bot Disallow blocks: ai-train=no directly contradicts the site's documented "training corpora welcome" policy. Fix: dashboard AI Crawl Control toggle (user lever, same trip as GSC)** |
+| **Security headers (HSTS, XCTO, Referrer/Permissions-Policy)** | `_headers` file written (v2), needs deploy + verify | 🟡 Shipping this round |
 
 ## The measurement gap (not a site gap)
 

@@ -1,10 +1,14 @@
-# Policy record (2026-11-06): AI crawlers are explicitly welcome on this
-# personal site — visibility in search indexes, AI answers, and training
-# corpora is the intent. The blanket AI-crawler blocks previously served here
-# came from Cloudflare's managed "AI Crawl Control" list (zone-level feature,
-# not this file). If blocks reappear in the served robots.txt, that feature
-# was re-enabled in the Cloudflare dashboard (Security -> Bots) and should be
-# turned off again to keep this recorded policy in force.
+# Policy record (2026-11-06, updated 2026-11-25): AI crawlers are explicitly
+# welcome on this personal site — visibility in search indexes, AI answers,
+# and training corpora is the intent.
+#
+# CONFIRMED LIVE (2026-11-25): the SERVED robots.txt is Cloudflare's managed
+# injection — a Content-Signals preamble (search=yes, ai-train=no, use=
+# reference) plus managed Disallow blocks (Amazonbot, Applebot-Extended,
+# Bytespider, Meta-ExternalAgent, and others). ai-train=no directly
+# contradicts this recorded policy. Fix: Cloudflare dashboard ->
+# AI Crawl Control (or Content Signals) -> disable for this zone. The file
+# below is what serves once that feature is off.
 #
 # Sitemap and contact for AI answer engines: see /llms.txt.
 
