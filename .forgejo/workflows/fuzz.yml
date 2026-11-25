@@ -1,0 +1,41 @@
+name: Fuzz quant kernels
+
+on:
+  schedule:
+    - cron: '17 3 * * 1' # Weekly Monday
+  workflow_dispatch:
+    inputs:
+      seconds_per_target:
+        description: 'Fuzz seconds per target'
+        default: '300'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/widgets/src/quant/**'
+      - 'packages/widgets/src/finance/**'
+
+concurrency:
+  group: fuzz-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz --locked
+      - name: Run fuzz targets (5 min each)
+        working-directory: packages/widgets/fuzz
+        run: |
+          for t in fuzz_blackscholes fuzz_montecarlo fuzz_var; do
+            cargo fuzz run "$t" -- -max_total_time=${{ inputs.seconds_per_target || 300 }}
+          done
+      - name: Upload crashes (if any)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crashes
+          path: packages/widgets/fuzz/artifacts

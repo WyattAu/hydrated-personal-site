@@ -409,7 +409,12 @@ export default function PortfolioBacktest() {
           </div>
         </div>
         <Show when={r() && r()!.windows && r()!.windows!.length > 0}>
-          <div class="mt-3 overflow-x-auto">
+          <div
+            class="mt-3 overflow-x-auto"
+            tabindex="0"
+            role="region"
+            aria-label="Scrollable data table"
+          >
             <table
               class="w-full border-collapse font-mono text-[9px]"
               style={{ 'min-width': '420px' }}
@@ -464,10 +469,15 @@ export default function PortfolioBacktest() {
           <For each={labels()}>
             {(label, i) => (
               <span
-                class="font-mono text-[9px]"
-                style={{ color: SERIES_COLORS[(i() + 1) % SERIES_COLORS.length] }}
+                class="font-mono text-[9px] inline-flex items-center gap-1"
+                style={{ color: 'var(--text-secondary)' }}
               >
-                - {label}
+                <span
+                  aria-hidden="true"
+                  class="inline-block w-2 h-2 rounded-sm"
+                  style={{ background: SERIES_COLORS[(i() + 1) % SERIES_COLORS.length] }}
+                />
+                {label}
               </span>
             )}
           </For>

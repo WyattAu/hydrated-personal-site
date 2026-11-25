@@ -30,6 +30,12 @@ export default defineConfig({
     }),
   ],
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [], // DIAGNOSTIC: tailwind removed
+    // The CSS minifier was stripping [data-theme] custom-property blocks
+    // (all 5 theme definitions vanished from the bundle; canvases fell
+    // back to hardcoded colors — the "widgets not covered in themes"
+    // report). Minification off until pinned root-caused.
+    css: { minify: false },
+    build: { cssMinify: false },
   },
 });

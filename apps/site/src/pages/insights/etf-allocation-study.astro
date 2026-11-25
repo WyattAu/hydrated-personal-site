@@ -1,6 +1,14 @@
 ---
 
 import dbRaw from '../../../public/data/etf-database.json';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+
+// Lineage: bind this study to the exact dataset bytes it computes from.
+const DATASET_SHA256_16 = createHash('sha256')
+	.update(readFileSync('public/data/etf-database.json'))
+	.digest('hex')
+	.slice(0, 16);
 import Footer from '../../components/astro/Footer.astro';
 import Nav from '../../components/astro/Nav.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -135,6 +143,9 @@ const datasetSchema = {
     </section>
 
     <section class="py-8 px-6 md:px-12 lg:px-24 space-y-10 pb-16">
+      <p class="text-xs font-mono" style="color: var(--text-secondary);">
+        Lineage: computed from etf-database.json @ sha256:{DATASET_SHA256_16} (snapshotted quarterly, manifest at /data/snapshots/manifest.json).
+      </p>
       <div>
         <h2 class="text-2xl font-bold mb-4">The most widely held tickers</h2>
         <div class="overflow-x-auto">

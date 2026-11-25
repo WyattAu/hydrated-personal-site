@@ -512,7 +512,7 @@ export default function WalkForwardBacktester() {
           </div>
         </div>
         <Show when={r() && r()!.windows.length > 0}>
-          <div class="mt-3 overflow-x-auto">
+          <div class="mt-3 overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable data table">
             <table
               class="w-full border-collapse font-mono text-[9px]"
               style={{ 'min-width': '360px' }}

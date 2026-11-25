@@ -3,6 +3,7 @@ import { log } from './logger';
 export interface Metrics {
   requests: number;
   errors: number;
+  lastSuccess: Map<string, number>;
   upstreamLatency: Map<string, number[]>;
   responseTimes: Map<string, number[]>;
   alerts: {
@@ -12,6 +13,7 @@ export interface Metrics {
 }
 
 export const metrics: Metrics = {
+  lastSuccess: new Map<string, number>(),
   requests: 0,
   errors: 0,
   upstreamLatency: new Map(),
@@ -81,6 +83,11 @@ export function getMetricsSummary() {
 
   checkAlerts();
 
+  const feedLastSuccess: Record<string, number> = {};
+  metrics.lastSuccess.forEach((ts, ep) => {
+    feedLastSuccess[ep] = ts;
+  });
+
   return {
     requests: metrics.requests,
     errors: metrics.errors,
@@ -88,5 +95,6 @@ export function getMetricsSummary() {
     latency: latencySummary,
     responseTimes: responseTimeSummary,
     alerts: { ...metrics.alerts },
+    feedLastSuccess,
   };
 }

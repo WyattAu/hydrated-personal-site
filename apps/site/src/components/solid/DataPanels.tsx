@@ -219,7 +219,7 @@ function FiatMatrixPanel() {
             subtitle="BASE: USD · LIVE"
             count={`${FIAT_CURRENCIES.length}×${FIAT_CURRENCIES.length}`}
           />
-          <div class="overflow-x-auto" style="max-height: 400px; overflow-y: auto;">
+          <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable data table" style="max-height: 400px; overflow-y: auto;">
             <table class="w-full border-collapse" style="min-width: 800px;">
               <thead>
                 <tr>
@@ -303,7 +303,7 @@ function CryptoMatrixPanel() {
             subtitle="BINANCE · 24H TICKER"
             count={`${CRYPTO_PAIRS.length}×${CRYPTO_PAIRS.length}`}
           />
-          <div class="overflow-x-auto" style="max-height: 350px; overflow-y: auto;">
+          <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable data table" style="max-height: 350px; overflow-y: auto;">
             <table class="w-full border-collapse" style="min-width: 500px;">
               <thead>
                 <tr>

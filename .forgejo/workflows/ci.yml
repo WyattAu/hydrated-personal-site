@@ -3,6 +3,10 @@ name: CI
 on:
   push:
     branches: [main]
+  schedule:
+    # Monthly full gate + advisory re-run (catches new advisories on
+    # unmoved dependencies — push-triggered audits cannot)
+    - cron: '23 4 15 * *'
   pull_request:
     branches: [main]
 
@@ -123,6 +127,12 @@ jobs:
         run: |
           test -f packages/widgets/pkg/hydrated_widgets_bg.wasm
           test -f apps/site/public/wasm/hydrated_widgets_bg.wasm
+      - name: Dataset lineage test
+        run: bunx vitest run tests/unit/lineage.test.ts
+      - name: SBOM (CycloneDX)
+        run: bun scripts/generate-sbom.mjs
+      - name: WASM size gate (650KB ceiling)
+        run: test "$(stat -c%s packages/widgets/pkg/hydrated_widgets_bg.wasm)" -le 650000
       - name: Upload WASM artifacts
         uses: actions/upload-artifact@v4
         with:

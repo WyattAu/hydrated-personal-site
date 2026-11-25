@@ -3,6 +3,23 @@ import { expect, test } from '@playwright/test';
 const pages = ['/', '/world', '/etf', '/projects', '/guestbook'];
 
 test.describe('Accessibility', () => {
+
+  for (const path of pages) {
+    test(`axe: no serious/critical violations on ${path}`, async ({ page }) => {
+      await page.goto(path, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(1500); // islands settle
+      const { AxeBuilder } = await import('@axe-core/playwright');
+      const results = await new AxeBuilder({ page }).analyze();
+      const serious = results.violations.filter((v) =>
+        v.impact === 'serious' || v.impact === 'critical',
+      );
+      const detail = serious
+        .map((v) => `${v.id}(${v.impact}): ${v.nodes.length} nodes`)
+        .join('; ');
+      expect(serious, `axe violations on ${path}: ${detail}`).toHaveLength(0);
+    });
+  }
+
   for (const path of pages) {
     test.describe(`Page: ${path}`, () => {
       test.beforeEach(async ({ page }) => {

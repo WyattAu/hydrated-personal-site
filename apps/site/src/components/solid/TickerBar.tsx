@@ -85,7 +85,7 @@ export default function TickerBar() {
             </span>
             <span
               style={{
-                color: isPositive(ticker.changePercent24h) ? '#69f0ae' : '#f85149',
+                color: isPositive(ticker.changePercent24h) ? 'var(--positive)' : 'var(--negative)',
                 'font-weight': '500',
               }}
             >

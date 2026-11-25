@@ -23,6 +23,10 @@ export function log(level: string, message: string, meta: Record<string, unknown
     console.error(serialized);
   } else if (level === 'warn') {
     console.warn(serialized);
+  } else {
+    // info/debug lines are retained by Workers Observability; without
+    // this the per-request structured logs were computed but dropped.
+    console.log(serialized);
   }
 }
 

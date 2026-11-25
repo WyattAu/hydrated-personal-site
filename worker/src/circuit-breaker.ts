@@ -1,3 +1,5 @@
+import { metrics } from './metrics';
+
 export interface CircuitState {
   failures: number;
   lastFailure: number;
@@ -26,6 +28,7 @@ export function recordFailure(endpoint: string): void {
 }
 
 export function recordSuccess(endpoint: string): void {
+  metrics.lastSuccess.set(endpoint, Date.now());
   const state = circuits.get(endpoint);
   if (state) {
     state.failures = 0;

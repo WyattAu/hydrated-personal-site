@@ -158,7 +158,7 @@ export default {
         }
       } else if (routePath === '/api/crypto-ticker/stream') {
         response = await handleCryptoTickerSSE(request);
-      } else if (routePath === '/api/metrics/stream') {
+
         response = await handleMetricsSSE(request);
       } else {
         response = error('Not found', 404);

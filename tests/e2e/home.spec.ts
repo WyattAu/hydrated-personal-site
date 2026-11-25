@@ -88,6 +88,30 @@ test.describe('Home Page', () => {
     }
   });
 
+
+  test('performance budget (LCP + page weight)', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'load' });
+    const lcp = await page.evaluate(
+      () =>
+        new Promise<number>((resolve) => {
+          let v = 0;
+          new PerformanceObserver((l) => {
+            const e = l.getEntries();
+            if (e.length) v = e[e.length - 1].startTime;
+          }).observe({ type: 'largest-contentful-paint', buffered: true });
+          setTimeout(() => resolve(v), 1500);
+        }),
+    );
+    const transfer = await page.evaluate(() =>
+      performance
+        .getEntriesByType('navigation')
+        .concat(performance.getEntriesByType('resource'))
+        .reduce((s, e) => s + ((e as PerformanceResourceTiming).transferSize || 0), 0),
+    );
+    expect(lcp, `LCP ${Math.round(lcp)}ms must stay under 1800ms`).toBeLessThan(1800);
+    expect(transfer, `page weight ${transfer}B must stay under 1.2MB`).toBeLessThan(1_200_000);
+  });
+
   test('no console errors on load', async ({ page }) => {
     const errors: string[] = [];
     page.on('console', (msg) => {

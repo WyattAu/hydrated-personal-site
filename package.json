@@ -15,6 +15,7 @@
     "prepare": "scripts/install-hooks.sh"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.1",
     "@biomejs/biome": "^1.9.0",
     "@vitest/coverage-v8": "^4.1.0",
     "fast-check": "^4.8.0",

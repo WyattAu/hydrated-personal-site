@@ -453,7 +453,7 @@ export default function FullOverlapMatrix() {
             </div>
 
             <Show when={r.common_holdings.length > 0}>
-              <div class="overflow-x-auto border" style={{ 'border-color': 'var(--border)' }}>
+              <div class="overflow-x-auto border" tabindex="0" role="region" aria-label="Scrollable data table" style={{ 'border-color': 'var(--border)' }}>
                 <table class="border-collapse w-full">
                   <thead>
                     <tr style={{ background: 'var(--bg-secondary)' }}>
