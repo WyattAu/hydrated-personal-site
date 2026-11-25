@@ -24,23 +24,33 @@ HTML file upload, ~15 minutes in the Cloudflare dashboard). Until GSC is
 verified, every ranking statement is unfounded and stays unfounded —
 this audit deliberately makes no ranking claim.
 
-## The one fixable gap found: DMARC/DKIM
+## The one fixable gap found: email anti-spoofing hardening
 
-The domain sends via Proton (`wyatt_au@protonmail.com` → custom-domain
-identity), but the DNS records that receivers check are unpublished.
-Without them: spoofed mail from `@wyattau.com` lands in inboxes
-unmarked, and legitimate mail can be flagged. Fix (user, ~15 min):
+DNS reality (probed 2026-11-25): **no MX records** (the domain receives
+no mail — contact address is `wyatt_au@protonmail.com`), no root TXT, no
+DMARC. Since nothing legitimately sends from `@wyattau.com`, the correct
+posture is the **non-sending-domain hardening trio** (spoofed mail from
+this domain should be rejectable everywhere). The Cloudflare API token
+is zone-read only, so these three DNS records are a copy-paste action
+(Cloudflare dashboard → DNS → Add record, all DNS-only):
 
-1. Proton settings → domain `wyattau.com` → open the **DKIM/DMARC
-   setup wizard** — it generates three CNAME/TXT records (2 DKIM
-   selectors + 1 DMARC TXT).
-2. Paste them into Cloudflare DNS (proxy off for these records — they
-   must be DNS-only).
-3. Verify in Proton (green checkmarks) — re-run the osint probe after.
+| Type | Name | Content |
+|---|---|---|
+| TXT | `wyattau.com` | `v=spf1 -all` |
+| TXT | `_dmarc.wyattau.com` | `v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s;` |
+| TXT | `*._domainkey.wyattau.com` | `v=DKIM1; p=` |
 
-Recommended DMARC for a low-volume domain: start `p=quarantine`,
-`rua=mailto:wyatt_au@protonmail.com`, then tighten to `p=reject` after
-two clean weeks.
+(Rationale: null SPF declares no sender; reject DMARC marks every
+spoofed `@wyattau.com` mail as rejectable; the null-DKIM wildcard
+invalidates any DKIM-signed spoof. If the domain ever sends — e.g., a
+Proton custom-domain identity — replace these with Proton's generated
+records instead.)
+
+Verification after adding: re-run the osint probes — the DMARC TXT
+should resolve, and mail-tester-style checks should report the domain
+fully hardened. Git history note: the API write attempt returned
+authentication error 10000 (token is zone-read scoped) — the records
+above are paste-ready.
 
 ## Visibility roadmap
 
