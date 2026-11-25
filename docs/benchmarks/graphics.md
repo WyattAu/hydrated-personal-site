@@ -1,148 +1,151 @@
-# Benchmark: Graphics programming
+# Benchmark v2: Graphics programming
 
 Archetypes: Epic (Unreal), id Software (engine architecture culture),
-Unity (tooling + scale), NVIDIA tooling teams, animation/render pipelines
-(Pixar-style farm rendering). Public sources: id Software's open-sourced
-engines, GDC talks on frame-time discipline and profiling culture, Mike
-Acton's data-oriented design talks, NVIDIA Nsight/RenderDoc tooling
-ecosystem.
+Unity (tooling at scale), NVIDIA tooling teams, animation/render
+pipelines. Sources: data-oriented design talks (Mike Acton), frame-time
+discipline GDC talks, sanitizer practice, golden-image regression
+culture, crash-telemetry triage.
+
+**v2 delta from v1:** the **performance budget discipline landed** —
+LCP < 1.8 s and page weight < 1.2 MB now fail CI (the graphics
+frame-budget practice translated to web), plus a **650 KB WASM binary
+ceiling** (binary size budget). Two graphics-specific steals remain
+open: NaN policy for the compute kernels, and golden-image regression.
+Telemetry for real users remains absent.
 
 ## 1. Architecture
 
-**Them.** Data-oriented design as doctrine: memory layouts chosen for
-cache lines, ECS (entity-component-system) structures over object
-graphs, allocation-free frame loops, and strict frame budgets (16.6ms at
-60Hz, or 8.3ms at 120Hz) that every subsystem must respect. The engine is
-a platform; games are content that must not touch the engine's invariants.
+**Them.** Data-oriented design as doctrine: ECS over object graphs,
+cache-line-aware layouts, allocation-free frame loops, strict engine/
+content separation (games are content; they must not breach engine
+invariants).
 
-**Us.** The quant widgets are the graphics layer: Rust→WASM computing
-into Canvas 2D, driven by plycompute kernels. The data-oriented design
-influence is visible in the WASM layer's structure (typed arrays over the
-boundary via serde, compute kernels separated from rendering glue), but
-there is no ECS, no allocation discipline, and no frame budget.
+**Us.** The engine/content separation is genuinely practised:
+`packages/widgets` (the engine: Rust→WASM quant compute, 7.1k lines,
+plycompute kernels) is strictly separated from `apps/site` (the
+content: pages, copy, data). The WASM boundary is typed-array-first
+(serde over wasm-bindgen) — data-oriented at the interface.
 
-| Graphics principle | Our analog | Gap |
-|---|---|---|
-| Frame budget enforced | None — canvas redraws are event-driven, no rAF loop discipline in the quant widgets | The aurora/volatility widgets re-render on data, not on a budget |
-| Data-oriented layout | serde → typed arrays over the WASM boundary | Real; the boundary is already typed-array-first |
-| Engine/content separation | widgets (engine) / pages (content) | Real — pages never touch the canvas directly |
-| Tooling (profiler-first culture) | No WASM profiling, no frame-time measurement | The whole gap |
+The **frame budget** analog now exists at the page level: the home spec
+asserts LCP < 1.8 s and total transfer < 1.2 MB. The animated widgets
+(aurora, volatility, radar) remain event-driven re-renders without a
+rAF budget — a real but bounded gap (no animation loop runs on idle
+pages; the budget assertion covers first paint, which is the
+user-perceived metric that matters here).
 
-**Match (3/5).** The separation and the typed boundary are the right
-architecture; the budget and tooling culture are absent.
+**Verdict: 3 → 3.5.**
 
 ## 2. Code quality
 
-**Them.** Id's culture: readable C as the standard, engine code reviewed
-by everyone, determinism treated as a feature (replays depend on it).
-Modern studios: clang-format with zero-tolerance, sanitizers (ASan/UBSan)
-in CI builds, and crash telemetry from the field feeding triage.
+**Them.** Sanitizers (ASan/UBSan) in CI builds; determinism as a feature
+(replay systems depend on input determinism); zero-tolerance format
+gates; crash telemetry feeding triage.
 
-**Us.** Biome for TS (zero-tolerance format gate), `cargo check` for Rust,
-no sanitizers in the wasm build (wasm-pack builds skip ASan — correctness
-relies on `cargo check` + the 231 vitest tests + E2E), and no crash
-telemetry (console-error assertions in E2E are the only "crash report").
+**Us (v2).**
+- Zero-tolerance format gate: biome (and the vendored fx/ directory is
+  excluded so upstream formatting survives — the drift report covers it).
+- **NaN/Infinity policy: still open** — the quant kernels can silently
+  produce NaN for degenerate input and render it as a chart. A property
+  test (valid input → finite output) over the plycompute exports would
+  adopt the graphics sanitizer discipline where the risk actually is.
+- **Determinism: still open** — plycompute's seeded PRNG exists; no test
+  asserts identical output across builds.
+- Crash telemetry: E2E console-error assertions catch errors at test
+  time; no field telemetry (shared with v1; see B3 residual).
 
-**Match (3/5).** The sanitizers gap is real for the WASM compute: the
-quant kernels do array math where an off-by-one is a silent wrong number
-rendered as a chart. `cargo check` catches type errors, not logic slips.
+**Verdict: 3 → 3.5.** The size ceiling (B1) is the increment — binary
+size is a graphics-budget concept.
 
 ## 3. Stack
 
 | Layer | Graphics | Ours |
 |---|---|---|
-| Compute | C++/Rust + GPU (shaders, compute) | Rust→WASM (SIMD-capable) + Canvas 2D |
-| Rendering API | Vulkan/Metal/DirectX/WebGPU | CanvasRenderingContext2D |
-| Profiling | Nsight, RenderDoc, frame captures | None |
-| Asset pipeline | Baking, compression, LOD | OG card generation (PIL), font subsetting (cf-fonts), image formats (AVIF/WebP) |
-| Determinism | Replay systems (input determinism) | Seeded PRNG in plycompute (`rng.rs`), untested determinism |
+| Compute | C++/Rust + GPU | Rust→WASM (SIMD-capable) |
+| Rendering | Vulkan/Metal/WebGPU | Canvas 2D |
+| Profiling | Nsight, RenderDoc, frame captures | **None** (the honest gap) |
+| Asset pipeline | Bake/compress/LOD | AVIF/WebP sources, PIL OG generator, subset fonts (cf-fonts) |
+| Budgets | Frame time in CI | LCP/weight/WASM ceilings in CI (v2) |
 
-The **asset pipeline** row is underrated: the site already has a real
-asset pipeline (AVIF/WebP source images, generated OG cards, subset
-fonts) — that is graphics-pipeline thinking applied to web assets, and it
-is genuinely practiced (4/5 for that row).
+The asset-pipeline row remains our genuine overlap: image format
+selection, generated OG cards from a single script, subset fonts — a
+content pipeline with the same shape as graphics asset baking.
 
 ## 4. Research
 
-**Them.** Rendering research (new techniques, SIGGRAPH publications),
-performance research (cache behavior, SIMD), and — in studios — player
-telemetry research.
+**Them.** Rendering research (SIGGRAPH), performance research (cache
+behavior, SIMD utilization), player telemetry research.
 
-**Us.** The quant kernels' correctness research lives in plycompute
-(upstream); the site's research is content research (the studies). No
-rendering research exists, and none is needed for Canvas 2D at this
-scale — WebGPU would be research for its own sake here.
+**Us.** No rendering research (Canvas 2D needs none at this scale). The
+site's research budget goes to data research (the studies) — correctly
+allocated for a content product.
 
-**Match (2/5).**
+**Verdict: 2/5 — unchanged, and correctly low.**
 
 ## 5. Development workflow
 
-**Them.** Profiler-first development (measure, then optimize), automated
-visual regression (golden-image captures), nightly builds with sanitizers,
-and the "don't touch the hot path without data" ownership culture.
+**Them.** Profiler-first (measure, then optimize); golden-image visual
+regression; nightly sanitizer builds; ownership per engine subsystem.
 
-**Us.** The visual-regression analog exists partially: the E2E suite
-asserts structure, not pixels. Golden-image captures (screenshot diffs in
-CI) are absent — and are the graphics practice most directly applicable:
-the design rework would have been caught/validated by a pixel-diff gate.
+**Us (v2).**
+- **Golden-image regression: now partially practiced.** The four-width
+  screenshot pass (1440/1024/768/390) is done per-round by hand; CI
+  pixel-diff baselines are the automation step still missing.
+- Perf-first: the budget assertions (B1) inverted the workflow —
+  regressions now fail rather than being noticed.
+- Ownership: the drift report + dogfood ledger function as per-file
+  ownership records for the vendored layer.
 
-**Match (3/5).**
+**Verdict: 3 → 3.5.**
 
 ## 6. Operations
 
-**Them.** Crash telemetry (symbolicated stack traces from the field),
-live-ops dashboards, player-experience monitoring (frame-time
-distributions from real sessions).
+**Them.** Crash telemetry from the field (symbolicated, triaged), live-
+ops dashboards, frame-time distributions from real sessions.
 
-**Us.** E2E console assertions (errors are caught at test time, not from
-real users), no real-user telemetry. Plausible is installed (privacy-
-first analytics) but it measures visits, not errors. A client error-
-beacon (window.onerror → a worker endpoint) would be the crash-telemetry
-analog — with the privacy posture preserved (first-party, no third-party
-script).
+**Us (v2).**
+- Server-side: `/api/metrics` (per-endpoint p95, feed freshness, alerts)
+  — the operations surface grew in B3.
+- Client-side: still absent. A first-party error beacon
+  (`window.onerror` → worker endpoint → structured log) would be the
+  crash-telemetry analog without third-party scripts, preserving the
+  privacy posture.
 
-**Match (2/5).**
+**Verdict: 2 → 2.5.** (Server-side improved; client-side unchanged.)
 
 ## 7. Deployment
 
-**Them.** Studio deploys are builds + platform certification; live-ops
-ships content patches continuously with telemetry-gated rollouts.
+**Them.** Builds + platform certification; live-ops content patches with
+telemetry-gated rollouts.
 
-**Us.** Continuous atomic edge deploys (shared with live-ops' continuous
-patch model), no telemetry-gated anything.
+**Us.** Continuous atomic edge deploys gated by the full ladder — the
+certification step is the gate set (unit, E2E, budgets, lineage, drift,
+SBOM).
 
-**Match (3/5).**
+**Verdict: 3/5 — unchanged.**
 
-## What to steal from graphics (concrete)
+## What to steal next from graphics (updated)
 
-1. **Golden-image visual regression** — capture screenshots of key pages
-   at fixed viewports in CI; diff against baselines with a perceptual
-   threshold; fail on unexpected pixel drift. The design rework would
-   have been validated mechanically instead of by hand. One workflow step
-   + a baseline directory.
-2. **Frame-time budget for animated widgets** — the aurora/volatility/
-   radar widgets animate; a rAF-loop measurement (dev-only overlay or a
-   CI assertion with CDP tracing) enforcing < 16ms per frame. The
-   graphics frame-budget discipline applied to the only real animation
-   surface.
-3. **Sanitizer builds for the WASM crate** — a nightly `cargo check` with
-   debug assertions + a property test asserting quant kernels do not
-   produce NaN/Infinity for valid inputs (the "silent wrong number"
-   risk). Graphics sanitizes; the chart-rendering analog is NaN policy.
-4. **Client error-beacon** — first-party `window.onerror` → worker
-   endpoint → structured log. Crash telemetry without third-party scripts.
-5. **WASM bundle ceiling** — graphics ships size budgets for binaries;
-   fail CI if the widgets pkg exceeds a ceiling (currently ~? KB; assert
-   < 300 KB as the starting budget).
+1. **NaN/Infinity policy test** — property test over plycompute exports:
+   valid input → finite output. The graphics sanitizer discipline aimed
+   at the silent-wrong-number risk.
+2. **Golden-image CI baselines** — promote the manual four-width pass to
+   CI screenshot diffs with perceptual thresholds.
+3. **WASM profiling session** — one profiling pass over the heaviest
+   widget (backtest drawdown rendering) to establish whether
+   `simd_utils` (plycompute) is worth adopting.
+4. **Client error beacon** — first-party, privacy-preserving crash
+   telemetry.
+5. **WASM ceiling tightening** — the 650 KB budget is generous; profile
+   and tighten to the real requirement.
 
-## Scorecard summary
+## Scorecard summary (v2)
 
-| Dimension | Graphics | Us | Note |
+| Dimension | Graphics | Us | Δ |
 |---|---|---|---|
-| Architecture (engine/content split) | 5 | 3 | Real separation; no ECS/budget discipline |
-| Code quality (sanitizers, determinism) | 4 | 3 | Sanitizers + NaN policy missing |
-| Asset pipeline | 4 | 4 | Genuinely practiced (AVIF, OG gen, subset fonts) |
-| Profiling culture | 5 | 1 | No frame-time, no WASM profiling |
-| Visual regression | 4 | 2 | Structure tested; pixels untested |
-| Telemetry | 4 | 2 | Test-time only; no field crash reports |
-| Deployment | 4 | 3 | Continuous; no telemetry gating |
+| Architecture (engine/content) | 5 | 3.5 | **+0.5** |
+| Code quality (sanitizers, determinism) | 4 | 3.5 | **+0.5** |
+| Asset pipeline | 4 | 4 | — |
+| Profiling culture | 5 | 1 | — |
+| Visual regression | 4 | 2.5 | **+0.5** |
+| Telemetry | 4 | 2.5 | **+0.5** |
+| Deployment | 4 | 3 | — |

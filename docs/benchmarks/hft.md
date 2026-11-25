@@ -1,163 +1,169 @@
-# Benchmark: HFT (high-frequency trading)
+# Benchmark v2: HFT (high-frequency trading)
 
 Archetypes: Citadel Securities, Jump Trading, Hudson River Trading,
-Optiver, SIG, Virtu. Public sources: exchange connectivity papers,
-kernel-bypass engineering talks (Solarflare/onload, DPDK), tick-to-trade
-latency discussions, Fermium/Jane Street OCaml culture talks, Optiver
-engineering blogs.
+Optiver, SIG, Virtu. Sources: kernel-bypass engineering (onload, DPDK),
+tick-to-trade latency literature, exchange certification practice,
+pre-trade risk discipline.
+
+**v2 delta from v1:** the rate limiter went from a 13-line stub with an
+unbounded leak to a real bounded sliding-window limiter with 6 tests
+(HFT's in-line risk-check discipline, adopted); per-endpoint latency
+percentiles became queryable (`/api/metrics` p95 — the HFT latency
+dashboard primitive); a WASM size ceiling entered CI (binary size
+budget); fuzz runs weekly. Cert drill and determinism test remain
+open.
 
 ## 1. Architecture
 
-**Them.** The entire firm is a latency budget. Colocated racks at
-exchanges, kernel bypass networking (solarflare/onload, DPDK), FPGA
-hardware acceleration for feed handling, NUMA-pinned processes with
-isolated cores, lock-free ring buffers (`shm-rings` exists in this
-estate), preallocated memory (zero allocations on the hot path), and a
-tick-to-trade budget measured in hundreds of nanoseconds to a few
-microseconds. Everything downstream — research, monitoring, tooling — is
-subordinate to the hot path.
+**Them.** Everything is a latency budget: colocation, kernel bypass,
+FPGA feed handling, NUMA pinning, lock-free structures, zero hot-path
+allocations. Small, owned, single-purpose modules; one senior owner per
+hot-path file.
 
-**Us.** There is no hot path in the HFT sense; the closest analog is the
-edge worker's request path (fetch → cache → circuit-breaker → origin)
-and the WASM quant compute (rust → wasm-bindgen, canvas rendering).
-The architecture lesson that *transfers* is structural, not temporal:
+**Us (in-tree).** No hot path exists in the HFT sense — but the module
+ownership discipline is the transferable part, and it is now measurable:
 
-| HFT principle | Our analog | Honest gap |
-|---|---|---|
-| Small single-purpose modules, each owned | Worker: `cache.ts` (28 lines), `circuit-breaker.ts` (38), `connection-pool.ts` (72), `fetch.ts` (50), `rate-limiter.ts` (13), `retry.ts` (30), `security.ts` (44) | `rate-limiter.ts` at 13 lines is a stub, not a token bucket |
-| Zero waste on the hot path | Static-first: HTML is prerendered; the only runtime compute is quant in WASM | WASM bundle size has no CI ceiling |
-| Determinism | Deterministic quant kernels (seeded PRNG in plycompute's `rng.rs`) | Chart rendering is deterministic; live feeds are not (by nature) |
+| Module | Lines | Purpose | Tests |
+|---|---|---|---|
+| `worker/cache.ts` | 28 | stale-serve cache | unit |
+| `worker/circuit-breaker.ts` | 38+ | feed failure isolation + last-success stamping | unit |
+| `worker/connection-pool.ts` | 72 | upstream connection reuse | unit |
+| `worker/rate-limiter.ts` | ~60 | sliding-window limiter, bounded memory | 6 unit tests |
+| `worker/retry.ts` | 30 | backoff | unit |
+| `worker/security.ts` | 44 | response hygiene | unit |
+| `worker/fetch.ts` | 50 | dedup + latency recording | covered via suite |
 
-**Match (4/5 architecture coherence).** The HFT aesthetic — tiny,
-auditable modules with one reason to exist — is genuinely practiced:
-no worker file exceeds 74 lines without justification, and the Durable
-Object (`price-stream.ts`, 74 lines) does exactly one thing.
+The two HFT structural principles, audited honestly:
+1. **Single-purpose owned modules** — practiced; every worker module is
+   under 74 lines and unit-tested.
+2. **Measure the hot path** — newly practiced: upstream latency per
+   endpoint is recorded on every feed call and exposed as p95 at
+   `/api/metrics` (the HFT latency dashboard, minimal form).
+
+**Verdict: 4/5 — unchanged**, but the v2 deltas make the 4 firmer: the
+limiter and latency measurement are now real, tested code rather than
+aspirations.
 
 ## 2. Code quality
 
-**Them.** Compiler-flag paranoia (`-O3 -march=native -fno-plt`), MISRA-
-style internal coding standards, mandatory profiling before merge for
-hot-path changes, latency regression tests that fail CI on p99 movement,
-and review ownership: one senior owner per hot-path file, no exceptions.
+**Them.** Latency regression tests fail CI on p99 movement; profiling
+before any hot-path merge; hardware-aware idioms.
 
-**Us.** Biome gates, `tsc` strict, `cargo check` on the WASM crate,
-the integrity gate (stylesheet per page), and a drift report that
-surfaced a 17/17 deep fork. Missing, and genuinely missing (not
-scale-inherent): **profiling is absent.** No flamegraphs for the WASM
-compute, no Lighthouse budget in CI, no latency percentile measurement
-on the worker. HFT's contribution here is not their toolchain but their
-posture: *measure before merging anything on a hot path.*
+**Us (v2).**
+- **Budget regression tests now fail CI**: LCP < 1.8 s and page weight
+  < 1.2 MB are asserted in the home spec (the web translation of "p99
+  movement fails CI"); the WASM binary has a 650 KB ceiling in the build
+  gate.
+- **Fuzzing runs weekly** against the quant kernels — the HFT
+  certification-run cadence applied to the money math. Three targets
+  (`fuzz_blackscholes`, `fuzz_montecarlo`, `fuzz_var`), artifacts on
+  crash, zero open crashes as standing policy.
+- Missing (honest): a **determinism test** — plycompute's seeded PRNG
+  (`rng.rs`) exists but nothing asserts identical output across builds
+  for a fixed seed. HFT would not ship a pricing kernel without it.
 
-**Match (3/5, improvable to 4 cheaply).**
+**Verdict: 3 → 3.5.** Budgets and fuzz are in; determinism proof is the
+remaining step.
 
 ## 3. Stack
 
-| Layer | HFT | Ours | Transferable? |
+| Layer | HFT | Ours | Transfer |
 |---|---|---|---|
-| Core language | C++20/Rust, sometimes OCaml (Jane Street) | Rust (widgets) + TypeScript (worker/site) | Yes — Rust is the shared dialect |
-| Data structures | Lock-free, cache-line-aware, preallocated | Standard collections in quant kernels | Partially — hot loops could use `simd_utils` (exists in plycompute, unused by us) |
-| Networking | Kernel bypass, PTP-synced clocks | Edge fetch + WS streams (Binance) | No — wrong problem domain |
-| Storage | Tick archives, memory-mapped files | KV + quarterly sha256 snapshots | The *immutability discipline* transfers |
-
-The estate's `shm-rings`, `uring-kit`, `uring-http-kit`, and `simd-tokenizer`
-repos are the HFT-flavored tooling — none consumed by this site, and none
-should be: the site has no hot loop that justifies ring buffers.
+| Core language | C++/Rust | Rust (quant kernels) + TS edge | Shared dialect: Rust |
+| Memory discipline | Preallocated, lock-free | Standard collections | `simd_utils` in plycompute remains unconsumed — a candidate for the drawdown/correlation hot loops if they ever grow |
+| Storage | Tick archives, mmap | KV + sha256 snapshots | Immutability discipline transferred (append-only snapshots) |
+| Determinism | Replay from tick archive | Seeded PRNG, untested | **Open: determinism CI test** |
 
 ## 4. Research
 
-**Them.** Signal research on petabytes of tick data, backtesting with
-careful lookahead-bias discipline, research-to-production parity (the
-exact code that backtests is the code that trades).
+**Them.** Backtesting with lookahead-bias discipline; research-to-
+production parity (the backtest code is the trading code).
 
-**Us.** The closest genuine analog and our best asset: **research-to-
-production parity in the quant widgets.** `packages/widgets` consumes
-`plycompute` (the estate's quant crate) — the same crate the estate uses
-elsewhere — via git-pinned dependencies, and the ETF study recomputes its
-numbers from the public dataset at build time (reproducible research).
-The storm report's correlation (Pearson r = 0.787, n = 45, forward-filled
-3h→30min) documents its method precisely — the MFT/HFT publication
-discipline applied to a weather event.
+**Us (v2).** The parity claim strengthened materially: the ETF study
+now **cites its dataset hash** in the page and a CI test binds that hash
+to the sha256-stamped snapshot. Research-to-production parity in HFT
+terms: "the number you published is provably computed from the data you
+said you used." That is the lineage principle, mechanically enforced.
 
-**Match (3/5).** Missing: no backtest lookahead-bias tests, no dataset
-versioning *tests* (the manifest records sha256 but nothing verifies a
-study's numbers against its claimed snapshot).
+Still missing: a lookahead-bias guard for the backtest widget (the
+`walk_forward` path) — a test asserting the model at time t never sees
+t+1 data. Worth one focused test.
+
+**Verdict: 3 → 4** (lineage enforcement is the increment).
 
 ## 5. Development workflow
 
-**Them.** Small teams with extreme ownership; changes to risk paths
-require sign-off; kill switches tested in production; hardware-in-the-
-loop for exchange cert changes.
+**Them.** Kill switches tested in production; certification runs before
+exchange deploys.
 
-**Us.** The kill-switch analog exists and is tested: the circuit breaker
-module and the E2E-verified widget error states (live-feed outage =
-graceful degradation, verified as "environmental, not page bugs" in the
-console-error filter). Single-flight build locks stop concurrent-agent
-races — the workflow equivalent of "one process owns the book."
+**Us (v2).** The kill-switch analog is tested: the circuit breaker's
+open→stale→throw path has unit coverage, and widget error states are
+E2E-verified against real feed outages. The certification-bundle idea
+materialized: every CI run now prints lineage, WASM-size, SBOM, and
+drift evidence.
 
-**Match (4/5).** The risk-check discipline (HFT's "never trade without
-in-line checks") maps to the build integrity gate: no page ships without
-its stylesheet, no build runs concurrently.
+**Verdict: 4/5.**
 
 ## 6. Operations
 
-**Them.** Exchange certification runs, latency dashboards, hardware
-failover drills, kill-switch drills, capacity planning per core.
+**Them.** Latency dashboards, failover drills, capacity planning per
+core, exchange certification.
 
-**Us.** 6-hour uptime probes × 4 endpoints, a runner smoke test, and...
-that is the whole operations surface. Honest gap (2/5 in the matrix via
-FAANG, but HFT's standard is different: they would call our probe set
-"certification-lite"). The transferable practice: **recurring drills**.
-HFT drills failover monthly; the equivalent here is a scheduled
-deploy-from-clean-clone drill (prove the repo + gates rebuild the site
-from scratch on a runner) — which would also confirm the Forgejo runner.
+**Us (v2).**
+- `/api/metrics` exposes per-endpoint latency `{avg, p95, count}` —
+  an actual latency dashboard primitive, queryable.
+- Freshness alarms: `feedLastSuccess` timestamps + uptime assertions.
+- Missing: the **deploy-from-clean-clone drill** (scheduled, proves
+  portability + the Forgejo runner end-to-end). Still open; HFT's
+  failover-drill cadence is the model.
+
+**Verdict: 2 → 3.** Measurement exists; drills do not.
 
 ## 7. Deployment
 
-**Them.** Deploy windows tied to exchange calendars, certification
-sign-off, staged firmware/fpga rollouts with hardware fallback.
+**Them.** Certification sign-off before deploy; staged rollouts with
+hardware fallback.
 
-**Us.** Atomic edge deploys, instant rollback, manual wrangler with
-keyfile credentials. No deploy window needed (nothing trading). The HFT
-lesson that transfers is *certification before deploy*: run the full
-ladder (done) plus the drift report and the snapshot manifest check —
-a "certification bundle" the deploy step could print.
+**Us (v2).** The certification bundle now exists in CI: lineage, WASM
+size, SBOM, drift evidence emitted on every run. Atomic edge deploy with
+instant rollback. Missing: artifact signing (defence file owns that
+gap).
+
+**Verdict: 3 → 3.5.**
 
 ## 8. Risk & safety
 
-**Them.** Pre-trade risk checks in-line with the hot path, self-trade
-prevention, fat-finger limits, kill switches at multiple layers.
+**Them.** In-line pre-trade risk checks; fat-finger limits; multi-layer
+kill switches.
 
-**Us.** The direct analog: content safety gates. The build integrity
-gate (no page without styles), the copy-rule enforcement, and the
-drift report are pre-publish risk checks. The rate-limiter stub is the
-one unguarded input path.
+**Us (v2 — the big delta).** The rate limiter is now a real in-line risk
+check: sliding-window semantics, bounded memory with two-stage eviction
+(expired first, then oldest-inserted), the current IP protected from its
+own eviction, six unit tests including a spoofed-IP flood and a
+no-expiry cap test. Before v2, this was 13 lines with an unbounded map.
 
-## What to steal from HFT (concrete)
+**Verdict: 3 → 4.5.**
 
-1. **Latency/size budget in CI** — fail the build if the WASM bundle or
-   homepage LCP regresses beyond a ceiling. HFT's "latency regression
-   fails CI" translated to web terms. One workflow step.
-2. **Fill the rate-limiter stub** — a real token bucket (13 lines is not
-   one) with tests. The estate's `ratelimit` repo is the reference.
-3. **Determinism test for quant kernels** — plycompute's seeded PRNG
-   exists; a CI test asserting identical output for a fixed seed across
-   builds would be the HFT "same inputs, same fills" discipline.
-4. **Certification-bundle print at deploy** — one workflow step that
-   emits: unit results, E2E results, drift report, snapshot manifest
-   hash, bundle size. HFT's cert-run paperwork, automated.
-5. **Deploy-from-clean-clone drill** (scheduled) — proves portability;
-   also the missing proof that the Forgejo runner works end-to-end.
+## What to steal next from HFT
 
-## Scorecard summary
+1. **Determinism CI test** — fixed seed → identical quant output across
+   builds; one test file against `plycompute::rng` consumers.
+2. **Lookahead-bias test** for the backtest `walk_forward` path.
+3. **Deploy-from-clean-clone drill** — monthly; doubles as Forgejo
+   runner proof.
+4. **`simd_utils` adoption** — if drawdown/correlation kernels ever
+   profile hot.
 
-| Dimension | HFT | Us | Note |
+## Scorecard summary (v2)
+
+| Dimension | HFT | Us | Δ |
 |---|---|---|---|
-| Architecture coherence | 5 | 4 | Tiny owned modules practiced; no hot path to own |
-| Code quality | 5 | 3 | Gates yes; profiling/measurement absent |
-| Testing | 4 | 4 | 367 tests; no determinism/budget tests |
-| Research | 5 | 3 | Parity discipline real; no bias tests |
-| Workflow | 4 | 4 | Ownership + locks + kill-switch analogs |
-| Operations | 4 | 2 | Probes only; no drills, no percentiles |
-| Deployment | 3 | 3 | Certification bundle missing on both sides of the scale argument |
-| Risk & safety | 5 | 3 | Integrity gates real; rate limiter is a stub |
-| Perf engineering | 5 | 3 | WASM compute good; no budgets, no flamegraphs |
+| Architecture coherence | 5 | 4 | — |
+| Code quality | 5 | 3.5 | +0.5 |
+| Testing | 4 | 4.5 | +0.5 |
+| Research | 5 | 4 | +1 |
+| Workflow | 4 | 4 | — |
+| Operations | 4 | 3 | +1 |
+| Deployment | 3 | 3.5 | +0.5 |
+| Risk & safety | 5 | 4.5 | **+1.5** |
+| Perf engineering | 5 | 4 | +1 |

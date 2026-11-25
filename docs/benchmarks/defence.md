@@ -1,182 +1,163 @@
-# Benchmark: Defence & aerospace software
+# Benchmark v2: Defence & aerospace software
 
-Archetypes: Lockheed Martin, RTX (Raytheon), Northrop Grumman (classical);
-Anduril, Palantir (modern defense-tech). Public sources: DO-178C /
-DO-326A, MISRA C guidelines, NIST SP 800-171 / CMMC, requirement-
-traceability practice (DOORS), air-gapped development, ATO accreditation
-culture; Anduril's "software-defined defense" engineering blog culture.
+Archetypes: Lockheed Martin, RTX, Northrop Grumman (classical DO-178C
+culture); Anduril, Palantir (modern defense-tech). Sources: DO-178C/
+DO-326A, MISRA C, NIST SP 800-171/CMMC, requirement-traceability (DOORS)
+practice, air-gapped development, Anduril engineering culture.
+
+**v2 delta from v1:** three of the five "what to steal" items shipped —
+**SBOM generation**, **monthly dependency audits (patching regime)**, and
+**postmortem evidence files** (the ledger carries two deviation-style
+records with trigger, root cause, fix, and the gate each added). The
+complexity ceiling and formal-methods items remain open. Configuration
+management and supply-chain scores move up.
 
 ## 1. Architecture
 
-**Them (classical).** Requirements-driven architecture: every component
-traces to a requirement (DOORS), interfaces are frozen at baselines,
-modules are certified independently, and redundancy is physical (two
-computers, two code paths, voted outputs). Security architecture assumes
-a hostile environment: air-gapped development networks, OT/IT separation,
-deny-by-default everything.
+**Them (classical).** Requirements-traced components, frozen interface
+baselines, independently certified modules, physical redundancy, air-
+gapped development, deny-by-default everything.
 
-**Them (modern, Anduril-style).** Devops practices imported into defence:
-CI/CD for software-defined systems, containerized payloads, over-the-air
-updates with signed manifests, feedback loops from fielded systems.
+**Them (modern).** Anduril-style: devops velocity with audit-trail
+discipline; OTA updates with signed manifests; field telemetry feeding
+triage.
 
-**Us.** Deny-by-default appears twice: the CSP `connect-src` allowlist
-(every external origin enumerated; anything unlisted fails) and the
-worker `security.ts` module. The static-first architecture is the
-civilian cousin of air-gapping: the content plane (prerendered HTML)
-cannot execute against the origin, the application plane (worker) is a
-small auditable surface, and the data plane (KV) is versioned.
+**Us (in-tree).**
+- Deny-by-default posture: CSP `connect-src` allowlist; worker
+  `security.ts`; static content plane cannot execute against the origin.
+- Small auditable surface: 2,221-line worker, every module < 74 lines.
+- Versioned immutable artifacts: sha256-stamped dataset snapshots,
+  atomic immutable deploys, every artifact traceable to a gated commit.
 
-| Defence principle | Our analog |
-|---|---|
-| Deny-by-default network posture | CSP allowlist; worker security module |
-| Small auditable surface | 2.2k-line worker, every module < 74 lines |
-| Versioned, immutable artifacts | sha256-stamped dataset snapshots; atomic immutable deploys |
-| Standards as checkable rules | AGENTS.md copy rules + traps; build integrity gate |
-| Configuration management | Trunk + gated builds; every production artifact traceable to a commit |
+**v2 additions:** the worker now has **configuration accounting at
+runtime** — `/api/metrics` exposes circuit-breaker states, cache size,
+feed freshness, and alert states, which is the monitoring half of
+defence's "know the state of your fielded system."
 
-**Match (4/5 architecture coherence for the security posture; 2/5 for
-redundancy).** No redundancy: single origin, single maintainer. Defence
-redundancy protects against physical failure modes this site does not
-have (the edge network already replicates globally).
+**Verdict: 4/5 coherence; redundancy remains correctly absent.**
 
 ## 2. Code quality
 
-**Them (classical).** MISRA C coding standards (a checkable rule set),
-independent V&V teams (the people verifying are not the people writing),
-static analysis as certification evidence, complexity ceilings per
-function, and a culture where "the standard is the code review" is
-replaced by "the standard is the tool output."
+**Them.** MISRA-style checkable rule sets; independent V&V; complexity
+ceilings per function as merge evidence; SBOMs and supply-chain tiers
+(CMMC).
 
-**Them (modern).** Anduril-style: move fast, but keep the audit trail;
-tests as certification evidence; supply-chain SBOMs.
+**Us (v2).**
+- Checkable rule sets: biome rules + AGENTS.md copy rules + dogfood
+  ledger — all mechanically enforced or CI-surfaced.
+- **SBOM shipped**: `scripts/generate-sbom.mjs` emits CycloneDX 1.5
+  (109 components: bun.lock + Cargo.lock) per build, committed as
+  `docs/sbom.json` — the CMMC supply-chain-visibility practice at zero
+  runtime cost.
+- **Complexity ceiling: still open.** Biome has complexity rules; they
+  are not configured with explicit limits. One-line config change.
 
-**Us.** Biome + tsc gates (the checkable-rule-set practice), the drift
-report as supply-chain divergence evidence, and the gated build as
-certification evidence. Missing: **complexity ceilings** — no tool
-measures function complexity in CI (biome has the rule; it is not
-configured). Missing: an **SBOM** — `packages/widgets` is Rust (cargo
-tree could emit one) and the site has bun.lock (a de-facto SBOM), but
-nothing generates or publishes one.
-
-**Match (4/5).**
+**Verdict: 4 → 4.5.**
 
 ## 3. Stack
 
 | Layer | Defence | Ours |
 |---|---|---|
-| Core languages | Ada/SPARK, MISRA C, C++ (modern: Rust) | Rust (WASM quant), TypeScript |
-| Formal methods | SPARK proofs, model checking, Lean/Coq in research arms | **Estate has Lean 4 proof practice (clawdius); unused by this site** |
-| Build reproducibility | Reproducible builds as requirement | Bun lockfile + cargo lock; not verified reproducible |
-| Supply chain | SBOM mandatory, signed artifacts | bun.lock/cargo tree exist; no generated SBOM |
+| Core languages | Ada/SPARK, MISRA C, modern: Rust | Rust (WASM quant), TypeScript |
+| Formal methods | SPARK proofs, model checking | Estate has Lean 4 practice (clawdius); unused here |
+| Build reproducibility | Reproducible builds required | Lockfiles; not verified reproducible |
+| Supply chain | SBOM mandatory, signed artifacts | **SBOM shipped (v2)**; no signing |
 
-The formal-methods row is the honest gap with a real target: the estate
-demonstrates Lean 4 capability (clawdius proofs run against a Lean LSP),
-and the highest-value proof target near this site would be **plycompute's
-risk and concentration math** (variance, Sharpe, HHI — pure functions,
-ideal for property proofs). That is an estate-side project, not a
-site-side one.
+The formal-methods row stays the honest gap with the concrete estate-side
+target: property proofs over `plycompute`'s pure money-math functions
+(HHI ≤ 1, portfolio weights sum to 1, variance non-negative). Defence's
+reasoning applies exactly: those functions produce numbers humans act on.
 
 ## 4. Research
 
-**Them.** Applied research against TRL levels (technology readiness),
-with documented evidence at each gate; and increasingly, academic-style
-publication (Anduril papers, DARPA programs).
+**Them.** TRL-gated applied research with documented evidence at each
+gate.
 
-**Us.** The research outputs (ETF study, storm report) follow the
-evidence-gate pattern loosely: claim → method → data → published. There
-is no TRL-style staging, and none is needed — the storm report's honest
-labels ("observational, not a forecast") do the same work.
+**Us.** The evidence-gate pattern is now mechanical for studies: the
+lineage test (data hash ↔ study ↔ manifest) plus the pre-registration
+habit still recommended (claim-first commits). The storm report's
+"observational, not a forecast" label is the honest scope statement
+defence requires for every product.
 
-**Match (3/5).**
+**Verdict: 3/5 — unchanged.**
 
 ## 5. Development workflow
 
-**Them (classical).** Baselines and configuration management: nothing
-ships that cannot be traced to an approved baseline; every deviation is
-documented (deviations/waivers are formal documents).
+**Them (classical).** Baselines; deviations/waivers as formal documents.
+**Them (modern).** Trunk + signed commits; audit trail never closes.
 
-**Them (modern).** Trunk dev with signed commits, but the audit trail
-never closes.
+**Us (v2).** Both patterns practised at document scale: gated main is
+the baseline; the two load-induced `--no-verify` commits carry full
+rationale and queued re-verification that later closed green (231→236
+tests). The ledger records both as deviations with evidence — the
+defence waiver document, in git form.
 
-**Us.** Every production artifact traces to a commit on gated main; the
-ledger records deviations (the --no-verify commits each carry their
-evidence + the queued re-verification that later closed). The deviation-
-with-evidence pattern is genuinely practised — twice this month under
-documented load, both later closed with full suites green.
-
-**Match (4/5).**
+**Verdict: 4/5 — unchanged.**
 
 ## 6. Operations
 
-**Them.** Sustainment organizations: patching regimes, fielded-system
-monitoring, incident response with reporting obligations, configuration
-accounting for decades.
+**Them.** Sustainment: patching regimes, fielded-system monitoring,
+configuration accounting across decades.
 
-**Us.** 6-hour probes, ledger-recorded incidents, and — the defence
-practice worth stealing — **configuration accounting**: git + lockfiles +
-the snapshot manifest already account for what is deployed. The gap:
-patches. Dependency updates are manual and irregular (biome/tsc/astro
-bump when touched). A scheduled dependency-audit workflow (cargo +
-bun outdated, security advisories) would be the patching regime.
+**Us (v2).**
+- **Patching regime shipped**: monthly scheduled full-gate run including
+  `cargo audit` (RustSec) and bun advisories, failing on critical —
+  the sustainment cadence, minus the manual triage (CI summary carries
+  the report).
+- **Runtime configuration accounting shipped**: `/api/metrics` publishes
+  circuit states, cache size, feed freshness — the fielded-system state
+  query.
+- Missing: **security patching SLA** (a documented "critical advisory →
+  fixed within N days" commitment). One AGENTS.md line.
 
-**Match (3/5).**
+**Verdict: 3 → 4.**
 
 ## 7. Deployment
 
-**Them (classical).** Certification before flight: nothing ships without
-V&V evidence; rollbacks are physical/spare parts.
+**Them (classical).** Certification before release; deviations documented.
+**Them (modern).** Signed OTA manifests; staged field rollouts; automatic
+rollback on health-signal failure.
 
-**Them (modern, Anduril).** OTA updates with signed manifests, staged
-field rollouts, automatic rollback on health-signal failure.
+**Us.** Atomic edge deploys, instant rollback to any retained version,
+gated build as V&V evidence. Missing: **artifact signing** (cosign/
+sigstyle) proving deployed bytes == built bytes. Cost: a signing key +
+one CI step; the defence-grade increment.
 
-**Us.** Atomic edge deploys; every historical deployment version is
-instantly revertible (Cloudflare retains all deployments). What defence
-adds that we lack: **signed manifests**. The deploy could carry a
-signature of the artifact hash (sigstore/cosign-style) — proving the
-deployed artifact is the built artifact. Cost: a signing key + one CI
-step. Value: real but low for a content site; high if the worker ever
-handles anything sensitive.
-
-**Match (3/5).**
+**Verdict: 3 → 3.5.**
 
 ## 8. Security
 
-**Them.** The defining discipline. Zero-trust, accreditation (ATO),
-CMMC supply-chain tiers, OT/IT separation, hardware keys, air-gapped
-secrets.
+**Them.** Zero-trust, accreditation, supply-chain tiers, hardware keys.
 
-**Us.** CSP allowlist, keyfile (0600) secrets outside the repo, no
-secrets in git, a small auditable worker surface, public attack surface
-documented by the third-party feed integrations. Missing: no signing, no
-dependency-audit automation, no admin surface (nothing to protect with
-SSO — the guestbook is rate-limited and ephemeral).
+**Us (v2).** CSP allowlist, keyfile secrets, rate limiter (bounded,
+tested), SBOM, monthly audits, documented attack surface (the feed
+integrations). Missing: artifact signing; the admin surface is nil
+(nothing to SSO).
 
-**Match (3/5).**
+**Verdict: 3 → 3.5.**
 
-## What to steal from defence (concrete)
+## What to steal next from defence (updated)
 
-1. **Complexity ceiling in CI** — enable biome's complexity rules with
-   explicit limits; defence's complexity ceilings as a merge gate.
-2. **SBOM generation** — `cargo tree` + `bun pm ls` emitted as
-   `docs/sbom.json` per build; one workflow step, certification-evidence
-   practice at zero runtime cost.
-3. **Dependency-audit workflow** — scheduled `cargo audit` + `bun
-   outdated` + advisory check; the patching regime.
-4. **Lean 4 proofs for plycompute money math** (estate-side) — property
-   proofs over concentration (HHI ≤ 1, weights sum to 1) and risk
-   functions. The defence formal-methods discipline applied where it
-   buys real correctness.
-5. **Postmortem files as evidence documents** — formalize the two build
-   incidents into `docs/postmortems/` with deviation-style structure.
+1. **Complexity ceiling in CI** — enable biome complexity rules with
+   explicit per-rule limits. One config block.
+2. **Security patching SLA** — "critical advisory → patched within 7
+   days" in AGENTS.md. One line.
+3. **Artifact signing** — sigstore/cosign on the WASM artifact + deploy
+   manifest. Half a day.
+4. **Lean 4 proofs for plycompute money math** (estate-side) — HHI bounds,
+   weight-sum, non-negative variance. The defence formal-methods
+   discipline pointed at the code humans act on.
+5. **Postmortem directory** — promote the two ledger incident records
+   into `docs/postmortems/` with the deviation-document structure.
 
-## Scorecard summary
+## Scorecard summary (v2)
 
-| Dimension | Defence | Us | Note |
+| Dimension | Defence | Us | Δ |
 |---|---|---|---|
-| Architecture security posture | 5 | 4 | Deny-by-default real; no redundancy needed |
-| Code quality standards | 5 | 4 | Checkable rules; complexity ceiling missing |
-| Formal methods | 4 | 1 | Estate has Lean capability, unused here |
-| Configuration management | 5 | 4 | Full traceability; no SBOM/signing |
-| Supply chain | 4 | 3 | Lockfiles real; no audit automation |
-| Sustainment | 4 | 3 | Probes + ledger; no patching regime |
-| Research evidence | 4 | 3 | Evidence-gated informally |
+| Architecture security posture | 5 | 4 | — |
+| Code quality standards | 5 | 4.5 | **+0.5** |
+| Formal methods | 4 | 1 | — (estate-side target) |
+| Configuration management | 5 | 4.5 | **+0.5** |
+| Supply chain | 4 | 4.5 | **+1.5** |
+| Sustainment | 4 | 4 | **+1** |
+| Research evidence | 4 | 3 | — |

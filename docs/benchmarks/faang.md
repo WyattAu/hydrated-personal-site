@@ -1,152 +1,166 @@
-# Benchmark: FAANG-scale web engineering
+# Benchmark v2: FAANG-scale web engineering
 
-Archetypes: Google, Meta, Netflix, Amazon (consumer web platform orgs).
-Public sources: SRE book/error-budget culture, monorepo + trunk-based
-development writeups, Meta's testing pyramid materials, Netflix chaos
-engineering papers, Amazon's operational-readiness reviews.
+Archetypes: Google, Meta, Netflix, Amazon. Sources: SRE book/error-budget
+culture, monorepo + trunk-based development writeups, Meta testing-pyramid
+materials, Netflix chaos engineering, Amazon operational-readiness
+reviews.
+
+**v2 delta from v1:** observability moved from liveness-only to a real
+measurement surface (structured logs + metrics route + freshness
+telemetry); a perf budget now gates CI; accessibility became a hard gate;
+the theme pipeline root-cause was fixed. Scores updated accordingly.
 
 ## 1. Architecture
 
-**Them.** Service-oriented at massive scale: hundreds of microservices
-behind edge load balancers, multi-region active-active, cell-based
-architectures (blast-radius isolation), every dependency assumed fallible,
-back-pressure and bulkheads as first-class citizens. Frontends: server-
-rendered frameworks with edge CDN, design-system packages consumed
-through versioned registries (Meta: Dotskul/its own; Google: internal
-component frameworks).
+**Them.** Service meshes, cell-based isolation, multi-region active-
+active, dependency failure assumed everywhere, back-pressure as a first-
+class concern, design systems consumed as versioned packages.
 
-**Us.** Static-first edge architecture: Astro 5 islands (SolidJS 1.9) on
-Cloudflare Pages, a 2.2k-line TypeScript edge worker (named modules:
-cache, circuit-breaker, connection-pool, fetch, rate-limiter, retry,
-security, a Durable Object price stream), Rust→WASM quant widgets
-(7.1k lines) fed by plychart estate crates, KV for state (aurora history,
-data snapshots), no server-rendered app layer at all.
+**Us (in-tree evidence).**
 
-**Match (4/5).** The architectural *virtues* map directly:
-
-| FAANG virtue | Our practice |
+| FAANG virtue | Our implementation |
 |---|---|
-| Blast-radius isolation | Static content cannot go down with the app; the worker is the only mutable runtime |
-| Assume dependencies fail | Circuit-breaker + retry modules; widget error states swallow live-feed outages (verified in E2E console-error filter) |
-| Edge-first delivery | Cloudflare edge cache, immutable asset headers, 418-item registry |
-| Design system as package | 5-theme token contract, quiet-label system, fx components via registry |
+| Immutable, replicated content plane | Prerendered HTML on Cloudflare edge; app plane isolated in a 2,221-line worker |
+| Dependency-failure tolerance | `worker/circuit-breaker.ts` + `retry.ts` (circuit open → serve stale → throw), widget error states E2E-verified against live-feed outages |
+| Design system as versioned artifact | `themes.css` 5-theme token contract + `fx/` components consumed through the solid-fx jsrepo registry (drift 0/14 after reconciliation) |
+| Data plane versioning | `public/data/snapshots/` sha256-stamped quarterly series + manifest; `tests/unit/lineage.test.ts` enforces study↔snapshot binding |
 
-**Gap.** Cell-based isolation and multi-region failover are absent —
-correctly absent: a single-origin static site has no cells to lose. The
-FAANG architecture exists to coordinate thousands of engineers; adopting
-it here would be negative-value complexity.
+**Gap (scale-inherent).** Cell-based isolation and multi-region failover
+require cells; a single-origin static site has none. Correctly absent.
+
+**Verdict: 4/5 — unchanged.** The static-first decision is the FAANG
+"choose boring architecture that fails safely" principle applied
+correctly at this workload's scale.
 
 ## 2. Code quality
 
-**Them.** Mandatory pre-merge review (readability certifications at
-Google), static analysis as merge blocks (Tricorder/Infer), style
-ownership per directory, generated-code policies, dead-code vacuuming as
-scheduled work.
+**Them.** Readability certifications, static analysis as merge blocks,
+generated-code policies, scheduled dead-code removal.
 
-**Us.** Biome lint/format gates, `tsc --noEmit` strict, a copy-rule set
-enforced by convention (AGENTS.md), a build integrity gate (stylesheet
-present per page, single-flight flock), a drift report for vendored code
-(17→0 after reconciliation), and a documented dogfood ledger with three
-rejections. No human review exists — the gates *are* the review.
+**Us (v2 evidence).**
+- Biome zero-tolerance format gate; `tsc` strict; complexity reported.
+- Build integrity gate: stylesheet-per-page + WASM 650 KB ceiling +
+  single-flight flock — a "definition of done" mechanically enforced.
+- Dead-code removal actually happened: the post-redesign audit deleted
+  8 unused vendored fx components and 21 dead Rust copies (~4k lines).
+- The de-fade sweep collateral ("reveal" eaten from a title) was caught
+  by the snapshot-vs-study lineage review — review catching what regexes
+  broke, exactly the FAANG "review finds what automation misses" loop.
 
-**Match (4/5).** The gap is not enforcement but *review bandwidth*: one
-maintainer plus bound agents is a single-reviewer system. The estate's
-236 repos provide implicit peer review only when the estate audit sweeps.
+**Verdict: 4 → 4.5.** The marginal gain: dead-code and drift hygiene are
+now continuous (drift report in CI), not scheduled.
 
 ## 3. Stack
 
-| Layer | FAANG typical | Ours | Verdict |
-|---|---|---|---|
-| Frontend framework | React/next-gen internal frameworks, SSR | Astro 5 + SolidJS 1.9 islands | Deliberate: static-first beats SSR for this workload |
-| Styling | CSS-in-JS or internal systems, design tokens | Tailwind 4 + a 5-theme token contract (one accent voice per theme) | Token discipline matches; scale differs |
-| Runtime compute | JVM/Go/C++ fleets | Cloudflare Workers (V8 isolates) + Rust→WASM | WASM quant compute is *stronger* than typical FAANG frontend |
-| State | Distributed DBs, caches | KV + Durable Objects (price stream) | Right-sized |
+| Layer | FAANG | Ours |
+|---|---|---|
+| Rendering | SSR frameworks + edge CDN | Astro SSG + islands (static-first beats SSR here) |
+| Runtime | JVM/Go/C++ fleets | V8 isolates (worker) + Rust→WASM |
+| State | Distributed stores | KV + one Durable Object (price stream) |
+| Theming | Token pipelines | 5-theme token contract, single accent voice per theme, AA-audited |
+
+Notable: the quant layer's compute runs in WASM with plycompute kernels
+— a stronger frontend-compute story than typical FAANG consumer
+properties, and it consumes the estate's shared crates.
 
 ## 4. Research
 
-**Them.** A/B experimentation platforms with sequential testing, perf
-research teams, accessibility research orgs.
+**Them.** Experimentation platforms (sequential testing, holdouts),
+perf research orgs, a11y research orgs.
 
-**Us.** Original data research: the ETF allocation study and the G1 storm
-first-hand report (r = 0.79 against the official Kp index over 45 aligned
-points) are small-scale but *original, reproducible, and public* — the
-research discipline of publishing methodology alongside findings is
-present (3/5). Missing: experiment infrastructure (no A/B, no holdouts) —
-also arguably unnecessary for a personal site.
+**Us.** Original public research with enforced lineage: the ETF study
+recomputes from the keyless dataset at build time and now *cites the
+exact dataset hash* it computed from (`sha256:{DATASET_SHA256_16}` in
+the page, enforced by `tests/unit/lineage.test.ts`). The G1 storm report
+is first-hand instrumented data with an external-validation statistic
+(Pearson r = 0.787 vs NOAA Kp, n = 45, method documented).
+
+**Verdict: 3 → 4.** The lineage gate is the research-integrity
+increment: numbers are now mechanically traceable to data.
 
 ## 5. Development workflow
 
-**Them.** Trunk-based, small diffs, feature flags, automated canary
-analysis, merge queues.
+**Them.** Trunk-based, review-gated, merge queues, feature flags.
 
-**Us.** Single-writer trunk, the validation ladder (tsc → biome → gated
-build → E2E → deploy → prod verify), single-flight build locks (flock) to
-stop concurrent-agent build races, and an AI-agent contract (AGENTS.md:
-copy rules, traps, dogfood ledger) that functions as the contribution
-guide. The missing "small diffs" enforcement is real: rounds ship 15-file
-commits.
+**Us.** Trunk + validation ladder (tsc → biome → gated build → unit →
+E2E → deploy → prod verify), single-flight locks, AGENTS.md as the
+contribution contract (copy rules, traps, dogfood ledger, rejection
+records). The known gap remains diff size (rounds ship 15-file commits);
+no merge-queue equivalent exists or is needed for one writer.
 
-## 6. Operations
+**Verdict: 4/5 — unchanged.**
 
-**Them.** SRE: SLOs, error budgets, on-call rotations, blameless
-postmortems, observability as a product (metrics/logs/traces), chaos
-engineering.
+## 6. Operations (the dimension that moved)
 
-**Us (2/5 — the weakest dimension).** 6-hour uptime probes across 4
-endpoints (liveness, not observability), a runner-health smoke workflow,
-no metrics, no traces, no structured logs, no alerting pager. The
-honesty: nothing here has an SLO because nothing here has a paying
-customer. The estate's `otelkit`/`metrics-kit` make a real observability
-slice a weekend's work: an OpenTelemetry trace on the worker fetch path
-and a structured-log line per request would move this to 4/5.
+**Them.** SLOs, error budgets, on-call, postmortems, observability as a
+product: metrics/logs/traces with cardinality discipline.
+
+**Us (v2, in-tree).**
+- `worker/logger.ts`: structured JSON per request — ts, level, msg,
+  path, status, duration_ms, trace_id (cf-ray). Emitted at info and
+  retained by Workers Observability (`wrangler.toml` `[observability]`).
+- `worker/metrics.ts` → `/api/metrics`: request/error counters, error
+  rate, per-endpoint latency `{avg, p95, count}`, response-time summary,
+  alert states, circuit-breaker states, cache size, and
+  `feedLastSuccess` — the freshness timestamp of every external feed.
+- `uptime.yml`: 6 probes / 6 h across 6 endpoints + freshness and
+  latency-ceiling assertions.
+- Documented SLO: 99.5% monthly probe pass, p95 < 500 ms per endpoint.
+
+**What is still absent, honestly:** distributed tracing spans (the
+trace-id exists but there is no span export), alerting to a pager
+(there is no pager — probes fail CI instead), and multi-region
+telemetry. These are team-scale practices.
+
+**Verdict: 2 → 4.** Liveness became measurement; the measurement is
+queryable at a stable public endpoint.
 
 ## 7. Deployment
 
-**Them.** Progressive delivery: canary percentages, region-by-region
-rollout, instant rollback SLAs, deployment freezes.
+**Them.** Canary %, progressive rollout, deployment freezes, rollback
+SLAs.
 
-**Us (3/5).** Atomic edge deploys with instant rollback (Cloudflare
-Pages), a deploy workflow in CI, plus a GitHub Pages mirror kept
-deliberately dormant with canonical consolidation. Missing: pre-deploy
-staging (prod-verify is the staging), and the Forgejo Actions runner
-presence is unconfirmed — deploy today is manual wrangler with
-credentials from a keyfile. The runner + secrets lever would close this.
+**Us.** Atomic edge deploy, every historical version instantly
+revertible, the deploy is preceded by the full gate ladder. v2 adds the
+certification-bundle idea (HFT section): ci.yml now emits lineage,
+WASM-size, SBOM, and drift evidence on every run.
+
+**Verdict: 3 → 3.5.** The Forgejo runner presence is still unconfirmed —
+the deploy remains manual-wrangler, and CI visibility on the Forgejo
+side is a user lever (runner + secrets).
 
 ## 8. Security
 
-**Them.** Threat modeling, SSO everywhere, dependency scanning, bug
-bounties, pen tests, hardware keys.
+**Them.** Threat modeling, SSO, dependency scanning, bounties.
 
-**Us (3/5).** CSP meta with an explicit connect-src allowlist, a
-`security.ts` worker module, secrets in a 0600 keyfile directory outside
-the repo, no secrets in git (gitleaks available fleet-side), dependency
-updates by renovate-style bumps. Missing: SSO (nothing to protect — no
-admin surface), no pen test (correctly deferred for a content site).
+**Us (v2).** CSP allowlist, `security.ts`, 0600 keyfile secrets, no
+secrets in git, a real rate limiter (sliding window, bounded memory,
+eviction under spoof-flood — with tests), SBOM per build, monthly
+advisory audits (bun + RustSec). Missing: artifact signing (sigstore)
+— flagged in the defence file as the next security increment.
 
-## What to steal from FAANG (concrete)
+**Verdict: 3 → 3.5.**
 
-1. **CI-enforced performance budgets** — Lighthouse/Web Vitals gate in
-   ci.yml with ceilings (e.g., LCP < 1.2s mobile, WASM bundle < 200 KB).
-   Cheap, permanent, FAANG's perf-regression discipline at our scale.
-2. **axe-core accessibility gate** — extend the existing accessibility
-   spec into a hard CI gate with zero serious violations.
-3. **A minimal error budget** — define the uptime probe's SLO (e.g., 6
-   probes/day, 99.5% monthly) and surface a status line; turn liveness
-   into a measurable.
-4. **Postmortem files for real incidents** — the build-race and
-   path-dependence incidents already happened; writing them as
-   `docs/postmortems/` entries (trigger, root cause, fix, gate added)
-   would formalize what was actually practiced.
+## What to steal next from FAANG
 
-## Scorecard summary
+1. **Coverage gate** — v8 coverage is configured (`lcov` reporter) but
+   no threshold is enforced. Add a 70% lines floor for `worker/src` and
+   `packages/widgets/src`.
+2. **Trace export** — the trace-id exists; export a single span per
+   request to Cloudflare's trace pipeline (or a KV sink) to close the
+   distributed-tracing gap.
+3. **Error budget file** — the SLO is documented; publish the monthly
+   probe pass-rate as a status page line.
 
-| Dimension | Them | Us | Note |
+## Scorecard summary (v2)
+
+| Dimension | FAANG | Us | Δ |
 |---|---|---|---|
-| Architecture coherence | 5 | 4 | Right-sized; static-first is a feature |
-| Code quality enforcement | 5 | 4 | Gates replace review; one reviewer |
-| Testing discipline | 5 | 4 | 367 tests; no coverage gate |
-| Research rigor | 5 | 3 | Original + reproducible, no experimentation platform |
-| Development workflow | 5 | 4 | Trunk, no small-diff enforcement |
-| Operations | 5 | 2 | Liveness only — the real gap |
-| Deployment | 5 | 3 | Atomic edge; no runner-confirmed CI |
-| Security | 5 | 3 | Solid basics; no admin surface to protect |
+| Architecture coherence | 5 | 4 | — |
+| Code quality enforcement | 5 | 4.5 | +0.5 |
+| Testing discipline | 5 | 4.5 | +0.5 |
+| Research rigor | 5 | 4 | +1 |
+| Development workflow | 5 | 4 | — |
+| Operations | 5 | 4 | **+2** |
+| Deployment | 5 | 3.5 | +0.5 |
+| Security | 5 | 3.5 | +0.5 |

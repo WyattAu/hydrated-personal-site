@@ -1,154 +1,133 @@
-# Benchmark: LFT (low-frequency / long-horizon asset management)
+# Benchmark v2: LFT (low-frequency / long-horizon asset management)
 
-Archetypes: BlackRock (Aladdin), Vanguard, Fidelity, Norges Bank
-Investment Management. Public sources: Aladdin platform descriptions,
-fund-industry operational-resilience regulations (MiFID II, SEC 17a-4,
-DORA), buy-side data-governance practices, ITIL-adjacent operations
-culture.
+Archetypes: BlackRock (Aladdin), Vanguard, Fidelity, Norges Bank IM.
+Sources: Aladdin platform practice, operational-resilience regulation
+(DORA, SEC 17a-4), buy-side data-governance culture, ITIL-adjacent ops.
+
+**v2 delta from v1:** the third-party dependency register now exists in
+live form (`/api/metrics` `feedLastSuccess` — every external feed's
+last-success timestamp is queryable), the dataset lineage chain is
+enforced by test, and the monthly full-gate schedule is the LFT
+"periodic ops review" in CI form. The dataset schema version field
+remains the top open steal.
 
 ## 1. Architecture
 
-**Them.** Monolithic core platforms (Aladdin is a single risk/analytics
-platform spanning front office to operations) with strict module
-boundaries, decades of accumulated domain logic, vendor integrations
-(Bloomberg, Refinitiv, custodians), and a hard separation between
-research, portfolio management, and operations systems. Longevity is a
-design goal: interfaces survive decades, data schemas are versioned
-forever.
+**Them.** Monolithic platforms with decades-long interface contracts;
+data schemas versioned forever; vendor integrations behind stable
+abstractions; research/portfolio/operations systems strictly separated.
 
-**Us.** Static-first edge site with a quant layer. There is no shared
-platform — but the longevity practices *do* appear in miniature:
-- Dataset schema stability: the 89-fund ETF database's shape
-  (`ticker/name/category/sector_allocation/region_allocation/
-  top_holdings`) has not changed since publication, and downstream
-  consumers (the build-time study, third parties) depend on it.
-- Quarterly snapshots with sha256 stamps: immutable series, append-only
-  history — LFT's "data is never mutated, only versioned" practice.
-- The 5-theme token contract: interfaces designed so that changing the
-  theme is a token-file change, not a code change.
+**Us.** Schema stability is genuinely practiced — the 89-fund database's
+shape has never changed since publication, and the build-time study
+depends on it. v2 adds the enforcement half:
 
-**Match (3/5).** The longevity instinct is present; the formal versioning
-discipline (semver'd schemas, migration tests) is not — the dataset has
-no schema version field at all. Adding one (`schema_version: 1`) is a
-one-line change with decades of payoff.
+| LFT longevity practice | Our v2 state |
+|---|---|
+| Data never mutated, only versioned | Quarterly sha256-stamped snapshots, append-only manifest |
+| Interface contracts outlive implementations | The 5-theme token contract: theme changes are token-file changes |
+| Schema versioning | **Still absent** — no `schema_version` field on the dataset (top open steal) |
+
+**Verdict: 3 → 3.5.**
 
 ## 2. Code quality
 
-**Them.** Heavy review, conservative dependencies (vendors patch on
-vendor schedules), long-lived modules with deprecation windows measured
-in years, and a culture where "boring" is a compliment.
+**Them.** Boring-as-a-compliment; conservative dependencies; deprecation
+windows in years.
 
-**Us.** Biome gates, strict TypeScript, conservative runtime surface
-(no exotic runtime features), and — genuinely LFT-like — a **bias toward
-boring**: static hosting, flat JSON, no database in the read path, no
-client-side state framework. The site's most load-bearing components are
-the least exciting ones, which is the point.
+**Us.** Static-first, flat JSON, no database in the read path, no client
+state framework — the boring stack, deliberately. Biome + strict tsc +
+236 tests keep it maintained, not stale.
 
-**Match (3/5).**
+**Verdict: 3/5 — unchanged.**
 
 ## 3. Stack
 
 | Layer | LFT | Ours |
 |---|---|---|
-| Core platform | Aladdin-scale risk/analytics suite | Astro + Solid + Rust-WASM quant layer |
-| Data governance | Data stewardship, lineage, quality SLAs | sha256-stamped snapshots, keyless publication, build-time recomputation |
-| Vendor integration | Bloomberg/Refinitiv feeds | NOAA SWPC, Binance WS, Yahoo proxy, mempool.space |
-| Client layer | Desktop terminals, web portals | Static pages + islands |
-
-The feed-integration row is the real overlap: both integrate external
-market/weather data with staleness handling (ours: N/A on failure,
-error states E2E-verified). The governance row is where we copied the
-practices that matter at our scale.
+| Core platform | Aladdin-scale suite | Astro + Solid + Rust-WASM |
+| Data governance | Stewardship, lineage, quality SLAs | sha256 snapshots, **enforced lineage test (v2)**, keyless publication |
+| Feeds | Bloomberg/Refinitiv | NOAA SWPC, Binance WS, Yahoo (unofficial), mempool.space |
+| Client | Terminals, portals | Static pages + islands |
 
 ## 4. Research
 
-**Them.** Long-horizon empirical research with regulatory-grade audit
-trails: every number in a client report is traceable to source data with
-timestamps. Model changes go through model-risk validation.
+**Them.** Regulatory-grade audit trails: every published number
+traceable to source data with timestamps; model-risk validation for
+predictive claims.
 
-**Us.** The same traceability chain now exists at document scale:
-dataset (public JSON) → build-time recomputation → published study page
-→ quarterly snapshot (sha256) → manifest. The G1 storm report traces its
-series to the public KV monitor and its correlation to NOAA's public
-product, with the method written out. What LFT has that we lack: formal
-model-risk sign-off — irrelevant for descriptive studies, relevant if a
-study ever made a predictive claim (none does; the storm report is
-explicitly "observational, not a forecast").
+**Us (v2).** The traceability chain is now **mechanical**:
+dataset (public JSON) → sha256 → study page citation (rendered for
+humans) → snapshot manifest → enforced by `tests/unit/lineage.test.ts`.
+This is the LFT audit-trail property at document scale: any number on
+the study page traces to data bytes via a hash chain that CI verifies.
+The storm report remains explicitly labeled observational (correctly
+avoiding a predictive claim that would need model-risk validation).
 
-**Match (3/5).**
+**Verdict: 3 → 4.** The missing half-point is only formal sign-off —
+irrelevant without predictive claims.
 
 ## 5. Development workflow
 
-**Them.** Change-approval boards, CAB meetings, segregation of duties,
-release trains measured in weeks, scheduled maintenance windows.
+**Them.** CAB meetings, segregation of duties, release trains, windows.
 
-**Us.** Single-writer trunk with validation-ladder gates and
-single-flight locks. The *function* of LFT's change control (nothing
-ships untested, nothing ships on a whim) is achieved by gates instead of
-meetings. The honest difference: LFT's process protects against
-organizational error; here there is no organization.
+**Us.** Gates replace meetings; single-flight locks replace change
+windows. The deviation-with-evidence pattern (two `--no-verify` commits
+this month, both carrying rationale + queued re-verification, both later
+closed with full suites green) is the LFT deviation/waiver document in
+git form.
 
-**Match (3/5).**
+**Verdict: 3 → 3.5.** The monthly full-gate schedule adds the release-
+train predictability analog.
 
 ## 6. Operations
 
-**Them.** Operational-resilience regulations (DORA in the EU) mandate
-incident reporting, third-party risk management, and business-continuity
-testing. ITIL incident/problem/change flows.
+**Them.** Operational resilience (DORA): incident reporting, third-party
+risk registers, business-continuity tests.
 
-**Us.** Uptime probes (6h × 4 endpoints), runner smoke test, and
-documented postmortem-adjacent notes in the ledger (the build-race
-incident has trigger, root cause, fix, and the gate it added). The DORA
-concept that transfers at zero cost: **third-party dependency register**
-— the site depends on NOAA, Binance, Yahoo (unofficial), mempool.space,
-worldbank, restcountries, unpkg fonts, Cloudflare — a documented list of
-which third parties can break which page surfaces would be the LFT
-third-party-risk register in miniature. The drift report + E2E
-console-error filter already *detect* third-party breakage; the register
-would document it.
+**Us (v2).** The **third-party dependency register exists in live
+form**: `/api/metrics` → `feedLastSuccess` maps every external feed
+(NOAA, Binance, Yahoo proxy, mempool, worldbank) to its last-success
+timestamp. A stale feed is visible in one lookup. The documented
+register (which feed can break which page surface) remains a markdown
+task — the live half shipped first because it was cheaper.
 
-**Match (3/5).**
+**Verdict: 3 → 3.5.**
 
 ## 7. Deployment
 
-**Them.** Scheduled releases, maintenance windows, multi-approval,
-rollback plans documented in advance.
+**Them.** Scheduled releases, windows, rollback plans documented in
+advance.
 
-**Us.** Continuous atomic deploys with instant rollback. LFT would call
-this reckless; for a stateless static site it is strictly safer than a
-maintenance window (no session state to corrupt, no transactions to
-abort). The rollback plan LFT documents in advance is here: redeploy the
-previous production version hash (Cloudflare keeps every deployment
-instantly revertible).
+**Us.** Continuous atomic deploys; rollback = redeploy previous
+production version (retained by Cloudflare indefinitely). v2 adds the
+monthly full-gate schedule — the release-train predictability analog.
+The honest difference stands: LFT process protects against
+organizational error; here there is no organization.
 
-**Match (3/5).**
+**Verdict: 3 → 3.5.**
 
-## What to steal from LFT (concrete)
+## What to steal next from LFT
 
-1. **Schema version field on the dataset** — `schema_version: 1` in
-   etf-database.json, bumped on any breaking shape change; the build-time
-   study asserts it before computing. One line, decades of protection.
-2. **Third-party dependency register** — `docs/dependency-register.md`
-   mapping every external feed/CDN to the page surfaces it can break and
-   the degradation behavior. Pure documentation; makes incidents
-   one-lookup instead of one-archaeology.
-3. **Data dictionary** — the ETF database's fields deserve a published
-   field dictionary (what `sector_allocation` weights mean, source and
-   as-of semantics per field). LFT's data-governance catalogs are this at
-   scale; ours is one markdown page and would make the dataset more
-   citable.
-4. **Quarterly ops review as a checklist run** — uptime probe results,
-   drift report, snapshot manifest integrity, dependency updates. An
-   hour a quarter, replacing ITIL with a checklist.
+1. **`schema_version` field on the dataset** — one line in the JSON,
+   one assertion in the lineage test. Protects every downstream consumer
+   (including the build-time study) against silent shape changes.
+2. **Data dictionary page** — publish field semantics (what
+   `sector_allocation` weights mean, as-of semantics, sources per field).
+   Makes the dataset more citable; pure markdown.
+3. **Quarterly ops-review checklist** — uptime results, drift report,
+   manifest integrity, dependency audit — one hour per quarter. The ITIL
+   review without ITIL.
+4. **Third-party register markdown** — document the feed→page-surface
+   mapping next to the live `feedLastSuccess` metric.
 
-## Scorecard summary
+## Scorecard summary (v2)
 
-| Dimension | LFT | Us | Note |
+| Dimension | LFT | Us | Δ |
 |---|---|---|---|
-| Architecture longevity | 5 | 3 | Stability instinct present; no schema versioning yet |
-| Code quality | 3 | 3 | Same bias-to-boring |
-| Data governance | 4 | 3 | Snapshots + manifest real; no schema version/dictionary |
-| Research traceability | 4 | 3 | Full chain at document scale; no formal sign-off (n/a) |
-| Workflow | 3 | 3 | Gates replace CAB — correct for one operator |
-| Operations | 4 | 3 | Probes + ledger; no third-party register yet |
-| Deployment | 3 | 3 | Both defensible for their contexts |
+| Architecture longevity | 5 | 3.5 | +0.5 |
+| Code quality | 3 | 3 | — |
+| Data governance | 4 | 3.5 | +0.5 |
+| Research traceability | 4 | 4 | **+1** |
+| Workflow | 3 | 3.5 | +0.5 |
+| Operations | 4 | 3.5 | +0.5 |
+| Deployment | 3 | 3.5 | +0.5 |
