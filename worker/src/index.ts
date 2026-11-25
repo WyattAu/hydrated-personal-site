@@ -37,6 +37,7 @@ import {
 } from './handlers';
 import { handleCryptoTickerSSE, handleMetricsSSE } from './handlers/sse';
 import { clearTraceId, log, setTraceId } from './logger';
+import { checkRateLimit } from './rate-limiter';
 import { checkAlerts, metrics, recordResponseTime } from './metrics';
 import { error, json } from './security';
 import type { Env } from './types';
@@ -143,7 +144,24 @@ export default {
         response = await handleEtfPrice(request);
       } else if (routePath === '/api/metrics') {
         response = handleMetrics();
-      } else if (routePath === '/api/csp-report') {
+      } else if (routePath === '/api/beacon') {
+        const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+        if (!checkRateLimit(ip, 20, 60_000)) {
+          response = error('Rate limited', 429);
+        } else if (request.method !== 'POST') {
+          response = error('Method not allowed', 405);
+        } else {
+          let body: { kind?: string; message?: string; path?: string } = {};
+          try {
+            body = await request.json();
+          } catch {}
+          log('warn', 'client-error', {
+            kind: String(body.kind ?? 'unknown').slice(0, 32),
+            message: String(body.message ?? '').slice(0, 200),
+            path: String(body.path ?? '').slice(0, 120),
+          });
+          response = new Response(null, { status: 204 });
+        }
         response = await handleCspReport(request);
       } else if (routePath === '/api/guestbook') {
         const ip = request.headers.get('CF-Connecting-IP') || 'unknown';

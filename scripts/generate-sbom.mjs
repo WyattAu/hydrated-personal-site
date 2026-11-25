@@ -6,7 +6,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const components = [];
-let serialBase = 'hydrated-personal-site';
+const serialBase = 'hydrated-personal-site';
 
 // Bun (text lockfile: lines with quoted package@version)
 try {
@@ -25,7 +25,9 @@ try {
       purl: `pkg:npm/${m[1]}@${m[2]}`,
     });
   }
-} catch { /* bun.lock absent */ }
+} catch {
+  /* bun.lock absent */
+}
 
 // Cargo (Cargo.lock [[package]] blocks)
 try {
@@ -40,7 +42,9 @@ try {
       purl: `pkg:cargo/${m[1]}@${m[2]}`,
     });
   }
-} catch { /* Cargo.lock absent */ }
+} catch {
+  /* Cargo.lock absent */
+}
 
 const sbom = {
   bomFormat: 'CycloneDX',

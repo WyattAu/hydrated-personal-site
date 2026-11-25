@@ -8,24 +8,45 @@
  * Mapping heuristic: site ComponentName.tsx <-> upstream kebab-case name.
  * Components with real local adaptations are declared in LOCAL_ADAPTATIONS.
  */
-import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-const UPSTREAM = process.env.SOLID_FX_SRC ?? '/home/wyatt/dev/src/github.com/WyattAu/solid-fx/src/content';
+const UPSTREAM =
+  process.env.SOLID_FX_SRC ?? '/home/wyatt/dev/src/github.com/WyattAu/solid-fx/src/content';
 const LOCAL = new URL('../apps/site/src/components/solid/fx/', import.meta.url).pathname;
 
 // files with intentional local divergences (theme-aware wrappers etc.)
 const LOCAL_ADAPTATIONS = new Set([
-  'theme.ts', 'ThemeCrosshair.tsx', 'ThemeDotField.tsx', 'ThemeElectricBorder.tsx',
-  'ThemeRadar.tsx', 'SiteDock.tsx', 'Aurora.tsx', 'TechLoop.tsx',
+  'theme.ts',
+  'ThemeCrosshair.tsx',
+  'ThemeDotField.tsx',
+  'ThemeElectricBorder.tsx',
+  'ThemeRadar.tsx',
+  'SiteDock.tsx',
+  'Aurora.tsx',
+  'TechLoop.tsx',
   // intentional local rewrites (same name, different component):
-  'Counter.tsx', 'CountUp.tsx', 'Radar.tsx',
+  'Counter.tsx',
+  'CountUp.tsx',
+  'Radar.tsx',
 ]);
 
-const kebab = (s) => s.replace(/\.tsx?$/, '').replace(/(?<=[a-z0-9])([A-Z])/g, '-$1').toLowerCase();
-const norm = (s) => s.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/[;,]/g, '').replace(/\s+/g, ' ').trim();
+const kebab = (s) =>
+  s
+    .replace(/\.tsx?$/, '')
+    .replace(/(?<=[a-z0-9])([A-Z])/g, '-$1')
+    .toLowerCase();
+const norm = (s) =>
+  s
+    .replace(/\/\/.*$/gm, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/[;,]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 
-let drift = 0, checked = 0, upstreamless = 0;
+let drift = 0,
+  checked = 0,
+  upstreamless = 0;
 for (const f of readdirSync(LOCAL)) {
   if (LOCAL_ADAPTATIONS.has(f)) continue;
   const localPath = join(LOCAL, f);
@@ -35,9 +56,15 @@ for (const f of readdirSync(LOCAL)) {
   let upstreamPath;
   for (const cat of readdirSync(UPSTREAM)) {
     const p = join(UPSTREAM, cat, baseNoExt, baseNoExt + '.tsx');
-    if (existsSync(p)) { upstreamPath = p; break; }
+    if (existsSync(p)) {
+      upstreamPath = p;
+      break;
+    }
   }
-  if (!upstreamPath) { upstreamless++; continue; }
+  if (!upstreamPath) {
+    upstreamless++;
+    continue;
+  }
   checked++;
   const a = norm(readFileSync(localPath, 'utf8'));
   const b = norm(readFileSync(upstreamPath, 'utf8'));

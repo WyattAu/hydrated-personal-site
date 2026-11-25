@@ -131,6 +131,16 @@ jobs:
         run: bunx vitest run tests/unit/lineage.test.ts
       - name: SBOM (CycloneDX)
         run: bun scripts/generate-sbom.mjs
+      - name: Parity correctness tests (determinism, lookahead, NaN policy)
+        run: cargo test --test parity_tests
+        working-directory: packages/widgets
+      - name: Golden-image visual regression
+        run: |
+          if ls tests/baselines/*.png >/dev/null 2>&1; then
+            E2E_URL=http://127.0.0.1:4399 bun scripts/golden-image.mjs
+          else
+            echo "no baselines; capture with: bun scripts/golden-image.mjs --update"
+          fi
       - name: WASM size gate (650KB ceiling)
         run: test "$(stat -c%s packages/widgets/pkg/hydrated_widgets_bg.wasm)" -le 650000
       - name: Upload WASM artifacts

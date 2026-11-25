@@ -32,6 +32,12 @@ describe('dataset lineage', () => {
     expect(rendered, 'study must render the hash for citation').toBeTruthy();
   });
 
+  it('manifest declares a schema version', () => {
+    const manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'));
+    expect(manifest.schema_version, 'dataset shape changes must bump schema_version').toBeGreaterThanOrEqual(1);
+    expect(typeof manifest.schema).toBe('string');
+  });
+
   it('manifest records a snapshot with the current dataset hash', () => {
     expect(existsSync(MANIFEST), 'snapshot manifest must exist').toBe(true);
     const manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'));

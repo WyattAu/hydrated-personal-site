@@ -251,6 +251,42 @@ const webPageSchema = {
       {BUILD_ID}
     </div>
     <script is:inline src="/webmcp.js"></script>
+  
+    <!-- First-party error beacon: crash telemetry without third-party
+         scripts. Capped at 2 sends per page load; same-origin only. -->
+    <script>
+      (function () {
+        var sent = 0;
+        function send(payload) {
+          if (sent >= 2) return;
+          sent++;
+          try {
+            fetch('/api/beacon', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+              keepalive: true,
+            }).catch(function () {});
+          } catch (e) {}
+        }
+        window.addEventListener('error', function (e) {
+          send({
+            kind: 'error',
+            message: String((e && e.message) || '').slice(0, 200),
+            source: String((e && e.filename) || '').slice(0, 120),
+            line: (e && e.lineno) || 0,
+            path: location.pathname,
+          });
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          send({
+            kind: 'unhandledrejection',
+            message: String((e && e.reason) || '').slice(0, 200),
+            path: location.pathname,
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
 <!-- csp v4 -->

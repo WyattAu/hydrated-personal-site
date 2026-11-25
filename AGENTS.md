@@ -52,6 +52,16 @@ re-vendor by hand from `jsrepo list` / upstream sources and run the
 drift check.
 
 
+## Sustainment
+
+- **Patching SLA**: critical advisory (RustSec/npm) -> patched within
+  7 days; high within 30. The monthly ci.yml schedule runs both audits;
+  the audit step fails on critical.
+- **Trace export**: satisfied by the structured request log line
+  (route/status/duration/trace-id) retained by Workers Observability —
+  no separate span exporter is used.
+- **Quarterly ops review**: run `docs/ops-review.md` checklist.
+
 ## Copy rules
 
 1. **No em-dashes.** Em-dashes are an AI-writing tell and are banned in

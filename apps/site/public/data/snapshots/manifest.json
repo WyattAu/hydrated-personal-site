@@ -9,5 +9,7 @@
 			"sha256_16": "4c5d927fa4d40ed4",
 			"taken": "2026-11-24"
 		}
-	]
+	],
+	"schema_version": 1,
+	"schema": "flat array of fund objects (ticker, name, category, sector_allocation, region_allocation, top_holdings)"
 }
