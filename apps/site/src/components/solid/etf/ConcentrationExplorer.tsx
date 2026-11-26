@@ -26,6 +26,11 @@ function effectiveN(sectors: FundSector[]): number {
   return hhi(sectors) > 0 ? 1 / hhi(sectors) : 0;
 }
 
+const SECTOR_COLORS = [
+  '#c9a86c', '#5b8def', '#4caf50', '#ef5350',
+  '#ab47bc', '#26c6da', '#ffa726', '#8d6e63',
+];
+
 export default function ConcentrationExplorer() {
   const [funds, setFunds] = createSignal<Fund[]>([]);
   const [selA, setSelA] = createSignal<string>('VOO');
@@ -156,6 +161,41 @@ export default function ConcentrationExplorer() {
               </Show>
             </Show>
           </div>
+
+          {/* concentration strip: one segment per sector of fund A */}
+          <Show when={sectA().length > 0}>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color: var(--text-secondary);">
+                Sector strip, {fundA()!.ticker}
+              </p>
+              <div class="flex w-full h-10 overflow-hidden" style="border-radius: 3px;" role="img"
+                aria-label={`Sector strip for ${fundA()!.ticker}: ${sectA().map(s => `${s.sector} ${s.weight.toFixed(1)} percent`).join(', ')}`}>
+                <For each={sectA()}>
+                  {(s, i) => (
+                    <div
+                      class="h-full transition-all duration-300 hover:brightness-125 group relative"
+                      style={`width: ${s.weight}%; background: ${SECTOR_COLORS[i() % SECTOR_COLORS.length]};`}
+                      title={`${s.sector}: ${s.weight.toFixed(1)}%`}
+                    >
+                      <span class="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-black/70 opacity-0 group-hover:opacity-100 whitespace-nowrap overflow-hidden">
+                        {s.weight.toFixed(0)}
+                      </span>
+                    </div>
+                  )}
+                </For>
+              </div>
+              <div class="flex w-full mt-1 text-[9px]" style="color: var(--text-secondary);">
+                <For each={sectA().slice(0, 6)}>
+                  {(s, i) => (
+                    <span class="flex items-center gap-1 mr-3">
+                      <span class="inline-block w-2 h-2" style={`background: ${SECTOR_COLORS[i() % SECTOR_COLORS.length]};`} />
+                      {s.sector} {s.weight.toFixed(0)}%
+                    </span>
+                  )}
+                </For>
+              </div>
+            </div>
+          </Show>
 
           {/* sector bars A (+B overlay) */}
           <div class="space-y-3" role="table" aria-label="Sector allocation comparison">

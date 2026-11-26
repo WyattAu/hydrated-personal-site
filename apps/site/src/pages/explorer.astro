@@ -24,6 +24,23 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </p>
     </section>
 
+    <section class="py-8 px-6 md:px-12 lg:px-24 pb-8">
+      <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_280px] gap-8 items-end">
+        <p class="text-lg" style="color: var(--text-secondary); max-width: 720px;">
+          Every bar below is computed in your browser from the keyless
+          dataset. Nothing is pre-rendered for you: pick two funds, and
+          the concentration math runs live.
+        </p>
+        <img
+          src="/images/art-particle-navy.jpg"
+          alt=""
+          class="w-full border"
+          style="border-color: var(--border);"
+          loading="lazy"
+        />
+      </div>
+    </section>
+
     <section class="py-8 px-6 md:px-12 lg:px-24 pb-24">
       <AppErrorBoundary client:load>
         <ConcentrationExplorer client:load />
