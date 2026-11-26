@@ -141,6 +141,10 @@ jobs:
           else
             echo "no baselines; capture with: bun scripts/golden-image.mjs --update"
           fi
+      - name: Utility gate (Tailwind utilities must be present)
+        run: |
+          cssf=$(ls apps/site/dist/_astro/*.css 2>/dev/null | head -1)
+          test -n "$cssf" && grep -qE 'pt-32|max-w-7xl' "$cssf"
       - name: WASM size gate (650KB ceiling)
         run: test "$(stat -c%s packages/widgets/pkg/hydrated_widgets_bg.wasm)" -le 650000
       - name: Upload WASM artifacts
