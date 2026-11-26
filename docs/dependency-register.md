@@ -40,3 +40,10 @@ and how failure degrades. The live counterpart is `/api/metrics`
 3. New third-party integrations must be added here AND to the CSP
    allowlist in `BaseLayout.astro` AND to the probe matrix in
    `.forgejo/workflows/uptime.yml` if they have a health endpoint.
+
+## Known unimplemented routes (widgets expecting worker APIs)
+
+| Expected route | Consumer | State |
+|---|---|---|
+| `GET /api/arxiv-papers` | /ml ArxivPapers widget | **Missing** — worker has no arxiv proxy; widget shows error state. Fix: add handler proxying `export.arxiv.org/api/query` (no CORS on arxiv — proxy required) |
+| `GET /api/swpc-plasma`, `/api/swpc-mag` | /world SolarWindPanel | Handlers exist but return 502: **NOAA retired the entire solar-wind product family** (plasma-1-day/2-day, mag-1-day/2-day all 404 upstream, confirmed 2026-11-25). Panel degrades to error state. Alternative DSCOVR source = future research |

@@ -727,6 +727,16 @@ export const GET: APIRoute = async (ctx) => {
 export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const path = request.url.replace(/^.*\/api\//, '');
+  if (path === 'beacon') {
+    // client crash telemetry: forward to the worker (it owns beacon storage)
+    const upstream = `https://hydrated-worker.wyatt-au.workers.dev/api/beacon`;
+    const res = await fetch(upstream, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: await request.text(),
+    });
+    return new Response(null, { status: res.status });
+  }
   if (path === 'guestbook') {
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
     if (!rlchk(ip, 5, 600000)) return E('Rate limit exceeded', 429);
