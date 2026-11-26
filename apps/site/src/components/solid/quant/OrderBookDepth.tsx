@@ -26,6 +26,10 @@ interface DepthFrame {
 const WS_URL = 'wss://stream.binance.com:9443/ws';
 
 /// Maps an activeAsset symbol to a Binance USDT pair where possible.
+function isIndexSymbol(asset: string): boolean {
+  return asset.trim().startsWith('^');
+}
+
 function toBinancePair(asset: string): string {
   const a = asset.toUpperCase().replace('=F', '').replace('/', '');
   if (a.endsWith('USDT')) return a.toLowerCase();
@@ -43,7 +47,12 @@ export default function OrderBookDepth() {
   let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
   let attempts = 0;
 
-  function connect(streamPair: string) {
+  function connect(streamPair: string | null) {
+    if (!streamPair) {
+      ws?.close();
+      setConnected(false);
+      return;
+    }
     ws?.close();
     try {
       ws = new WebSocket(`${WS_URL}/${streamPair}@depth20@100ms`);
@@ -104,13 +113,22 @@ export default function OrderBookDepth() {
   }
 
   function switchPair(asset: string) {
-    const p = toBinancePair(asset);
-    setPair(p);
+    if (isIndexSymbol(asset)) {
+      // indices have no Binance book — clear and disconnect
+      setPair('');
+      setBook(null);
+      setHist([]);
+      attempts = 0;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      connect(null);
+      return;
+    }
+    setPair(toBinancePair(asset));
     setBook(null);
     setHist([]);
     attempts = 0;
     if (reconnectTimer) clearTimeout(reconnectTimer);
-    connect(p);
+    connect(toBinancePair(asset));
   }
 
   onMount(() => switchPair(activeTicker()));

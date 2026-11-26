@@ -89,3 +89,12 @@ already at ceiling (technical sweep score 99, enforced lineage, enforced
 a11y, freshness telemetry). The ranking that comes will be earned by the
 content cadence, measured by GSC once verified — not by further on-page
 work.
+
+
+## Beacon status (2026-11-25)
+
+The client error beacon (`/api/beacon`) works on the worker directly
+(POST → 204, logged) but returns 404 through the Pages proxy — the
+proxy's POST-forwarding fix (method + body) is deployed but the route
+still falls through. Debugging deferred: the beacon is crash
+telemetry, not a site function. Worker-direct reception is proven.

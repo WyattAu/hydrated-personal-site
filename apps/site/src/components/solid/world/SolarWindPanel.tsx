@@ -24,8 +24,8 @@ export default function SolarWindPanel() {
     setErr(null);
     try {
       const [plasmaRes, magRes] = await Promise.all([
-        fetch('https://services.swpc.noaa.gov/products/solar-wind/plasma-1-day.json'),
-        fetch('https://services.swpc.noaa.gov/products/solar-wind/mag-1-day.json'),
+        fetch('/api/swpc-plasma'),
+        fetch('/api/swpc-mag'),
       ]);
       if (!plasmaRes.ok || !magRes.ok) throw new Error('SWPC unavailable');
 

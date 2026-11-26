@@ -369,3 +369,35 @@ export async function handleProtonFlux(): Promise<Response> {
     return error('Upstream NOAA proton feed unavailable', 502);
   }
 }
+
+export async function handleSwpcPlasma(): Promise<Response> {
+  const cached = getCached('swpc-plasma');
+  if (cached) return json(cached);
+  try {
+    const data = await fetchJson(
+      'https://services.swpc.noaa.gov/products/solar-wind/plasma-1-day.json',
+      'swpc-plasma',
+    );
+    setCache('swpc-plasma', data, 5 * 60 * 1000);
+    return json(data);
+  } catch (e) {
+    log('error', 'swpc-plasma fetch failed', { error: String(e) });
+    return json({ error: 'SWPC plasma unavailable' }, 502);
+  }
+}
+
+export async function handleSwpcMag(): Promise<Response> {
+  const cached = getCached('swpc-mag');
+  if (cached) return json(cached);
+  try {
+    const data = await fetchJson(
+      'https://services.swpc.noaa.gov/products/solar-wind/mag-1-day.json',
+      'swpc-mag',
+    );
+    setCache('swpc-mag', data, 5 * 60 * 1000);
+    return json(data);
+  } catch (e) {
+    log('error', 'swpc-mag fetch failed', { error: String(e) });
+    return json({ error: 'SWPC mag unavailable' }, 502);
+  }
+}

@@ -11,6 +11,10 @@ interface Trade {
 
 const MAX_ROWS = 24;
 
+function isIndexSymbol(asset: string): boolean {
+  return asset.trim().startsWith('^');
+}
+
 function toBinancePair(asset: string): string {
   const a = asset.toUpperCase().replace('=F', '').replace('/', '');
   if (a.endsWith('USDT')) return a.toLowerCase();
@@ -36,7 +40,12 @@ export default function TradeTape() {
   let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
   let attempts = 0;
 
-  function connect(p: string) {
+  function connect(p: string | null) {
+    if (!p) {
+      ws?.close();
+      setConnected(false);
+      return;
+    }
     ws?.close();
     try {
       ws = new WebSocket(`wss://stream.binance.com:9443/ws/${p}@aggTrade`);
@@ -82,11 +91,20 @@ export default function TradeTape() {
   }
 
   function switchPair(asset: string) {
-    const p = toBinancePair(asset);
-    setPair(p);
+    if (isIndexSymbol(asset)) {
+      // indices have no Binance tape — clear and disconnect
+      setPair('');
+      setTrades([]);
+      attempts = 0;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      connect(null);
+      return;
+    }
+    setPair(toBinancePair(asset));
     setTrades([]);
+    attempts = 0;
     if (reconnectTimer) clearTimeout(reconnectTimer);
-    connect(p);
+    connect(toBinancePair(asset));
   }
 
   onMount(() => switchPair(activeAsset()));

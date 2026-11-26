@@ -18,6 +18,8 @@ import {
   handleGuestbookPost,
   handleHackerNews,
   handleKpIndex,
+  handleSwpcPlasma,
+  handleSwpcMag,
   handleLlmBenchmarks,
   handleMempool,
   handleMetrics,
@@ -105,6 +107,10 @@ export default {
         response = await handleFearGreed();
       } else if (routePath === '/api/kp-index') {
         response = await handleKpIndex();
+      } else if (routePath === '/api/swpc-plasma') {
+        response = await handleSwpcPlasma();
+      } else if (routePath === '/api/swpc-mag') {
+        response = await handleSwpcMag();
       } else if (routePath === '/api/proton-flux') {
         response = await handleProtonFlux();
       } else if (routePath === '/api/solar-cycle') {

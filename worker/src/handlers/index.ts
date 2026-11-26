@@ -4,6 +4,8 @@ export {
   handleEarthquakes,
   handleFearGreed,
   handleKpIndex,
+  handleSwpcPlasma,
+  handleSwpcMag,
   handleAurora,
   handleAuroraHistory,
   scheduledAuroraSnapshot,
