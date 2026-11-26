@@ -2,17 +2,19 @@
 # welcome on this personal site — visibility in search indexes, AI answers,
 # and training corpora is the intent.
 #
-# CONFIRMED LIVE (2026-11-25): the SERVED robots.txt is Cloudflare's managed
-# injection — a Content-Signals preamble (search=yes, ai-train=no, use=
-# reference) plus managed Disallow blocks (Amazonbot, Applebot-Extended,
-# Bytespider, Meta-ExternalAgent, and others). ai-train=no directly
-# contradicts this recorded policy. Fix: Cloudflare dashboard ->
-# AI Crawl Control (or Content Signals) -> disable for this zone. The file
-# below is what serves once that feature is off.
+# SERVED-FILE NOTE (2026-11-25): Cloudflare's "managed robots.txt" feature
+# is ON for this zone and currently REPLACES this file at the edge with its
+# own version: a Content-Signals preamble + ai-train=no + managed AI-bot
+# blocks, contradicting this policy. Per Cloudflare's current docs, the
+# managed feature (and the Content Signals text it injects) is toggled in
+# the dashboard: Security -> Settings, or the Overview section. Once off,
+# this file serves as written, including the site's own content signal
+# below (search=yes, ai-train=yes — matching the policy above).
 #
 # Sitemap and contact for AI answer engines: see /llms.txt.
 
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 Disallow: /api/
 

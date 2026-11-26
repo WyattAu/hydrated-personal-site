@@ -11,9 +11,9 @@ the measurement-gap note).
 | Technical SEO | crawlkit CI audit (weekly) + 2026-11-18 sweep (score 99, JSON-LD 0 issues on 14 pages) | ✅ Complete — nothing technical left to fix |
 | Transport trust | CT logs (`crtsh`): Google Trust Services + Let's Encrypt chains, no expired certs in the live set | ✅ Healthy |
 | Email authentication (SPF) | SPF chain analysis | ✅ Present |
-| **Email authentication (DKIM + DMARC)** | TXT probes on `_dmarc` + Proton selectors | ❌ **Absent — the domain sends via Proton but the custom-domain DKIM/DMARC DNS records were never published** |
+| **Email authentication** | dig against 1.1.1.1 (authoritative) | ✅ **MX ✓ (Cloudflare Email Routing), SPF ✓ (`include:_spf.mx.cloudflare.net ~all`), DMARC ✓ (`p=none`, aggregate reports to Cloudflare), Brevo domain-verification code ✓**. Open: DKIM selectors absent — only needed when sending from `@wyattau.com` via Brevo SMTP (complete Brevo's DKIM setup to enable) |
 | **Google ranking / indexing** | Requires Search Console | ❌ **Unmeasurable — GSC verification is the single blocking lever** |
-| **Served robots.txt policy** | Curl of live robots.txt vs repo policy record | ❌ **CONTRADICTION — Cloudflare injects a managed Content-Signals preamble + AI-bot Disallow blocks: ai-train=no directly contradicts the site's documented "training corpora welcome" policy. Fix: dashboard AI Crawl Control toggle (user lever, same trip as GSC)** |
+| **Served robots.txt policy** | Curl of live robots.txt vs repo policy record | ❌ **Managed robots.txt feature is ON: Cloudflare replaces the served file with a Content-Signals preamble + ai-train=no + AI-bot Disallow blocks, contradicting the site's documented "training corpora welcome" policy. Fix: dashboard Security -> Settings (or Overview) -> turn off the managed robots.txt / Content Signals feature. The repo robots.txt already carries the site's own signals: search=yes, ai-input=yes, ai-train=yes** |
 | **Security headers (HSTS, XCTO, Referrer/Permissions-Policy)** | `_headers` file written (v2), needs deploy + verify | 🟡 Shipping this round |
 
 ## The measurement gap (not a site gap)
