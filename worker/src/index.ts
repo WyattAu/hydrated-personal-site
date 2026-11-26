@@ -17,6 +17,7 @@ import {
   handleGuestbookGet,
   handleGuestbookPost,
   handleHackerNews,
+  handleArxivPapers,
   handleKpIndex,
   handleSwpcPlasma,
   handleSwpcMag,
@@ -148,6 +149,8 @@ export default {
         response = await handleWorldBank(new URL(request.url));
       } else if (routePath === '/api/etf-price') {
         response = await handleEtfPrice(request);
+      } else if (routePath === '/api/arxiv-papers') {
+        response = await handleArxivPapers();
       } else if (routePath === '/api/metrics') {
         response = handleMetrics();
       } else if (routePath === '/api/beacon') {

@@ -401,3 +401,47 @@ export async function handleSwpcMag(): Promise<Response> {
     return json({ error: 'SWPC mag unavailable' }, 502);
   }
 }
+
+export async function handleArxivPapers(): Promise<Response> {
+  const cached = getCached('arxiv-papers');
+  if (cached) return json(cached);
+  try {
+    const res = await fetch(
+      'http://export.arxiv.org/api/query?search_query=cat:cs.AI+OR+cat:cs.LG&sortBy=submittedDate&sortOrder=descending&max_results=12',
+      { signal: AbortSignal.timeout(8000) },
+    );
+    if (!res.ok) throw new Error(`Upstream error: ${res.status}`);
+    const xml = await res.text();
+    const entries: Array<{ id: string; title: string; summary: string; authors: string[]; published: string; link: string; category: string }> = [];
+    const entryRe = /<entry>([\s\S]*?)<\/entry>/g;
+    let m: RegExpExecArray | null;
+    while ((m = entryRe.exec(xml)) !== null && entries.length < 12) {
+      const block = m[1];
+      const pick = (tag: string): string => {
+        const t = block.match(new RegExp(`<${tag}>([^<]+)</${tag}>`));
+        return t ? t[1].replace(/\s+/g, ' ').trim() : '';
+      };
+      const idUrl = pick('id');
+      const authors: string[] = [];
+      const authorRe = /<author>\s*<name>([^<]+)<\/name>/g;
+      let am: RegExpExecArray | null;
+      while ((am = authorRe.exec(block)) !== null) authors.push(am[1].trim());
+      const cat = (block.match(/category term="([^"]+)"/) || [])[1] || 'cs.AI';
+      entries.push({
+        id: idUrl,
+        title: pick('title'),
+        summary: pick('summary').slice(0, 320),
+        authors,
+        published: pick('published'),
+        link: idUrl,
+        category: cat,
+      });
+    }
+    if (entries.length === 0) throw new Error('no entries parsed');
+    setCache('arxiv-papers', entries, 30 * 60 * 1000);
+    return json(entries);
+  } catch (e) {
+    log('error', 'arxiv-papers fetch failed', { error: String(e) });
+    return json({ error: 'arXiv feed unavailable' }, 502);
+  }
+}

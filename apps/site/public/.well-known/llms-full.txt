@@ -42,6 +42,9 @@
 - Forgejo: [forgejo.wyattau.com/wyatt](https://forgejo.wyattau.com/wyatt)
 - X: [@_WyattAu_](https://x.com/_WyattAu_)
 
+# Interactive
+- [Concentration Explorer](https://wyattau.com/explorer): live sector-concentration explorer over the 89-fund dataset — HHI, effective sectors, side-by-side fund comparison, computed client-side.
+
 # Full page contents (markdown)
 
 

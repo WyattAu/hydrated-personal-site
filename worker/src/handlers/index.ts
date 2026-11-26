@@ -3,6 +3,7 @@ export { handleCryptoTicker, handleCoinGeckoGlobal, handleBinanceKlines } from '
 export {
   handleEarthquakes,
   handleFearGreed,
+  handleArxivPapers,
   handleKpIndex,
   handleSwpcPlasma,
   handleSwpcMag,

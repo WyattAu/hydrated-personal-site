@@ -1,0 +1,47 @@
+---
+import Footer from '../components/astro/Footer.astro';
+import AppErrorBoundary from '../components/solid/ErrorBoundary';
+import ConcentrationExplorer from '../components/solid/etf/ConcentrationExplorer';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Concentration Explorer — live sector HHI across 89 ETFs — Wyatt Au"
+  ogImage="/og/concentration-explorer.png"
+  description="Pick any of the 89 funds in the open dataset and see sector concentration live: HHI, effective number of sectors, and side-by-side comparison. Recomputed on every change."
+>
+  <main id="main-content" class="pt-32">
+    <section class="py-16 px-6 md:px-12 lg:px-24">
+      <p class="label mb-6">INTERACTIVE · LIVE DATA</p>
+      <h1 class="text-4xl md:text-6xl font-bold mb-4" style="font-family: var(--font-display, 'Fraunces', Georgia, serif); letter-spacing: -0.02em; line-height: 1.05;">
+        Concentration Explorer
+      </h1>
+      <p class="text-lg mb-8" style="color: var(--text-secondary); max-width: 720px;">
+        Pick any of the 89 funds in the open dataset and see sector
+        concentration live: HHI, the effective number of sectors, and
+        side-by-side comparison against a second fund. Recomputed on
+        every change, in your browser, from the keyless download.
+      </p>
+    </section>
+
+    <section class="py-8 px-6 md:px-12 lg:px-24 pb-24">
+      <AppErrorBoundary client:load>
+        <ConcentrationExplorer client:load />
+      </AppErrorBoundary>
+
+      <div class="mt-12 border p-6" style="border-color: var(--border);">
+        <p class="section-label">Where the numbers come from</p>
+        <p class="text-sm" style="color: var(--text-secondary); max-width: 720px;">
+          Source: the keyless <a href="/data" class="hover:underline" style="color: var(--accent);">ETF database</a>
+          (89 funds, schema_version 1). Sector weights are the fund's latest
+          reported allocations. HHI is the Herfindahl-Hirschman Index of the
+          sector weights: the sum of squared shares. An HHI near 1.0 means one
+          sector dominates; the effective number of sectors is 1/HHI. The
+          companion study is the
+          <a href="/insights/etf-allocation-study" class="hover:underline" style="color: var(--accent);">concentration analysis across all 89 funds</a>.
+        </p>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>
