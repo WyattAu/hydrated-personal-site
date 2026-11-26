@@ -96,6 +96,30 @@ const datasetSchema = {
       </div>
 
       <div class="border p-6">
+        <p class="label mb-3" style="color: var(--accent);">MACHINE INTERFACE</p>
+        <h3 class="text-lg font-bold mb-2">OpenAPI contract</h3>
+        <p class="text-sm mb-4" style="color: var(--text-secondary);">
+          The full worker API is specified as an OpenAPI 3.1 document:
+          24 routes, request/response shapes, versioning policy. Agents
+          and integrations consume the contract, not the docs.
+        </p>
+        <a href="/api/openapi.json" class="font-mono text-xs hover:underline" style="color: var(--accent);">GET /api/openapi.json ↗</a>
+      </div>
+
+      <div class="border p-6">
+        <p class="label mb-3" style="color: var(--accent);">DATA DICTIONARY</p>
+        <h3 class="text-lg font-bold mb-2">Field semantics</h3>
+        <dl class="text-sm space-y-2" style="color: var(--text-secondary);">
+          <div><dt class="inline font-mono" style="color: var(--text-primary);">ticker</dt> — exchange symbol (e.g. VOO)</div>
+          <div><dt class="inline font-mono" style="color: var(--text-primary);">category</dt> — fund family (US Equity, Sector, Commodity, Bond)</div>
+          <div><dt class="inline font-mono" style="color: var(--text-primary);">sector_allocation</dt> — percent weights per GICS sector, as of the fund's latest filing</div>
+          <div><dt class="inline font-mono" style="color: var(--text-primary);">region_allocation</dt> — percent weights per geography</div>
+          <div><dt class="inline font-mono" style="color: var(--text-primary);">top_holdings</dt> — ten largest positions with percent weights</div>
+          <div><dt class="inline font-mono" style="color: var(--text-primary);">schema_version</dt> — integer, bumped on any shape change (current: 1)</div>
+        </dl>
+      </div>
+
+      <div class="border p-6">
         <p class="label mb-3" style="color: var(--accent);">QUARTERLY SNAPSHOTS</p>
         <h3 class="text-lg font-bold mb-2">Longitudinal dataset history</h3>
         <p class="text-sm mb-4" style="color: var(--text-secondary);">

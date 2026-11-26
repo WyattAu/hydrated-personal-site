@@ -1,0 +1,662 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "hydrated-worker API",
+  "version": "v1",
+  "description": "Public data-plane API for wyattau.com: OSINT feeds, market data, space-weather telemetry, and site services. Proxied same-origin at https://wyattau.com/api/*. Contract document: changes must bump /api/versions.",
+  "contact": {
+   "name": "Wyatt Au",
+   "url": "https://wyattau.com"
+  },
+  "license": {
+   "name": "SEE LICENSE IN repository"
+  }
+ },
+ "servers": [
+  {
+   "url": "https://wyattau.com/api"
+  }
+ ],
+ "paths": {
+  "/health": {
+   "get": {
+    "summary": "Liveness + environment",
+    "operationId": "health",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/metrics": {
+   "get": {
+    "summary": "Request/error counters, per-endpoint latency p95, feed last-success timestamps, alerts, circuit states",
+    "operationId": "metrics",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/kp-index": {
+   "get": {
+    "summary": "NOAA planetary K-index time series",
+    "operationId": "kp_index",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/swpc-plasma": {
+   "get": {
+    "summary": "NOAA solar-wind plasma density/temperature (proxied, 5-min edge cache)",
+    "operationId": "swpc_plasma",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/swpc-mag": {
+   "get": {
+    "summary": "NOAA interplanetary magnetic field (proxied, 5-min cache)",
+    "operationId": "swpc_mag",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/proton-flux": {
+   "get": {
+    "summary": "GOES proton flux",
+    "operationId": "proton_flux",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/solar-cycle": {
+   "get": {
+    "summary": "Solar cycle progression",
+    "operationId": "solar_cycle",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/swpc-alerts": {
+   "get": {
+    "summary": "NOAA space-weather alert feed",
+    "operationId": "swpc_alerts",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/earthquakes": {
+   "get": {
+    "summary": "USGS earthquake feed",
+    "operationId": "earthquakes",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/crypto-ticker": {
+   "get": {
+    "summary": "Crypto price ticker (Binance WS-backed)",
+    "operationId": "crypto_ticker",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/crypto-ticker/stream": {
+   "get": {
+    "summary": "SSE stream of ticker updates",
+    "operationId": "crypto_ticker/stream",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/coingecko-global": {
+   "get": {
+    "summary": "CoinGecko global market data",
+    "operationId": "coingecko_global",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/world-bank": {
+   "get": {
+    "summary": "World Bank development indicators",
+    "operationId": "world_bank",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/restcountries": {
+   "get": {
+    "summary": "Country reference data",
+    "operationId": "restcountries",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/github-trending": {
+   "get": {
+    "summary": "GitHub trending repositories",
+    "operationId": "github_trending",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/hacker-news": {
+   "get": {
+    "summary": "Hacker News front page",
+    "operationId": "hacker_news",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/llm-benchmarks": {
+   "get": {
+    "summary": "LLM benchmark dataset",
+    "operationId": "llm_benchmarks",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/etf-price": {
+   "get": {
+    "summary": "ETF price quote",
+    "operationId": "etf_price",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/weather": {
+   "get": {
+    "summary": "Weather summary",
+    "operationId": "weather",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/arxiv-papers": {
+   "get": {
+    "summary": "arXiv cs.LG/cs.AI paper feed (planned)",
+    "operationId": "arxiv_papers",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/versions": {
+   "get": {
+    "summary": "Supported API versions + deprecation schedule",
+    "operationId": "versions",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  },
+  "/guestbook": {
+   "get": {
+    "summary": "List guestbook entries",
+    "responses": {
+     "200": {
+      "description": "Entries"
+     }
+    }
+   },
+   "post": {
+    "summary": "Sign the guestbook",
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "required": [
+         "name",
+         "message"
+        ],
+        "properties": {
+         "name": {
+          "type": "string",
+          "maxLength": 50
+         },
+         "message": {
+          "type": "string",
+          "maxLength": 500
+         },
+         "website": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     },
+     "responses": {
+      "200": {
+       "description": "Signed"
+      },
+      "400": {
+       "description": "Invalid input"
+      },
+      "429": {
+       "description": "Rate limited"
+      }
+     }
+    }
+   },
+   "delete": {
+    "summary": "Delete own entry (authenticated)",
+    "responses": {
+     "200": {
+      "description": "Deleted"
+     }
+    }
+   }
+  },
+  "/beacon": {
+   "get": {
+    "summary": "Client error beacon (POST; logged as structured telemetry)",
+    "operationId": "beacon",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   },
+   "post": {
+    "summary": "Client error beacon",
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "properties": {
+         "kind": {
+          "type": "string"
+         },
+         "message": {
+          "type": "string"
+         },
+         "path": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     }
+    },
+    "responses": {
+     "204": {
+      "description": "Logged"
+     }
+    }
+   }
+  },
+  "/csp-report": {
+   "get": {
+    "summary": "CSP violation reports",
+    "operationId": "csp_report",
+    "responses": {
+     "200": {
+      "description": "JSON payload",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object"
+        }
+       }
+      }
+     },
+     "502": {
+      "description": "Upstream unavailable (circuit breaker open; stale cache served when available)"
+     },
+     "429": {
+      "description": "Rate limited"
+     }
+    }
+   }
+  }
+ }
+}
