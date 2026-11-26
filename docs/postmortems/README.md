@@ -11,6 +11,7 @@ say why.
 |---|---|---|
 | 2026-11-20 | [2026-11-20-build-race.md](2026-11-20-build-race.md) | flock single-flight; dist integrity gate |
 | 2026-11-20 | [2026-11-20-css-pipeline.md](2026-11-20-css-pipeline.md) | themes.css import in BaseLayout; stylesheet integrity gate |
+| 2026-11-25 | [2026-11-25-tailwind-plugin.md](2026-11-25-tailwind-plugin.md) | utility-gate in the gated build; diagnostic-restore rule |
 
 ## Template
 
