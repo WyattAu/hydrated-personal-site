@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import StarFieldCanvas from '../components/solid/fx/StarFieldCanvas';
 import Footer from '../components/astro/Footer.astro';
 ---
 
@@ -9,7 +10,9 @@ import Footer from '../components/astro/Footer.astro';
   description="Every performance claim on this site is enforced by CI budgets: LCP under 1.8s, page weight under 1.2MB, WASM under 650KB. Measured, not asserted."
 >
   <main id="main-content" class="pt-32">
-    <section class="py-16 px-6 md:px-12 lg:px-24">
+    <section class="relative py-16 px-6 md:px-12 lg:px-24 overflow-hidden">
+      <StarFieldCanvas client:load class="absolute inset-0 w-full h-full opacity-70 pointer-events-none" aria-hidden="true" />
+      <div class="relative">
       <p class="label mb-6">PROOF PAGE</p>
       <h1 class="text-4xl md:text-6xl font-bold mb-4" style="font-family: var(--font-display, 'Fraunces', Georgia, serif); letter-spacing: -0.02em; line-height: 1.05;">
         Fast is a budget,<br />not a feeling.
