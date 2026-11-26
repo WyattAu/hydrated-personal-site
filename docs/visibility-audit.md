@@ -64,6 +64,15 @@ above are paste-ready.
 | 2 | **Proton DKIM/DMARC records** | Email trust (anti-spoofing + deliverability); closes the one audit gap | ~15 min |
 | 3 | Forgejo runner + deploy secrets | Push-to-deploy; CI visibility on the Forgejo side | ~30 min |
 
+## LL2 note (corrected 2026-11-25)
+
+The launches panel needs NO API key: `ll.thespacedevs.com/2.2.0/launch/upcoming/`
+serves anonymous requests (rate-limited by IP, verified live 2026-11-25).
+The earlier "LL2_API_KEY pending" lever is withdrawn. The panel was only
+broken by the CSP connect-src gap, fixed 2026-11-25. A key becomes
+relevant only if the widget moves to the authenticated thespacedevs.com
+API for deeper data (bonus content, not required).
+
 ### Ongoing (agent-maintained, already automated)
 
 - crawlkit weekly SEO audit (CI) — technical drift is monitored.
