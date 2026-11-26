@@ -1,0 +1,4 @@
+{
+ "date": "2026-11-26",
+ "alerts": "\n- robots.txt: Cloudflare managed injection active (ai-train=no) \u2014 AI Crawl Control toggle still OFF\n- robots.txt: managed AI-bot Disallow blocks present"
+}
