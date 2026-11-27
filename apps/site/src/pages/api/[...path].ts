@@ -233,7 +233,7 @@ export const GET: APIRoute = async (ctx) => {
   }
   // Space/weather endpoints implemented in the standalone worker —
   // same-origin proxy so agent clients need only wyattau.com.
-  const WORKER_ROUTES = ['swpc-alerts', 'solar-cycle', 'proton-flux', 'aurora', 'aurora-history', 'metrics', 'beacon', 'swpc-plasma', 'swpc-mag'];
+  const WORKER_ROUTES = ['swpc-alerts', 'solar-cycle', 'proton-flux', 'aurora', 'aurora-history', 'metrics', 'beacon', 'swpc-plasma', 'swpc-mag', 'arxiv-papers'];
   if (WORKER_ROUTES.includes(path)) {
     const upstream = `https://hydrated-worker.wyatt-au.workers.dev/api/${path}${url.search}`;
     const isPost = ctx.request.method === 'POST';

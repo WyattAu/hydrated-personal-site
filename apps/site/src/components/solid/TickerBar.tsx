@@ -96,19 +96,13 @@ export default function TickerBar() {
         )}
       </For>
 
-      <Show when={error()}>
-        <span style={{ color: 'var(--text-secondary)', 'font-style': 'italic' }}>
-          Unable to fetch prices
+      <Show when={error()} fallback={
+        <span style={{ color: 'var(--text-secondary)', 'font-size': '9px', 'white-space': 'nowrap', 'flex-shrink': 0 }}>
+          updated {lastUpdated()?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
         </span>
-      </Show>
-
-      <Show when={lastUpdated()}>
-        <span style={{ color: 'var(--text-secondary)', 'font-size': '9px', 'margin-left': 'auto' }}>
-          {lastUpdated()?.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          })}
+      }>
+        <span style={{ color: 'var(--text-secondary)', 'font-style': 'italic', 'white-space': 'nowrap', 'font-size': '9px' }}>
+          market feed unavailable
         </span>
       </Show>
     </output>

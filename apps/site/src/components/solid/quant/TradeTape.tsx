@@ -146,7 +146,7 @@ export default function TradeTape() {
         </span>
       </div>
       <div class="max-h-[340px] overflow-y-auto border" style={{ 'border-color': 'var(--border)' }}>
-        <table class="w-full font-mono text-[10px]">
+        <div class="overflow-x-auto"><table class="w-full font-mono text-[10px]">
           <thead>
             <tr style={{ color: 'var(--text-secondary)' }} class="sticky top-0">
               <th class="text-left p-1.5" style={{ background: 'var(--bg-card)' }}>
@@ -183,7 +183,7 @@ export default function TradeTape() {
             </For>
           </tbody>
         </table>
-        <Show when={trades().length === 0}>
+</div>        <Show when={trades().length === 0}>
           <p class="font-mono text-xs p-4 text-center" style={{ color: 'var(--text-secondary)' }}>
             Waiting for trades...
           </p>
