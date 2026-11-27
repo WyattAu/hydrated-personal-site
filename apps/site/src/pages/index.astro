@@ -6,6 +6,7 @@ import ContactForm from '../components/solid/ContactForm';
 import AppErrorBoundary from '../components/solid/ErrorBoundary';
 import ThemeToggle from '../components/solid/ThemeToggle';
 import TickerBar from '../components/solid/TickerBar';
+import LiveStats from '../components/solid/LiveStats';
 import ToasterWrapper from '../components/solid/ToasterWrapper';
 import DecryptedText from '../components/solid/fx/DecryptedText';
 import SpotlightCard from '../components/solid/fx/SpotlightCard';
@@ -130,23 +131,8 @@ const employment = [
     <!-- Ticker Bar (self-contained; renders nothing until data arrives) -->
     <TickerBar client:load />
 
-    <!-- Vital numbers, quiet row, Fraunces numerals -->
-    <section class="py-14 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">
-      <div class="flex flex-wrap gap-x-16 gap-y-6 items-baseline">
-        <div>
-          <p class="text-4xl font-semibold" style="font-family: var(--font-display, 'Fraunces', Georgia, serif); color: var(--accent);">16</p>
-          <p class="text-sm mt-1" style="color: var(--text-secondary);">WASM widgets</p>
-        </div>
-        <div>
-          <p class="text-4xl font-semibold" style="font-family: var(--font-display, 'Fraunces', Georgia, serif); color: var(--accent);">89</p>
-          <p class="text-sm mt-1" style="color: var(--text-secondary);">ETFs in the open database</p>
-        </div>
-        <div>
-          <p class="text-4xl font-semibold" style="font-family: var(--font-display, 'Fraunces', Georgia, serif); color: var(--accent);">8</p>
-          <p class="text-sm mt-1" style="color: var(--text-secondary);">live data feeds</p>
-        </div>
-      </div>
-    </section>
+    <!-- Vital numbers — live from real endpoints, never hardcoded -->
+    <LiveStats client:load />
 
     <!-- About: content column + portrait rail -->
     <section class="py-24 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">

@@ -27,8 +27,14 @@ function effectiveN(sectors: FundSector[]): number {
 }
 
 const SECTOR_COLORS = [
-  '#c9a86c', '#5b8def', '#4caf50', '#ef5350',
-  '#ab47bc', '#26c6da', '#ffa726', '#8d6e63',
+  '#c9a86c',
+  '#5b8def',
+  '#4caf50',
+  '#ef5350',
+  '#ab47bc',
+  '#26c6da',
+  '#ffa726',
+  '#8d6e63',
 ];
 
 export default function ConcentrationExplorer() {
@@ -165,11 +171,20 @@ export default function ConcentrationExplorer() {
           {/* concentration strip: one segment per sector of fund A */}
           <Show when={sectA().length > 0}>
             <div>
-              <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color: var(--text-secondary);">
+              <p
+                class="text-xs font-semibold uppercase tracking-wide mb-2"
+                style="color: var(--text-secondary);"
+              >
                 Sector strip, {fundA()!.ticker}
               </p>
-              <div class="flex w-full h-10 overflow-hidden" style="border-radius: 3px;" role="img"
-                aria-label={`Sector strip for ${fundA()!.ticker}: ${sectA().map(s => `${s.sector} ${s.weight.toFixed(1)} percent`).join(', ')}`}>
+              <div
+                class="flex w-full h-10 overflow-hidden"
+                style="border-radius: 3px;"
+                role="img"
+                aria-label={`Sector strip for ${fundA()!.ticker}: ${sectA()
+                  .map((s) => `${s.sector} ${s.weight.toFixed(1)} percent`)
+                  .join(', ')}`}
+              >
                 <For each={sectA()}>
                   {(s, i) => (
                     <div
@@ -188,7 +203,10 @@ export default function ConcentrationExplorer() {
                 <For each={sectA().slice(0, 6)}>
                   {(s, i) => (
                     <span class="flex items-center gap-1 mr-3">
-                      <span class="inline-block w-2 h-2" style={`background: ${SECTOR_COLORS[i() % SECTOR_COLORS.length]};`} />
+                      <span
+                        class="inline-block w-2 h-2"
+                        style={`background: ${SECTOR_COLORS[i() % SECTOR_COLORS.length]};`}
+                      />
                       {s.sector} {s.weight.toFixed(0)}%
                     </span>
                   )}
