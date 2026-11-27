@@ -12,7 +12,6 @@ interface TickerItem {
 export default function TickerBar() {
   const [tickers, setTickers] = createSignal<TickerItem[]>([]);
   const [error, setError] = createSignal(false);
-  const [lastUpdated, setLastUpdated] = createSignal<Date | null>(null);
   let intervalId: ReturnType<typeof setInterval> | undefined;
   let abortController: AbortController | undefined;
 
@@ -30,7 +29,6 @@ export default function TickerBar() {
 
       const data = (await res.json()) as { data: TickerItem[] };
       setTickers(data.data ?? []);
-      setLastUpdated(new Date());
       setError(false);
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -96,12 +94,15 @@ export default function TickerBar() {
         )}
       </For>
 
-      <Show when={error()} fallback={
-        <span style={{ color: 'var(--text-secondary)', 'font-size': '9px', 'white-space': 'nowrap', 'flex-shrink': 0 }}>
-          live
-        </span>
-      }>
-        <span style={{ color: 'var(--text-secondary)', 'font-style': 'italic', 'white-space': 'nowrap', 'font-size': '9px' }}>
+      <Show when={error()}>
+        <span
+          style={{
+            color: 'var(--text-secondary)',
+            'font-style': 'italic',
+            'white-space': 'nowrap',
+            'font-size': '9px',
+          }}
+        >
           market feed unavailable
         </span>
       </Show>
