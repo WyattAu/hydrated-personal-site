@@ -59,8 +59,14 @@ export default function ConcentrationExplorer() {
   const fundA = createMemo(() => funds().find((f) => f.ticker === selA()));
   const fundB = createMemo(() => funds().find((f) => f.ticker === selB()));
 
-  const sectA = createMemo(() => (fundA() ? sectorsOf(fundA()) : []));
-  const sectB = createMemo(() => (fundB() ? sectorsOf(fundB()) : []));
+  const sectA = createMemo(() => {
+    const fa = fundA();
+    return fa ? sectorsOf(fa) : [];
+  });
+  const sectB = createMemo(() => {
+    const fb = fundB();
+    return fb ? sectorsOf(fb) : [];
+  });
 
   const allSectors = createMemo(() => {
     const set = new Set<string>();

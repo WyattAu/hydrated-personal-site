@@ -2,6 +2,7 @@
 import Footer from '../components/astro/Footer.astro';
 import AppErrorBoundary from '../components/solid/ErrorBoundary';
 import ConcentrationExplorer from '../components/solid/etf/ConcentrationExplorer';
+import BacktestExplorer from '../components/solid/quant/BacktestExplorer';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
@@ -56,6 +57,26 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           sector dominates; the effective number of sectors is 1/HHI. The
           companion study is the
           <a href="/insights/etf-allocation-study" class="hover:underline" style="color: var(--accent);">concentration analysis across all 89 funds</a>.
+        </p>
+      </div>
+    </section>
+
+    <section class="py-8 px-6 md:px-12 lg:px-24 pb-24">
+      <AppErrorBoundary client:load>
+        <BacktestExplorer client:load />
+      </AppErrorBoundary>
+
+      <div class="mt-12 border p-6" style="border-color: var(--border);">
+        <p class="section-label">Where the backtest numbers come from</p>
+        <p class="text-sm" style="color: var(--text-secondary); max-width: 720px;">
+          Two years of real daily closes, fetched through the site's
+          stock-chart proxy. Drag the window handles and the Rust backtest
+          engine (compiled to WASM, running in your browser) recomputes the
+          equity curve, CAGR, Sharpe, and max drawdown for exactly the days
+          you selected: equal weight, inverse volatility, or minimum
+          variance, rebalanced every 20 trading days with a 2bp cost model.
+          Nothing is pre-computed; the CSV export matches the chart exactly.
+          Past performance of any basket says nothing about its future.
         </p>
       </div>
     </section>

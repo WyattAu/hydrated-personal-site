@@ -4,6 +4,7 @@ import {
   EarthquakeFeatureSchema,
   FearGreedDataSchema,
   HackerNewsStorySchema,
+  Kp1mSchema,
   KpIndexSchema,
   LLMBenchmarkModelSchema,
   MempoolDataSchema,
@@ -233,7 +234,18 @@ export const GET: APIRoute = async (ctx) => {
   }
   // Space/weather endpoints implemented in the standalone worker —
   // same-origin proxy so agent clients need only wyattau.com.
-  const WORKER_ROUTES = ['swpc-alerts', 'solar-cycle', 'proton-flux', 'aurora', 'aurora-history', 'metrics', 'beacon', 'swpc-plasma', 'swpc-mag', 'arxiv-papers'];
+  const WORKER_ROUTES = [
+    'swpc-alerts',
+    'solar-cycle',
+    'proton-flux',
+    'aurora',
+    'aurora-history',
+    'metrics',
+    'beacon',
+    'swpc-plasma',
+    'swpc-mag',
+    'arxiv-papers',
+  ];
   if (WORKER_ROUTES.includes(path)) {
     const upstream = `https://hydrated-worker.wyatt-au.workers.dev/api/${path}${url.search}`;
     const isPost = ctx.request.method === 'POST';
@@ -266,6 +278,29 @@ export const GET: APIRoute = async (ctx) => {
       return J(validated);
     }
     return J(getCached('kp') || { error: 'unavailable' });
+  }
+  if (path === 'kp-1m') {
+    // 1-minute planetary Kp (NOAA's only remaining high-cadence geomagnetic
+    // feed after the solar-wind plasma/mag family retirement). Payload is
+    // bounded server-side: current reading + last 24h at 5-min resolution.
+    const c = getCached('kp1m');
+    if (c) return J(c);
+    const d = await safeFetch(
+      'https://services.swpc.noaa.gov/json/planetary_k_index_1m.json',
+      'kp1m',
+    );
+    if (d) {
+      const validated = validateOrPass(v.array(Kp1mSchema), d, 'kp-1m');
+      const rows = Array.isArray(validated) ? validated : [];
+      const series = rows
+        .filter((_r, i) => i % 5 === 0)
+        .slice(-288)
+        .map((r) => ({ t: r.time_tag, kp: r.estimated_kp, idx: r.kp_index }));
+      const out = { current: rows[rows.length - 1] ?? null, series };
+      setCache('kp1m', out, 120000);
+      return J(out);
+    }
+    return J(getCached('kp1m') || { error: 'unavailable' });
   }
   if (path === 'space-launches') {
     const c = getCached('sl');

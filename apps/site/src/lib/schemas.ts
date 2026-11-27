@@ -121,3 +121,12 @@ export const EtfPerformanceSchema = v.object({
   sharpe_ratio: v.number(),
   max_drawdown: v.number(),
 });
+
+export const Kp1mRowSchema = v.object({
+  time_tag: v.string(),
+  kp_index: v.number(),
+  estimated_kp: v.number(),
+  kp: v.string(),
+});
+
+export const Kp1mSchema = v.array(Kp1mRowSchema);
