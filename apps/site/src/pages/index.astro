@@ -127,10 +127,8 @@ const employment = [
     </section>
 
 
-    <!-- Ticker Bar -->
-    <section class="px-6 md:px-12 lg:px-24" style="border-top: 1px solid var(--border);">
-      <TickerBar client:load />
-    </section>
+    <!-- Ticker Bar (self-contained; renders nothing until data arrives) -->
+    <TickerBar client:load />
 
     <!-- Vital numbers, quiet row, Fraunces numerals -->
     <section class="py-14 px-6 md:px-12 lg:px-24 border-t" style="border-color: var(--border);">

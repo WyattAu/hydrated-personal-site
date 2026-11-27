@@ -51,61 +51,65 @@ export default function TickerBar() {
   });
 
   return (
-    <output
-      style={{
-        display: 'flex',
-        'align-items': 'center',
-        gap: '24px',
-        padding: '8px 16px',
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border)',
-        'font-family': "'JetBrains Mono', monospace",
-        'font-size': '11px',
-        overflow: 'hidden',
-      }}
-      aria-label="Cryptocurrency price ticker"
-    >
-      <For each={tickers()}>
-        {(ticker) => (
-          <div
-            style={{
-              display: 'flex',
-              'align-items': 'center',
-              gap: '8px',
-              'white-space': 'nowrap',
-            }}
-          >
-            <span style={{ color: 'var(--text-secondary)', 'font-weight': '700' }}>
-              {ticker.symbol}
-            </span>
-            <span style={{ color: 'var(--text-primary)', 'font-weight': '500' }}>
-              ${formatPrice(ticker.price)}
-            </span>
-            <span
+    <Show when={tickers().length > 0 || error()}>
+      <output
+        style={{
+          display: 'flex',
+          'align-items': 'center',
+          gap: '24px',
+          padding: '8px 16px',
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)',
+          'font-family': "'JetBrains Mono', monospace",
+          'font-size': '11px',
+          overflow: 'hidden',
+        }}
+        aria-label="Cryptocurrency price ticker"
+      >
+        <For each={tickers()}>
+          {(ticker) => (
+            <div
               style={{
-                color: isPositive(ticker.changePercent24h) ? 'var(--positive)' : 'var(--negative)',
-                'font-weight': '500',
+                display: 'flex',
+                'align-items': 'center',
+                gap: '8px',
+                'white-space': 'nowrap',
               }}
             >
-              {isPositive(ticker.changePercent24h) ? '+' : ''}
-              {ticker.changePercent24h}%
-            </span>
-          </div>
-        )}
-      </For>
+              <span style={{ color: 'var(--text-secondary)', 'font-weight': '700' }}>
+                {ticker.symbol}
+              </span>
+              <span style={{ color: 'var(--text-primary)', 'font-weight': '500' }}>
+                ${formatPrice(ticker.price)}
+              </span>
+              <span
+                style={{
+                  color: isPositive(ticker.changePercent24h)
+                    ? 'var(--positive)'
+                    : 'var(--negative)',
+                  'font-weight': '500',
+                }}
+              >
+                {isPositive(ticker.changePercent24h) ? '+' : ''}
+                {ticker.changePercent24h}%
+              </span>
+            </div>
+          )}
+        </For>
 
-      <Show when={error()}>
-        <span
-          style={{
-            color: 'var(--text-secondary)',
-            'font-style': 'italic',
-            'white-space': 'nowrap',
-            'font-size': '9px',
-          }}
-        >
-          market feed unavailable
-        </span>
-      </Show>
-    </output>
+        <Show when={error()}>
+          <span
+            style={{
+              color: 'var(--text-secondary)',
+              'font-style': 'italic',
+              'white-space': 'nowrap',
+              'font-size': '9px',
+            }}
+          >
+            market feed unavailable
+          </span>
+        </Show>
+      </output>
+    </Show>
   );
 }
