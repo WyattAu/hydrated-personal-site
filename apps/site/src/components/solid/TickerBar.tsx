@@ -98,7 +98,7 @@ export default function TickerBar() {
 
       <Show when={error()} fallback={
         <span style={{ color: 'var(--text-secondary)', 'font-size': '9px', 'white-space': 'nowrap', 'flex-shrink': 0 }}>
-          updated {lastUpdated()?.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+          live
         </span>
       }>
         <span style={{ color: 'var(--text-secondary)', 'font-style': 'italic', 'white-space': 'nowrap', 'font-size': '9px' }}>
